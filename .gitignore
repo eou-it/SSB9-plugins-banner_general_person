@@ -15,7 +15,7 @@ SendFailures.txt
 .idea
 .idea/**/*
 out/
-grails-banner-core*.zip
+*.zip
 *.sha1
 test/**/cobertura.ser
 test/**/release_info.groovy
