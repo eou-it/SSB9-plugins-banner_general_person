@@ -1,5 +1,5 @@
 /** *****************************************************************************
- © 2010 SunGard Higher Education.  All Rights Reserved.
+ © 2011 SunGard Higher Education.  All Rights Reserved.
 
  CONFIDENTIAL BUSINESS INFORMATION
 
@@ -10,14 +10,13 @@
  ****************************************************************************** */
 package com.sungardhe.banner.general.person
 
-
-import com.sungardhe.banner.general.system.* 
+import com.sungardhe.banner.general.system.Disability
+import com.sungardhe.banner.general.system.DisabilityAssistance
+import com.sungardhe.banner.general.system.MedicalCondition
+import com.sungardhe.banner.general.system.MedicalEquipment
 import com.sungardhe.banner.service.DatabaseModifiesState
-
-import javax.persistence.*
-
-import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.Type
+import javax.persistence.*
 
 /**
  * Represents student medical information.  May be more than one per student.

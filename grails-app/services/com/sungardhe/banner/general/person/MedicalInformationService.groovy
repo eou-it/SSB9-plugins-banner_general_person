@@ -1,5 +1,5 @@
 /** *****************************************************************************
- © 2010 SunGard Higher Education.  All Rights Reserved.
+ © 2011 SunGard Higher Education.  All Rights Reserved.
 
  CONFIDENTIAL BUSINESS INFORMATION
 
@@ -10,12 +10,7 @@
  ****************************************************************************** */
 package com.sungardhe.banner.general.person
 
-import java.sql.CallableStatement
-import java.sql.Date
 import groovy.sql.Sql
-import com.sungardhe.banner.general.system.MedicalCondition
-import com.sungardhe.banner.exceptions.ApplicationException
-import com.sungardhe.banner.service.DomainManagementMethodsInjector
 import com.sungardhe.banner.service.ServiceBase
 
 // NOTE:
@@ -28,29 +23,28 @@ import com.sungardhe.banner.service.ServiceBase
 /**
  * A transactional service supporting persistence of the Medical Information model.
  * */
-class MedicalInformationService {
+class MedicalInformationService extends ServiceBase{
 
-    static defaultCrudMethods = true  // inject ServiceBase methods (versus extending from ServiceBase)
     boolean transactional = true      // and make transactional (needed only when injecting versus extending)
 
     def institutionalDescriptionService // injected by Spring
     def sessionFactory                  // injected by Spring
 
 
-    void preCreate( map ) {
-        Sql sql = new Sql( sessionFactory.getCurrentSession().connection() )
-        sql.execute( """call gb_common.p_set_context( 'GB_MEDICAL', 'CHECK_HR_SECURITY', 'Y' )""" )
+    void preCreate(map) {
+        Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
+        sql.execute("""call gb_common.p_set_context( 'GB_MEDICAL', 'CHECK_HR_SECURITY', 'Y' )""")
     }
 
 
-    void preUpdate( map ) {
-        Sql sql = new Sql( sessionFactory.getCurrentSession().connection() )
-        sql.execute( """call gb_common.p_set_context( 'GB_MEDICAL', 'CHECK_HR_SECURITY', 'Y' )""" )
+    void preUpdate(map) {
+        Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
+        sql.execute("""call gb_common.p_set_context( 'GB_MEDICAL', 'CHECK_HR_SECURITY', 'Y' )""")
     }
 
 
-    void preDelete( map ) {
-        Sql sql = new Sql( sessionFactory.getCurrentSession().connection() )
-        sql.execute( """call gb_common.p_set_context( 'GB_MEDICAL', 'CHECK_HR_SECURITY', 'Y' )""" )
+    void preDelete(map) {
+        Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
+        sql.execute("""call gb_common.p_set_context( 'GB_MEDICAL', 'CHECK_HR_SECURITY', 'Y' )""")
     }
 }

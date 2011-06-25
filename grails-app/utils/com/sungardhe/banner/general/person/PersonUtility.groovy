@@ -1,5 +1,5 @@
 /** *****************************************************************************
- © 2010 SunGard Higher Education.  All Rights Reserved.
+ © 2011 SunGard Higher Education.  All Rights Reserved.
 
  CONFIDENTIAL BUSINESS INFORMATION
 
@@ -10,7 +10,9 @@
  ****************************************************************************** */
 package com.sungardhe.banner.general.person
 
-import com.sungardhe.banner.exceptions.ApplicationException
+import org.codehaus.groovy.grails.web.context.ServletContextHolder as SCH
+import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes as GA
+import groovy.sql.Sql
 
 /**
  * This is a helper class that is used to help common validation and other processing for
@@ -38,4 +40,19 @@ class PersonUtility {
         return PersonIdentificationName.fetchBannerPerson(pidm)
 
     }
+
+
+    public static Boolean isPersonDeceased(Integer pidm) {
+
+        def bioSql =
+        """select nvl (spbpers_dead_ind,  'N') dead
+        from spbpers where spbpers_pidm = ? """
+        def ctx = SCH.servletContext.getAttribute(GA.APPLICATION_CONTEXT)
+        def sessionFactory = ctx.sessionFactory
+        def session = sessionFactory.currentSession
+        def sql = new Sql (session.connection ())
+        def bio = sql.firstRow (bioSql, [pidm])
+        return bio?.dead == 'Y'
+    }
+
 }

@@ -1,6 +1,6 @@
 /** *****************************************************************************
 
- © 2010 SunGard Higher Education.  All Rights Reserved.
+ © 2011 SunGard Higher Education.  All Rights Reserved.
 
  CONFIDENTIAL BUSINESS INFORMATION
 
@@ -11,12 +11,10 @@
  ****************************************************************************** */
 package com.sungardhe.banner.general.person
 
-
-import groovy.sql.Sql
-import com.sungardhe.banner.general.system.MedicalCondition
 import com.sungardhe.banner.exceptions.ApplicationException
+import com.sungardhe.banner.general.system.MedicalCondition
 import com.sungardhe.banner.service.ServiceBase
-
+import groovy.sql.Sql
 
 class MedicalInformationCompositeService {
 
@@ -46,8 +44,8 @@ class MedicalInformationCompositeService {
 
 
         processInsertUpdates(map?.medicalInformations,
-                             medicalInformationService,
-                             map?.keyBlock)
+                medicalInformationService,
+                map?.keyBlock)
 
 
     }
@@ -62,10 +60,7 @@ class MedicalInformationCompositeService {
 
         medicalList.each { test ->
             def map = [keyBlock: keyBlock, domainModel: test]
-            if (!test.id) {
-                test = service.create(map)
-            }
-            else {
+            if (test.id) {
                 def oldMedicalCondition = findDirtyMedical(test)
                 if (oldMedicalCondition) {
                     validateHR(test, oldMedicalCondition)
@@ -79,6 +74,10 @@ class MedicalInformationCompositeService {
                 else {
                     service.update(map)
                 }
+
+            }
+            else {
+                test = service.create(map)
             }
         }
     }

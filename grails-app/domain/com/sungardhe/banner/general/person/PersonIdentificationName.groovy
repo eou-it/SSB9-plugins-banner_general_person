@@ -1,5 +1,5 @@
 /** *****************************************************************************
- © 2010 SunGard Higher Education.  All Rights Reserved.
+ © 2011 SunGard Higher Education.  All Rights Reserved.
 
  CONFIDENTIAL BUSINESS INFORMATION
 
@@ -10,27 +10,10 @@
  ****************************************************************************** */
 package com.sungardhe.banner.general.person
 
-import com.sungardhe.banner.general.system.NameType
 import com.sungardhe.banner.general.system.FgacDomain
+import com.sungardhe.banner.general.system.NameType
 import com.sungardhe.banner.service.DatabaseModifiesState
-
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
-import javax.persistence.Table
-import javax.persistence.Version
-import javax.persistence.JoinColumn
-import javax.persistence.JoinColumns
-import javax.persistence.ManyToOne
-import javax.persistence.SequenceGenerator
-import javax.persistence.GenerationType
-import javax.persistence.NamedQueries
-import javax.persistence.NamedQuery
-import javax.persistence.Transient
-
-import org.hibernate.annotations.GenericGenerator
-
+import javax.persistence.*
 
 /**
  * Person Identification/Name model.

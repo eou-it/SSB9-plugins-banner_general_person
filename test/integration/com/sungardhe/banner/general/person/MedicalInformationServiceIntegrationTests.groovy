@@ -1,6 +1,6 @@
 /** *****************************************************************************
 
- © 2010 SunGard Higher Education.  All Rights Reserved.
+ © 2011 SunGard Higher Education.  All Rights Reserved.
 
  CONFIDENTIAL BUSINESS INFORMATION
 
@@ -12,11 +12,13 @@
 
 package com.sungardhe.banner.general.person
 
-import com.sungardhe.banner.general.system.*
-import com.sungardhe.banner.testing.BaseIntegrationTestCase
 import com.sungardhe.banner.exceptions.ApplicationException
+import com.sungardhe.banner.general.system.Disability
+import com.sungardhe.banner.general.system.DisabilityAssistance
+import com.sungardhe.banner.general.system.MedicalCondition
+import com.sungardhe.banner.general.system.MedicalEquipment
+import com.sungardhe.banner.testing.BaseIntegrationTestCase
 import groovy.sql.Sql
-import org.junit.Ignore
 
 class MedicalInformationServiceIntegrationTests extends BaseIntegrationTestCase {
 
@@ -71,14 +73,14 @@ class MedicalInformationServiceIntegrationTests extends BaseIntegrationTestCase 
         assertNotNull entity.id
 
         def newMediInfo = new MedicalInformation(disability: createDisability("u2"),
-                                                 disabilityAssistance: createDisabilityAssistance("U2"),
-                                                 medicalCondition: createMedicalCondition("U2"),
-                                                 medicalEquipment: createMedicalEquipment("U2"),
-                                                 pidm: entity.pidm,
-                                                 disabilityIndicator: true,
-                                                 comment: "unit-test",
-                                                 medicalDate: new Date(),
-                                                 onsetAge: 29)
+                disabilityAssistance: createDisabilityAssistance("U2"),
+                medicalCondition: createMedicalCondition("U2"),
+                medicalEquipment: createMedicalEquipment("U2"),
+                pidm: entity.pidm,
+                disabilityIndicator: true,
+                comment: "unit-test",
+                medicalDate: new Date(),
+                onsetAge: 29)
 
         try {
             newMediInfo = medicalInformationService.create([domainModel: newMediInfo])
@@ -86,12 +88,8 @@ class MedicalInformationServiceIntegrationTests extends BaseIntegrationTestCase 
         }
         catch (e) {
             def ae = new ApplicationException(newMediInfo, e)
-            if (ae.wrappedException != null) // =~ /Only one disability may be designated as primary for Medical Information/ )
-                println "Found exception ${ae.wrappedException}"
-            else {
+            if (ae.wrappedException == null) // =~ /Only one disability may be designated as primary for Medical Information/ )
                 fail("This should have ended with the exception Only one disability may be designated as primary for Medical Information but got: ${ae}")
-
-            }
         }
 
     }
@@ -103,14 +101,14 @@ class MedicalInformationServiceIntegrationTests extends BaseIntegrationTestCase 
         assertNotNull entity.id
 
         def newMediInfo = new MedicalInformation(disability: createDisability("u2"),
-                                                 disabilityAssistance: createDisabilityAssistance("U2"),
-                                                 medicalCondition: createMedicalCondition("U2"),
-                                                 medicalEquipment: createMedicalEquipment("U2"),
-                                                 pidm: entity.pidm,
-                                                 disabilityIndicator: false,
-                                                 comment: "unit-test",
-                                                 medicalDate: new Date(),
-                                                 onsetAge: 29)
+                disabilityAssistance: createDisabilityAssistance("U2"),
+                medicalCondition: createMedicalCondition("U2"),
+                medicalEquipment: createMedicalEquipment("U2"),
+                pidm: entity.pidm,
+                disabilityIndicator: false,
+                comment: "unit-test",
+                medicalDate: new Date(),
+                onsetAge: 29)
 
         newMediInfo = medicalInformationService.create([domainModel: newMediInfo])
         def updateMediInfo = MedicalInformation.get(newMediInfo.id)
@@ -122,12 +120,8 @@ class MedicalInformationServiceIntegrationTests extends BaseIntegrationTestCase 
         }
         catch (e) {
             def ae = new ApplicationException(updateMediInfo, e)
-            if (ae.wrappedException != null) // =~ /Only one disability may be designated as primary for Medical Information/ )
-                println "Found exception ${ae.wrappedException}"
-            else {
+            if (ae.wrappedException == null) // =~ /Only one disability may be designated as primary for Medical Information/ )
                 fail("This should have ended with the exception Only one disability may be designated as primary for Medical Information but got: ${ae}")
-
-            }
         }
 
     }
@@ -148,15 +142,7 @@ class MedicalInformationServiceIntegrationTests extends BaseIntegrationTestCase 
             fail("This should have failed with @@r1:readonlyFieldsCannotBeModified")
         }
         catch (ApplicationException ae) {
-            if (ae.wrappedException =~ /@@r1:readonlyFieldsCannotBeModified/) {
-                //  println "Found correct message code @@r1:readonlyFieldsCannotBeModified
-            } else {
-                fail("Did not find expected error code @@r1:readonlyFieldsCannotBeModified, found this other application exception ${ae.wrappedException}")
-            }
-            // @@r1:readonlyFieldsCannotBeModified
-        }
-        catch (Exception e) {
-            fail("Did not find expected error code @@r1:readonlyFieldsCannotBeModified, found exeption ${e}")
+            assertApplicationException ae, "readonlyFieldsCannotBeModified"
         }
     }
 
@@ -195,14 +181,14 @@ class MedicalInformationServiceIntegrationTests extends BaseIntegrationTestCase 
         person.save(flush: true)
         assert person.id
         def medicalInformation = new MedicalInformation(disability: createDisability(),
-                                                        disabilityAssistance: createDisabilityAssistance(),
-                                                        medicalCondition: createMedicalCondition(),
-                                                        medicalEquipment: createMedicalEquipment(),
-                                                        pidm: person.pidm,
-                                                        disabilityIndicator: true,
-                                                        comment: "unit-test",
-                                                        medicalDate: new Date(),
-                                                        onsetAge: 29)
+                disabilityAssistance: createDisabilityAssistance(),
+                medicalCondition: createMedicalCondition(),
+                medicalEquipment: createMedicalEquipment(),
+                pidm: person.pidm,
+                disabilityIndicator: true,
+                comment: "unit-test",
+                medicalDate: new Date(),
+                onsetAge: 29)
 
         return medicalInformation
     }
@@ -211,28 +197,28 @@ class MedicalInformationServiceIntegrationTests extends BaseIntegrationTestCase 
     private Disability createDisability(String disCode) {
         if (disCode == null) disCode = "uu"
         save(new Disability(code: disCode, description: "unit-test", lastModified: new Date(),
-                            lastModifiedBy: "test", dataOrigin: "banner"))
+                lastModifiedBy: "test", dataOrigin: "banner"))
     }
 
 
     private DisabilityAssistance createDisabilityAssistance(String disAss) {
         if (disAss == null) disAss = "xx"
         save(new DisabilityAssistance(code: disAss, description: "unit-test", lastModified: new Date(),
-                                      lastModifiedBy: "test", dataOrigin: "Banner"))
+                lastModifiedBy: "test", dataOrigin: "Banner"))
     }
 
 
     private MedicalCondition createMedicalCondition(String mediCond) {
         if (mediCond == null) mediCond = "ZZ"
         save(new MedicalCondition(code: mediCond, description: "unit-test", lastModified: new Date(),
-                                  lastModifiedBy: "test", dataOrigin: "Banner"))
+                lastModifiedBy: "test", dataOrigin: "Banner"))
     }
 
 
     private MedicalEquipment createMedicalEquipment(String medEq) {
         if (medEq == null) medEq = "zz"
         save(new MedicalEquipment(code: medEq, description: "unit-test", lastModified: new Date(),
-                                  lastModifiedBy: "test", dataOrigin: "Banner"))
+                lastModifiedBy: "test", dataOrigin: "Banner"))
     }
 
 }

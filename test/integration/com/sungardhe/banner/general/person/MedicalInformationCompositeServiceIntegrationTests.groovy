@@ -1,6 +1,6 @@
 /** *****************************************************************************
 
- © 2010 SunGard Higher Education.  All Rights Reserved.
+ © 2011 SunGard Higher Education.  All Rights Reserved.
 
  CONFIDENTIAL BUSINESS INFORMATION
 
@@ -82,6 +82,7 @@ class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegration
 
     }
 
+
     @Ignore
     // TODO for some reason this fails,  the medical condition is not flagged as being dirty,  i suspect that a domain
     // exists that has incorrect equals and hash causing this
@@ -99,25 +100,18 @@ class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegration
 
         // update it to have comment change and medical condition change
         MedicalInformation medicalUpdate = MedicalInformation.get(saveID)
-        println "Medical condition before update: ${medicalUpdate.medicalCondition} ${medicalUpdate} isdirty: ${medicalUpdate.isDirty()}"
         def newMedCond = MedicalCondition.findByCode("PP")
-        println "Update with this: ${newMedCond}"
         medicalUpdate.medicalCondition = newMedCond
         medicalUpdate.medicalEquipment = createMedicalEquipment("X1")
 
         def changedNames = medicalUpdate.dirtyPropertyNames
-        println "Inside test, changed names: ${changedNames} ${medicalUpdate}"
-       // medicalUpdate.comment = "MH test with condition C1"
+        // medicalUpdate.comment = "MH test with condition C1"
         def medicalInformations = []
         medicalInformations << medicalUpdate
         def map = [medicalInformations: medicalInformations, keyBlock: [pidm: pidm]]
 
         changedNames = medicalUpdate.dirtyPropertyNames
 
-        if (changedNames.size() > 0) {
-            println "changed items: ${changedNames}"
-        }
-        else println "No changed items in medicalUpdate"
         medicalInformationCompositeService.createOrUpdate(map)
 
         // verify that the original is deleted and that the ID is not the same on the new record
@@ -148,7 +142,6 @@ class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegration
         assertEquals "One record should have been inserted", 1, rowsIns
 
         // save the medical condition
-        MedicalInformation oldMedicalCondition = medicalInformation
         assertNotNull "Medical Information ID should not be null", medicalInformation.id
         MedicalInformation medicalInformationUpdate = MedicalInformation.get(medicalInformation.id)
         assertNotNull "Medical Information ID is null in Test Update", medicalInformationUpdate.id
@@ -166,14 +159,7 @@ class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegration
             fail("I should have received an error but it passed; @@r1:cannotChangeEmployeeMedical@@ ")
         }
         catch (ApplicationException ae) {
-            if (ae.wrappedException =~ /@@r1:cannotChangeEmployeeMedical@@/) {
-                // println "Found correct message code @@r1:cannotChangeEmployeeMedical@@"
-            }
-            else
-                fail("Did not find expected error code @@r1:cannotChangeEmployeeMedical@@, found: ${ae.wrappedException}")
-        }
-        catch (e) {
-            fail "This should have failed with @@r1:cannotChangeEmployeeMedical@@ but found exception: ${e} "
+            assertApplicationException ae, "cannotChangeEmployeeMedical"
         }
     }
 
@@ -214,14 +200,7 @@ class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegration
             fail("I should have received an error but it passed; @@r1:cannotChangeEmployeeMedical@@ ")
         }
         catch (ApplicationException ae) {
-            if (ae.wrappedException =~ /@@r1:cannotChangeEmployeeMedical@@/) {
-                // println "Found correct message code @@r1:cannotChangeEmployeeMedical@@"
-            }
-            else
-                fail("Did not find expected error code @@r1:cannotChangeEmployeeMedical@@, found: ${ae.wrappedException}")
-        }
-        catch (e) {
-            fail "This should have failed with @@r1:cannotChangeEmployeeMedical@@ but found exception: ${e} "
+            assertApplicationException ae, "cannotChangeEmployeeMedical"
         }
     }
 
@@ -245,14 +224,14 @@ class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegration
         person.save(flush: true)
         assert person.id
         def medicalInformation = new MedicalInformation(disability: createDisability(),
-                                                        disabilityAssistance: createDisabilityAssistance(),
-                                                        medicalCondition: createMedicalCondition(),
-                                                        medicalEquipment: createMedicalEquipment(),
-                                                        pidm: person.pidm,
-                                                        disabilityIndicator: true,
-                                                        comment: "unit-test",
-                                                        medicalDate: new Date(),
-                                                        onsetAge: 29)
+                disabilityAssistance: createDisabilityAssistance(),
+                medicalCondition: createMedicalCondition(),
+                medicalEquipment: createMedicalEquipment(),
+                pidm: person.pidm,
+                disabilityIndicator: true,
+                comment: "unit-test",
+                medicalDate: new Date(),
+                onsetAge: 29)
         return medicalInformation
     }
 
@@ -277,25 +256,25 @@ class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegration
         assert person.id
         def medicalInformations = []
         def medicalInformation = new MedicalInformation(disability: createDisability(),
-                                                        disabilityAssistance: createDisabilityAssistance(),
-                                                        medicalCondition: createMedicalCondition(),
-                                                        medicalEquipment: createMedicalEquipment(),
-                                                        pidm: person.pidm,
-                                                        disabilityIndicator: true,
-                                                        comment: "unit-test",
-                                                        medicalDate: new Date(),
-                                                        onsetAge: 29)
+                disabilityAssistance: createDisabilityAssistance(),
+                medicalCondition: createMedicalCondition(),
+                medicalEquipment: createMedicalEquipment(),
+                pidm: person.pidm,
+                disabilityIndicator: true,
+                comment: "unit-test",
+                medicalDate: new Date(),
+                onsetAge: 29)
         medicalInformations << medicalInformation
 
         def medicalInformation2 = new MedicalInformation(disability: createDisability("%2"),
-                                                         disabilityAssistance: createDisabilityAssistance("%2"),
-                                                         medicalCondition: createMedicalCondition("!@"),
-                                                         medicalEquipment: createMedicalEquipment("!@"),
-                                                         pidm: person.pidm,
-                                                         disabilityIndicator: false,
-                                                         comment: "unit-test2",
-                                                         medicalDate: new Date(),
-                                                         onsetAge: 29)
+                disabilityAssistance: createDisabilityAssistance("%2"),
+                medicalCondition: createMedicalCondition("!@"),
+                medicalEquipment: createMedicalEquipment("!@"),
+                pidm: person.pidm,
+                disabilityIndicator: false,
+                comment: "unit-test2",
+                medicalDate: new Date(),
+                onsetAge: 29)
         medicalInformations << medicalInformation2
         return medicalInformations
     }
@@ -305,7 +284,7 @@ class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegration
         if (!disCode) disCode = "%%"
 
         save(new Disability(code: disCode, description: "unit-test", lastModified: new Date(),
-                            lastModifiedBy: "test", dataOrigin: "banner"))
+                lastModifiedBy: "test", dataOrigin: "banner"))
     }
 
 
@@ -313,21 +292,21 @@ class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegration
 
         if (!disAss) disAss = "%%"
         save(new DisabilityAssistance(code: disAss, description: "unit-test", lastModified: new Date(),
-                                      lastModifiedBy: "test", dataOrigin: "Banner"))
+                lastModifiedBy: "test", dataOrigin: "Banner"))
     }
 
 
     private MedicalCondition createMedicalCondition(String mediCond) {
         if (!mediCond) mediCond = "ZZ"
         save(new MedicalCondition(code: mediCond, description: "unit-test", lastModified: new Date(),
-                                  lastModifiedBy: "test", dataOrigin: "Banner"))
+                lastModifiedBy: "test", dataOrigin: "Banner"))
     }
 
 
     private MedicalEquipment createMedicalEquipment(String medEq) {
         if (!medEq) medEq = "zz"
         save(new MedicalEquipment(code: medEq, description: "unit-test", lastModified: new Date(),
-                                  lastModifiedBy: "test", dataOrigin: "Banner"))
+                lastModifiedBy: "test", dataOrigin: "Banner"))
     }
 
 
@@ -335,7 +314,7 @@ class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegration
         def sql
         try {
             sql = new Sql(sessionFactory.getCurrentSession().connection())
-            def rowCount = sql.executeUpdate("update gubinst set GUBINST_HUMANRE_INSTALLED = 'Y' where GUBINST_KEY = 'INST'")
+            sql.executeUpdate("update gubinst set GUBINST_HUMANRE_INSTALLED = 'Y' where GUBINST_KEY = 'INST'")
         } finally {
             sql?.close() // note that the test will close the connection, since it's our current session's connection
         }
@@ -346,7 +325,7 @@ class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegration
         def sql
         try {
             sql = new Sql(sessionFactory.getCurrentSession().connection())
-            def rowCount = sql.executeUpdate("update gubinst set GUBINST_HUMANRE_INSTALLED = 'N' where GUBINST_KEY = 'INST'")
+            sql.executeUpdate("update gubinst set GUBINST_HUMANRE_INSTALLED = 'N' where GUBINST_KEY = 'INST'")
         } finally {
             sql?.close() // note that the test will close the connection, since it's our current session's connection
         }

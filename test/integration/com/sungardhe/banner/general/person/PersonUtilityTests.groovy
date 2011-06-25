@@ -1,5 +1,5 @@
 /** *****************************************************************************
- © 2010 SunGard Higher Education.  All Rights Reserved.
+ © 2011 SunGard Higher Education.  All Rights Reserved.
 
  CONFIDENTIAL BUSINESS INFORMATION
 
@@ -58,6 +58,14 @@ class PersonUtilityTests extends BaseIntegrationTestCase {
         assertNotNull testPidm
         assertNotNull testPidm.fullName
         assertEquals testPidm.bannerId, "HOS00001"
-  
+
+    }
+
+
+    void testIsPersonDeceased() {
+        def pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("JCSYS0001", null).pidm
+        assertNotNull pidm
+        def testPidm = PersonUtility.isPersonDeceased(pidm)
+        assertTrue testPidm
     }
 }

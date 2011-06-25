@@ -1,5 +1,5 @@
 /** *****************************************************************************
- © 2010 SunGard Higher Education.  All Rights Reserved.
+ © 2011 SunGard Higher Education.  All Rights Reserved.
 
  CONFIDENTIAL BUSINESS INFORMATION
 
@@ -11,16 +11,9 @@
 
 package com.sungardhe.banner.general.person
 
-import com.sungardhe.banner.testing.BaseIntegrationTestCase
-import com.sungardhe.banner.general.person.PersonIdentificationName
-
-import grails.test.GrailsUnitTestCase
-import groovy.sql.Sql
-import org.hibernate.annotations.OptimisticLock
-import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
 import com.sungardhe.banner.general.system.NameType
-import com.sungardhe.banner.exceptions.ApplicationException
-
+import com.sungardhe.banner.testing.BaseIntegrationTestCase
+import groovy.sql.Sql
 
 class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
 
@@ -44,58 +37,6 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
         //Test if the generated entity now has an id assigned
         assertNotNull personIdentificationName.id
     }
-
-//  TODO:  this will require changes to the IDEN API
-//    void testUpdatePersonIdentificationName() {
-//        def personIdentificationName = newPersonIdentificationName()
-//        personIdentificationName.save(flush: true)
-//
-//        assertNotNull personIdentificationName.id
-//        assertEquals 0L, personIdentificationName.version
-//        assertEquals "TTTTT", personIdentificationName.lastName
-//        assertEquals "TTTTT", personIdentificationName.firstName
-//        assertEquals "TTTTT", personIdentificationName.middleName
-//        assertNull personIdentificationName.changeIndicator
-//        assertEquals "P", personIdentificationName.entityIndicator
-//
-//        //Update the entity
-//        def testDate = new Date()
-//        personIdentificationName.lastName = "UUUUU"
-//        personIdentificationName.firstName = "UUUUU"
-//        personIdentificationName.middleName = "UUUUU"
-//        personIdentificationName.changeIndicator = "N"
-//        save personIdentificationName
-//
-//        personIdentificationName = PersonIdentificationName.get(personIdentificationName.id)
-//        assertEquals 1L, personIdentificationName?.version
-//        assertEquals "UUUUU", personIdentificationName.lastName
-//        assertEquals "UUUUU", personIdentificationName.firstName
-//        assertEquals "UUUUU", personIdentificationName.middleName
-//        assertEquals "N", personIdentificationName.changeIndicator
-//        assertEquals "P", personIdentificationName.entityIndicator
-//    }
-//
-//
-//    void testOptimisticLock() {
-//        def personIdentificationName = newPersonIdentificationName()
-//        personIdentificationName.save(flush: true)
-//
-//        def sql
-//        try {
-//            sql = new Sql(sessionFactory.getCurrentSession().connection())
-//            sql.executeUpdate("update SV_SPRIDEN set SPRIDEN_VERSION = 999 where SPRIDEN_SURROGATE_ID = ?", [personIdentificationName.id])
-//        } finally {
-//            sql?.close() // note that the test will close the connection, since it's our current session's connection
-//        }
-//        //Try to update the entity
-//        personIdentificationName.lastName = "UUUUU"
-//        personIdentificationName.firstName = "UUUUU"
-//        personIdentificationName.middleName = "UUUUU"
-//        personIdentificationName.changeIndicator = "N"
-//        shouldFail(HibernateOptimisticLockingFailureException) {
-//            personIdentificationName.save(flush: true)
-//        }
-//    }
 
 
     void testDeletePersonIdentificationName() {
@@ -123,28 +64,28 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
         def personIdentificationName = new PersonIdentificationName()
         assertFalse "PersonIdentificationName should have failed validation", personIdentificationName.validate()
         assertErrorsFor personIdentificationName, 'nullable',
-                        [
+                [
                         'lastName'
-                        ]
+                ]
         assertNoErrorsFor personIdentificationName,
-                          [
-                          'firstName',
-                          'middleName',
-                          'changeIndicator',
-                          'entityIndicator',
-                          'userData',
-                          'origin',
-                          'searchLastName',
-                          'searchFirstName',
-                          'searchMiddleName',
-                          'soundexLastName',
-                          'soundexFirstName',
-                          'createUser',
-                          'createDate',
-                          'surnamePrefix',
-                          'nameType',
-                          'cohortReasonEFineGrainedAccessControlDomain'
-                          ]
+                [
+                        'firstName',
+                        'middleName',
+                        'changeIndicator',
+                        'entityIndicator',
+                        'userData',
+                        'origin',
+                        'searchLastName',
+                        'searchFirstName',
+                        'searchMiddleName',
+                        'soundexLastName',
+                        'soundexFirstName',
+                        'createUser',
+                        'createDate',
+                        'surnamePrefix',
+                        'nameType',
+                        'cohortReasonEFineGrainedAccessControlDomain'
+                ]
     }
 
 
