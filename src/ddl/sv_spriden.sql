@@ -1,0 +1,28 @@
+CREATE OR REPLACE FORCE VIEW sv_spriden AS SELECT
+      spriden_pidm,
+      spriden_id,
+      spriden_last_name,
+      spriden_first_name,
+      spriden_mi,
+      spriden_change_ind,
+      spriden_entity_ind,
+      spriden_user,
+      spriden_origin,
+      spriden_search_last_name,
+      spriden_search_first_name,
+      spriden_search_mi,
+      spriden_soundex_last_name,
+      spriden_soundex_first_name,
+      spriden_ntyp_code,
+      spriden_create_user,
+      spriden_create_date,
+      spriden_create_fdmn_code,
+      spriden_surname_prefix,
+      spriden_surrogate_id,
+      spriden_version,
+      spriden_user_id,
+      spriden_data_origin,
+      spriden_activity_date,
+      ROWID spriden_v_rowid
+  FROM saturn.spriden;
+CREATE OR REPLACE PUBLIC SYNONYM sv_spriden FOR sv_spriden;
