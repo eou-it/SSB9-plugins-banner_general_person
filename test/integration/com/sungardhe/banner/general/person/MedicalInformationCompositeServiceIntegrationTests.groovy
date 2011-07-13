@@ -221,7 +221,7 @@ class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegration
                 changeIndicator: null,
                 entityIndicator: "P"
         )
-        person.save(flush: true)
+        person.save(flush:true, failOnError:true)
         assert person.id
         def medicalInformation = new MedicalInformation(disability: createDisability(),
                 disabilityAssistance: createDisabilityAssistance(),
@@ -252,7 +252,7 @@ class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegration
                 changeIndicator: null,
                 entityIndicator: "P"
         )
-        person.save(flush: true)
+        person.save(flush:true, failOnError:true)
         assert person.id
         def medicalInformations = []
         def medicalInformation = new MedicalInformation(disability: createDisability(),

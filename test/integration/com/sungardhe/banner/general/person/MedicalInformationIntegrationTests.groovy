@@ -70,7 +70,7 @@ class MedicalInformationIntegrationTests extends BaseIntegrationTestCase {
         }
         entity.comment = "This better fail ;-)"
         shouldFail(HibernateOptimisticLockingFailureException) {
-            entity.save(flush: true)
+            entity.save(flush:true, failOnError:true)
         }
     }
 
@@ -123,7 +123,7 @@ class MedicalInformationIntegrationTests extends BaseIntegrationTestCase {
         def entity = newMedicalInformation()
         save entity
         def medEquipId = entity.medicalEquipment.id
-        assertNotNull "Could not save medical information due to: ${entity.errors}", entity.save(flush: true)
+        assertNotNull "Could not save medical information due to: ${entity.errors}", entity.save(flush:true, failOnError:true)
 
         def found = MedicalInformation.get(entity.id)
         assertEquals medEquipId, found.medicalEquipment.id
@@ -156,7 +156,7 @@ class MedicalInformationIntegrationTests extends BaseIntegrationTestCase {
                 lastModified: new Date(), lastModifiedBy: "test", dataOrigin: "Banner")
 
         try {
-            newMediInfo.save(flush: true)
+            newMediInfo.save(flush:true, failOnError:true)
             assertNotNull "Medical should not have been saved", newMediInfo.id
         }
         catch (e) {
@@ -185,7 +185,7 @@ class MedicalInformationIntegrationTests extends BaseIntegrationTestCase {
                 changeIndicator: null,
                 entityIndicator: "P"
         )
-        person.save(flush: true)
+        person.save(flush:true, failOnError:true)
         assert person.id
 
         def medicalInformation = new MedicalInformation(disability: createDisability(),

@@ -178,7 +178,7 @@ class MedicalInformationServiceIntegrationTests extends BaseIntegrationTestCase 
                 changeIndicator: null,
                 entityIndicator: "P"
         )
-        person.save(flush: true)
+        person.save(flush:true, failOnError:true)
         assert person.id
         def medicalInformation = new MedicalInformation(disability: createDisability(),
                 disabilityAssistance: createDisabilityAssistance(),

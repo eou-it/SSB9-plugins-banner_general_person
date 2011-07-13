@@ -349,6 +349,10 @@ class PersonIdentificationName implements Serializable {
      */
     /*PROTECTED REGION ID(personentificationname_custom_methods) ENABLED START*/
     // methods used in id and name search lookups
+    public static List fetchByBannerIdAutoComplete(filter) {
+
+          return []
+      }
 
 
     public static List fetchByBannerId(filter) {
