@@ -82,9 +82,8 @@ class MedicalInformation implements Serializable {
 
 
     static constraints = {
-        pidm(                  blank:    false )
-        disabilityIndicator(   blank:    false , maxSixe:10)
-        medicalCondition(      blank:    false , maxSixe:3)
+        disabilityIndicator(   maxSixe:10)
+        medicalCondition(      maxSixe:3)
         disability(            nullable: true , maxSixe:2 )
         medicalEquipment(      nullable: true , maxSixe:3 )
         disabilityAssistance(  nullable: true , maxSixe:2 )
