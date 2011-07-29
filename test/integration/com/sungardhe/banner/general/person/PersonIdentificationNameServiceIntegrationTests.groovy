@@ -101,6 +101,11 @@ class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTes
     }
 
 
+     void testGetPrefixDisplayIndForSelfService() {
+        assertEquals('N', personIdentificationNameService.getPrefixDisplayIndicatorForSelfService())
+    }
+    
+
     private def newPersonIdentificationName() {
         def inameType = NameType.findWhere(code: "PROF")
         // leave the pidm null to get a generated on, and the ID equal to GENERATED to get a newly

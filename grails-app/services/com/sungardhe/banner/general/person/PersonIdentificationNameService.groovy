@@ -66,5 +66,16 @@ class PersonIdentificationNameService extends ServiceBase {
         sql?.close()
         return idPrefix
     }
+
+
+     def getPrefixDisplayIndicatorForSelfService() {
+        def sql
+        def prefixInd
+        sql = new Sql(sessionFactory.getCurrentSession().connection())
+        sql.call("{? = call gb_displaymask.f_ssb_format_name()}",
+                [Sql.VARCHAR]) { result -> prefixInd = result }
+        sql?.close()
+        return prefixInd
+    }
     /*PROTECTED REGION END*/
 }
