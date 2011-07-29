@@ -55,4 +55,26 @@ class PersonUtility {
         return bio?.dead == 'Y'
     }
 
+    public static Boolean isPersonConfidential(Integer pidm) {
+        def confSql = """ select nvl(spbpers_confid_ind, 'N') confidential
+                      from spbpers where spbpers_pidm = ? """
+        def ctx = SCH.servletContext.getAttribute(GA.APPLICATION_CONTEXT)
+        def sessionFactory = ctx.sessionFactory
+        def session = sessionFactory.currentSession
+        def sql = new Sql(session.connection())
+        def conf = sql.firstRow(confSql, [pidm])
+        return conf?.confidential == 'Y'
+    }
+
+    public static Map isPersonConfidentialOrDeceased(Integer pidm) {
+        def sqlQuery = """ select nvl(spbpers_confid_ind, 'N') confidential,  nvl (spbpers_dead_ind,  'N') dead
+                      from spbpers where spbpers_pidm = ? """
+        def ctx = SCH.servletContext.getAttribute(GA.APPLICATION_CONTEXT)
+        def sessionFactory = ctx.sessionFactory
+        def session = sessionFactory.currentSession
+        def sql = new Sql(session.connection())
+        def conf = sql.firstRow(sqlQuery, [pidm])
+        return [confidential: conf?.confidential == 'Y', deceased: conf?.dead == 'Y']
+    }
+
 }

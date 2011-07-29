@@ -1,4 +1,4 @@
-CREATE OR REPLACE FORCE VIEW sv_spriden AS SELECT
+CREATE OR REPLACE FORCE VIEW SV_SPRIDEN AS SELECT
       spriden_pidm,
       spriden_id,
       spriden_last_name,
@@ -23,6 +23,7 @@ CREATE OR REPLACE FORCE VIEW sv_spriden AS SELECT
       spriden_user_id,
       spriden_data_origin,
       spriden_activity_date,
+      decode(spriden_pidm,null, null,f_format_name(spriden_pidm,'FML')) as FULL_NAME,
       ROWID spriden_v_rowid
   FROM saturn.spriden;
-CREATE OR REPLACE PUBLIC SYNONYM sv_spriden FOR sv_spriden;
+CREATE OR REPLACE PUBLIC SYNONYM SV_SPRIDEN FOR SV_SPRIDEN;

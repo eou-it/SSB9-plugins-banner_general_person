@@ -13,39 +13,87 @@ package com.sungardhe.banner.general.person
 import com.sungardhe.banner.general.system.FgacDomain
 import com.sungardhe.banner.general.system.NameType
 import com.sungardhe.banner.service.DatabaseModifiesState
-import javax.persistence.*
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.Id
+import javax.persistence.JoinColumn
+import javax.persistence.JoinColumns
+import javax.persistence.ManyToOne
+import javax.persistence.NamedQueries
+import javax.persistence.NamedQuery
+import javax.persistence.SequenceGenerator
+import javax.persistence.Table
+import javax.persistence.Version
 
 /**
  * Person Identification/Name model.
  */
 @Entity
-@Table( name = "SV_SPRIDEN" )
-@NamedQueries( value = [
-@NamedQuery( name = "PersonIdentificationName.fetchByBannerId",
-             query = """FROM  PersonIdentificationName a
+@Table(name = "SV_SPRIDEN")
+@NamedQueries(value = [
+@NamedQuery(name = "PersonIdentificationName.fetchByBannerId",
+query = """FROM  PersonIdentificationName a
 	  	                WHERE a.bannerId like :filter
 	  	                and a.entityIndicator = 'P'
-	  	                and a.changeIndicator is null 
-	  	                ORDER by a.lastName, a.firstName, a.middleName, a.bannerId  """ ),
-@NamedQuery( name = "PersonIdentificationName.fetchByName",
-             query = """FROM  PersonIdentificationName a
+	  	                and a.changeIndicator is null
+	  	                ORDER by a.lastName, a.firstName, a.middleName, a.bannerId  """),
+@NamedQuery(name = "PersonIdentificationName.fetchByName",
+query = """FROM  PersonIdentificationName a
 	  	                WHERE  ( a.lastName like :filter
 	  	                OR a.searchLastName like :filter)
 	  	                and a.entityIndicator = 'P'
 	  	                and a.changeIndicator is null
-	  	                 ORDER by a.lastName, a.firstName, a.middleName, a.bannerId  """ ),
-@NamedQuery( name = "PersonIdentificationName.fetchPersonByBannerId",
-             query = """FROM  PersonIdentificationName a
+	  	                 ORDER by a.lastName, a.firstName, a.middleName, a.bannerId  """),
+@NamedQuery(name = "PersonIdentificationName.fetchPersonByBannerId",
+query = """FROM  PersonIdentificationName a
 	  	                WHERE a.bannerId = :filter
 	  	                and a.entityIndicator = 'P'
-	  	                and a.changeIndicator is null    """ ),
-@NamedQuery( name = "PersonIdentificationName.fetchPersonByPidm",
-             query = """FROM  PersonIdentificationName a
+	  	                and a.changeIndicator is null    """),
+@NamedQuery(name = "PersonIdentificationName.fetchPersonByPidm",
+query = """FROM  PersonIdentificationName a
 	  	                WHERE a.pidm = :filter
 	  	                and a.entityIndicator = 'P'
-	  	                and a.changeIndicator is null    """ ) 
-] )
-@DatabaseModifiesState 
+	  	                and a.changeIndicator is null    """),
+@NamedQuery(name = "PersonIdentificationName.fetchPersonOrNonPersonByPidm",
+query = """FROM  PersonIdentificationName a
+	  	                WHERE a.pidm = :filter
+	  	                and a.changeIndicator is null    """),
+@NamedQuery(name = "PersonIdentificationName.fetchPersonOrNonPersonByBannerId",
+query = """FROM  PersonIdentificationName a
+                        WHERE (a.pidm in (SELECT Y.pidm FROM PersonIdentificationName Y WHERE Y.bannerId =  :filter  AND Y.changeIndicator = 'I')
+                        or a.pidm in (SELECT Z.pidm FROM PersonIdentificationName Z WHERE Z.bannerId = :filter AND Z.changeIndicator is NULL))
+                       and a.changeIndicator is null
+	  	               ORDER by a.lastName, a.firstName, a.middleName, a.bannerId """),
+@NamedQuery(name = "PersonIdentificationName.fetchAllPersonByNameOrBannerId",
+query = """FROM  PersonIdentificationName a
+	  	                WHERE (a.bannerId like :filter
+	  	                or a.searchFirstName like :filter
+	  	                or a.searchMiddleName like :filter
+	  	                or a.searchLastName like :filter)
+	  	                and a.entityIndicator = 'P' order by lastName, firstName, middleName, bannerId  """),
+@NamedQuery(name = "PersonIdentificationName.fetchCountPersonByNameOrBannerId",
+query = """select count(a.bannerId) FROM  PersonIdentificationName a
+	  	                WHERE (a.bannerId like :filter
+	  	                or a.searchFirstName like :filter
+	  	                or a.searchMiddleName like :filter
+	  	                or a.searchLastName like :filter)
+	  	                and a.entityIndicator = 'P'
+	  	                and a.changeIndicator is null"""),
+@NamedQuery(name = "PersonIdentificationName.fetchAllNonPersonByNameOrBannerId",
+query = """FROM  PersonIdentificationName a
+	  	                WHERE (a.bannerId like :filter
+	  	                or a.searchLastName like :filter)
+	  	                and a.entityIndicator = 'C' order by lastName, bannerId  """),
+@NamedQuery(name = "PersonIdentificationName.fetchCountNonPersonByNameOrBannerId",
+query = """select count(a.bannerId) FROM  PersonIdentificationName a
+	  	                WHERE (a.bannerId like :filter
+	  	                or a.searchLastName like :filter)
+	  	                and a.entityIndicator = 'C'
+	  	                and a.changeIndicator is null """)
+])
+@DatabaseModifiesState
 class PersonIdentificationName implements Serializable {
 
     /**
@@ -200,12 +248,12 @@ class PersonIdentificationName implements Serializable {
      */
     @ManyToOne
     @JoinColumns([
-    @JoinColumn(name = "SPRIDEN_CREATE_FDMN_CODE", referencedColumnName = "GTVFDMN_CODE")
+        @JoinColumn(name = "SPRIDEN_CREATE_FDMN_CODE", referencedColumnName = "GTVFDMN_CODE")
     ])
     FgacDomain fgacDomain
 
-    @Transient
-    fullName
+    @Column(name = "FULL_NAME", nullable = true)
+    String fullName
 
     public static readonlyProperties = ['pidm']
 
@@ -215,26 +263,27 @@ class PersonIdentificationName implements Serializable {
 					id=$id,
 					pidm=$pidm,
 					bannerId=$bannerId,
-					lastName=$lastName, 
-					firstName=$firstName, 
-					mdleInitial=$middleName, 
-					changeIndicator=$changeIndicator, 
-					entityIndicator=$entityIndicator, 
-					lastModified=$lastModified, 
-					userData=$userData, 
-					origin=$origin, 
-					searchLastName=$searchLastName, 
-					searchFirstName=$searchFirstName, 
-					searchMiddleName=$searchMiddleName, 
-					soundexLastName=$soundexLastName, 
-					soundexFirstName=$soundexFirstName, 
-					createUser=$createUser, 
-					createDate=$createDate, 
-					dataOrigin=$dataOrigin, 
-					surnamePrefix=$surnamePrefix, 
-					version=$version, 
-					lastModifiedBy=$lastModifiedBy, 
-					nameType=$nameType, 
+					lastName=$lastName,
+					firstName=$firstName,
+					mdleInitial=$middleName,
+					changeIndicator=$changeIndicator,
+					entityIndicator=$entityIndicator,
+					lastModified=$lastModified,
+					userData=$userData,
+					origin=$origin,
+					searchLastName=$searchLastName,
+					searchFirstName=$searchFirstName,
+					searchMiddleName=$searchMiddleName,
+					soundexLastName=$soundexLastName,
+					soundexFirstName=$soundexFirstName,
+					createUser=$createUser,
+					createDate=$createDate,
+					dataOrigin=$dataOrigin,
+					surnamePrefix=$surnamePrefix,
+					version=$version,
+					lastModifiedBy=$lastModifiedBy,
+					nameType=$nameType,
+					fullName=$fullName,
 					fgacDomain=$fgacDomain]"""
     }
 
@@ -308,7 +357,6 @@ class PersonIdentificationName implements Serializable {
         return result;
     }
 
-    
 //  The Banner ID and PIDM are nullable: true because the API generates these
     static constraints = {
         pidm(nullable: true)
@@ -351,24 +399,17 @@ class PersonIdentificationName implements Serializable {
     // methods used in id and name search lookups
     public static List fetchByBannerIdAutoComplete(filter) {
 
-          return []
-      }
+        return []
+    }
 
 
     public static List fetchByBannerId(filter) {
 
-        def name
-        if (filter) name = "%" + filter.toUpperCase() + "%"
-        else name = "%"
+        def queryCriteria
+        if (filter) queryCriteria = "%" + filter.toUpperCase() + "%"
+        else queryCriteria = "%"
         def names = PersonIdentificationName.withSession {session ->
-            session.getNamedQuery('PersonIdentificationName.fetchByBannerId').setString('filter', filter).list()
-        }
-        names.each {
-            if(it.middleName == null) {
-               it.fullName = it.firstName + ' ' + it.lastName
-            } else {
-            it.fullName = it.firstName + ' ' + it.middleName + ' ' + it.lastName
-        }
+            session.getNamedQuery('PersonIdentificationName.fetchByBannerId').setString('filter', queryCriteria).list()
         }
         return names
     }
@@ -376,30 +417,22 @@ class PersonIdentificationName implements Serializable {
 
     public static List fetchByName(filter) {
 
-        def name
-        if (filter) name = "%" + filter.toUpperCase() + "%"
-        else name = "%"
+        def queryCriteria
+        if (filter) queryCriteria = "%" + filter.toUpperCase() + "%"
+        else queryCriteria = "%"
         def names = PersonIdentificationName.withSession {session ->
-            session.getNamedQuery('PersonIdentificationName.fetchByName').setString('filter', filter).list()
-        }
-        names.each {
-            if(it.middleName == null) {
-               it.fullName = it.firstName + ' ' + it.lastName
-            } else {
-            it.fullName = it.firstName + ' ' + it.middleName + ' ' + it.lastName
-        }
+            session.getNamedQuery('PersonIdentificationName.fetchByName').setString('filter', queryCriteria).list()
         }
         return names
     }
-
-
+    //Used for Lookup.
     public static def fetchBySomeBannerId() {
         def filter = null
         def returnObj = [list: PersonIdentificationName.fetchByBannerId(filter)]
         return returnObj
     }
 
-
+    //Used for Lookup.
     public static def fetchBySomeBannerId(filter) {
         def name
         if (filter) name = "%" + filter.toUpperCase() + "%"
@@ -407,14 +440,14 @@ class PersonIdentificationName implements Serializable {
         return returnObj
     }
 
-
+    //Used for Lookup.
     public static def fetchBySomeName() {
         def filter = null
         def returnObj = [list: PersonIdentificationName.fetchByName(filter)]
         return returnObj
     }
 
-
+    //Used for Lookup.
     public static def fetchBySomeName(filter) {
         def name
         if (filter) name = "%" + filter.toUpperCase() + "%"
@@ -422,34 +455,16 @@ class PersonIdentificationName implements Serializable {
         return returnObj
     }
 
-    // method to validate the Id entered in a lookup
-
-
+    ///Used for Lookup.
     public static Object fetchValidateBannerId(String bannerId) {
-        def object = PersonIdentificationName.fetchPersonByBannerId(bannerId)
-        if (!object.fullName) {
-          if(object.middleName == null) {
-              object.fullName = object.firstName + ' ' + object.lastName
-           } else {
-            object.fullName = object.firstName + ' ' + object.middleName + ' ' + object.lastName
-        }
-        }
+        def object = PersonIdentificationName.fetchBannerPerson(bannerId)
         return object
     }
 
     // Method used in utils to validate and return the name
-
-
     public static PersonIdentificationName fetchBannerPerson(String bannerId) {
         PersonIdentificationName object = PersonIdentificationName.withSession {session ->
-            session.getNamedQuery('PersonIdentificationName.fetchPersonByBannerId').setString('filter', bannerId).list()[0]
-        }
-        if (object && !object?.fullName) {
-          if(object.middleName == null) {
-              object.fullName = object.firstName + ' ' + object.lastName
-           } else {
-            object.fullName = object.firstName + ' ' + object.middleName + ' ' + object.lastName
-        }
+            def list = session.getNamedQuery('PersonIdentificationName.fetchPersonByBannerId').setString('filter', bannerId).list()[0]
         }
         return object
     }
@@ -459,14 +474,111 @@ class PersonIdentificationName implements Serializable {
         PersonIdentificationName object = PersonIdentificationName.withSession {session ->
             session.getNamedQuery('PersonIdentificationName.fetchPersonByPidm').setInteger('filter', pidm).list()[0]
         }
-        if (object && !object?.fullName) {
-          if(object.middleName == null) {
-              object.fullName = object.firstName + ' ' + object.lastName
-           } else {
-            object.fullName = object.firstName + ' ' + object.middleName + ' ' + object.lastName
-        }
+        return object
+    }
+
+
+    public static PersonIdentificationName fetchPersonOrNonPersonByPidm(Integer pidm) {
+        PersonIdentificationName object = PersonIdentificationName.withSession {session ->
+            session.getNamedQuery('PersonIdentificationName.fetchPersonOrNonPersonByPidm').setInteger('filter', pidm).list()[0]
         }
         return object
     }
+
+    //Person Lookup Related Named Queries   and helper methods
+    public static List fetchAllPersonByNameOrBannerId(filter, pagingAndSortParams) {
+        def queryCriteria
+        if (!filter) return []
+        queryCriteria = filter.toUpperCase() + "%"
+        def persons = PersonIdentificationName.withSession {session ->
+            org.hibernate.Query query = session.getNamedQuery('PersonIdentificationName.fetchAllPersonByNameOrBannerId').setString('filter', queryCriteria)
+            query.setMaxResults(pagingAndSortParams.max)
+            query.setFirstResult(pagingAndSortParams.offset)
+            query.list()
+        }
+        return persons
+    }
+
+
+
+    public static int fetchCountPersonByNameOrBannerId(filter) {
+        def queryCriteria
+        if (!filter) return 0
+        queryCriteria = filter.toUpperCase() + "%"
+        def count = PersonIdentificationName.withSession {session ->
+            org.hibernate.Query query = session.getNamedQuery('PersonIdentificationName.fetchCountPersonByNameOrBannerId').setString('filter', queryCriteria)
+            query.list().get(0)
+        }
+        return count
+    }
+
+
+
+    public static List fetchAllNonPersonByNameOrBannerId(filter, pagingAndSortParams) {
+        def queryCriteria
+        if (!filter) return []
+        queryCriteria = filter.toUpperCase() + "%"
+        def nonPersons = PersonIdentificationName.withSession {session ->
+            org.hibernate.Query query = session.getNamedQuery('PersonIdentificationName.fetchAllNonPersonByNameOrBannerId').setString('filter', queryCriteria)
+            query.setMaxResults(pagingAndSortParams.max);
+            query.setFirstResult(pagingAndSortParams.offset);
+            query.list()
+        }
+        return nonPersons
+    }
+
+
+
+    public static int fetchCountNonPersonByNameOrBannerId(filter) {
+        def queryCriteria
+        if (!filter) return 0
+        queryCriteria = filter.toUpperCase() + "%"
+        def count = PersonIdentificationName.withSession {session ->
+            org.hibernate.Query query = session.getNamedQuery('PersonIdentificationName.fetchCountNonPersonByNameOrBannerId').setString('filter', queryCriteria)
+            query.list().get(0)
+        }
+        return count
+    }
+
+
+    public static PersonIdentificationName fetchBannerPersonOrNonPerson(String bannerId) {
+        PersonIdentificationName object = PersonIdentificationName.withSession {session ->
+            session.getNamedQuery('PersonIdentificationName.fetchPersonOrNonPersonByBannerId').setString('filter', bannerId).list()[0]
+        }
+        return object
+    }
+
+    //Used for spriden id Lookup.
+    public static Map fetchAllForBannerId(filter) {
+        return [list: []]
+    }
+
+    //Used for spriden id Lookup.
+    public static Map fetchAllForBannerId() {
+        return [list: []]
+    }
+
+    //Used for spriden id Lookup.
+    public static Map fetchPersonByNameOrBannerId(filter, pagingAndSortParams) {
+        return [list: PersonIdentificationName.fetchAllPersonByNameOrBannerId(filter, pagingAndSortParams), totalCount: PersonIdentificationName.fetchCountPersonByNameOrBannerId(filter)]
+    }
+
+    //Used for spriden id Lookup.
+    public static Map fetchPersonByNameOrBannerId(pagingAndSortParams) {
+        //Reason is person lookup will have performance issues when filter is unavailable
+        return [list: []]
+    }
+
+    //Used for spriden id Lookup.
+    public static Map fetchNonPersonByNameOrBannerId(filter, pagingAndSortParams) {
+        return [list: PersonIdentificationName.fetchAllNonPersonByNameOrBannerId(filter, pagingAndSortParams), totalCount: PersonIdentificationName.fetchCountNonPersonByNameOrBannerId(filter)]
+    }
+
+    //Used for spriden id Lookup.
+    public static Map fetchNonPersonByNameOrBannerId(pagingAndSortParams) {
+        //Reason is person lookup will have performance issues when filter is unavailable
+        return [list: []]
+    }
+
     /*PROTECTED REGION END*/
 }

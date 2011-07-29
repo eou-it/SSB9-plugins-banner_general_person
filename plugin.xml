@@ -11,8 +11,10 @@
     <resource>UrlMappings</resource>
     <resource>spring.resources</resource>
     <resource>com.sungardhe.banner.general.person.MedicalInformation</resource>
+    <resource>com.sungardhe.banner.general.person.PersonAddress</resource>
     <resource>com.sungardhe.banner.general.person.PersonIdentificationName</resource>
     <resource>com.sungardhe.banner.general.person.PersonRelatedHold</resource>
+    <resource>com.sungardhe.banner.general.person.PersonTelephone</resource>
     <resource>com.sungardhe.banner.general.person.MedicalInformationCompositeService</resource>
     <resource>com.sungardhe.banner.general.person.MedicalInformationService</resource>
     <resource>com.sungardhe.banner.general.person.PersonIdentificationNameService</resource>

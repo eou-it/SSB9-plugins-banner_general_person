@@ -1,5 +1,5 @@
 /** *****************************************************************************
- © 2011 SunGard Higher Education.  All Rights Reserved.
+ ï¿½ 2011 SunGard Higher Education.  All Rights Reserved.
 
  CONFIDENTIAL BUSINESS INFORMATION
 
@@ -12,6 +12,7 @@
 package com.sungardhe.banner.general.person
 
 import com.sungardhe.banner.testing.BaseIntegrationTestCase
+import org.junit.Ignore
 
 class PersonUtilityTests extends BaseIntegrationTestCase {
 
@@ -67,5 +68,30 @@ class PersonUtilityTests extends BaseIntegrationTestCase {
         assertNotNull pidm
         def testPidm = PersonUtility.isPersonDeceased(pidm)
         assertTrue testPidm
+    }
+
+
+    @Ignore //TODO: need to enable this once its determined how seed data is to be incorporated - Amrit
+    void testIsPersonConfidential() {
+        def pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("EVT00023", null).pidm
+        assertNotNull pidm
+        def testPidm = PersonUtility.isPersonConfidential(pidm)
+        assertTrue testPidm
+    }
+
+
+    @Ignore //TODO: need to enable this once its determined how seed data is to be incorporated - Amrit
+    void testIsPersonConfidentialOrDeceased() {
+        def pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("EVT00023", null).pidm
+        assertNotNull pidm
+        def testPidm = PersonUtility.isPersonConfidentialOrDeceased(pidm)
+        assertTrue testPidm.confidential
+        assertFalse testPidm.deceased
+
+         pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("EVT00024", null).pidm
+        assertNotNull pidm
+        testPidm = PersonUtility.isPersonConfidentialOrDeceased(pidm)
+         assertFalse testPidm.confidential
+        assertTrue testPidm.deceased
     }
 }
