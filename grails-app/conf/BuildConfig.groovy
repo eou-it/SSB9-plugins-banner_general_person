@@ -24,7 +24,8 @@ grails.project.dependency.resolution = {
         compile 'com.sungardhe:spring-security-cas:1.0.2'
         compile 'com.sungardhe:banner-general-validation-common:0.0.5' // Note: Also update version within 'application.properties'
 
-		compile 'com.sungardhe:banner-db-main:0.0.9' // Note: Also update version within 'application.properties'
+		compile 'com.sungardhe:banner-db-main:0.0.10' // Note: Also update version within 'application.properties'
+        compile 'com.sungardhe:banner-seeddata-catalog:0.0.9'
     }
     dependencies {
 
