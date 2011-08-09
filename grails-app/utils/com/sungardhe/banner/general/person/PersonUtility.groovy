@@ -1,5 +1,5 @@
 /** *****************************************************************************
- © 2011 SunGard Higher Education.  All Rights Reserved.
+ ï¿½ 2011 SunGard Higher Education.  All Rights Reserved.
 
  CONFIDENTIAL BUSINESS INFORMATION
 
@@ -75,6 +75,19 @@ class PersonUtility {
         def sql = new Sql(session.connection())
         def conf = sql.firstRow(sqlQuery, [pidm])
         return [confidential: conf?.confidential == 'Y', deceased: conf?.dead == 'Y']
+    }
+
+    public static String getEmailId(Integer pidm) {
+        def emailQuery = """ select goremal_email_address email from goremal
+                         where goremal_pidm = ?
+                           and goremal_status_ind = ?
+                           and goremal_preferred_ind = ? """
+        def ctx = SCH.servletContext.getAttribute(GA.APPLICATION_CONTEXT)
+        def sessionFactory = ctx.sessionFactory
+        def session = sessionFactory.currentSession
+        def sql = new Sql(session.connection())
+        def conf = sql.firstRow(emailQuery, [pidm,'A', 'Y'])
+        return conf?.email
     }
 
 }

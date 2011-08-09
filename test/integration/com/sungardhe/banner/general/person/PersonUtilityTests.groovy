@@ -94,4 +94,14 @@ class PersonUtilityTests extends BaseIntegrationTestCase {
          assertFalse testPidm.confidential
         assertTrue testPidm.deceased
     }
+
+
+    @Ignore //TODO: need to enable this once its determined how seed data is to be incorporated - Manjunath
+    void testGetEmailId() {
+        def pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("CMOORE", null).pidm
+        assertNotNull pidm
+        def emailId = PersonUtility.getEmailId(pidm)
+        assertNotNull emailId
+        assertEquals emailId, "Cindy@comcast.net"
+    }
 }
