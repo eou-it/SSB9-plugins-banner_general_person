@@ -1,15 +1,11 @@
 --
--- dbeu_table_extends.sql
---
--- V8.1
---
 -- *****************************************************************************
 -- *                                                                           *
--- * Copyright 2011 SunGard. All rights reserved.                              *
+-- * Copyright 2010 SunGard. All rights reserved.                              *
 -- *                                                                           *
 -- * SunGard or its subsidiaries in the U.S. and other countries is the owner  *
--- * of numerous marks, including 'SunGard,' the SunGard logo, 'Banner,'       *
--- * 'PowerCAMPUS,' 'Advance,' 'Luminis,' 'UDC,' and 'Unified Digital Campus.' *
+-- * of numerous marks, including "SunGard," the SunGard logo, "Banner,"       *
+-- * "PowerCAMPUS," "Advance," "Luminis," "UDC," and "Unified Digital Campus." *
 -- * Other names and marks used in this material are owned by third parties.   *
 -- *                                                                           *
 -- * This [site/software] contains confidential and proprietary information of *
@@ -20,15 +16,31 @@
 -- *                                                                           *
 -- *****************************************************************************
 --
-whenever oserror exit rollback;
-whenever sqlerror exit rollback;
-REM connect dbeu_owner/&&dbeu_password
-
-execute dbeu_util.extend_table('SATURN','SPRADDR','S',TRUE);
-execute dbeu_util.extend_table('SATURN','SPRHOLD','S',TRUE);
-execute dbeu_util.extend_table('SATURN','SPRIDEN','S',TRUE);
-execute dbeu_util.extend_table('SATURN','SPRMEDI','S',TRUE);
-execute dbeu_util.extend_table('SATURN','SPRTELE','S',TRUE);
--- keeping this in this file for now; will break them up later
-execute dbeu_util.extend_table('GENERAL','GOREMAL','G',TRUE);
-
+-- gv_goremal_upd_trg.sql
+--
+-- AUDIT TRAIL: 8.x
+-- DBEU 08/08/2011
+--
+--    Generated trigger for Horizon API support
+--
+-- AUDIT TRAIL END
+--
+CREATE OR REPLACE TRIGGER goremal_view_update_trg
+  INSTEAD OF UPDATE ON gv_goremal
+BEGIN
+  gfksjpa.setId(:OLD.goremal_surrogate_id);
+  gfksjpa.setVersion(:NEW.goremal_version);
+  gb_email.p_update
+    (p_pidm => :NEW.goremal_pidm,
+     p_emal_code => :NEW.goremal_emal_code,
+     p_email_address => :NEW.goremal_email_address,
+     p_status_ind => :NEW.goremal_status_ind,
+     p_preferred_ind => :NEW.goremal_preferred_ind,
+     p_user_id => :NEW.goremal_user_id,
+     p_comment => :NEW.goremal_comment,
+     p_disp_web_ind => :NEW.goremal_disp_web_ind,
+     p_data_origin => :NEW.goremal_data_origin,
+     p_rowid => :NEW.goremal_v_rowid);
+END;
+/
+show errors
