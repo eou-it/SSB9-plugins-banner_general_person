@@ -25,6 +25,8 @@ import javax.persistence.NamedQueries
 import javax.persistence.NamedQuery
 import javax.persistence.SequenceGenerator
 import javax.persistence.Table
+import javax.persistence.Temporal
+import javax.persistence.TemporalType
 import javax.persistence.Version
 
 /**
@@ -153,6 +155,7 @@ class PersonIdentificationName implements Serializable {
      * This field defines the most current date record is created or changed.
      */
     @Column(name = "SPRIDEN_ACTIVITY_DATE")
+    @Temporal(TemporalType.TIMESTAMP)
     Date lastModified
 
     /**

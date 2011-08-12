@@ -31,6 +31,8 @@ import javax.persistence.JoinColumns
 import javax.persistence.ManyToOne
 import org.hibernate.annotations.GenericGenerator
 import com.sungardhe.banner.general.system.TelephoneType
+import javax.persistence.Temporal
+import javax.persistence.TemporalType
 import com.sungardhe.banner.general.system.AddressType
 
 
@@ -158,6 +160,7 @@ class PersonTelephone implements Serializable {
 	 * Date of last activity for telephone record.
 	 */
 	@Column(name = "SPRTELE_ACTIVITY_DATE")
+	@Temporal(TemporalType.TIMESTAMP)
 	Date lastModified
 
 	/**

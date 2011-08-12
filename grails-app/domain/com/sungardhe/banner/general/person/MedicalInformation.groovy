@@ -34,6 +34,7 @@ class MedicalInformation implements Serializable {
     Long id
 
     @Column (name="SPRMEDI_ACTIVITY_DATE" )
+    @Temporal(TemporalType.TIMESTAMP)
     Date lastModified
 
     @Column (name="SPRMEDI_USER_ID" )

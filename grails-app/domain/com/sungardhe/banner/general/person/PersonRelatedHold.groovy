@@ -28,6 +28,8 @@ import javax.persistence.SequenceGenerator
 import javax.persistence.Table
 import javax.persistence.Version
 
+import javax.persistence.Temporal
+import javax.persistence.TemporalType
 import org.hibernate.annotations.Type
 
 /**
@@ -143,6 +145,7 @@ class PersonRelatedHold implements Serializable {
 	 * This field defines most current date record is created or changed.
 	 */
 	@Column(name="SPRHOLD_ACTIVITY_DATE")
+	@Temporal(TemporalType.TIMESTAMP)
 	Date lastModified
 
 	/**

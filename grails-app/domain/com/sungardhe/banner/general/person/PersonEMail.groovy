@@ -35,6 +35,8 @@ import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.Type
 import com.sungardhe.banner.general.system.EmailType
 import org.hibernate.annotations.NamedQueries
+import javax.persistence.Temporal
+import javax.persistence.TemporalType
 import org.hibernate.annotations.NamedQuery
 
 /**
@@ -110,6 +112,7 @@ class PersonEMail implements Serializable {
 	 * The date on which the row was added or modified.
 	 */
 	@Column(name = "GOREMAL_ACTIVITY_DATE")
+	@Temporal(TemporalType.TIMESTAMP)
 	Date lastModified
 
 	/**

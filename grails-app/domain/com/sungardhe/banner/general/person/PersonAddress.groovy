@@ -1,5 +1,5 @@
 /** *****************************************************************************
- © 2010 SunGard Higher Education.  All Rights Reserved.
+ Â© 2010 SunGard Higher Education.  All Rights Reserved.
 
  CONFIDENTIAL BUSINESS INFORMATION
 
@@ -257,6 +257,7 @@ class PersonAddress implements Serializable {
      * This field defines the most current date a record is added or changed.
      */
     @Column(name = "SPRADDR_ACTIVITY_DATE")
+    @Temporal(TemporalType.TIMESTAMP)
     Date lastModified
 
     /**
