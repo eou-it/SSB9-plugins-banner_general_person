@@ -104,7 +104,26 @@ class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTes
      void testGetPrefixDisplayIndForSelfService() {
         assertEquals('N', personIdentificationNameService.getPrefixDisplayIndicatorForSelfService())
     }
-    
+
+
+    void testGetFormattedNameFL() {
+        def fmt
+        def pidm
+        def formattedName
+        pidm = 37859
+        fmt = "FL"
+        formattedName = personIdentificationNameService.getFormattedName(pidm,fmt)
+        assertEquals(formattedName, 'Emily Jamison')
+
+        fmt = "FMIL"
+        formattedName = personIdentificationNameService.getFormattedName(pidm,fmt)
+        assertEquals(formattedName, 'Emily E. Jamison')
+
+        fmt = "FML"
+        formattedName = personIdentificationNameService.getFormattedName(pidm,fmt)
+        assertEquals(formattedName, 'Emily Elizabeth Jamison')
+    }
+
 
     private def newPersonIdentificationName() {
         def inameType = NameType.findWhere(code: "PROF")

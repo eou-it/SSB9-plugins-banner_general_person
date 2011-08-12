@@ -77,5 +77,37 @@ class PersonIdentificationNameService extends ServiceBase {
         sql?.close()
         return prefixInd
     }
+
+
+     /**
+      *  Calls stand alone function (sufname.sql) f_format_name to return a formatted name.
+      * @param pidm The pidm of the name to be returned
+      * @parm fmt The format of the name to be returned.
+      * @return formattedName
+      *
+      *      LF30 - Last name, first name for 30 characters
+      *      L30 -  Last name for 30 characters
+      *      L60 -  Last name for 60 characters
+      *      FL30 - First name, last name for 30 characters
+      *      FL   - Last name, first name
+      *      FMIL - First name, middle initial, last name
+      *      FML  - First name, middle name, last name
+      *      LFMI - Last name, first name, middle initial
+      *      LFM  - Last name, first name, middle
+      *      LFIMI30 - Last name, first name initial, middle name initial
+      *                for 30 characters
+      *
+     */
+    def getFormattedName(pidm, fmt) {
+        def sql
+        def formattedName
+        sql = new Sql(sessionFactory.getCurrentSession().connection())
+        sql.call("{? = call f_format_name(?,?)}",
+                [Sql.VARCHAR, pidm, fmt]) { result -> formattedName = result }
+        sql?.close()
+        return formattedName
+    }
+
+    
     /*PROTECTED REGION END*/
 }
