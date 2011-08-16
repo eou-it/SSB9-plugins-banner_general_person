@@ -147,7 +147,6 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
 		}
 	}
 
-    @Ignore
 	void testUpdateValidPersonTelephone() {
 		def personTelephone = newValidForCreatePersonTelephone()
 		save personTelephone

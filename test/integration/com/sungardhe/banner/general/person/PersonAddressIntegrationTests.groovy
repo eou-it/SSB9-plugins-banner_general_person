@@ -201,9 +201,6 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 		super.tearDown()
 	}
 
-
-    //TODO: need to fix and enable this test - Amrit
-    @Ignore
 	void testCreateValidPersonAddress() {
 		def personAddress = newValidForCreatePersonAddress()
 		save personAddress
@@ -218,9 +215,6 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 		}
 	}
 
-
-    //TODO: need to fix and enable this test - Amrit
-    @Ignore
 	void testUpdateValidPersonAddress() {
 		def personAddress = newValidForCreatePersonAddress()
 		save personAddress
@@ -326,7 +320,6 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 	}
 
 
-    //TODO: need to fix and enable this test - Amrit
     @Ignore
 	void testUpdateInvalidPersonAddress() {
 		def personAddress = newValidForCreatePersonAddress()
@@ -397,8 +390,7 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 		}
 	}
 
-    //TODO: need to fix and enable this test - Amrit
-    @Ignore
+
     void testOptimisticLock() {
         def sql1 = new Sql(sessionFactory.getCurrentSession().connection())
         sql1.executeUpdate("update gubinst set gubinst_finance_installed = 'Y'")
@@ -444,8 +436,6 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-    //TODO: need to fix and enable this test - Amrit
-    @Ignore
 	void testDeletePersonAddress() {
 		def personAddress = newValidForCreatePersonAddress()
 		save personAddress
@@ -455,23 +445,18 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 		assertNull PersonAddress.get( id )
 	}
 
-    //TODO: need to fix and enable this test - Amrit
-    @Ignore
     void testValidation() {
        def personAddress = newValidForCreatePersonAddress()
        assertTrue "PersonAddress could not be validated as expected due to ${personAddress.errors}", personAddress.validate()
     }
 
 
-    //TODO: need to fix and enable this test - Amrit
-    @Ignore
     void testNullValidationFailure() {
         def personAddress = new PersonAddress()
         assertFalse "PersonAddress should have failed validation", personAddress.validate()
         assertErrorsFor personAddress, 'nullable',
                                                [
                                                  'pidm',
-                                                 'sequenceNumber',
                                                  'city',
                                                  'addressType'
                                                ]
@@ -482,6 +467,7 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
              									 'streetLine1',
              									 'streetLine2',
              									 'streetLine3',
+                                                 'sequenceNumber',
              									 'zip',
              									 'phoneArea',
              									 'phoneNumber',
@@ -505,8 +491,6 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-    //TODO: need to fix and enable this test - Amrit
-    @Ignore
     void testMaxSizeValidationFailures() {
         def personAddress = new PersonAddress(
         streetLine1:'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
@@ -529,14 +513,16 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 		assertErrorsFor personAddress, 'maxSize', [ 'streetLine1', 'streetLine2', 'streetLine3', 'zip', 'phoneArea', 'phoneNumber', 'phoneExtension', 'statusIndicator', 'userData', 'carrierRoute', 'goodsAndServiceTaxTaxId', 'reviewedIndicator', 'reviewedUser', 'countryPhone', 'houseNumber', 'streetLine4' ]
     }
 
+
 	void testValidationMessages() {
 	    def personAddress = newInvalidForCreatePersonAddress()
 	    personAddress.pidm = null
 	    assertFalse personAddress.validate()
 	    assertLocalizedError personAddress, 'nullable', /.*Field.*pidm.*of class.*PersonAddress.*cannot be null.*/, 'pidm'
-	    personAddress.sequenceNumber = null
-	    assertFalse personAddress.validate()
-	    assertLocalizedError personAddress, 'nullable', /.*Field.*sequenceNumber.*of class.*PersonAddress.*cannot be null.*/, 'sequenceNumber'
+        //Sequence number will be populated by API.
+//	    personAddress.sequenceNumber = null
+//	    assertFalse personAddress.validate()
+//	    assertLocalizedError personAddress, 'nullable', /.*Field.*sequenceNumber.*of class.*PersonAddress.*cannot be null.*/, 'sequenceNumber'
 	    personAddress.city = null
 	    assertFalse personAddress.validate()
 	    assertLocalizedError personAddress, 'nullable', /.*Field.*city.*of class.*PersonAddress.*cannot be null.*/, 'city'
@@ -549,7 +535,7 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 	private def newValidForCreatePersonAddress() {
 		def personAddress = new PersonAddress(
 			pidm: i_success_pidm,
-			sequenceNumber: i_success_sequenceNumber,
+		//sequenceNumber: i_success_sequenceNumber,
 			fromDate: i_success_fromDate,
 			toDate: i_success_toDate,
 			streetLine1: i_success_streetLine1,

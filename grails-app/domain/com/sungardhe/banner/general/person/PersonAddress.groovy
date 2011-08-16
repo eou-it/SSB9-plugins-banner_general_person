@@ -27,7 +27,6 @@ import com.sungardhe.banner.service.DatabaseModifiesState
  * Address Repeating Table
  */
 /*PROTECTED REGION ID(personaddress_namedqueries) ENABLED START*/
-//TODO: NamedQueries that needs to be ported:
 @NamedQueries(value = [
 @NamedQuery(name = "PersonAddress.fetchActiveAddressByPidmAndAddressType",
 query = """ FROM PersonAddress a
@@ -123,7 +122,7 @@ class PersonAddress implements Serializable {
     /**
      * This field assigns an internal sequence number to each address type associated with person. This field does not display on screen.
      */
-    @Column(name = "SPRADDR_SEQNO", nullable = false, precision = 2)
+    @Column(name = "SPRADDR_SEQNO", precision = 2)
     Integer sequenceNumber
 
     /**
@@ -438,7 +437,7 @@ class PersonAddress implements Serializable {
 
     static constraints = {
         pidm(nullable: false, min: -99999999, max: 99999999)
-        sequenceNumber(nullable: false, min: -99, max: 99)
+        sequenceNumber(nullable: true, min: -99, max: 99)
         fromDate(nullable: true)
         toDate(nullable: true)
         streetLine1(nullable: true, maxSize: 75)
@@ -455,6 +454,7 @@ class PersonAddress implements Serializable {
         correctionDigit(nullable: true, min: -9, max: 9)
         carrierRoute(nullable: true, maxSize: 4)
         reviewedIndicator(nullable: true, maxSize: 1, inList: ["Y", "N"])
+        goodsAndServiceTaxTaxId(nullable:true, maxSize:15)
         reviewedUser(nullable: true, maxSize: 30)
         countryPhone(nullable: true, maxSize: 4)
         houseNumber(nullable: true, maxSize: 10)
