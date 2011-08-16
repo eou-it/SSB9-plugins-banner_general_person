@@ -266,7 +266,9 @@ class PersonEMailIntegrationTests extends BaseIntegrationTestCase {
 
        def res = results.get(0)
 
-       assertEquals res.id, 1416
+       assertEquals res.id, 1412
+
+
        assertEquals res.version, 0
        assertEquals res.pidm, 33784
        assertEquals res.emailAddress, "einstein2be@verizon.net"
