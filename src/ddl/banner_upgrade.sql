@@ -21,3 +21,10 @@ connect baninst1/&&baninst1_password
 start studbpr_bgp
 
 spool off;
+
+
+
+select * from all_objects where status = 'INVALID'
+
+conn sys/u_pick_it as sysdba
+execute utl_recomp.recomp_parallel();

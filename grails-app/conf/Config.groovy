@@ -11,7 +11,7 @@
 
 
 import com.sungardhe.banner.configuration.ApplicationConfigurationUtils as ConfigFinder
-import grails.plugins.springsecurity.SecurityConfigType
+
 
 // ******************************************************************************
 //
@@ -31,7 +31,6 @@ grails.config.locations = [] // leave this initialized to an empty list, and add
 def locationAdder = ConfigFinder.&addLocation.curry(grails.config.locations)
 
 [bannerGrailsAppConfig: "${userHome}/.grails/banner_configuration.groovy",
-        customRepresentationConfig: "grails-app/conf/CustomRepresentationConfig.groovy",
 ].each { envName, defaultFileName -> locationAdder(envName, defaultFileName) }
 
 
@@ -63,12 +62,6 @@ grails.converters.domain.include.version = true
 grails.converters.json.date = "javascript"
 grails.converters.json.pretty.print = true
 
-banner {
-    sso {
-        authenticationProvider = 'default'
-        authenticationAssertionAttribute = 'udcId'
-    }
-}
 
 // enabled native2ascii conversion of i18n properties files
 grails.enable.native2ascii = false
@@ -77,63 +70,5 @@ grails.enable.native2ascii = false
 grails.views.gsp.sitemesh.preprocess = true
 
 
-
-// ******************************************************************************
-//
-//                       +++ LOGGER CONFIGURATION +++
-//
-// ******************************************************************************
-// See http://grails.org/doc/1.1.x/guide/3.%20Configuration.html#3.1.2%20Logging
-// for more information about log4j configuration.
-log4j = {
-    appenders {
-        file name: 'file', file: 'target/logs/development.log'
-    }
-    root {
-        off 'stdout', 'file'
-        additivity = true
-    }
-
-    // Configure logging for other classes (e.g., in src/ or grails-app/utils/) here:
-    // info 'com.sungardhe.banner.representations'
-    // info 'com.sungardhe.banner.supplemental.SupplementalDataService'
-    off  'com.sungardhe.banner.security'
-    off  'com.sungardhe.banner.db'
-    off  'com.sungardhe.banner.student'
-    off  'com.sungardhe.banner.general.system.CollegeController'
-    off  'com.sungardhe.banner.general.system.CollegeService'
-
-    // Grails framework classes
-    off  'org.codehaus.groovy.grails.web.servlet'        // controllers
-    off  'org.codehaus.groovy.grails.web.pages'          // GSP
-    off  'org.codehaus.groovy.grails.web.sitemesh'       // layouts
-    off  'org.codehaus.groovy.grails.web.mapping.filter' // URL mapping
-    off  'org.codehaus.groovy.grails.web.mapping'        // URL mapping
-    off  'org.codehaus.groovy.grails.commons'            // core / classloading
-    off  'org.codehaus.groovy.grails.plugins'            // plugins
-    off  'org.codehaus.groovy.grails.orm.hibernate'      // hibernate integration
-    off  'org.springframework'                           // Spring IoC
-    off  'org.hibernate'                                 // hibernate ORM
-
-    off  'grails.plugins.springsecurity'
-    off  'org.springframework.security'
-
-    // Grails provides a convenience for enabling logging within artefacts, using 'grails.app.XXX'.
-    // Unfortunately, this configuration is not effective when 'mixing in' methods that perform logging.
-    // Therefore, for controllers and services it is recommended that you enable logging using the controller
-    // or service class name (see above 'class name' based configurations).  For example:
-    //     all  'com.sungardhe.banner.testing.FooController' // turns on all logging for the FooController
-    //
-    off 'grails.app' // apply to all artefacts
-    // off 'grails.app.<artefactType>.ClassName // where artefactType is in:
-    //  bootstrap  - For bootstrap classes
-    //  dataSource - For data sources
-    //  tagLib     - For tag libraries
-    //  service    // Not effective with mixins -- see comment above
-    //  controller // Not effective with mixins -- see comment above
-    //  domain     - For domain entities
-
-    off 'com.sungardhe.banner.student.system'
-}
 
 seedDataTarget =  ['bgp': ['/src/groovy/com/sungardhe/banner/seeddata/Data/banner_general_person.xml']]
