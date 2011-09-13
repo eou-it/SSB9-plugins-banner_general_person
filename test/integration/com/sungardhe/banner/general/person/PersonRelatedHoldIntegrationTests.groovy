@@ -1,14 +1,14 @@
 
-/*******************************************************************************
- © 2011 SunGard Higher Education.  All Rights Reserved.
-
- CONFIDENTIAL BUSINESS INFORMATION
-
- THIS PROGRAM IS PROPRIETARY INFORMATION OF SUNGARD HIGHER EDUCATION
- AND IS NOT TO BE COPIED, REPRODUCED, LENT, OR DISPOSED OF,
- NOR USED FOR ANY PURPOSE OTHER THAN THAT WHICH IT IS SPECIFICALLY PROVIDED
- WITHOUT THE WRITTEN PERMISSION OF THE SAID COMPANY
- *******************************************************************************/
+/*********************************************************************************
+ Copyright 2009-2011 SunGard Higher Education. All Rights Reserved.
+ This copyrighted software contains confidential and proprietary information of 
+ SunGard Higher Education and its subsidiaries. Any use of this software is limited 
+ solely to SunGard Higher Education licensees, and is further subject to the terms 
+ and conditions of one or more written license agreements between SunGard Higher 
+ Education and the licensee in question. SunGard, Banner and Luminis are either 
+ registered trademarks or trademarks of SunGard Higher Education in the U.S.A. 
+ and/or other regions and/or countries.
+ **********************************************************************************/
  
 package com.sungardhe.banner.general.person
 
@@ -146,28 +146,7 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
 		assertFalse "PersonRelatedHold should have failed validation", personRelatedHold.validate()
 		assertErrorsFor personRelatedHold, 'maxSize', [ 'reason' ]    
     }
-    
-	void testValidationMessages() {
-	    def personRelatedHold = newPersonRelatedHold()
-	    personRelatedHold.pidm = null
-	    assertFalse personRelatedHold.validate()
-	    assertLocalizedError personRelatedHold, 'nullable', /.*Field.*pidm.*of class.*PersonRelatedHold.*cannot be null.*/, 'pidm'
-	    personRelatedHold.userData = null
-	    assertFalse personRelatedHold.validate()
-	    assertLocalizedError personRelatedHold, 'nullable', /.*Field.*userData.*of class.*PersonRelatedHold.*cannot be null.*/, 'userData'
-	    personRelatedHold.fromDate = null
-	    assertFalse personRelatedHold.validate()
-	    assertLocalizedError personRelatedHold, 'nullable', /.*Field.*fromDate.*of class.*PersonRelatedHold.*cannot be null.*/, 'fromDate'
-	    personRelatedHold.toDate = null
-	    assertFalse personRelatedHold.validate()
-	    assertLocalizedError personRelatedHold, 'nullable', /.*Field.*toDate.*of class.*PersonRelatedHold.*cannot be null.*/, 'toDate'
-	    personRelatedHold.releaseIndicator = null
-	    assertFalse personRelatedHold.validate()
-	    assertLocalizedError personRelatedHold, 'nullable', /.*Field.*releaseIndicator.*of class.*PersonRelatedHold.*cannot be null.*/, 'releaseIndicator'
-	    personRelatedHold.holdType = null
-	    assertFalse personRelatedHold.validate()
-	    assertLocalizedError personRelatedHold, 'nullable', /.*Field.*holdType.*of class.*PersonRelatedHold.*cannot be null.*/, 'holdType'
-	}
+
   
     
   private def newPersonRelatedHold() {
