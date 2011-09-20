@@ -38,7 +38,7 @@ import javax.persistence.Version
 @NamedQueries(value = [
 @NamedQuery(name = "PersonIdentificationName.fetchByBannerId",
 query = """FROM  PersonIdentificationName a
-	  	                WHERE a.bannerId like :filter
+	  	                WHERE a.bannerId like UPPER(:filter)
 	  	                and a.entityIndicator = 'P'
 	  	                and a.changeIndicator is null
 	  	                ORDER by a.lastName, a.firstName, a.middleName, a.bannerId  """),
@@ -51,7 +51,7 @@ query = """FROM  PersonIdentificationName a
 	  	                 ORDER by a.lastName, a.firstName, a.middleName, a.bannerId  """),
 @NamedQuery(name = "PersonIdentificationName.fetchPersonByBannerId",
 query = """FROM  PersonIdentificationName a
-	  	                WHERE a.bannerId = :filter
+	  	                WHERE a.bannerId = UPPER(:filter)
 	  	                and a.entityIndicator = 'P'
 	  	                and a.changeIndicator is null    """),
 @NamedQuery(name = "PersonIdentificationName.fetchPersonByPidm",
@@ -65,20 +65,20 @@ query = """FROM  PersonIdentificationName a
 	  	                and a.changeIndicator is null    """),
 @NamedQuery(name = "PersonIdentificationName.fetchPersonOrNonPersonByBannerId",
 query = """FROM  PersonIdentificationName a
-                        WHERE (a.pidm in (SELECT Y.pidm FROM PersonIdentificationName Y WHERE Y.bannerId =  :filter  AND Y.changeIndicator = 'I')
-                        or a.pidm in (SELECT Z.pidm FROM PersonIdentificationName Z WHERE Z.bannerId = :filter AND Z.changeIndicator is NULL))
+                        WHERE (a.pidm in (SELECT Y.pidm FROM PersonIdentificationName Y WHERE Y.bannerId =  UPPER(:filter)  AND Y.changeIndicator = 'I')
+                        or a.pidm in (SELECT Z.pidm FROM PersonIdentificationName Z WHERE Z.bannerId = UPPER(:filter) AND Z.changeIndicator is NULL))
                        and a.changeIndicator is null
 	  	               ORDER by a.lastName, a.firstName, a.middleName, a.bannerId """),
 @NamedQuery(name = "PersonIdentificationName.fetchAllPersonByNameOrBannerId",
 query = """FROM  PersonIdentificationName a
-	  	                WHERE (a.bannerId like :filter
+	  	                WHERE (a.bannerId like UPPER(:filter)
 	  	                or a.searchFirstName like :filter
 	  	                or a.searchMiddleName like :filter
 	  	                or a.searchLastName like :filter)
 	  	                and a.entityIndicator = 'P' order by lastName, firstName, middleName, bannerId  """),
 @NamedQuery(name = "PersonIdentificationName.fetchCountPersonByNameOrBannerId",
 query = """select count(a.bannerId) FROM  PersonIdentificationName a
-	  	                WHERE (a.bannerId like :filter
+	  	                WHERE (a.bannerId like UPPER(:filter)
 	  	                or a.searchFirstName like :filter
 	  	                or a.searchMiddleName like :filter
 	  	                or a.searchLastName like :filter)
@@ -86,12 +86,12 @@ query = """select count(a.bannerId) FROM  PersonIdentificationName a
 	  	                and a.changeIndicator is null"""),
 @NamedQuery(name = "PersonIdentificationName.fetchAllNonPersonByNameOrBannerId",
 query = """FROM  PersonIdentificationName a
-	  	                WHERE (a.bannerId like :filter
+	  	                WHERE (a.bannerId like UPPER(:filter)
 	  	                or a.searchLastName like :filter)
 	  	                and a.entityIndicator = 'C' order by lastName, bannerId  """),
 @NamedQuery(name = "PersonIdentificationName.fetchCountNonPersonByNameOrBannerId",
 query = """select count(a.bannerId) FROM  PersonIdentificationName a
-	  	                WHERE (a.bannerId like :filter
+	  	                WHERE (a.bannerId like UPPER(:filter)
 	  	                or a.searchLastName like :filter)
 	  	                and a.entityIndicator = 'C'
 	  	                and a.changeIndicator is null """)
