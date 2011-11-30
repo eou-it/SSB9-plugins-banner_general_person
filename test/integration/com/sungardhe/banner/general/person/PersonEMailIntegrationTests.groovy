@@ -17,14 +17,12 @@
 package com.sungardhe.banner.general.person
 
 import com.sungardhe.banner.testing.BaseIntegrationTestCase
-import com.sungardhe.banner.exceptions.ApplicationException 
-import groovy.sql.Sql 
-import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
+
 import com.sungardhe.banner.general.system.EmailType
 import java.sql.Timestamp
 
 
-class PersonEMailIntegrationTests extends BaseIntegrationTestCase {
+class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
 	
 	/*PROTECTED REGION ID(personemail_domain_integration_test_data) ENABLED START*/
 	//Test data for creating new domain instance
@@ -133,7 +131,7 @@ class PersonEMailIntegrationTests extends BaseIntegrationTestCase {
 		
 		personEMail.save( failOnError: true, flush: true )
 		//Assert for sucessful update        
-        personEMail = PersonEMail.get( personEMail.id )
+        personEMail = PersonEmail.get( personEMail.id )
         assertEquals 1L, personEMail?.version
         assertEquals u_success_statusIndicator, personEMail.statusIndicator
         assertEquals u_success_preferredIndicator, personEMail.preferredIndicator
@@ -171,17 +169,17 @@ class PersonEMailIntegrationTests extends BaseIntegrationTestCase {
 		def id = personEMail.id
 		assertNotNull id
 		personEMail.delete()
-		assertNull PersonEMail.get( id )
+		assertNull PersonEmail.get( id )
 	}
 	
     void testValidation() {
        def personEMail = newInvalidForCreatePersonEMail()
-       assertFalse "PersonEMail could not be validated as expected due to ${personEMail.errors}", personEMail.validate()
+       assertFalse "PersonEmail could not be validated as expected due to ${personEMail.errors}", personEMail.validate()
     }
 
     void testNullValidationFailure() {
-        def personEMail = new PersonEMail()
-        assertFalse "PersonEMail should have failed validation", personEMail.validate()
+        def personEMail = new PersonEmail()
+        assertFalse "PersonEmail should have failed validation", personEMail.validate()
         assertErrorsFor personEMail, 'nullable', 
                                                [ 
                                                  'pidm', 
@@ -198,9 +196,9 @@ class PersonEMailIntegrationTests extends BaseIntegrationTestCase {
     }
     
     void testMaxSizeValidationFailures() {
-        def personEMail = new PersonEMail( 
+        def personEMail = new PersonEmail(
         commentData:'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX' )
-		assertFalse "PersonEMail should have failed validation", personEMail.validate()
+		assertFalse "PersonEmail should have failed validation", personEMail.validate()
 		assertErrorsFor personEMail, 'maxSize', [ 'commentData' ]    
     }
 
@@ -209,27 +207,27 @@ class PersonEMailIntegrationTests extends BaseIntegrationTestCase {
 //	    def personEMail = newInvalidForCreatePersonEMail()
 //	    personEMail.pidm = null
 //	    assertFalse personEMail.validate()
-//	    assertLocalizedError personEMail, 'nullable', /.*Field.*pidm.*of class.*PersonEMail.*cannot be null.*/, 'pidm'
+//	    assertLocalizedError personEMail, 'nullable', /.*Field.*pidm.*of class.*PersonEmail.*cannot be null.*/, 'pidm'
 //	    personEMail.emailAddress = null
 //	    assertFalse personEMail.validate()
-//	    assertLocalizedError personEMail, 'nullable', /.*Field.*emailAddress.*of class.*PersonEMail.*cannot be null.*/, 'emailAddress'
+//	    assertLocalizedError personEMail, 'nullable', /.*Field.*emailAddress.*of class.*PersonEmail.*cannot be null.*/, 'emailAddress'
 //	    personEMail.statusIndicator = null
 //	    assertFalse personEMail.validate()
-//	    assertLocalizedError personEMail, 'nullable', /.*Field.*statusIndicator.*of class.*PersonEMail.*cannot be null.*/, 'statusIndicator'
+//	    assertLocalizedError personEMail, 'nullable', /.*Field.*statusIndicator.*of class.*PersonEmail.*cannot be null.*/, 'statusIndicator'
 //	    personEMail.preferredIndicator = null
 //	    assertFalse personEMail.validate()
-//	    assertLocalizedError personEMail, 'nullable', /.*Field.*preferredIndicator.*of class.*PersonEMail.*cannot be null.*/, 'preferredIndicator'
+//	    assertLocalizedError personEMail, 'nullable', /.*Field.*preferredIndicator.*of class.*PersonEmail.*cannot be null.*/, 'preferredIndicator'
 //	    personEMail.displayWebIndicator = null
 //	    assertFalse personEMail.validate()
-//	    assertLocalizedError personEMail, 'nullable', /.*Field.*displayWebIndicator.*of class.*PersonEMail.*cannot be null.*/, 'displayWebIndicator'
+//	    assertLocalizedError personEMail, 'nullable', /.*Field.*displayWebIndicator.*of class.*PersonEmail.*cannot be null.*/, 'displayWebIndicator'
 //	    personEMail.emailType = null
 //	    assertFalse personEMail.validate()
-//	    assertLocalizedError personEMail, 'nullable', /.*Field.*emailType.*of class.*PersonEMail.*cannot be null.*/, 'emailType'
+//	    assertLocalizedError personEMail, 'nullable', /.*Field.*emailType.*of class.*PersonEmail.*cannot be null.*/, 'emailType'
 //	}
   
     
 	private def newValidForCreatePersonEMail() {
-		def personEMail = new PersonEMail(
+		def personEMail = new PersonEmail(
 			pidm: i_success_pidm, 
 			emailAddress: i_success_emailAddress, 
 			statusIndicator: i_success_statusIndicator, 
@@ -242,7 +240,7 @@ class PersonEMailIntegrationTests extends BaseIntegrationTestCase {
 	}
 
 	private def newInvalidForCreatePersonEMail() {
-		def personEMail = new PersonEMail(
+		def personEMail = new PersonEmail(
 			pidm: i_failure_pidm, 
 			emailAddress: i_failure_emailAddress, 
 			statusIndicator: i_failure_statusIndicator, 
@@ -261,13 +259,11 @@ class PersonEMailIntegrationTests extends BaseIntegrationTestCase {
     /*PROTECTED REGION ID(personemail_custom_integration_test_methods) ENABLED START*/
 
    def testFetchByPidmAndStatusAndWebDisplayAndPreferredIndicator() {
-       def results = PersonEMail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator(33784, 'A', 'Y', 'Y')
+       def results = PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator(PersonUtility.getPerson("966049236").pidm, 'A', 'Y', 'Y')
 
        assertTrue results.size() == 1
 
        def res = results.get(0)
-
-       assertEquals res.id, 1412
 
 
        assertEquals res.version, 0

@@ -24,7 +24,6 @@ import javax.persistence.Table
 import javax.persistence.Version
 import javax.persistence.NamedQueries
 import javax.persistence.NamedQuery
-import javax.persistence.Transient
 
 import javax.persistence.GenerationType
 import javax.persistence.SequenceGenerator
@@ -32,13 +31,12 @@ import javax.persistence.SequenceGenerator
 import javax.persistence.JoinColumn
 import javax.persistence.JoinColumns
 import javax.persistence.ManyToOne
-import org.hibernate.annotations.GenericGenerator
+
 import org.hibernate.annotations.Type
 import com.sungardhe.banner.general.system.EmailType
-import org.hibernate.annotations.NamedQueries
+
 import javax.persistence.Temporal
 import javax.persistence.TemporalType
-import org.hibernate.annotations.NamedQuery
 
 /**
  * Represents a person's email address
@@ -46,14 +44,14 @@ import org.hibernate.annotations.NamedQuery
 @Entity
 @Table(name = "GV_GOREMAL")
 @NamedQueries(value=[
-    @NamedQuery(name="PersonEMail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator",
-    query="""FROM PersonEMail a
+    @NamedQuery(name="PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator",
+    query="""FROM PersonEmail a
     WHERE a.pidm = :pidm
     AND a.statusIndicator = :statusIndicator
     AND a.preferredIndicator = :preferredIndicator
     AND a.displayWebIndicator = :displayWebIndicator""")
 ])
-class PersonEMail implements Serializable {
+class PersonEmail implements Serializable {
 	
 	/**
 	 * Surrogate ID for GOREMAL
@@ -158,8 +156,8 @@ class PersonEMail implements Serializable {
 	
 	boolean equals(o) {
 	    if (this.is(o)) return true
-	    if (!(o instanceof PersonEMail)) return false
-	    PersonEMail that = (PersonEMail) o
+	    if (!(o instanceof PersonEmail)) return false
+	    PersonEmail that = (PersonEmail) o
         if(id != that.id) return false
         if(version != that.version) return false
         if(pidm != that.pidm) return false
@@ -234,8 +232,8 @@ class PersonEMail implements Serializable {
     public static List fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator(Integer pidm, String statusIndicator,
                                                                               String displayWebIndicator, String preferredIndicator) {
 
-        def email = PersonEMail.withSession {session ->
-            session.getNamedQuery('PersonEMail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator')
+        def email = PersonEmail.withSession {session ->
+            session.getNamedQuery('PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator')
                    .setInteger('pidm', pidm)
                    .setString('statusIndicator', statusIndicator)
                    .setString('displayWebIndicator', displayWebIndicator)
