@@ -167,8 +167,8 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 	void initializeTestDataForReferences() {
 		/*PROTECTED REGION ID(personaddress_domain_integration_test_data_initialization) ENABLED START*/
 		//Valid test data (For success tests)
-        u_success_pidm = i_success_pidm = PersonIdentificationName.findByBannerId("EVT00030").pidm
-        u_failure_pidm = i_failure_pidm = PersonIdentificationName.findByBannerId("EVT00029").pidm
+        u_success_pidm = i_success_pidm = PersonIdentificationName.findByBannerId("HOF00714").pidm
+        u_failure_pidm = i_failure_pidm = PersonIdentificationName.findByBannerId("HOF00716").pidm
 
 
     	i_success_addressType = AddressType.findWhere(code:"PO")
