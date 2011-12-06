@@ -16,27 +16,10 @@
  */
 package com.sungardhe.banner.general.person
 
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
-import javax.persistence.Table
-import javax.persistence.Version
-import javax.persistence.NamedQueries
-import javax.persistence.NamedQuery
-
-import javax.persistence.GenerationType
-import javax.persistence.SequenceGenerator
-
-import javax.persistence.JoinColumn
-import javax.persistence.JoinColumns
-import javax.persistence.ManyToOne
-
-import org.hibernate.annotations.Type
 import com.sungardhe.banner.general.system.EmailType
-
-import javax.persistence.Temporal
-import javax.persistence.TemporalType
+import org.apache.log4j.Logger
+import org.hibernate.annotations.Type
+import javax.persistence.*
 
 /**
  * Represents a person's email address
@@ -52,6 +35,7 @@ import javax.persistence.TemporalType
     AND a.displayWebIndicator = :displayWebIndicator""")
 ])
 class PersonEmail implements Serializable {
+      static def log = Logger.getLogger( 'com.sungardhe.banner.general.person.PersonEmail' )
 	
 	/**
 	 * Surrogate ID for GOREMAL
@@ -240,7 +224,8 @@ class PersonEmail implements Serializable {
                    .setString('preferredIndicator', preferredIndicator)
                    .list()
         }
-
+        log.debug "Executing fetchByPidmAndStatusAndWebDisplayAndPreferredIndiator  with pidm = ${pidm} and status = ${statusIndicator} and displayWebIndicator = ${displayWebIndicator} and preferredIndicator = {$preferredIndicator}"
+        log.debug "Fetched number of emails ${email.size()}"
         return email
     }
 
