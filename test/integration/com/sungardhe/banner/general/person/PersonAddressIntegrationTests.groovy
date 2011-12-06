@@ -39,7 +39,7 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 	def i_success_nation
 	def i_success_addressSource
 
-	def i_success_pidm = 500030
+	def i_success_pidm
 	def i_success_sequenceNumber = 0
 	def i_success_fromDate = new Date()
 	def i_success_toDate = new Date()
@@ -69,7 +69,7 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 	def i_failure_nation
 	def i_failure_addressSource
 
-	def i_failure_pidm = 500029
+	def i_failure_pidm
 	def i_failure_sequenceNumber = null
 	def i_failure_fromDate = new Date()
 	def i_failure_toDate = new Date()
@@ -101,7 +101,7 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 	def u_success_nation
 	def u_success_addressSource
 
-	def u_success_pidm = 500030
+	def u_success_pidm
 	def u_success_sequenceNumber = null
 	def u_success_fromDate = new Date()
 	def u_success_toDate = new Date()
@@ -131,7 +131,7 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 	def u_failure_nation
 	def u_failure_addressSource
 
-	def u_failure_pidm = 500029
+	def u_failure_pidm
 	def u_failure_sequenceNumber = null
 	def u_failure_fromDate = new Date()
 	def u_failure_toDate = new Date()
@@ -167,32 +167,36 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 	void initializeTestDataForReferences() {
 		/*PROTECTED REGION ID(personaddress_domain_integration_test_data_initialization) ENABLED START*/
 		//Valid test data (For success tests)
-    	i_success_addressType = AddressType.findWhere(code:"PO") //TODO: fill in the query condition
-    	i_success_state = State.findWhere(code:"MER") //TODO: fill in the query condition
-    	i_success_county = County.findWhere(code:"044") //TODO: fill in the query condition
-    	i_success_nation = Nation.findWhere(code:"157") //TODO: fill in the query condition
-    	i_success_addressSource = AddressSource.findWhere(code:"BRD") //TODO: fill in the query condition
+        u_success_pidm = i_success_pidm = PersonIdentificationName.findByBannerId("HOF00714").pidm
+        u_failure_pidm = i_failure_pidm = PersonIdentificationName.findByBannerId("HOF00716").pidm
+
+
+    	i_success_addressType = AddressType.findWhere(code:"PO")
+    	i_success_state = State.findWhere(code:"MER")
+    	i_success_county = County.findWhere(code:"044")
+    	i_success_nation = Nation.findWhere(code:"157")
+    	i_success_addressSource = AddressSource.findWhere(code:"BRD")
 
 		//Invalid test data (For failure tests)
-	    i_failure_addressType = AddressType.findWhere(code:"GR") //TODO: fill in the query condition
-	    i_failure_state = State.findWhere(code:"GLO") //TODO: fill in the query condition
-	    i_failure_county = County.findWhere(code:"045") //TODO: fill in the query condition
-	    i_failure_nation = Nation.findWhere(code:"40") //TODO: fill in the query condition
-	    i_failure_addressSource = AddressSource.findWhere(code:"BRD") //TODO: fill in the query condition
+	    i_failure_addressType = AddressType.findWhere(code:"GR")
+	    i_failure_state = State.findWhere(code:"GLO")
+	    i_failure_county = County.findWhere(code:"045")
+	    i_failure_nation = Nation.findWhere(code:"40")
+	    i_failure_addressSource = AddressSource.findWhere(code:"BRD")
 
 		//Valid test data (For success tests)
-	    u_success_addressType = AddressType.findWhere(code:"PO") //TODO: fill in the query condition
-	    u_success_state = State.findWhere(code:"MER") //TODO: fill in the query condition
-	    u_success_county = County.findWhere(code:"044") //TODO: fill in the query condition
-	    u_success_nation = Nation.findWhere(code:"157") //TODO: fill in the query condition
-	    u_success_addressSource = AddressSource.findWhere(code:"BRD") //TODO: fill in the query condition
+	    u_success_addressType = AddressType.findWhere(code:"PO")
+	    u_success_state = State.findWhere(code:"MER")
+	    u_success_county = County.findWhere(code:"044")
+	    u_success_nation = Nation.findWhere(code:"157")
+	    u_success_addressSource = AddressSource.findWhere(code:"BRD")
 
 		//Valid test data (For failure tests)
-    	u_failure_addressType = AddressType.findWhere(code:"GR") //TODO: fill in the query condition
-    	u_failure_state = State.findWhere(code:"GLO") //TODO: fill in the query condition
-    	u_failure_county = County.findWhere(code:"045") //TODO: fill in the query condition
-    	u_failure_nation = Nation.findWhere(code:"40") //TODO: fill in the query condition
-    	u_failure_addressSource = AddressSource.findWhere(code:"BRD") //TODO: fill in the query condition
+    	u_failure_addressType = AddressType.findWhere(code:"GR")
+    	u_failure_state = State.findWhere(code:"GLO")
+    	u_failure_county = County.findWhere(code:"045")
+    	u_failure_nation = Nation.findWhere(code:"40")
+    	u_failure_addressSource = AddressSource.findWhere(code:"BRD")
 
 		//Test data for references for custom tests
 		/*PROTECTED REGION END*/
@@ -546,10 +550,7 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 			state: i_success_state,
 			county: i_success_county,
 			nation: i_success_nation,
-			addressSource: i_success_addressSource,
-        	lastModified: new Date(),
-			lastModifiedBy: "test",
-			dataOrigin: "Banner"
+			addressSource: i_success_addressSource
 	    )
 		return personAddress
 	}
@@ -584,10 +585,7 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 			state: i_failure_state,
 			county: i_failure_county,
 			nation: i_failure_nation,
-			addressSource: i_failure_addressSource,
-        	lastModified: new Date(),
-			lastModifiedBy: "test",
-			dataOrigin: "Banner"
+			addressSource: i_failure_addressSource
 		)
 		return personAddress
 	}
