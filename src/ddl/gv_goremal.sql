@@ -10,18 +10,15 @@
 -- * Banner and Luminis are either registered trademarks or trademarks of SunGard Higher   *
 -- * Education in the U.S.A. and/or other regions and/or countries.                        *
 -- *****************************************************************************************
-
-
---
--- gv_goremal.sql
---
--- AUDIT TRAIL: 8.x
--- DBEU 08/08/2011
---
---    Generated view for Horizon API support
---
--- AUDIT TRAIL END
---
+REM
+REM gv_goremal.sql
+REM 
+REM AUDIT TRAIL: 9.0 
+REM 08/08/2011
+REM 1. Horizon 
+REM Generated view for Horizon API support
+REM AUDIT TRAIL END 
+REM
 CREATE OR REPLACE FORCE VIEW gv_goremal AS SELECT
       goremal_pidm,
       goremal_emal_code,
@@ -37,5 +34,5 @@ CREATE OR REPLACE FORCE VIEW gv_goremal AS SELECT
       goremal_activity_date,
       ROWID goremal_v_rowid
   FROM goremal;
---
+REM
 CREATE OR REPLACE PUBLIC SYNONYM gv_goremal FOR gv_goremal;

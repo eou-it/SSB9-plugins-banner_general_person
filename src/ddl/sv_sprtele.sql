@@ -10,18 +10,15 @@
 -- * Banner and Luminis are either registered trademarks or trademarks of SunGard Higher   *
 -- * Education in the U.S.A. and/or other regions and/or countries.                        *
 -- *****************************************************************************************
-
-
---
--- sv_sprtele.sql
---
--- AUDIT TRAIL: 8.x
--- DBEU 06/30/2011
---
---    Generated view for Horizon API support
---
--- AUDIT TRAIL END
---
+REM
+REM sv_sprtele.sql
+REM 
+REM AUDIT TRAIL: 9.0 
+REM 30/06/2011
+REM 1. Horizon 
+REM Generated view for Horizon API support
+REM AUDIT TRAIL END 
+REM
 CREATE OR REPLACE FORCE VIEW sv_sprtele AS SELECT
       sprtele_pidm,
       sprtele_seqno,
@@ -44,4 +41,5 @@ CREATE OR REPLACE FORCE VIEW sv_sprtele AS SELECT
       sprtele_activity_date,
       ROWID sprtele_v_rowid
   FROM sprtele;
+REM
 CREATE OR REPLACE PUBLIC SYNONYM sv_sprtele FOR sv_sprtele;

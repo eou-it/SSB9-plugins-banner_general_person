@@ -10,18 +10,15 @@
 -- * Banner and Luminis are either registered trademarks or trademarks of SunGard Higher   *
 -- * Education in the U.S.A. and/or other regions and/or countries.                        *
 -- *****************************************************************************************
-
-
---
--- sv_spraddr.sql
---
--- AUDIT TRAIL: 8.x
--- DBEU 07/06/2011
---
---    Generated view for Horizon API support
---
--- AUDIT TRAIL END
---
+REM
+REM sv_spraddr.sql
+REM 
+REM AUDIT TRAIL: 9.0 
+REM 07/06/2011
+REM 1. Horizon 
+REM Generated view for Horizon API support
+REM AUDIT TRAIL END 
+REM
 CREATE OR REPLACE FORCE VIEW sv_spraddr AS SELECT
       spraddr_pidm,
       spraddr_atyp_code,
@@ -58,5 +55,5 @@ CREATE OR REPLACE FORCE VIEW sv_spraddr AS SELECT
       spraddr_activity_date,
       ROWID spraddr_v_rowid
   FROM spraddr;
---
+REM
 CREATE OR REPLACE PUBLIC SYNONYM sv_spraddr FOR sv_spraddr;

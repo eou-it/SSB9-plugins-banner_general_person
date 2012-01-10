@@ -9,10 +9,14 @@
 -- * Banner and Luminis are either registered trademarks or trademarks of SunGard Higher   *
 -- * Education in the U.S.A. and/or other regions and/or countries.                        *
 -- *****************************************************************************************
-
-
-
-
+REM
+REM sv_spriden.sql
+REM 
+REM AUDIT TRAIL: 9.0 
+REM 1. Horizon 
+REM Generated view for Horizon API support
+REM AUDIT TRAIL END 
+REM
 CREATE OR REPLACE FORCE VIEW SV_SPRIDEN AS SELECT
       spriden_pidm,
       spriden_id,
@@ -41,4 +45,5 @@ CREATE OR REPLACE FORCE VIEW SV_SPRIDEN AS SELECT
       decode(spriden_pidm,null, null,f_format_name(spriden_pidm,'FML')) as FULL_NAME,
       ROWID spriden_v_rowid
   FROM saturn.spriden;
+REM
 CREATE OR REPLACE PUBLIC SYNONYM SV_SPRIDEN FOR SV_SPRIDEN;

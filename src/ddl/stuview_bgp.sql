@@ -9,10 +9,13 @@
 -- * Banner and Luminis are either registered trademarks or trademarks of SunGard Higher   *
 -- * Education in the U.S.A. and/or other regions and/or countries.                        *
 -- *****************************************************************************************
-
-
-
-
+REM
+REM stuview_bgp.sql
+REM 
+REM AUDIT TRAIL: 9.0 
+REM 1. Horizon 
+REM AUDIT TRAIL END 
+REM
 start sv_spraddr
 start sv_sprhold
 start sv_spriden
