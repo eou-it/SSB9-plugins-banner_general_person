@@ -34,7 +34,6 @@ start studbpr_bgp
 REM
 spool off;
 REM
-select * from all_objects where status = 'INVALID'
-REM
-conn sys/u_pick_it as sysdba
+select * from all_objects where status = 'INVALID';
+conn sys/u_pick_it as sysdba;
 execute utl_recomp.recomp_parallel();
