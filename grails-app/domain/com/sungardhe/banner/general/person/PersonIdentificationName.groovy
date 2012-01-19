@@ -82,8 +82,7 @@ query = """select count(a.bannerId) FROM  PersonIdentificationName a
 	  	                or a.searchFirstName like :filter
 	  	                or a.searchMiddleName like :filter
 	  	                or a.searchLastName like :filter)
-	  	                and a.entityIndicator = 'P'
-	  	                and a.changeIndicator is null"""),
+	  	                and a.entityIndicator = 'P' """),
 @NamedQuery(name = "PersonIdentificationName.fetchAllNonPersonByNameOrBannerId",
 query = """FROM  PersonIdentificationName a
 	  	                WHERE (a.bannerId like :filter
@@ -93,8 +92,7 @@ query = """FROM  PersonIdentificationName a
 query = """select count(a.bannerId) FROM  PersonIdentificationName a
 	  	                WHERE (a.bannerId like :filter
 	  	                or a.searchLastName like :filter)
-	  	                and a.entityIndicator = 'C'
-	  	                and a.changeIndicator is null """)
+	  	                and a.entityIndicator = 'C' """)
 ])
 @DatabaseModifiesState
 class PersonIdentificationName implements Serializable {
