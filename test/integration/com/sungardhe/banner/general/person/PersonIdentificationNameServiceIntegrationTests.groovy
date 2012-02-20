@@ -110,7 +110,7 @@ class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTes
         def fmt
         def pidm
         def formattedName
-        pidm = 37859
+        pidm = PersonUtility.getPerson("HOS00001").pidm
         fmt = "FL"
         formattedName = personIdentificationNameService.getFormattedName(pidm,fmt)
         assertEquals(formattedName, 'Emily Jamison')
