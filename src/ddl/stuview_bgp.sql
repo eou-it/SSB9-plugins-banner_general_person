@@ -22,3 +22,6 @@ start sv_spriden
 start sv_sprmedi
 start sv_sprtele
 start gv_goremal
+start svq_sprtele
+start gvq_goradid
+start gvq_goremal
