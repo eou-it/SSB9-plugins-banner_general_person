@@ -60,9 +60,6 @@ class EmailSearchIntegrationTests extends BaseIntegrationTestCase {
 
         assertNotNull results
 
-
-        println "@@@@@@@@@@@ " + results
-
         def res = results[0]
 
         assertNotNull res.bannerId
