@@ -80,7 +80,7 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests the list of persons.
      */
-    def testEmailSearchByFilterAndPagination() {
+    def testPersonSearchByFilterAndPagination() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
         def id
