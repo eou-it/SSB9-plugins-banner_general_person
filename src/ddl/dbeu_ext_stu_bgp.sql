@@ -32,4 +32,3 @@ execute dbeu_util.extend_table('SATURN','SPRIDEN','S',TRUE);
 execute dbeu_util.extend_table('SATURN','SPRMEDI','S',TRUE);
 execute dbeu_util.extend_table('SATURN','SPRTELE','S',TRUE);
 execute dbeu_util.extend_table('GENERAL','GOREMAL','G',TRUE);
-execute dbeu_util.extend_table('SATURN','SPRAPIN','S',FALSE);
