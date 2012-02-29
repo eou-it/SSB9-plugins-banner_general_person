@@ -53,7 +53,25 @@ query = """select count(a.bannerId) FROM  PersonPersonView a
               :changeIndicator is null)
         and((a.nameType = :nameType and :nameType is not null) or
               :nameType is null)
-	   and a.entityIndicator = 'P' """)
+	   and a.entityIndicator = 'P' """),
+@NamedQuery(name = "PersonPersonView.searchByPidms",
+query = """FROM  PersonPersonView a
+WHERE ((a.bannerId like :id and :id is not null) or :id is null)
+      and (((soundex(a.lastName) = soundex(:soundexLastName)) and :soundexLastName is not null) or
+              (a.searchLastName like :lastName and
+               :lastName is not null) or (:lastName is null and :soundexLastName is null))
+      and (((soundex(a.firstName) = soundex(:soundexFirstName)) and :soundexFirstName is not null) or
+               (a.searchFirstName like :firstName and
+                 :firstName is not null) or
+                  (:firstName is null and :soundexFirstName is null))
+       and ((a.searchMiddleName like :midName and :midName is not null) or
+              :midName is null)
+        and ((a.changeIndicator = :changeIndicator and :changeIndicator is not null) or
+              :changeIndicator is null)
+        and((a.nameType = :nameType and :nameType is not null) or
+              :nameType is null)
+	   and a.entityIndicator = 'P'
+	   and a.pidm IN (:pidms)""")
 ])
 class PersonPersonView extends PersonView {
 
@@ -122,7 +140,7 @@ class PersonPersonView extends PersonView {
 
     /**
      *
-     * @param id  search parameter
+     * @param id search parameter
      * @param lastName search parameter
      * @param firstName search parameter
      * @param midName search parameter
@@ -257,8 +275,8 @@ class PersonPersonView extends PersonView {
     }
 
     /**
-    *  Query String Builder
-    */
+     *  Query String Builder
+     */
     def private static finderByAllEntityList = {filterData ->
         def query = """FROM  PersonPersonView a
                           WHERE ((a.bannerId like :id and :id is not null) or :id is null)
@@ -278,5 +296,61 @@ class PersonPersonView extends PersonView {
 	                  and a.entityIndicator = 'P' """
 
         return new DynamicFinder(PersonPersonView.class, query, "person")
+    }
+
+    /**
+     *
+     * @param id search parameter
+     * @param lastName search parameter
+     * @param firstName search parameter
+     * @param midName search parameter
+     * @param soundexLastName search parameter
+     * @param soundexFirstName search parameter
+     * @param changeIndicator search parameter
+     * @param nameType search parameter
+     * @param pagingAndSortParams search parameter
+     * @return list of Persons
+     */
+    public static List fetchPersonByPidms(pidms, id, lastName, firstName, midName, soundexLastName, soundexFirstName, changeIndicator, nameType, pagingAndSortParams) {
+        def idCriteria
+        def lastNameCriteria
+        def firstNameCriteria
+        def midNameCriteria
+
+
+        if (id) {
+            idCriteria = "%" + id.toUpperCase() + "%"
+        }
+
+        if (lastName) {
+            lastNameCriteria = "%" + lastName.toUpperCase() + "%"
+        }
+
+        if (firstName) {
+            firstNameCriteria = "%" + firstName.toUpperCase() + "%"
+        }
+
+        if (midName) {
+            midNameCriteria = "%" + midName.toUpperCase() + "%"
+        }
+
+        PersonPersonView.withSession {session ->
+
+            def persons = session.getNamedQuery('PersonPersonView.searchByPidms').
+                    setString('id', idCriteria).
+                    setString('lastName', lastNameCriteria).
+                    setString('soundexLastName', soundexLastName).
+                    setString('firstName', firstNameCriteria).
+                    setString('soundexFirstName', soundexFirstName).
+                    setString('midName', midNameCriteria).
+                    setString("changeIndicator", changeIndicator).
+                    setString("nameType", nameType).
+                    setParameterList("pidms", pidms)
+
+            persons.setMaxResults(pagingAndSortParams.max)
+            persons.setFirstResult(pagingAndSortParams.offset)
+
+            return persons.list()
+        }
     }
 }

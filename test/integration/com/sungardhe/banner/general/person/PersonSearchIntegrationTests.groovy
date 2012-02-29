@@ -271,4 +271,27 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         assert result.size() == 0
     }
+
+     /**
+     * Tests the list of emails for the pidm list
+     */
+    def testSearchPersonByPidm() {
+        def pidmList = []
+        pidmList.add(new Integer("1358"))
+        pidmList.add(new Integer("1355"))
+
+        def pagingAndSortParams = ["max": 8, "offset": 0]
+        def id
+        def lastName = "Duck"
+        def firstName
+        def midName
+        def soundexLastName
+        def soundexFirstName
+        def changeIndicator
+        def nameType = ""
+
+        //search by last name
+        def results = PersonPersonView.fetchPersonByPidms(pidmList, id, lastName, firstName, midName, soundexLastName, soundexFirstName, changeIndicator, nameType, pagingAndSortParams)
+        assert results.size() == 2
+    }
 }
