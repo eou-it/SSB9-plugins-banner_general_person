@@ -152,4 +152,27 @@ class NonPersonSearchIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+     /**
+     * Tests no data found.
+     */
+    def testDynamicFinder5() {
+
+        def pagingAndSortParams = ["max": 8, "offset": 0]
+
+        def filterData = [:]
+        def param = [:]
+        param."id" = ""
+        param."lastName" = "%thxompson e%"
+        param."soundexLastName" = ""
+        param."changeIndicator" = ""
+        param."nameType" = ""
+
+        filterData.params = param
+
+        def result = NonPersonPersonView.fetchSearchEntityList(filterData, pagingAndSortParams)
+
+        assertTrue result.size()==0
+    }
+
+
 }

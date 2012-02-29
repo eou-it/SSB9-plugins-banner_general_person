@@ -245,4 +245,30 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
         assert result.size() == 1
         assertEquals "LEGL", result[0].nameType
     }
+
+
+     /**
+     * Tests no data found.
+     */
+    def testDynamicFinder6() {
+
+        def pagingAndSortParams = ["max": 8, "offset": 0]
+
+        def filterData = [:]
+        def param = [:]
+        param."id" = ""
+        param."lastName" = "McxxAnderson"
+        param."firstName" = ""
+        param."midName" = ""
+        param."soundexLastName" = ""
+        param."soundexFirstName" = ""
+        param."changeIndicator" = ""
+        param."nameType" = "LEGL"
+
+        filterData.params = param
+
+        def result = PersonPersonView.fetchSearchEntityList(filterData, pagingAndSortParams)
+
+        assert result.size() == 0
+    }
 }
