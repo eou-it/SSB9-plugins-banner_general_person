@@ -90,7 +90,7 @@ abstract class PersonView implements Serializable {
      * Birth Date
      */
     @Column(name = "BIRTH_DATE")
-    String birthDate
+    Date birthDate
 
 
     public static readonlyProperties = ['pidm']

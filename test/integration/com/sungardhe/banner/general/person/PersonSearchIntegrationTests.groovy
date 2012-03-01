@@ -133,6 +133,48 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
         assert result.size() == 4
     }
 
+
+     /**
+     * Tests the list of persons for inquiry page.
+     * Search by lastName, birthDate
+     */
+    def testDynamicFinder11() {
+
+        def pagingAndSortParams = ["max": 8, "offset": 0]
+
+        def filterData = [:]
+        def param = [:]
+        param."id" = ""
+        param."lastName" = "%duck%"
+        param."firstName" = ""
+        param."midName" = ""
+        param."soundexLastName" = ""
+        param."soundexFirstName" = ""
+        param."changeIndicator" = ""
+        param."nameType" = ""
+
+        param."birthDate" = Date.parse("yyyy-MM-dd", "2012-03-07")
+
+
+        filterData.params = param
+
+
+        def m = [:]
+        m."key" = "birthDate"
+        m."binding" = "birthDate"
+        m."operator" = "lessthan"
+
+        def x = []
+        x.add(m)
+        filterData.criteria = x
+
+        def result = PersonPersonView.fetchSearchEntityList(filterData, pagingAndSortParams)
+
+        assertNotNull result
+
+        assert result.size() == 3
+    }
+
     /**
      * Tests the list of persons for inquiry page.
      * Search by lastName, firstName

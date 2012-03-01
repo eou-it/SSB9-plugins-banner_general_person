@@ -193,6 +193,13 @@ class NonPersonPersonView extends PersonView {
         finderByAllEntityList().find(filterData, pagingAndSortParams)
     }
 
+    /*
+    * Returns the count of the filtered data.
+    */
+    def static countAllEntities(filterData) {
+        finderByAllEntityList().count(filterData)
+    }
+
     /**
     *  Query String Builder
     */
@@ -208,6 +215,6 @@ class NonPersonPersonView extends PersonView {
                             :nameType is null)
 	                  and a.entityIndicator = 'C' """
 
-        return new DynamicFinder(NonPersonPersonView.class, query, "nonperson")
+        return new DynamicFinder(NonPersonPersonView.class, query, "a")
     }
 }
