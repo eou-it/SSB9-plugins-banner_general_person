@@ -139,7 +139,7 @@ class PersonPersonView extends PersonView {
     }
 
     /**
-     *
+     * Returns the count of persons found by the query.
      * @param id search parameter
      * @param lastName search parameter
      * @param firstName search parameter
@@ -192,7 +192,7 @@ class PersonPersonView extends PersonView {
     }
 
     /**
-     *
+     * Returns the list of persons.
      * @param id search parameter
      * @param lastName search parameter
      * @param firstName search parameter
@@ -247,7 +247,7 @@ class PersonPersonView extends PersonView {
     }
 
     /**
-     *
+     * Returns the map of persons.
      * @param id search parameter
      * @param lastName search parameter
      * @param firstName search parameter
@@ -265,7 +265,7 @@ class PersonPersonView extends PersonView {
     }
 
     /**
-     *
+     * Fetches the list of Persons.
      * @param filterData filter data
      * @param pagingAndSortParams
      * @return list of Persons
@@ -274,11 +274,30 @@ class PersonPersonView extends PersonView {
         finderByAllEntityList().find(filterData, pagingAndSortParams)
     }
 
+    /**
+     * Fetches the list of Persons by soundex.
+     * @param filterData filter data
+     * @param pagingAndSortParams
+     * @return list of Persons
+     */
+    def public static fetchSearchSoundexEntityList(filterData, pagingAndSortParams) {
+        finderByAllSoundexEntityList().find(filterData, pagingAndSortParams)
+    }
+
     /*
     * Returns the count of the filtered data.
     */
+
     def static countAllEntities(filterData) {
         finderByAllEntityList().count(filterData)
+    }
+
+    /*
+    * Returns the count of the filtered data by soundex.
+    */
+
+    def static countAllSoundexEntities(filterData) {
+        finderByAllSoundexEntityList().count(filterData)
     }
 
     /**
@@ -286,27 +305,25 @@ class PersonPersonView extends PersonView {
      */
     def private static finderByAllEntityList = {filterData ->
         def query = """FROM  PersonPersonView a
-                          WHERE ((a.bannerId like :id and :id is not null) or :id is null)
-                               and (((soundex(a.lastName) = soundex(:soundexLastName)) and :soundexLastName is not null) or
-                                      (a.searchLastName like UPPER(:lastName) and
-                          :lastName is not null) or (:lastName is null and :soundexLastName is null))
-                          and (((soundex(a.firstName) = soundex(:soundexFirstName)) and :soundexFirstName is not null) or
-                         (a.searchFirstName like UPPER(:firstName) and
-                            :firstName is not null) or
-                                 (:firstName is null and :soundexFirstName is null))
-                                  and ((a.searchMiddleName like UPPER(:midName) and :midName is not null) or
-                                        :midName is null)
-                          and ((a.changeIndicator = :changeIndicator and :changeIndicator is not null) or
-                             :changeIndicator is null)
-                            and((a.nameType = :nameType and :nameType is not null) or
-                            :nameType is null)
-	                  and a.entityIndicator = 'P' """
+	                   WHERE a.entityIndicator = 'P' """
 
         return new DynamicFinder(PersonPersonView.class, query, "a")
     }
 
     /**
-     *
+     *  Soundex Query String Builder
+     */
+    def private static finderByAllSoundexEntityList = {filterData ->
+        def query = """FROM  PersonPersonView a
+          WHERE ((soundex(a.lastName) = soundex(:soundexLastName)) or :soundexLastName is null)
+                and ((soundex(a.firstName) = soundex(:soundexFirstName)) or :soundexFirstName is null)
+	            and  a.entityIndicator = 'P' """
+
+        return new DynamicFinder(PersonPersonView.class, query, "a")
+    }
+
+    /**
+     * Fetches list of Persons with Pidm.
      * @param id search parameter
      * @param lastName search parameter
      * @param firstName search parameter

@@ -1,4 +1,4 @@
-/*********************************************************************************
+/** *******************************************************************************
  Copyright 2009-2011 SunGard Higher Education. All Rights Reserved.
  This copyrighted software contains confidential and proprietary information of 
  SunGard Higher Education and its subsidiaries. Any use of this software is limited 
@@ -15,6 +15,7 @@ package com.sungardhe.banner.general.person
 import com.sungardhe.banner.general.person.view.PersonPersonView
 import com.sungardhe.banner.testing.BaseIntegrationTestCase
 import com.sungardhe.banner.general.system.NameType
+import org.junit.Ignore
 
 class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
@@ -45,6 +46,7 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
         //search by last name
         def results = PersonPersonView.fetchPerson(id, lastName, firstName, midName, soundexLastName, soundexFirstName, changeIndicator, nameType, pagingAndSortParams)
         assert results.size() == 4
+        println results
 
         lastName = "Duc" //Ducey
 
@@ -104,8 +106,7 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
         assertNotNull res.birthDate
     }
 
-
-     /**
+    /**
      * Tests the list of persons for inquiry page.
      * Search by lastName
      */
@@ -115,16 +116,18 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def filterData = [:]
         def param = [:]
-        param."id" = ""
-        param."lastName" = "%duck%"
-        param."firstName" = ""
-        param."midName" = ""
-        param."soundexLastName" = ""
-        param."soundexFirstName" = ""
-        param."changeIndicator" = ""
-        param."nameType" = ""
+        param."searchLastName" = "duck%"
+
+        def m = [:]
+        m."key" = "searchLastName"
+        m."binding" = "searchLastName"
+        m."operator" = "contains"
 
         filterData.params = param
+
+        def x = []
+        x.add(m)
+        filterData.criteria = x
 
         def result = PersonPersonView.fetchSearchEntityList(filterData, pagingAndSortParams)
 
@@ -133,39 +136,34 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
         assert result.size() == 4
     }
 
-
-     /**
+    /**
      * Tests the list of persons for inquiry page.
      * Search by lastName, birthDate
      */
-    def testDynamicFinder11() {
+    def testDynamicFinder1_1() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
 
         def filterData = [:]
         def param = [:]
-        param."id" = ""
-        param."lastName" = "%duck%"
-        param."firstName" = ""
-        param."midName" = ""
-        param."soundexLastName" = ""
-        param."soundexFirstName" = ""
-        param."changeIndicator" = ""
-        param."nameType" = ""
-
+        param."searchLastName" = "duck%"
         param."birthDate" = Date.parse("yyyy-MM-dd", "2012-03-07")
-
 
         filterData.params = param
 
+        def m0 = [:]
+        m0."key" = "searchLastName"
+        m0."binding" = "searchLastName"
+        m0."operator" = "contains"
 
-        def m = [:]
-        m."key" = "birthDate"
-        m."binding" = "birthDate"
-        m."operator" = "lessthan"
+        def m1 = [:]
+        m1."key" = "birthDate"
+        m1."binding" = "birthDate"
+        m1."operator" = "lessthan"
 
         def x = []
-        x.add(m)
+        x.add(m0)
+        x.add(m1)
         filterData.criteria = x
 
         def result = PersonPersonView.fetchSearchEntityList(filterData, pagingAndSortParams)
@@ -185,16 +183,26 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def filterData = [:]
         def param = [:]
-        param."id" = ""
-        param."lastName" = "%duck%"
-        param."firstName" = "%don%"
-        param."midName" = ""
-        param."soundexLastName" = ""
-        param."soundexFirstName" = ""
-        param."changeIndicator" = ""
-        param."nameType" = ""
+
+        param."searchLastName" = "duck%"
+        param."searchFirstName" = "don%"
 
         filterData.params = param
+
+        def m0 = [:]
+        m0."key" = "searchLastName"
+        m0."binding" = "searchLastName"
+        m0."operator" = "contains"
+
+        def m1 = [:]
+        m1."key" = "searchFirstName"
+        m1."binding" = "searchFirstName"
+        m1."operator" = "contains"
+
+        def x = []
+        x.add(m0)
+        x.add(m1)
+        filterData.criteria = x
 
         def result = PersonPersonView.fetchSearchEntityList(filterData, pagingAndSortParams)
 
@@ -213,16 +221,18 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def filterData = [:]
         def param = [:]
-        param."id" = "%A00000654%"
-        param."lastName" = ""
-        param."firstName" = ""
-        param."midName" = ""
-        param."soundexLastName" = ""
-        param."soundexFirstName" = ""
-        param."changeIndicator" = ""
-        param."nameType" = ""
+        param."bannerId" = "%A00000654%"
+
+        def m = [:]
+        m."key" = "bannerId"
+        m."binding" = "bannerId"
+        m."operator" = "contains"
 
         filterData.params = param
+
+        def x = []
+        x.add(m)
+        filterData.criteria = x
 
         def result = PersonPersonView.fetchSearchEntityList(filterData, pagingAndSortParams)
 
@@ -241,27 +251,41 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def filterData = [:]
         def param = [:]
-        param."id" = ""
-        param."lastName" = ""
-        param."firstName" = ""
-        param."midName" = ""
         param."soundexLastName" = "duck"
         param."soundexFirstName" = ""
-        param."changeIndicator" = ""
-        param."nameType" = ""
-
         filterData.params = param
 
-        def result = PersonPersonView.fetchSearchEntityList(filterData, pagingAndSortParams)
+        def result = PersonPersonView.fetchSearchSoundexEntityList(filterData, pagingAndSortParams)
 
         assertNotNull result
 
         assert result.size() == 8
     }
 
-     /**
+    /**
      * Tests the list of persons for inquiry page.
-     * Search by soundexLastName, nameType
+     * Search by soundexLastName and soundexFirstName
+     */
+    def testDynamicFinder4_1() {
+
+        def pagingAndSortParams = ["max": 8, "offset": 0]
+
+        def filterData = [:]
+        def param = [:]
+        param."soundexLastName" = "duck"
+        param."soundexFirstName" = "dayzy"
+        filterData.params = param
+
+        def result = PersonPersonView.fetchSearchSoundexEntityList(filterData, pagingAndSortParams)
+
+        assertNotNull result
+
+        assert result.size() == 1
+    }
+
+    /**
+     * Tests the list of persons for inquiry page.
+     * Search by lastName, nameType
      */
     def testDynamicFinder5() {
 
@@ -269,16 +293,26 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def filterData = [:]
         def param = [:]
-        param."id" = ""
-        param."lastName" = ""
-        param."firstName" = ""
-        param."midName" = ""
-        param."soundexLastName" = "McAnderson"
-        param."soundexFirstName" = ""
-        param."changeIndicator" = ""
+
+        param."searchLastName" = "McAnderson"
         param."nameType" = "LEGL"
 
         filterData.params = param
+
+        def m0 = [:]
+        m0."key" = "searchLastName"
+        m0."binding" = "searchLastName"
+        m0."operator" = "contains"
+
+        def m1 = [:]
+        m1."key" = "nameType"
+        m1."binding" = "nameType"
+        m1."operator" = "equals"
+
+        def x = []
+        x.add(m0)
+        x.add(m1)
+        filterData.criteria = x
 
         def result = PersonPersonView.fetchSearchEntityList(filterData, pagingAndSortParams)
 
@@ -288,8 +322,7 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
         assertEquals "LEGL", result[0].nameType
     }
 
-
-     /**
+    /**
      * Tests no data found.
      */
     def testDynamicFinder6() {
@@ -298,23 +331,33 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def filterData = [:]
         def param = [:]
-        param."id" = ""
-        param."lastName" = "McxxAnderson"
-        param."firstName" = ""
-        param."midName" = ""
-        param."soundexLastName" = ""
-        param."soundexFirstName" = ""
-        param."changeIndicator" = ""
+
+        param."searchLastName" = "McxxxAnderson"
         param."nameType" = "LEGL"
 
         filterData.params = param
+
+        def m0 = [:]
+        m0."key" = "searchLastName"
+        m0."binding" = "searchLastName"
+        m0."operator" = "contains"
+
+        def m1 = [:]
+        m1."key" = "nameType"
+        m1."binding" = "nameType"
+        m1."operator" = "equals"
+
+        def x = []
+        x.add(m0)
+        x.add(m1)
+        filterData.criteria = x
 
         def result = PersonPersonView.fetchSearchEntityList(filterData, pagingAndSortParams)
 
         assert result.size() == 0
     }
 
-     /**
+    /**
      * Tests the list of emails for the pidm list
      */
     def testSearchPersonByPidm() {
