@@ -379,4 +379,22 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
         def results = PersonPersonView.fetchPersonByPidms(pidmList, id, lastName, firstName, midName, soundexLastName, soundexFirstName, changeIndicator, nameType, pagingAndSortParams)
         assert results.size() == 2
     }
+
+
+    /**
+     * Tests no parameters on query - fetch all.
+     */
+    def testQueryAllWithNoParameters() {
+
+        def pagingAndSortParams = ["max": 8, "offset": 0]
+
+        def filterData = [:]
+        def param = [:]
+
+        filterData.params = param
+
+        def result = PersonPersonView.fetchSearchEntityList(filterData, pagingAndSortParams)
+
+        assertTrue result.size() == 8
+    }
 }

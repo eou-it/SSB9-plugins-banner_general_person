@@ -63,13 +63,11 @@ class NonPersonPersonView extends PersonView {
     @Column(name = "SEARCH_LAST_NAME", length = 60)
     String searchLastName
 
-
     /**
      * The Last Name field in SOUNDEX phonetic format.
      */
     @Column(name = "SOUNDEX_LAST_NAME", length = 4)
     String soundexLastName
-
 
     /**
      * The name type of the person
@@ -90,8 +88,8 @@ class NonPersonPersonView extends PersonView {
     }
 
     /**
-     *
-     * @param id  search parameter
+     * Returns count of Non Persons.
+     * @param id search parameter
      * @param lastName search parameter
      * @param soundexLastName search parameter
      * @param changeIndicator search parameter
@@ -127,7 +125,7 @@ class NonPersonPersonView extends PersonView {
     }
 
     /**
-     *
+     * Fetches Non Persons.
      * @param id search parameter
      * @param lastName search parameter
      * @param soundexLastName search parameter
@@ -166,7 +164,7 @@ class NonPersonPersonView extends PersonView {
     }
 
     /**
-     *
+     * Returns the map of non persons.
      * @param id search parameter
      * @param lastName search parameter
      * @param soundexLastName search parameter
@@ -181,17 +179,31 @@ class NonPersonPersonView extends PersonView {
     }
 
     /**
-     *
+     * Fetches the list of Non Persons.
      * @param filterData filter data
      * @param pagingAndSortParams
      * @return list of Non-Persons
      */
     def public static fetchSearchEntityList(filterData, pagingAndSortParams) {
 
-        filterData?.params?.lastName = filterData?.params?.lastName.replaceAll("[\\s]", "")
+        if (filterData?.params?.searchLastName) {
+            filterData?.params?.searchLastName = filterData?.params?.searchLastName?.replaceAll("[\\s]", "")
+        }
 
         finderByAllEntityList().find(filterData, pagingAndSortParams)
     }
+
+
+     /**
+     * Fetches the list of Non Persons by soundex.
+     * @param filterData filter data
+     * @param pagingAndSortParams
+     * @return list of Persons
+     */
+    def public static fetchSearchSoundexEntityList(filterData, pagingAndSortParams) {
+        finderByAllSoundexEntityList().find(filterData, pagingAndSortParams)
+    }
+
 
     /*
     * Returns the count of the filtered data.
@@ -200,20 +212,33 @@ class NonPersonPersonView extends PersonView {
         finderByAllEntityList().count(filterData)
     }
 
-    /**
-    *  Query String Builder
+
+    /*
+    * Returns the count of the filtered data by soundex.
     */
+    def static countAllSoundexEntities(filterData) {
+        finderByAllSoundexEntityList().count(filterData)
+    }
+
+
+    /**
+     *  Query String Builder
+     */
     def private static finderByAllEntityList = {filterData ->
         def query = """FROM  NonPersonPersonView a
-                          WHERE ((a.bannerId like :id and :id is not null) or :id is null)
-                               and (((soundex(a.lastName) = soundex(:soundexLastName)) and :soundexLastName is not null) or
-                                      (a.searchLastName like UPPER(:lastName) and
-                          :lastName is not null) or (:lastName is null and :soundexLastName is null))
-                          and ((a.changeIndicator = :changeIndicator and :changeIndicator is not null) or
-                             :changeIndicator is null)
-                            and((a.nameType = :nameType and :nameType is not null) or
-                            :nameType is null)
-	                  and a.entityIndicator = 'C' """
+	                   WHERE a.entityIndicator = 'C' """
+
+        return new DynamicFinder(NonPersonPersonView.class, query, "a")
+    }
+
+
+    /**
+     *  Soundex Query String Builder
+     */
+    def private static finderByAllSoundexEntityList = {filterData ->
+        def query = """FROM  NonPersonPersonView a
+          WHERE ((soundex(a.lastName) = soundex(:soundexLastName)) or :soundexLastName is null)
+	            and  a.entityIndicator = 'C' """
 
         return new DynamicFinder(NonPersonPersonView.class, query, "a")
     }

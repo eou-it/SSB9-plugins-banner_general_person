@@ -12,10 +12,8 @@
 
 package com.sungardhe.banner.general.person
 
-import com.sungardhe.banner.general.person.view.PersonPersonView
 import com.sungardhe.banner.general.system.NameType
 import com.sungardhe.banner.testing.BaseIntegrationTestCase
-import org.junit.Ignore
 import com.sungardhe.banner.general.person.view.NonPersonPersonView
 
 class NonPersonSearchIntegrationTests extends BaseIntegrationTestCase {
@@ -48,7 +46,7 @@ class NonPersonSearchIntegrationTests extends BaseIntegrationTestCase {
         //search by change indicator
         soundexLastName = "Tompson"
         nameType = NameType.findWhere(code: "LEGL").code
-        results = NonPersonPersonView.fetchPerson(id, lastName, soundexLastName,  changeIndicator, nameType, pagingAndSortParams)
+        results = NonPersonPersonView.fetchPerson(id, lastName, soundexLastName, changeIndicator, nameType, pagingAndSortParams)
         assertTrue results.size() == 1
     }
 
@@ -85,13 +83,19 @@ class NonPersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def filterData = [:]
         def param = [:]
-        param."id" = ""
-        param."lastName" = "%thompson%"
-        param."soundexLastName" = ""
-        param."changeIndicator" = ""
-        param."nameType" = ""
+        param."searchLastName" = "%thompson%"
+        filterData.params = param
+
+        def m = [:]
+        m."key" = "searchLastName"
+        m."binding" = "searchLastName"
+        m."operator" = "contains"
 
         filterData.params = param
+
+        def x = []
+        x.add(m)
+        filterData.criteria = x
 
         def result = NonPersonPersonView.fetchSearchEntityList(filterData, pagingAndSortParams)
 
@@ -99,7 +103,6 @@ class NonPersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         assert result.size() == 6
     }
-
 
     /**
      * Tests the list of Non-Persons for inquiry page.
@@ -111,13 +114,20 @@ class NonPersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def filterData = [:]
         def param = [:]
-        param."id" = "%A00010216%"
-        param."lastName" = ""
-        param."soundexLastName" = ""
-        param."changeIndicator" = ""
-        param."nameType" = ""
+        param."bannerId" = "%A00010216%"
 
         filterData.params = param
+
+        def m = [:]
+        m."key" = "bannerId"
+        m."binding" = "bannerId"
+        m."operator" = "contains"
+
+        filterData.params = param
+
+        def x = []
+        x.add(m)
+        filterData.criteria = x
 
         def result = NonPersonPersonView.fetchSearchEntityList(filterData, pagingAndSortParams)
 
@@ -127,7 +137,7 @@ class NonPersonSearchIntegrationTests extends BaseIntegrationTestCase {
     }
 
     /**
-     * Tests the list of persons for inquiry page.
+     * Tests the list of non persons for inquiry page.
      * Search by lastName
      */
     def testDynamicFinder4() {
@@ -136,13 +146,20 @@ class NonPersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def filterData = [:]
         def param = [:]
-        param."id" = ""
-        param."lastName" = "%thompson e%"
-        param."soundexLastName" = ""
-        param."changeIndicator" = ""
-        param."nameType" = ""
+        param."searchLastName" = "%thompson e%"
 
         filterData.params = param
+
+        def m = [:]
+        m."key" = "searchLastName"
+        m."binding" = "searchLastName"
+        m."operator" = "contains"
+
+        filterData.params = param
+
+        def x = []
+        x.add(m)
+        filterData.criteria = x
 
         def result = NonPersonPersonView.fetchSearchEntityList(filterData, pagingAndSortParams)
 
@@ -151,8 +168,7 @@ class NonPersonSearchIntegrationTests extends BaseIntegrationTestCase {
         assert result.size() == 3
     }
 
-
-     /**
+    /**
      * Tests no data found.
      */
     def testDynamicFinder5() {
@@ -161,18 +177,60 @@ class NonPersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def filterData = [:]
         def param = [:]
-        param."id" = ""
-        param."lastName" = "%thxompson e%"
-        param."soundexLastName" = ""
-        param."changeIndicator" = ""
-        param."nameType" = ""
+        param."searchLastName" = "%thxompson e%"
+
+        filterData.params = param
+
+        def m = [:]
+        m."key" = "searchLastName"
+        m."binding" = "searchLastName"
+        m."operator" = "contains"
+
+        filterData.params = param
+
+        def x = []
+        x.add(m)
+        filterData.criteria = x
+
+        def result = NonPersonPersonView.fetchSearchEntityList(filterData, pagingAndSortParams)
+
+        assertTrue result.size() == 0
+    }
+
+    /**
+     * Tests no parameters on query - fetch all.
+     */
+    def testQueryAllWithNoParameters() {
+
+        def pagingAndSortParams = ["max": 8, "offset": 0]
+
+        def filterData = [:]
+        def param = [:]
 
         filterData.params = param
 
         def result = NonPersonPersonView.fetchSearchEntityList(filterData, pagingAndSortParams)
 
-        assertTrue result.size()==0
+        assertTrue result.size() == 8
     }
 
+    /**
+     * Tests the list of non persons for inquiry page.
+     * Search by soundexLastName
+     */
+    def testDynamicFinderSoundex() {
 
+        def pagingAndSortParams = ["max": 8, "offset": 0]
+
+        def filterData = [:]
+        def param = [:]
+        param."soundexLastName" = "Tompson" //Thompson is the actual name
+        filterData.params = param
+
+        def result = NonPersonPersonView.fetchSearchSoundexEntityList(filterData, pagingAndSortParams)
+
+        assertNotNull result
+
+        assert result.size() == 6
+    }
 }
