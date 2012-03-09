@@ -47,7 +47,7 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
        
         assertNotNull personRelatedHold.id
         assertEquals 0L, personRelatedHold.version
-        assertEquals 1, personRelatedHold.pidm
+        assertEquals PersonIdentificationName.findByBannerIdAndChangeIndicatorIsNull("HOS00001").pidm, personRelatedHold.pidm
         assertEquals "TTTTT", personRelatedHold.userData
         assertNotNull personRelatedHold.fromDate
         assertNotNull personRelatedHold.toDate
@@ -57,7 +57,7 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
         
 		//Update the entity
 		def testDate = new Date()
-		personRelatedHold.pidm = 1
+		personRelatedHold.pidm = PersonIdentificationName.findByBannerIdAndChangeIndicatorIsNull("HOS00001").pidm
 		personRelatedHold.userData = "UUUUU"
 		personRelatedHold.fromDate = testDate
 		personRelatedHold.toDate = testDate
@@ -71,7 +71,7 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
         
         personRelatedHold = PersonRelatedHold.get( personRelatedHold.id )
         assertEquals 1L, personRelatedHold?.version
-        assertEquals 1, personRelatedHold.pidm
+        assertEquals PersonIdentificationName.findByBannerIdAndChangeIndicatorIsNull("HOS00001").pidm, personRelatedHold.pidm
         assertEquals "UUUUU", personRelatedHold.userData
         assertEquals testDate, personRelatedHold.fromDate
         assertEquals testDate, personRelatedHold.toDate
@@ -162,10 +162,12 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
         def df1 = new SimpleDateFormat("yyyy-MM-dd")
         def fromDate = df1.parse("2010-07-01")
         def toDate = df1.parse("2010-09-01")
+        def pidm = PersonUtility.getPerson("HOS00001").pidm
+
     /*PROTECTED REGION END*/
      
     def personRelatedHold = new PersonRelatedHold(
-    		pidm: 1,
+    		pidm: pidm,
     		userData: "TTTTT", 
             fromDate: fromDate,
             toDate: toDate,
@@ -208,7 +210,9 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
 
 
     void testFetchByPidm() {
-        def holdPidm = PersonIdentificationName.findByBannerIdAndChangeIndicatorIsNull("210009102").pidm
+        def personRelatedHold = newPersonRelatedHold()
+		save personRelatedHold
+        def holdPidm = PersonIdentificationName.findByBannerIdAndChangeIndicatorIsNull("HOS00001").pidm
 
         def holdList = PersonRelatedHold.fetchByPidm(holdPidm)
         assertNotNull(holdList)
@@ -216,9 +220,11 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
         
     
     void testFetchByPidmAndDateBetween() {
+        def personRelatedHold = newPersonRelatedHold()
+		save personRelatedHold
         def df1 = new SimpleDateFormat("yyyy-MM-dd")
         def holdDate = df1.parse("2010-12-01")
-        def holdPidm = PersonIdentificationName.findByBannerIdAndChangeIndicatorIsNull("210009102").pidm
+        def holdPidm = PersonIdentificationName.findByBannerIdAndChangeIndicatorIsNull("HOS00001").pidm
 
         def holdList = PersonRelatedHold.fetchByPidmAndDateBetween(holdPidm, holdDate)
         assertNotNull(holdList)
@@ -226,9 +232,11 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
     
     
     void testFetchByPidmDateAndHoldType() {
+        def personRelatedHold = newPersonRelatedHold()
+		save personRelatedHold
         def df1 = new SimpleDateFormat("yyyy-MM-dd")
         def holdDate = df1.parse("2010-12-01")
-        def holdPidm = PersonIdentificationName.findByBannerIdAndChangeIndicatorIsNull("210009102").pidm
+        def holdPidm = PersonIdentificationName.findByBannerIdAndChangeIndicatorIsNull("HOS00001").pidm
         def holdType = HoldType.findByCode("AS")
 
         def holdList = PersonRelatedHold.fetchByPidmDateAndHoldType(holdPidm, holdDate, holdType.code )
@@ -238,9 +246,11 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
 
 
     void testFetchByPidmAndDateCompare() {
+         def personRelatedHold = newPersonRelatedHold()
+		save personRelatedHold
         def df1 = new SimpleDateFormat("yyyy-MM-dd")
         def holdDate = df1.parse("2010-12-01")
-        def holdPidm = PersonIdentificationName.findByBannerIdAndChangeIndicatorIsNull("210009102").pidm
+        def holdPidm = PersonIdentificationName.findByBannerIdAndChangeIndicatorIsNull("HOS00001").pidm
 
         def holdList = PersonRelatedHold.fetchByPidmAndDateCompare(holdPidm, holdDate)
         assertNotNull(holdList)
@@ -248,9 +258,11 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
 
 
     void testFetchRegistrationHoldsExist() {
+         def personRelatedHold = newPersonRelatedHold()
+		save personRelatedHold
         def df1 = new SimpleDateFormat("yyyy-MM-dd")
-        def holdDate = df1.parse("2010-12-01")
-        def holdPidm = PersonIdentificationName.findByBannerIdAndChangeIndicatorIsNull("210009102").pidm
+        def holdDate = df1.parse("2010-08-01")
+        def holdPidm = PersonIdentificationName.findByBannerIdAndChangeIndicatorIsNull("HOS00001").pidm
 
         def registrationHoldsExist = PersonRelatedHold.registrationHoldsExist(holdPidm, holdDate)
         assertTrue(registrationHoldsExist)
