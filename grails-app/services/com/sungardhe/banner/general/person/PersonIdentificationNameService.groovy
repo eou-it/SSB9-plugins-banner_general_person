@@ -35,17 +35,6 @@ class PersonIdentificationNameService extends ServiceBase {
      */
     /*PROTECTED REGION ID(personidentificationname_custom_service_methods) ENABLED START*/
 
-    /**
-     *
-     * Post Create refreshes the model to populate the API generated values
-     */
-
-    def postCreate(map) {
-        def newPers = PersonIdentificationName.get(map.after.id)
-        newPers.refresh()
-
-    }
-
 
     def fetchEntityOfPerson(pidm) {
         def sql
