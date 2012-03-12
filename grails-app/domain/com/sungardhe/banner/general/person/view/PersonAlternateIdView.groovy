@@ -251,7 +251,7 @@ class PersonAlternateIdView extends PersonView {
      *  Query String Builder
      */
     def private static finderByAllEntityList = {filterData ->
-        def query = """FROM PersonAlternateView a """
+        def query = """FROM PersonAlternateIdView a """
 
         return new DynamicFinder(PersonAlternateIdView.class, query, "a")
     }
