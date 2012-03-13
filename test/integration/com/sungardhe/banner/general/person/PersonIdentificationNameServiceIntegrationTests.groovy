@@ -127,7 +127,7 @@ class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTes
     }
 
 
-    void testLengthFullNameWIthSureNamePrefix() {
+    void testLengthFullNameWithSureNamePrefix() {
         def updateSql = """update  gordmsk set gordmsk_display_ind = 'Y' where  gordmsk_objs_code   = '**SSB_MASKING'
                And Gordmsk_Block_Name  = 'F_FORMAT_NAME'
                And Gordmsk_Column_Name = 'SPRIDEN_SURNAME_PREFIX' """
@@ -156,6 +156,57 @@ class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTes
         def personFullName = PersonIdentificationName.findByPidm(personIdentificationName2.pidm)
         assertTrue personFullName?.fullName?.length() <= 182
         assertEquals "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL", personFullName.fullName
+
+    }
+
+
+    void testLengthFullNameWithOutSureNamePrefixDisplayed() {
+        def updateSql = """update  gordmsk set gordmsk_display_ind = 'N' where  gordmsk_objs_code   = '**SSB_MASKING'
+                  And Gordmsk_Block_Name  = 'F_FORMAT_NAME'
+                  And Gordmsk_Column_Name = 'SPRIDEN_SURNAME_PREFIX' """
+        def sql = new Sql(sessionFactory.getCurrentSession().connection())
+        sql.executeUpdate(updateSql)
+        def ssbsql = "select gb_displaymask.f_ssb_format_name display from dual"
+        def ssbPrefix = sql.firstRow(ssbsql)
+        assertEquals "N", ssbPrefix.display
+        def personIdentificationName2 = newPersonIdentificationName()
+        // max lengths: first 60, mi 60, last 60, surname 60
+        personIdentificationName2.firstName = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+        personIdentificationName2.middleName = "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
+        personIdentificationName2.lastName = "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL"
+        personIdentificationName2.surnamePrefix = "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS"
+        personIdentificationName2 = personIdentificationNameService.create([domainModel: personIdentificationName2])
+        assertNotNull personIdentificationName2.id
+        assertEquals "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL", personIdentificationName2.lastName
+        assertEquals "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", personIdentificationName2.firstName
+        assertEquals "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM", personIdentificationName2.middleName
+        assertEquals "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS", personIdentificationName2.surnamePrefix
+        assertEquals 60, personIdentificationName2.lastName.length()
+        assertEquals 60, personIdentificationName2.firstName.length()
+        assertEquals 60, personIdentificationName2.middleName.length()
+        assertEquals 60, personIdentificationName2.surnamePrefix.length()
+
+        def personFullName = PersonIdentificationName.findByPidm(personIdentificationName2.pidm)
+        assertTrue personFullName?.fullName?.length() <= 182
+        assertEquals "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL", personFullName.fullName
+
+    }
+
+
+    void testLengthFullNameForContract() {
+        def personIdentificationName2 = newCompanyIdentificationName()
+        // max lengths: first 60, mi 60, last 60, surname 60
+        personIdentificationName2.lastName = "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL"
+        personIdentificationName2 = personIdentificationNameService.create([domainModel: personIdentificationName2])
+        assertNotNull personIdentificationName2.id
+        assertEquals "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL", personIdentificationName2.lastName
+        assertNull personIdentificationName2.firstName
+        assertNull personIdentificationName2.middleName
+        assertEquals 60, personIdentificationName2.lastName.length()
+
+        def personFullName = PersonIdentificationName.findByPidm(personIdentificationName2.pidm)
+        assertTrue personFullName?.fullName?.length() == 60
+        assertEquals "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL", personFullName.fullName
 
     }
 
