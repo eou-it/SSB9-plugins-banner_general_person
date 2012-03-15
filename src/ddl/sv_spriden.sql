@@ -42,7 +42,9 @@ CREATE OR REPLACE FORCE VIEW SV_SPRIDEN AS SELECT
       spriden_user_id,
       spriden_data_origin,
       spriden_activity_date,
-      decode(spriden_pidm,null, null,f_format_name(spriden_pidm,'FML')) as FULL_NAME,
+      Decode(Spriden_Pidm,Null, Null,
+         Decode(Spriden_Entity_Ind, 'C', F_Format_Name(spriden_pidm,'L'),
+           f_format_name(spriden_pidm,'FML'))) as FULL_NAME,
       ROWID spriden_v_rowid
   FROM saturn.spriden;
 REM
