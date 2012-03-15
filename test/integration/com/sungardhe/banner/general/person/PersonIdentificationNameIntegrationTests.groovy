@@ -137,6 +137,23 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
         assertTrue PersonIdentificationName.fetchByBannerId(invalidSearchString)?.isEmpty()
     }
 
+    void testFetchBySomeBannerId() {
+        def invalidSearchString = "XXX"
+        def results = PersonIdentificationName.fetchBySomeBannerId(invalidSearchString)
+        assertEquals results?.size(), 1
+        assertNull results?.list[0]
+
+        def limitSearchString1 = "%"
+        results = PersonIdentificationName.fetchBySomeBannerId(limitSearchString1)
+        assertEquals results?.size(), 1
+        assertNull results?.list[0]
+
+        def limitSearchString2 = "%%"
+        results = PersonIdentificationName.fetchBySomeBannerId(limitSearchString2)
+        assertEquals results?.size(), 1
+        assertNull results?.list[0]
+    }
+
 
     void testFetchAllPersonByNameOrBannerId() {
         def personIdentificationName1 = newPersonIdentificationName()

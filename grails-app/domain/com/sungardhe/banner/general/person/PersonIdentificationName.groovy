@@ -434,6 +434,9 @@ class PersonIdentificationName implements Serializable {
 
     //Used for Lookup.
     public static def fetchBySomeBannerId(filter) {
+        if("%".equals(filter) || "%%".equals(filter)){
+               return [list: []]
+        }
         def name
         if (filter) name = "%" + filter.toUpperCase() + "%"
         def returnObj = [list: PersonIdentificationName.fetchByBannerId(name)]
