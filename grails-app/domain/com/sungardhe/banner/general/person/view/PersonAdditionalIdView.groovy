@@ -73,13 +73,13 @@ class PersonAdditionalIdView extends PersonView {
         def queryCriteria
         if (!filter) return []
         queryCriteria = "%" + filter.toUpperCase() + "%"
-        def emails = PersonAdditionalIdView.withSession {session ->
+        def additionalIds = PersonAdditionalIdView.withSession {session ->
             org.hibernate.Query query = session.getNamedQuery('PersonAdditionalIdView.fetchByAdditionalId').setString('filter', queryCriteria)
             query.setMaxResults(pagingAndSortParams.max);
             query.setFirstResult(pagingAndSortParams.offset);
             query.list()
         }
-        return emails
+        return additionalIds
     }
 
 
@@ -87,11 +87,11 @@ class PersonAdditionalIdView extends PersonView {
         def queryCriteria
         if (!filter) return []
         queryCriteria = "%" + filter.toUpperCase() + "%"
-        def emails = PersonAdditionalIdView.withSession {session ->
+        def additionalIds = PersonAdditionalIdView.withSession {session ->
             org.hibernate.Query query = session.getNamedQuery('PersonAdditionalIdView.fetchByAdditionalId').setString('filter', queryCriteria)
             query.list()
         }
-        return emails
+        return additionalIds
     }
 
 

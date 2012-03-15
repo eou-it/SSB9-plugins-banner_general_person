@@ -115,7 +115,7 @@ class PersonPhoneView extends PersonView {
 
 
     def private static finderByAllEntityList = {filterData ->
-        def query = """FROM  PersonPhoneView  email """
+        def query = """FROM  PersonPhoneView phone """
         return new DynamicFinder(PersonPhoneView.class, query, "phone")
     }
 

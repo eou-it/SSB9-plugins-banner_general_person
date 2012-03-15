@@ -129,4 +129,32 @@ class PhoneSearchIntegrationTests extends BaseIntegrationTestCase {
 
         assertEquals 1, results.size()
     }
+
+
+    /**
+     * Tests the list of phones for inquire page.
+     */
+    def testDynamicFinder1() {
+
+        def pagingAndSortParams = ["max": 8, "offset": 0]
+
+        def filterData = [:]
+        def param = [:]
+        param."phoneSearch" = "%6102332323%"
+
+        filterData.params = param
+
+        def m = [:]
+        m."key" = "phoneSearch"
+        m."binding" = "phoneSearch"
+        m."operator" = "contains"
+
+        def x = []
+        x.add(m)
+        filterData.criteria = x
+
+        def result = PersonPhoneView.fetchSearchEntityList(filterData, pagingAndSortParams)
+
+        assertNotNull result
+    }
 }

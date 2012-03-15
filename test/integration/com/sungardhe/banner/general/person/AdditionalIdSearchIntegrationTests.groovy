@@ -17,6 +17,7 @@ package com.sungardhe.banner.general.person
 
 import com.sungardhe.banner.testing.BaseIntegrationTestCase
 import com.sungardhe.banner.general.person.view.PersonAdditionalIdView
+import org.junit.Ignore
 
 class AdditionalIdSearchIntegrationTests extends BaseIntegrationTestCase {
 
@@ -36,7 +37,7 @@ class AdditionalIdSearchIntegrationTests extends BaseIntegrationTestCase {
     def testAdditionalIdSearchByFilterAndPagination() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
-        def filter = "est"   //TEST
+        def filter = "nne1"   //DEANNE1
         def results = PersonAdditionalIdView.fetchPersonAdditionalId(filter, pagingAndSortParams)
 
         assertNotNull results?.list
@@ -46,15 +47,31 @@ class AdditionalIdSearchIntegrationTests extends BaseIntegrationTestCase {
         assertNotNull res?.bannerId
         assertNotNull res?.lastName
         assertNotNull res?.firstName
-        assertNotNull res?.birthDate
     }
 
     /**
      * Tests the list of additional ids by filter.
      */
-    def testEmailSearchByFilter() {
+    def testAdditionalIdSearchByFilter() {
 
-        def filter = "est"  //TEST
+        def filter = "nne1"  //DEANNE1
+        def results = PersonAdditionalIdView.fetchByAdditionalId(filter)
+
+        assertNotNull results
+
+        def res = results[0]
+
+        assertNotNull res.bannerId
+        assertNotNull res.lastName
+        assertNotNull res.firstName
+    }
+
+    /**
+     * Tests the list of additional ids by filter with birthday
+     */
+    def testAdditionalIdSearchByFilterBirthday() {
+
+        def filter = "glasses"  //Wears glasses
         def results = PersonAdditionalIdView.fetchByAdditionalId(filter)
 
         assertNotNull results
@@ -76,7 +93,7 @@ class AdditionalIdSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def filterData = [:]
         def param = [:]
-        param."additionalId" = "%est%"
+        param."additionalId" = "%nne1%"
 
         filterData.params = param
 
@@ -94,22 +111,21 @@ class AdditionalIdSearchIntegrationTests extends BaseIntegrationTestCase {
         assertNotNull result
     }
 
-
     /**
      * Tests the list of additional ids for the pidm list
      */
     def testAdditionalIdSearchByFilterAndPidm() {
         def pidmList = []
-        pidmList.add(new Integer("36666"))
+        pidmList.add(new Integer("36336"))
 
-        def filter = "est"
+        def filter = "nne1"
         def resultsMany = PersonAdditionalIdView.fetchByAdditionalId(filter)
 
-        assertTrue  resultsMany.size() > 1
+        assertTrue resultsMany.size() > 1
 
         def results = PersonAdditionalIdView.fetchByAdditionalIdAndPidm(pidmList, filter)
 
         assertNotNull results
-        assertEquals 1, results.size()
+        assertEquals 5, results.size()
     }
 }
