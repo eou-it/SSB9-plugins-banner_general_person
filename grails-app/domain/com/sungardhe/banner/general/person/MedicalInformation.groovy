@@ -61,7 +61,8 @@ class MedicalInformation implements Serializable {
     @Column (name = "SPRMEDI_DISB_IND")
     Boolean disabilityIndicator
 
-    @Column(name="SPRMEDI_MEDI_CODE_DATE") 
+    @Column(name="SPRMEDI_MEDI_CODE_DATE")
+    @Temporal(TemporalType.DATE)
     Date medicalDate
 
     @ManyToOne

@@ -106,12 +106,14 @@ class PersonRelatedHold implements Serializable {
 	 * This field identifies the effective begin date of hold.
 	 */
 	@Column(name="SPRHOLD_FROM_DATE")
+    @Temporal(TemporalType.DATE)
 	Date fromDate
 
 	/**
 	 * This field identifies the end date hold expires. 
 	 */
 	@Column(name="SPRHOLD_TO_DATE")
+    @Temporal(TemporalType.DATE)
 	Date toDate
 
 	/**

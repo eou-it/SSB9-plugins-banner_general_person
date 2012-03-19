@@ -130,12 +130,14 @@ class PersonAddress implements Serializable {
      * This field maintains the effective start date of address associated with person.
      */
     @Column(name = "SPRADDR_FROM_DATE")
+    @Temporal(TemporalType.DATE)
     Date fromDate
 
     /**
      * This field maintains the effective end date of address associated with person.
      */
     @Column(name = "SPRADDR_TO_DATE")
+    @Temporal(TemporalType.DATE)
     Date toDate
 
     /**

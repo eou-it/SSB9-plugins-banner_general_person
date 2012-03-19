@@ -209,6 +209,7 @@ class PersonIdentificationName implements Serializable {
      * Record Create Date: This field contains date new record created
      */
     @Column(name = "SPRIDEN_CREATE_DATE")
+    @Temporal(TemporalType.DATE)
     Date createDate
 
     /**
