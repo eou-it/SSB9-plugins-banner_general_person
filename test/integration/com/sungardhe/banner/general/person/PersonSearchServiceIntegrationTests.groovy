@@ -29,7 +29,6 @@ class PersonSearchServiceIntegrationTests extends BaseIntegrationTestCase {
         super.tearDown()
     }
 
-    @Ignore
     void testFindPerson() {
         def pagingAndSortParams = ["max": 8, "offset": 0]
         def id
@@ -49,7 +48,6 @@ class PersonSearchServiceIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests the list of persons for the pidm list
      */
-    @Ignore
     def testSearchPersonByPidm() {
         def pidmList = []
         pidmList.add(new Integer("1358"))
