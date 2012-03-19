@@ -44,3 +44,9 @@ REM
 start sv_sprtele_ins_trg
 start sv_sprtele_upd_trg
 start sv_sprtele_del_trg
+REM
+REM Create procedures
+REM
+start soknsut
+start soknsut1
+REM
