@@ -27,3 +27,4 @@ start gvq_goradid
 start gvq_goremal
 start svq_spriden
 start svq_spralti
+start svq_sadvsrc

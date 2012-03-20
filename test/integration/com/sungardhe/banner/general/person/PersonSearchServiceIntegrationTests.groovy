@@ -80,6 +80,10 @@ class PersonSearchServiceIntegrationTests extends BaseIntegrationTestCase {
         assertNotNull persons
         lastName = persons[0].lastName
         assert (/Lindblom/ =~ lastName)
+
+        // returns a list of pidms
+        assertNotNull (persons.collect { it.pidm } as HashSet)
+
     }
 
 

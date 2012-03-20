@@ -14,6 +14,7 @@ package com.sungardhe.banner.general.person
 import org.apache.log4j.Logger
 import com.sungardhe.banner.general.person.view.PersonPersonView
 import groovy.sql.Sql
+import com.sungardhe.banner.general.person.view.PersonAdvancedSearchView
 
 class PersonSearchService {
 
@@ -33,7 +34,7 @@ class PersonSearchService {
         def sql = new Sql(sessionFactory.getCurrentSession().connection())
 
         def sqlStatement = """
-            select id, last_name, first_name, mi,
+            select pidm, id, last_name, first_name, mi,
                    soknsut.name_search_booster(search_last_name,'${searchFilter}') as boost
               from svq_spriden
               where REGEXP_LIKE(search_last_name||search_first_name||search_mi||id, '${searchFilter}')
@@ -44,6 +45,7 @@ class PersonSearchService {
         def persons = sql.rows(sqlStatement)
         persons.each { personRow ->
             def person = [:]
+            person.pidm = personRow.PIDM
             person.bannerId = personRow.ID
             person.name = personRow.FIRST_NAME
             person.lastName = personRow.LAST_NAME
