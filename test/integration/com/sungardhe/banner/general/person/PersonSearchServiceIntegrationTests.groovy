@@ -94,4 +94,61 @@ class PersonSearchServiceIntegrationTests extends BaseIntegrationTestCase {
 
         assertNotNull persons.findAll {it.bannerId=="WEBT" }
     }
+
+
+    // advanced search by Id
+    def testAdvancedSearchById() {
+        //[[pidm:2185, bannerId:S101, name:Student, lastName:101, mi:null, boosterSearch:2, changeIndicator:I],
+        // [pidm:2185, bannerId:A00000718, name:Student, lastName:101, mi:null, boosterSearch:2, changeIndicator:null]]
+
+        def person = personSearchService.fetchTextSearch("A00000718")
+        assertNotNull person
+        assertEquals 2185, person.pidm
+        assertEquals "A00000718", person.bannerId
+    }
+
+    // advanced search by Id
+    def testAdvancedSearchById_1() {
+       // Alternate id=S101; pidm=2185
+       // [[pidm:2185, bannerId:S101, name:Student, lastName:101, mi:null, boosterSearch:2],
+       // [pidm:2185, bannerId:A00000718, name:Student, lastName:101, mi:null, boosterSearch:2]]
+
+
+        def person = personSearchService.fetchTextSearch("S101")
+        assertNotNull person
+        assertEquals 2185, person.pidm
+        assertEquals "A00000718", person.bannerId
+    }
+
+    // advanced search by Id
+    def testAdvancedSearchById_2() {
+
+         //[[pidm:2076, bannerId:A00000618, name:Walter, lastName:Simpson, mi:Lee, boosterSearch:2, changeIndicator:null],
+         // [pidm:2077, bannerId:A00000619, name:Ralph, lastName:Sommerfield, mi:null, boosterSearch:2, changeIndicator:null],
+         // [pidm:1920, bannerId:A00000610, name:Vera, lastName:Velmar, mi:null, boosterSearch:2, changeIndicator:N],
+         // [pidm:2067, bannerId:A00000612, name:System, lastName:Test of PPAIDEN changed, mi:null, boosterSearch:2, changeIndicator:null],
+         // [pidm:2067, bannerId:A00000612, name:System, lastName:Test of PPAIDEN, mi:null, boosterSearch:2, changeIndicator:N],
+         // [pidm:2071, bannerId:A00000613, name:Rose, lastName:Madden, mi:Marie, boosterSearch:2, changeIndicator:null],
+         // [pidm:2073, bannerId:A00000615, name:Sarah, lastName:Madden, mi:Ann, boosterSearch:2, changeIndicator:null],
+         // [pidm:2074, bannerId:A00000616, name:Rosemary, lastName:Madden, mi:Sherre, boosterSearch:2, changeIndicator:null],
+         // [pidm:2075, bannerId:A00000617, name:Jamie, lastName:Madden, mi:Lee, boosterSearch:2, changeIndicator:null],
+         // [pidm:1920, bannerId:A00000610, name:Vera, lastName:Velmar changed, mi:null, boosterSearch:2, changeIndicator:null],
+         // [pidm:2065, bannerId:A00000611, name:Test, lastName:Business person 1, mi:null, boosterSearch:2, changeIndicator:null],
+         // [pidm:2072, bannerId:A00000614, name:Robert, lastName:Madden, mi:Wayne, boosterSearch:2, changeIndicator:null]]
+
+        def persons = personSearchService.fetchTextSearch("A0000061")
+        assertNotNull persons
+        assertTrue persons.size() > 1
+        println persons
+    }
+
+    // advanced search by Id
+    def testAdvancedSearchById_3() {
+       // [[pidm:2067, bannerId:A00000612, name:System, lastName:Test of PPAIDEN, mi:null, boosterSearch:2],
+       // [pidm:2067, bannerId:A00000612, name:System, lastName:Test of PPAIDEN changed, mi:null, boosterSearch:2]]
+        def person = personSearchService.fetchTextSearch("A00000612")
+        assertNotNull person
+        assertEquals 2067, person.pidm
+        assertEquals "Test of PPAIDEN changed", person.lastName
+    }
 }

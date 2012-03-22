@@ -34,10 +34,13 @@ class PersonSearchService {
         def sql = new Sql(sessionFactory.getCurrentSession().connection())
 
         def sqlStatement = """
-            select pidm, id, last_name, first_name, mi,
-                   soknsut.name_search_booster(search_last_name,'${searchFilter}') as boost
-              from svq_spriden
-              where REGEXP_LIKE(search_last_name||search_first_name||search_mi||id, '${searchFilter}')
+        select pidm, id, last_name, first_name, mi,change_indicator,
+                soknsut.name_search_booster(search_last_name,'${searchFilter}') as boost
+              from svq_spriden where pidm in (
+            select pidm
+              from svq_spriden a
+              where REGEXP_LIKE(a.search_last_name||'::'||a.search_first_name||'::'||a.search_mi||'::'||a.id, '${searchFilter}')
+              )
               order by boost
 				              """
 
@@ -51,10 +54,19 @@ class PersonSearchService {
             person.lastName = personRow.LAST_NAME
             person.mi = personRow.MI
             person.boosterSearch = personRow.BOOST
+            person.changeIndicator = personRow.CHANGE_INDICATOR
 
             personsList << person
         }
 
-        return personsList.sort {it.boosterSearch}
+
+        def currentList = personsList.findAll { it.changeIndicator == null}
+
+
+        if (currentList && currentList?.size() == 1) {
+            return currentList[0]
+        } else {
+            return personsList.sort {it.boosterSearch}
+        }
     }
 }
