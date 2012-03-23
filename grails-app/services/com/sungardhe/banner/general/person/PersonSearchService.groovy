@@ -41,7 +41,7 @@ class PersonSearchService {
               from svq_spriden a
               where REGEXP_LIKE(a.search_last_name||'::'||a.search_first_name||'::'||a.search_mi||'::'||a.id, '${searchFilter}')
               )
-              order by boost
+              order by boost, last_name
 				              """
 
         def personsList = []
@@ -64,7 +64,48 @@ class PersonSearchService {
 
 
         if (currentList && currentList?.size() == 1) {
-            return currentList[0]
+            return currentList
+        } else {
+            return personsList.sort {it.boosterSearch}
+        }
+    }
+
+     def fetchTextWithSSNSearch(searchFilter) {
+        def sql = new Sql(sessionFactory.getCurrentSession().connection())
+
+        def sqlStatement = """
+        select pidm, id, ssn, last_name, first_name, mi,change_indicator,
+                soknsut.name_search_booster(search_last_name,'${searchFilter}') as boost
+              from svq_spralti where pidm in (
+            select pidm
+              from svq_spralti a
+              where REGEXP_LIKE(a.search_last_name||'::'||a.search_first_name||'::'||a.search_mi||'::'||a.id||'::'||a.ssn, '${searchFilter}')
+              )
+              order by boost,last_name
+				              """
+
+        def personsList = []
+        def persons = sql.rows(sqlStatement)
+        persons.each { personRow ->
+            def person = [:]
+            person.pidm = personRow.PIDM
+            person.bannerId = personRow.ID
+            person.ssn = personRow.SSN
+            person.name = personRow.FIRST_NAME
+            person.lastName = personRow.LAST_NAME
+            person.mi = personRow.MI
+            person.boosterSearch = personRow.BOOST
+            person.changeIndicator = personRow.CHANGE_INDICATOR
+
+            personsList << person
+        }
+
+
+        def currentList = personsList.findAll { it.changeIndicator == null}
+
+
+        if (currentList && currentList?.size() == 1) {
+            return currentList
         } else {
             return personsList.sort {it.boosterSearch}
         }

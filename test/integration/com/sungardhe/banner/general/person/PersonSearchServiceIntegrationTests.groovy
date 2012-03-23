@@ -101,10 +101,11 @@ class PersonSearchServiceIntegrationTests extends BaseIntegrationTestCase {
         //[[pidm:2185, bannerId:S101, name:Student, lastName:101, mi:null, boosterSearch:2, changeIndicator:I],
         // [pidm:2185, bannerId:A00000718, name:Student, lastName:101, mi:null, boosterSearch:2, changeIndicator:null]]
 
-        def person = personSearchService.fetchTextSearch("A00000718")
-        assertNotNull person
-        assertEquals 2185, person.pidm
-        assertEquals "A00000718", person.bannerId
+        def persons = personSearchService.fetchTextSearch("A00000718")
+        assertNotNull persons
+        assertTrue persons.size() == 1
+        assertEquals 2185, persons[0].pidm
+        assertEquals "A00000718", persons[0].bannerId
     }
 
     // advanced search by Id
@@ -114,10 +115,11 @@ class PersonSearchServiceIntegrationTests extends BaseIntegrationTestCase {
        // [pidm:2185, bannerId:A00000718, name:Student, lastName:101, mi:null, boosterSearch:2]]
 
 
-        def person = personSearchService.fetchTextSearch("S101")
-        assertNotNull person
-        assertEquals 2185, person.pidm
-        assertEquals "A00000718", person.bannerId
+        def persons = personSearchService.fetchTextSearch("S101")
+        assertNotNull persons
+        assertTrue persons.size() == 1
+        assertEquals 2185, persons[0].pidm
+        assertEquals "A00000718", persons[0].bannerId
     }
 
     // advanced search by Id
@@ -139,16 +141,70 @@ class PersonSearchServiceIntegrationTests extends BaseIntegrationTestCase {
         def persons = personSearchService.fetchTextSearch("A0000061")
         assertNotNull persons
         assertTrue persons.size() > 1
-        println persons
     }
 
     // advanced search by Id
     def testAdvancedSearchById_3() {
        // [[pidm:2067, bannerId:A00000612, name:System, lastName:Test of PPAIDEN, mi:null, boosterSearch:2],
        // [pidm:2067, bannerId:A00000612, name:System, lastName:Test of PPAIDEN changed, mi:null, boosterSearch:2]]
-        def person = personSearchService.fetchTextSearch("A00000612")
-        assertNotNull person
-        assertEquals 2067, person.pidm
-        assertEquals "Test of PPAIDEN changed", person.lastName
+        def persons = personSearchService.fetchTextSearch("A00000612")
+        assertNotNull persons
+        assertTrue persons.size() == 1
+        assertEquals 2067, persons[0].pidm
+        assertEquals "Test of PPAIDEN changed", persons[0].lastName
+    }
+
+
+    // advanced search by SSN
+    def testAdvancedSearchBySSN() {
+        //[pidm:2188, bannerId:A00000721, ssn:543-54-5432, name:Student, lastName:105, mi:null, boosterSearch:2, changeIndicator:null]
+
+        def persons = personSearchService.fetchTextWithSSNSearch("543-54-5432")
+        assertNotNull persons
+        assertTrue persons.size() == 1
+        assertEquals 2188, persons[0].pidm
+        assertEquals "A00000721", persons[0].bannerId
+        assertEquals "543-54-5432", persons[0].ssn
+
+
+        //[[pidm:2188, bannerId:S105, ssn:543-54-5432, name:Student, lastName:105, mi:null, boosterSearch:2, changeIndicator:I],
+        // [pidm:2188, bannerId:A00000721, ssn:543-54-5432, name:Student, lastName:105, mi:null, boosterSearch:2, changeIndicator:null],
+        // [pidm:2176, bannerId:S16, ssn:null, name:Student, lastName:16, mi:null, boosterSearch:2, changeIndicator:I],
+        // [pidm:2176, bannerId:A00000709, ssn:null, name:Student, lastName:16, mi:null, boosterSearch:2, changeIndicator:null],
+        // [pidm:2175, bannerId:S19, ssn:null, name:Student, lastName:19, mi:null, boosterSearch:2, changeIndicator:I],
+        // [pidm:2175, bannerId:A00000708, ssn:null, name:Student, lastName:19, mi:null, boosterSearch:2, changeIndicator:null],
+        // [pidm:2170, bannerId:A00000703, ssn:null, name:Student, lastName:2, mi:null, boosterSearch:2, changeIndicator:null],
+        // [pidm:2170, bannerId:S2, ssn:null, name:Student, lastName:2, mi:null, boosterSearch:2, changeIndicator:I],
+        // [pidm:2171, bannerId:S3, ssn:null, name:Student, lastName:3, mi:null, boosterSearch:2, changeIndicator:I],
+        // [pidm:2171, bannerId:A00000704, ssn:null, name:Student, lastName:3, mi:null, boosterSearch:2, changeIndicator:null],
+        // [pidm:2172, bannerId:A00000705, ssn:null, name:Student, lastName:4, mi:null, boosterSearch:2, changeIndicator:null],
+        // [pidm:2172, bannerId:S4, ssn:null, name:Student, lastName:4, mi:null, boosterSearch:2, changeIndicator:I],
+        // [pidm:2173, bannerId:A00000706, ssn:null, name:Student, lastName:5, mi:null, boosterSearch:2, changeIndicator:null],
+        // [pidm:2173, bannerId:S5, ssn:null, name:Student, lastName:5, mi:null, boosterSearch:2, changeIndicator:I],
+        // [pidm:2174, bannerId:S7, ssn:null, name:Student, lastName:7, mi:null, boosterSearch:2, changeIndicator:I],
+        // [pidm:2174, bannerId:A00000707, ssn:null, name:Student, lastName:7, mi:null, boosterSearch:2, changeIndicator:null],
+        // [pidm:2168, bannerId:studenta, ssn:666666666, name:Student, lastName:A, mi:null, boosterSearch:2, changeIndicator:I],
+        // [pidm:2168, bannerId:A00000701, ssn:666666666, name:Student, lastName:A, mi:null, boosterSearch:2, changeIndicator:null],
+        // [pidm:2622, bannerId:A00001052, ssn:256756689, name:Danny, lastName:Caroline, mi:A, boosterSearch:2, changeIndicator:null],
+        // [pidm:32751, bannerId:10522635, ssn:319803441, name:Julian, lastName:Hardman, mi:David, boosterSearch:2, changeIndicator:I],
+        // [pidm:32751, bannerId:A00011013, ssn:319803441, name:Julian, lastName:Hardman, mi:David, boosterSearch:2, changeIndicator:null],
+        // [pidm:30850, bannerId:A00010520, ssn:null, name:Melanie, lastName:Hunter, mi:null, boosterSearch:2, changeIndicator:null],
+        // [pidm:30851, bannerId:A00010521, ssn:null, name:Lindsey, lastName:James, mi:M, boosterSearch:2, changeIndicator:null],
+        // [pidm:30852, bannerId:A00010522, ssn:null, name:Jared, lastName:Jenkins, mi:T, boosterSearch:2, changeIndicator:null],
+        // [pidm:30853, bannerId:A00010523, ssn:null, name:Josh, lastName:Jimenez, mi:N, boosterSearch:2, changeIndicator:null],
+        // [pidm:30854, bannerId:A00010524, ssn:null, name:Evan, lastName:Jordan, mi:null, boosterSearch:2, changeIndicator:null],
+        // [pidm:30855, bannerId:A00010525, ssn:null, name:Nick, lastName:Joseph, mi:R, boosterSearch:2, changeIndicator:null],
+        // [pidm:30856, bannerId:A00010526, ssn:null, name:Erik, lastName:Kelley, mi:D, boosterSearch:2, changeIndicator:null],
+        // [pidm:30857, bannerId:A00010527, ssn:null, name:Julia, lastName:Kennedy, mi:R, boosterSearch:2, changeIndicator:null],
+        // [pidm:30858, bannerId:A00010528, ssn:null, name:Dana, lastName:Khan, mi:A, boosterSearch:2, changeIndicator:null],
+        // [pidm:30859, bannerId:A00010529, ssn:null, name:Craig, lastName:Le, mi:A, boosterSearch:2, changeIndicator:null],
+        // [pidm:2167, bannerId:A00000700, ssn:null, name:A, lastName:Student, mi:null, boosterSearch:2, changeIndicator:null]]
+
+        persons = personSearchService.fetchTextWithSSNSearch("543-54|A0000070|1052|Dana")
+        assertNotNull persons
+        assertTrue persons.size() > 1
+
+        persons = personSearchService.fetchTextWithSSNSearch("543-54-54377")
+        assertTrue persons.size() == 0
     }
 }
