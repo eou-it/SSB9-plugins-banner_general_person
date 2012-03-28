@@ -1,0 +1,26 @@
+<plugin name='banner-general-person' version='1.0.1' grailsVersion='1.3.5 &gt; *'>
+  <author>SunGard Higher Education</author>
+  <authorEmail>horizon-support@sungardhe.com</authorEmail>
+  <title>BannerGeneralPersomn Plugin</title>
+  <description>This plugin is BannerGeneralValidationCommon.</description>
+  <documentation>http://sungardhe.com/development/horizon/plugins/banner-general-validation</documentation>
+  <resources>
+    <resource>BuildConfig</resource>
+    <resource>Config</resource>
+    <resource>DataSource</resource>
+    <resource>UrlMappings</resource>
+    <resource>spring.resources</resource>
+    <resource>com.sungardhe.banner.general.person.MedicalInformation</resource>
+    <resource>com.sungardhe.banner.general.person.PersonAddress</resource>
+    <resource>com.sungardhe.banner.general.person.PersonEmail</resource>
+    <resource>com.sungardhe.banner.general.person.PersonIdentificationName</resource>
+    <resource>com.sungardhe.banner.general.person.PersonRelatedHold</resource>
+    <resource>com.sungardhe.banner.general.person.PersonTelephone</resource>
+    <resource>com.sungardhe.banner.general.person.MedicalInformationCompositeService</resource>
+    <resource>com.sungardhe.banner.general.person.MedicalInformationService</resource>
+    <resource>com.sungardhe.banner.general.person.PersonIdentificationNameService</resource>
+    <resource>com.sungardhe.banner.general.person.PersonUtility</resource>
+  </resources>
+  <dependencies />
+  <behavior />
+</plugin>
