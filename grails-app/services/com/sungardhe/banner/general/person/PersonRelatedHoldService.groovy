@@ -40,12 +40,17 @@ class PersonRelatedHoldService extends ServiceBase {
     }
 
 
+    void preDelete (map) {
+          validateHoldForDelete(map.domainModel)
+    }
+
+
     private validateHoldForUpdate(PersonRelatedHold hold) {
         if (!(hold.userData == SecurityContextHolder.context?.authentication?.principal?.username)) {
+            println(hold.userData || SecurityContextHolder.context?.authentication?.principal?.username)
             if (findDirty(hold,'holdType'))
                 throw new ApplicationException(PesonRelatedHold, "@@r1:invalidHoldUser")
             if (findDirty(hold,'releaseIndicator'))
-          //  if (hold.isDirty('releaseIndicator'))
                     throw new ApplicationException(PersonRelatedHold, "@@r1:invalidHoldUser")
             if (hold.releaseIndicator) {
                 if (findDirty(hold,'reason'))
@@ -56,7 +61,16 @@ class PersonRelatedHoldService extends ServiceBase {
                     throw new ApplicationException(PersonRelatedHold, "@@r1:invalidHoldUser")
             }
     }
+    }
 
+
+    private validateHoldForDelete(PersonRelatedHold hold) {
+         println("user data " + hold.userData + SecurityContextHolder.context?.authentication?.principal?.username)
+        if (!(hold.userData == SecurityContextHolder.context?.authentication?.principal?.username)) {
+            if (hold.releaseIndicator) {
+                throw new ApplicationException(PersonRelatedHold, "@@r1:invalidHoldUserForDelete")
+            }
+    }
     }
 
     private findDirty(hold, String field) {

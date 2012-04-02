@@ -64,7 +64,7 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
         catch (ApplicationException ae){
             assertApplicationException ae,"invalidHoldUser"
         }
-         try {
+        try {
             sql = new Sql(sessionFactory.getCurrentSession().connection())
             sql.executeUpdate("update SPRHOLD set SPRHOLD_USER = 'grails_user' where SPRHOLD_SURROGATE_ID = ?",[personRelatedHold.id])
         } finally{
@@ -116,8 +116,116 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
 
 	}
 
-  
-    
+
+    void testCreateAndDeletePersonRelatedHold() {
+        def personRelatedHold = newPersonRelatedHold()
+        def map = [domainModel: personRelatedHold]
+        personRelatedHold = personRelatedHoldService.create(map)
+        //Test if the generated entity now has an id assigned
+        assertNotNull personRelatedHold.id
+        assertEquals "Hold Type not as expected",personRelatedHold.holdType.code,"RG"
+        assertEquals "Originator not as expected",personRelatedHold.originator.code,"ACCT"
+        personRelatedHold.reason = "YYYY"
+        personRelatedHold = personRelatedHoldService.update([domainModel:personRelatedHold])
+        assertEquals "Reason not as expected","YYYY",personRelatedHold.reason
+        personRelatedHoldService.delete([domainModel: personRelatedHold])
+        personRelatedHold = PersonRelatedHold.findById(personRelatedHold.id)
+        assertNull(personRelatedHold)
+    }
+
+    void testCreateAndDeleteWithReleaseIndicatorBySameUser(){
+        def sql
+        def personRelatedHold = newPersonRelatedHold()
+        def map = [domainModel: personRelatedHold]
+        personRelatedHold = personRelatedHoldService.create(map)
+        //Test if the generated entity now has an id assigned
+        assertNotNull personRelatedHold.id
+        assertEquals "Hold Type not as expected",personRelatedHold.holdType.code,"RG"
+        assertEquals "Originator not as expected",personRelatedHold.originator.code,"ACCT"
+        personRelatedHold.userData = "grails_user"
+        try {
+            sql = new Sql(sessionFactory.getCurrentSession().connection())
+            sql.executeUpdate("update SPRHOLD set SPRHOLD_USER = 'grails_user' where SPRHOLD_SURROGATE_ID = ?",[personRelatedHold.id])
+        } finally{
+            sql?.close()
+        }
+        personRelatedHold.discard()
+        personRelatedHold = PersonRelatedHold.findById(personRelatedHold.id)
+        personRelatedHold.releaseIndicator = true
+        personRelatedHold = personRelatedHoldService.update([domainModel:personRelatedHold])
+        assertEquals "Release Indicator not as expected",true,personRelatedHold.releaseIndicator
+        personRelatedHoldService.delete([domainModel: personRelatedHold])
+        personRelatedHold = PersonRelatedHold.findById(personRelatedHold.id)
+        assertNull(personRelatedHold)
+    }
+
+
+     void testCreateAndDeleteWithReleaseIndicatorByDifferentUserWithReleaseIndicatorOff(){
+        def sql
+        def personRelatedHold = newPersonRelatedHold()
+        def map = [domainModel: personRelatedHold]
+        personRelatedHold = personRelatedHoldService.create(map)
+        //Test if the generated entity now has an id assigned
+        assertNotNull personRelatedHold.id
+        assertEquals "Hold Type not as expected",personRelatedHold.holdType.code,"RG"
+        assertEquals "Originator not as expected",personRelatedHold.originator.code,"ACCT"
+       // personRelatedHold.userData = "grails_user"
+      /*  try {
+            sql = new Sql(sessionFactory.getCurrentSession().connection())
+            sql.executeUpdate("update SPRHOLD set SPRHOLD_USER = 'grails_user' where SPRHOLD_SURROGATE_ID = ?",[personRelatedHold.id])
+        } finally{
+            sql?.close()
+        }
+        personRelatedHold.discard()
+        personRelatedHold = PersonRelatedHold.findById(personRelatedHold.id)
+        personRelatedHold.releaseIndicator = true  */
+      //  personRelatedHold = personRelatedHoldService.update([domainModel:personRelatedHold])
+       // assertEquals "Release Indicator not as expected",true,personRelatedHold.releaseIndicator
+        personRelatedHoldService.delete([domainModel: personRelatedHold])
+        personRelatedHold = PersonRelatedHold.findById(personRelatedHold.id)
+        assertNull(personRelatedHold)
+    }
+
+
+      void testCreateAndDeleteWithReleaseIndicatorByDifferentUserWithReleaseIndicator(){
+        def sql
+        def personRelatedHold = newPersonRelatedHold()
+        def map = [domainModel: personRelatedHold]
+        personRelatedHold = personRelatedHoldService.create(map)
+        //Test if the generated entity now has an id assigned
+        assertNotNull personRelatedHold.id
+        assertEquals "Hold Type not as expected",personRelatedHold.holdType.code,"RG"
+        assertEquals "Originator not as expected",personRelatedHold.originator.code,"ACCT"
+       // personRelatedHold.userData = "grails_user"
+        try {
+            sql = new Sql(sessionFactory.getCurrentSession().connection())
+            sql.executeUpdate("update SPRHOLD set SPRHOLD_USER = 'grails_user' where SPRHOLD_SURROGATE_ID = ?",[personRelatedHold.id])
+        } finally{
+            sql?.close()
+        }
+        personRelatedHold.discard()
+        personRelatedHold = PersonRelatedHold.findById(personRelatedHold.id)
+        personRelatedHold.releaseIndicator = true
+        personRelatedHold = personRelatedHoldService.update([domainModel:personRelatedHold])
+        assertEquals "Release Indicator not as expected",true,personRelatedHold.releaseIndicator
+        try {
+            sql = new Sql(sessionFactory.getCurrentSession().connection())
+            sql.executeUpdate("update SPRHOLD set SPRHOLD_USER = 'TTTTT' where SPRHOLD_SURROGATE_ID = ?",[personRelatedHold.id])
+        } finally{
+            sql?.close()
+        }
+        personRelatedHold.discard()
+        personRelatedHold = PersonRelatedHold.findById(personRelatedHold.id)
+        try {
+            personRelatedHoldService.delete([domainModel: personRelatedHold])
+            fail("this should have failed, user doing the update is not the user who created the hold")
+        }
+        catch (ApplicationException ae){
+            assertApplicationException ae,"invalidHoldUserForDelete"
+        }
+    }
+
+                                                                                 
   private def newPersonRelatedHold() {
   
     /**
