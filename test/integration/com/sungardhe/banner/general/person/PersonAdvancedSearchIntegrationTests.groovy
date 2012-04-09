@@ -68,7 +68,7 @@ class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
 
 
      /**
-     * Tests the list of additional ids for inquire page.
+     * Tests the advanced search..
      */
     def testAdvancedSearch() {
         // Define text search based on LastName, FirstName, and Id
