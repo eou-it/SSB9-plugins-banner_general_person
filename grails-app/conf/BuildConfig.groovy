@@ -12,6 +12,10 @@
 grails.project.class.dir = "target/classes"
 grails.project.test.class.dir = "target/test-classes"
 grails.project.test.reports.dir	= "target/test-reports"
+
+grails.plugin.location.'banner-core'="../banner_core.git"
+grails.plugin.location.'banner-general-validation-common'="../banner_general_validation_common.git"
+
 grails.project.dependency.resolution = {
 
     inherits( "global" ) {
@@ -20,9 +24,6 @@ grails.project.dependency.resolution = {
     log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
     repositories {
 
-        mavenRepo "http://m038083.sungardhe.com:8081/nexus/content/repositories/releases/"
-        mavenRepo "http://m038083.sungardhe.com:8081/nexus/content/repositories/snapshots/"
-        mavenRepo "http://m038083.sungardhe.com:8081/nexus/content/repositories/thirdparty/"
         grailsPlugins()
         grailsHome()
         grailsCentral()
@@ -31,8 +32,6 @@ grails.project.dependency.resolution = {
     }
 
       plugins {
-        compile 'com.sungardhe:banner-core:1.0.49'   // Note: Also update version within 'application.properties'
-        compile 'com.sungardhe:banner-general-validation-common:1.0.2' // Note: Also update version within 'application.properties'
 
     }
     dependencies {
