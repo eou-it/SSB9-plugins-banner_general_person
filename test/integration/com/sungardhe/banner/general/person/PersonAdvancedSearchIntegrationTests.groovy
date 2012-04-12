@@ -19,6 +19,7 @@ import com.sungardhe.banner.testing.BaseIntegrationTestCase
 import com.sungardhe.banner.general.person.view.PersonAdvancedSearchView
 import groovy.sql.Sql
 import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
+import org.junit.Ignore
 
 class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
 
@@ -36,6 +37,7 @@ class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests the list of additional ids for inquire page.
      */
+    @Ignore
     def testDynamicFinder() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
@@ -70,6 +72,7 @@ class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests the advanced search..
      */
+    @Ignore
     def testAdvancedSearch() {
         // Define text search based on LastName, FirstName, and Id
         def persons = personSearchService.fetchTextSearch("33|STUDENT|104|S104")
@@ -225,16 +228,11 @@ class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
     def testAllAdvancedSearchForId() {
 
         def persons = personSearchService.personSearch("A00000706")
-
-        println persons
         assertNotNull persons
         assertTrue persons.size() == 1
 
-
         // two Ids
         persons = personSearchService.personSearch("S104")
-
-        println persons
         assertNotNull persons
         assertTrue persons.size() == 1
         assertEquals "A00000747" , persons[0].bannerId

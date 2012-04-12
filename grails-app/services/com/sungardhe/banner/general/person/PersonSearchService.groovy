@@ -14,8 +14,9 @@ package com.sungardhe.banner.general.person
 import org.apache.log4j.Logger
 import com.sungardhe.banner.general.person.view.PersonPersonView
 import groovy.sql.Sql
-import com.sungardhe.banner.general.person.view.PersonAdvancedSearchView
 import org.springframework.security.core.context.SecurityContextHolder
+import com.sungardhe.banner.exceptions.ApplicationException
+import com.sungardhe.banner.general.person.view.PersonView
 
 class PersonSearchService {
 
@@ -115,28 +116,44 @@ class PersonSearchService {
     }
 
     def personSearch(searchFilter) {
-
+        def searchResult
         def ssnSearchEnabledIndicator = institutionalDescriptionService.findByKey().ssnSearchEnabledIndicator
         def ssn
+        def pii
+
+        Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
         if (ssnSearchEnabledIndicator) {
 
-            Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
             def userName = SecurityContextHolder.context?.authentication?.principal?.username?.toUpperCase()
             try {
                 sql.call("{$Sql.VARCHAR = call g\$_chk_auth.g\$_check_authorization_fnc('SSN_SEARCH',${userName})}") {ssnSearch -> ssn = ssnSearch}
-            } catch (e) {
-                log.error("ERROR: In check authorization. $e")
-                throw e
+
+                searchResult = search(ssn, searchFilter)
+
+                sql.call("{$Sql.VARCHAR = call gokfgac.f_spriden_pii_active}") { result -> pii = result }
+                if (searchResult?.size() == 0 && pii == "Y") {
+                    sql.execute("""call gokfgac.p_turn_fgac_off()""")
+                    searchResult = search(ssn, searchFilter)
+                    sql.execute("""call gokfgac.p_turn_fgac_on()""")
+                    if (searchResult?.size() > 0) {
+                        throw new ApplicationException(PersonView, "@@r1:invalidId@@")
+                    }
+                }
             } finally {
                 sql?.close()
             }
-
         }
-             if (ssn == "YES") {
-                return fetchTextWithSSNSearch(searchFilter)
-            } else {
-                return fetchTextSearch(searchFilter)
-            }
 
+        return searchResult
+    }
+
+
+    def private search(ssn, searchFilter) {
+
+        if (ssn == "YES") {
+            return fetchTextWithSSNSearch(searchFilter)
+        } else {
+            return fetchTextSearch(searchFilter)
+        }
     }
 }
