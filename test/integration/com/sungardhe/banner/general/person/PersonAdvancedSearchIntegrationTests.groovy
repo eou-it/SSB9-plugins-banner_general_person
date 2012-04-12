@@ -75,7 +75,7 @@ class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
     @Ignore
     def testAdvancedSearch() {
         // Define text search based on LastName, FirstName, and Id
-        def persons = personSearchService.fetchTextSearch("33|STUDENT|104|S104")
+        def persons = personSearchService.fetchTextSearch(["33","STUDENT","104","S104"])
         assertNotNull persons
 
         // Step 1: returns a list of pidms
@@ -131,7 +131,7 @@ class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
      */
     def testAllAdvancedSearch() {
         // Define text search based on LastName, FirstName, and Id
-        def persons = personSearchService.personSearch("33|STUDENT|104|S104")
+        def persons = personSearchService.personSearch(["33","STUDENT","104","S104"])
         assertNotNull persons
 
         // Step 1: returns a list of pidms
@@ -200,7 +200,7 @@ class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
             sql.executeUpdate("update gubiprf set gubiprf_security_enabled_ind = 'N' where gubiprf_inst_key = 'INST'")
             sql.commit()
             // Define text search based on LastName, FirstName, and Id 543-54-5432   123081212
-            def persons = personSearchService.personSearch("543-54-5432")
+            def persons = personSearchService.personSearch(["543-54-5432"])
 
             assertNotNull persons
             assertTrue persons.size() == 1
@@ -217,7 +217,7 @@ class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
      */
     def testAllAdvancedSearchForSsnNotAllowed() {
         // Define text search based on LastName, FirstName, and Id 543-54-5432   123081212
-        def persons = personSearchService.personSearch("543-54-5432")
+        def persons = personSearchService.personSearch(["543-54-5432"])
         assertNotNull persons
         assertTrue persons.size() == 0
     }
@@ -227,17 +227,17 @@ class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
      */
     def testAllAdvancedSearchForId() {
 
-        def persons = personSearchService.personSearch("A00000706")
+        def persons = personSearchService.personSearch(["A00000706"])
         assertNotNull persons
         assertTrue persons.size() == 1
 
         // two Ids
-        persons = personSearchService.personSearch("S104")
+        persons = personSearchService.personSearch(["S104"])
         assertNotNull persons
         assertTrue persons.size() == 1
         assertEquals "A00000747" , persons[0].bannerId
 
-        persons = personSearchService.personSearch("A00000747")
+        persons = personSearchService.personSearch(["A00000747"])
 
         assertNotNull persons
         assertTrue persons.size() == 1

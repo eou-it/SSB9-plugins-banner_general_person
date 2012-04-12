@@ -71,12 +71,12 @@ class PersonSearchServiceIntegrationTests extends BaseIntegrationTestCase {
 
     // advanced search by First Name and Last Name in any order
     def testAdvancedSearchByFistNameAndLastName() {
-        def persons = personSearchService.fetchTextSearch("LINDBLOM|GANNON")
+        def persons = personSearchService.fetchTextSearch(["LINDBLOM","GANNON"])
         assertNotNull persons
         def lastName = persons[0].lastName
         assert (/Lindblom/ =~ lastName)
 
-        persons = personSearchService.fetchTextSearch("GANNON|LINDBLOM")
+        persons = personSearchService.fetchTextSearch(["GANNON","LINDBLOM"])
         assertNotNull persons
         lastName = persons[0].lastName
         assert (/Lindblom/ =~ lastName)
@@ -89,7 +89,7 @@ class PersonSearchServiceIntegrationTests extends BaseIntegrationTestCase {
 
     // advanced search by Id
     def testAdvancedSearchByIdAndLastName() {
-        def persons = personSearchService.fetchTextSearch("WEB")
+        def persons = personSearchService.fetchTextSearch(["WEB"])
         assertNotNull persons
 
         assertNotNull persons.findAll {it.bannerId=="WEBT" }
@@ -101,7 +101,7 @@ class PersonSearchServiceIntegrationTests extends BaseIntegrationTestCase {
         //[[pidm:2185, bannerId:S101, name:Student, lastName:101, mi:null, boosterSearch:2, changeIndicator:I],
         // [pidm:2185, bannerId:A00000718, name:Student, lastName:101, mi:null, boosterSearch:2, changeIndicator:null]]
 
-        def persons = personSearchService.fetchTextSearch("A00000718")
+        def persons = personSearchService.fetchTextSearch(["A00000718"])
         assertNotNull persons
         assertTrue persons.size() == 1
         assertEquals 2185, persons[0].pidm
@@ -115,7 +115,7 @@ class PersonSearchServiceIntegrationTests extends BaseIntegrationTestCase {
        // [pidm:2185, bannerId:A00000718, name:Student, lastName:101, mi:null, boosterSearch:2]]
 
 
-        def persons = personSearchService.fetchTextSearch("S101")
+        def persons = personSearchService.fetchTextSearch(["S101"])
         assertNotNull persons
         assertTrue persons.size() == 1
         assertEquals 2185, persons[0].pidm
@@ -138,7 +138,7 @@ class PersonSearchServiceIntegrationTests extends BaseIntegrationTestCase {
          // [pidm:2065, bannerId:A00000611, name:Test, lastName:Business person 1, mi:null, boosterSearch:2, changeIndicator:null],
          // [pidm:2072, bannerId:A00000614, name:Robert, lastName:Madden, mi:Wayne, boosterSearch:2, changeIndicator:null]]
 
-        def persons = personSearchService.fetchTextSearch("A0000061")
+        def persons = personSearchService.fetchTextSearch(["A0000061"])
         assertNotNull persons
         assertTrue persons.size() > 1
     }
@@ -147,7 +147,7 @@ class PersonSearchServiceIntegrationTests extends BaseIntegrationTestCase {
     def testAdvancedSearchById_3() {
        // [[pidm:2067, bannerId:A00000612, name:System, lastName:Test of PPAIDEN, mi:null, boosterSearch:2],
        // [pidm:2067, bannerId:A00000612, name:System, lastName:Test of PPAIDEN changed, mi:null, boosterSearch:2]]
-        def persons = personSearchService.fetchTextSearch("A00000612")
+        def persons = personSearchService.fetchTextSearch(["A00000612"])
         assertNotNull persons
         assertTrue persons.size() == 1
         assertEquals 2067, persons[0].pidm
@@ -159,7 +159,7 @@ class PersonSearchServiceIntegrationTests extends BaseIntegrationTestCase {
     def testAdvancedSearchBySSN() {
         //[pidm:2188, bannerId:A00000721, ssn:543-54-5432, name:Student, lastName:105, mi:null, boosterSearch:2, changeIndicator:null]
 
-        def persons = personSearchService.fetchTextWithSSNSearch("543-54-5432")
+        def persons = personSearchService.fetchTextWithSSNSearch(["543-54-5432"])
         assertNotNull persons
         assertTrue persons.size() == 1
         assertEquals 2188, persons[0].pidm
@@ -200,11 +200,11 @@ class PersonSearchServiceIntegrationTests extends BaseIntegrationTestCase {
         // [pidm:30859, bannerId:A00010529, ssn:null, name:Craig, lastName:Le, mi:A, boosterSearch:2, changeIndicator:null],
         // [pidm:2167, bannerId:A00000700, ssn:null, name:A, lastName:Student, mi:null, boosterSearch:2, changeIndicator:null]]
 
-        persons = personSearchService.fetchTextWithSSNSearch("543-54|A0000070|1052|Dana")
+        persons = personSearchService.fetchTextWithSSNSearch(["543-54","A0000070","1052","Dana"])
         assertNotNull persons
         assertTrue persons.size() > 1
 
-        persons = personSearchService.fetchTextWithSSNSearch("543-54-54377")
+        persons = personSearchService.fetchTextWithSSNSearch(["543-54-54377"])
         assertTrue persons.size() == 0
     }
 }

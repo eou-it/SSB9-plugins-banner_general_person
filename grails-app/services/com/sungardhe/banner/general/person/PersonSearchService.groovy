@@ -35,15 +35,18 @@ class PersonSearchService {
     }
 
     def fetchTextSearch(searchFilter) {
+
+        def search = searchFilter.join("|")
+
         def sql = new Sql(sessionFactory.getCurrentSession().connection())
 
         def sqlStatement = """
         select pidm, id, last_name, first_name, mi,change_indicator,
-                soknsut.name_search_booster(search_last_name,'${searchFilter}') as boost
+                soknsut.name_search_booster(search_last_name,'${search}') as boost
               from svq_spriden where pidm in (
             select pidm
               from svq_spriden a
-              where REGEXP_LIKE(a.search_last_name||'::'||a.search_first_name||'::'||a.search_mi||'::'||a.id, '${searchFilter}')
+              where REGEXP_LIKE(a.search_last_name||'::'||a.search_first_name||'::'||a.search_mi||'::'||a.id, '${search}')
               )
               order by boost, last_name
 				              """
@@ -75,15 +78,17 @@ class PersonSearchService {
     }
 
     def fetchTextWithSSNSearch(searchFilter) {
+        def search = searchFilter.join("|")
+
         def sql = new Sql(sessionFactory.getCurrentSession().connection())
 
         def sqlStatement = """
         select pidm, id, ssn, last_name, first_name, mi,change_indicator,
-                soknsut.name_search_booster(search_last_name,'${searchFilter}') as boost
+                soknsut.name_search_booster(search_last_name,'${search}') as boost
               from svq_spralti where pidm in (
             select pidm
               from svq_spralti a
-              where REGEXP_LIKE(a.search_last_name||'::'||a.search_first_name||'::'||a.search_mi||'::'||a.id||'::'||a.ssn, '${searchFilter}')
+              where REGEXP_LIKE(a.search_last_name||'::'||a.search_first_name||'::'||a.search_mi||'::'||a.id||'::'||a.ssn, '${search}')
               )
               order by boost,last_name
 				              """
@@ -116,6 +121,7 @@ class PersonSearchService {
     }
 
     def personSearch(searchFilter) {
+
         def searchResult
         def ssnSearchEnabledIndicator = institutionalDescriptionService.findByKey().ssnSearchEnabledIndicator
         def ssn
@@ -128,12 +134,12 @@ class PersonSearchService {
             try {
                 sql.call("{$Sql.VARCHAR = call g\$_chk_auth.g\$_check_authorization_fnc('SSN_SEARCH',${userName})}") {ssnSearch -> ssn = ssnSearch}
 
-                searchResult = search(ssn, searchFilter)
+                searchResult = searchComponent(ssn, searchFilter)
 
                 sql.call("{$Sql.VARCHAR = call gokfgac.f_spriden_pii_active}") { result -> pii = result }
                 if (searchResult?.size() == 0 && pii == "Y") {
                     sql.execute("""call gokfgac.p_turn_fgac_off()""")
-                    searchResult = search(ssn, searchFilter)
+                    searchResult = searchComponent(ssn, searchFilter)
                     sql.execute("""call gokfgac.p_turn_fgac_on()""")
                     if (searchResult?.size() > 0) {
                         throw new ApplicationException(PersonView, "@@r1:invalidId@@")
@@ -148,7 +154,7 @@ class PersonSearchService {
     }
 
 
-    def private search(ssn, searchFilter) {
+    def private searchComponent(ssn, searchFilter) {
 
         if (ssn == "YES") {
             return fetchTextWithSSNSearch(searchFilter)
