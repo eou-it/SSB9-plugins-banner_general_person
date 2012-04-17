@@ -87,6 +87,24 @@ class PersonAlternateIdView extends PersonView {
     @Column(name = "SSN", length = 15)
     String ssn
 
+    /**
+     * The surname prefix of the person
+     */
+    @Column(name = "SURNAME_PREFIX", length = 60)
+    String surnamePrefix
+
+    /**
+     * The preferred first name of the person
+     */
+    @Column(name = "PREFERRED_FIRST_NAME", length = 60)
+    String preferredFirstName
+
+    /**
+     * The preferred first name of the person
+     */
+    @Column(name = "NAME_SUFFIX", length = 20)
+    String nameSuffix
+
 
     public String toString() {
         """PersonAlternateIdView[
@@ -98,7 +116,10 @@ class PersonAlternateIdView extends PersonView {
 					middleName=$middleName,
 					birthDate=$birthDate,
 					ssn=$ssn,
-					changeIndicator=$changeIndicator"""
+					changeIndicator=$changeIndicator,
+					surnamePrefix=$surnamePrefix,
+					preferredFirstName=$preferredFirstName,
+					nameSuffix=$nameSuffix]"""
     }
 
     /**

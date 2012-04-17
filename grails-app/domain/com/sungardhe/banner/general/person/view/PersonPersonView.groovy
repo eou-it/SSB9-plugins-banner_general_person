@@ -123,6 +123,24 @@ class PersonPersonView extends PersonView {
     @Column(name = "NAME_TYPE", length = 4)
     String nameType
 
+    /**
+     * The surname prefix of the person
+     */
+    @Column(name = "SURNAME_PREFIX", length = 60)
+    String surnamePrefix
+
+    /**
+     * The preferred first name of the person
+     */
+    @Column(name = "PREFERRED_FIRST_NAME", length = 60)
+    String preferredFirstName
+
+    /**
+     * The preferred first name of the person
+     */
+    @Column(name = "NAME_SUFFIX", length = 20)
+    String nameSuffix
+
 
     public String toString() {
         """PersonPersonView[
@@ -135,7 +153,10 @@ class PersonPersonView extends PersonView {
 					birthDate=$birthDate,
 					nameType=$nameType,
 					changeIndicator=$changeIndicator,
-					entityIndicator=$entityIndicator]"""
+					entityIndicator=$entityIndicator,
+					surnamePrefix=$surnamePrefix,
+					preferredFirstName=$preferredFirstName,
+					nameSuffix=$nameSuffix]"""
     }
 
     /**

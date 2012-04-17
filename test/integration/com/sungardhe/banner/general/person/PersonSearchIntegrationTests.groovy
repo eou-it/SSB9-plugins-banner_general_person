@@ -397,4 +397,38 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         assertTrue result.size() == 8
     }
+
+    /**
+     * Tests the list of persons for inquiry page.
+     * Search by surnamePrefix, nameSuffix
+     */
+    def testDynamicFinder7() {
+
+        def pagingAndSortParams = ["max": 8, "offset": 0]
+
+        def filterData = [:]
+        def param = [:]
+
+        param."surnamePrefix" = "Van Der"
+
+        filterData.params = param
+
+        def m0 = [:]
+        m0."key" = "surnamePrefix"
+        m0."binding" = "surnamePrefix"
+        m0."operator" = "contains"
+
+        def x = []
+        x.add(m0)
+
+        filterData.criteria = x
+
+        def result = PersonPersonView.fetchSearchEntityList(filterData, pagingAndSortParams)
+
+        assertNotNull result
+
+        assert result.size() == 1
+        assertEquals "Bunte", result[0].lastName
+    }
+
 }
