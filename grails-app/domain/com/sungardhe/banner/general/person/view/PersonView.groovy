@@ -93,6 +93,30 @@ abstract class PersonView implements Serializable {
     @Temporal(TemporalType.DATE)
     Date birthDate
 
+    /**
+     * The surname prefix of the person
+     */
+    @Column(name = "SURNAME_PREFIX", length = 60)
+    String surnamePrefix
+
+    /**
+     * The preferred first name of the person
+     */
+    @Column(name = "PREFERRED_FIRST_NAME", length = 60)
+    String preferredFirstName
+
+    /**
+     * The name prefix of the person
+     */
+    @Column(name = "NAME_PREFIX", length = 20)
+    String namePrefix
+
+    /**
+     * The name suffix of the person
+     */
+    @Column(name = "NAME_SUFFIX", length = 20)
+    String nameSuffix
+
 
     public static readonlyProperties = ['pidm']
 
@@ -109,7 +133,11 @@ abstract class PersonView implements Serializable {
 					dataOrigin=$dataOrigin,
 					version=$version,
 					lastModifiedBy=$lastModifiedBy,
-					birthDate=$birthDate]"""
+					birthDate=$birthDate
+					surnamePrefix=$surnamePrefix,
+					preferredFirstName=$preferredFirstName,
+					namePrefix=$namePrefix
+					nameSuffix=$nameSuffix]"""
     }
 
 

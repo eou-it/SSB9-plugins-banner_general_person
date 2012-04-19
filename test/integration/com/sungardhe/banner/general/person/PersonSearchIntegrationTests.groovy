@@ -16,6 +16,7 @@ import com.sungardhe.banner.general.person.view.PersonPersonView
 import com.sungardhe.banner.testing.BaseIntegrationTestCase
 import com.sungardhe.banner.general.system.NameType
 import org.junit.Ignore
+import java.text.SimpleDateFormat
 
 class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
@@ -46,7 +47,6 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
         //search by last name
         def results = PersonPersonView.fetchPerson(id, lastName, firstName, midName, soundexLastName, soundexFirstName, changeIndicator, nameType, pagingAndSortParams)
         assert results.size() == 4
-        println results
 
         lastName = "Duc" //Ducey
 
@@ -70,12 +70,12 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
         soundexLastName = ""
         changeIndicator = ""
         results = PersonPersonView.fetchPerson(id, lastName, firstName, midName, soundexLastName, soundexFirstName, changeIndicator, nameType, pagingAndSortParams)
-        println results
+
         assertTrue results.size() == 1
 
         //fetch all defined by page size with no parameters
         results = PersonPersonView.fetchPerson("", "", "", "", "", "", "", "", pagingAndSortParams)
-        println results
+
         assertTrue results.size() == 8
     }
 
@@ -136,6 +136,83 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
         assert result.size() == 4
     }
 
+
+    /**
+     * Tests the list of persons for inquiry page.
+     * Search by lastName with special characters
+     */
+    def testDynamicFinder1_SpecialCharactersCondition() {
+
+        def pagingAndSortParams = ["max": 8, "offset": 0]
+
+        def filterData = [:]
+        def param = [:]
+        param."searchLastName" = "W'est%".replaceAll('[^a-zA-Z0-9]+','')
+
+        def m = [:]
+        m."key" = "searchLastName"
+        m."binding" = "searchLastName"
+        m."operator" = "contains"
+
+        filterData.params = param
+
+        def x = []
+        x.add(m)
+        filterData.criteria = x
+
+        def result = PersonPersonView.fetchSearchEntityList(filterData, pagingAndSortParams)
+
+        assertNotNull result
+
+        assertNotNull result.find{ it.lastName == "W'est"
+        }
+    }
+
+
+    /**
+     * Tests the list of persons for inquiry page.
+     * Search by changeIndicator is null
+     */
+    def testDynamicFinder1_ChangeIndicator() {
+
+        def pagingAndSortParams = ["max": 8, "offset": 0]
+
+        def filterData = [:]
+        def param = [:]
+
+        param."searchLastName" = "beaulac%"
+        param."searchFirstName" = "carl%"
+
+        def m = [:]
+        m."key" = "changeIndicator"
+        m."binding" = "changeIndicator"
+        m."operator" = "isnull"
+
+        def m0 = [:]
+        m0."key" = "searchLastName"
+        m0."binding" = "searchLastName"
+        m0."operator" = "contains"
+
+        def m1 = [:]
+        m1."key" = "searchFirstName"
+        m1."binding" = "searchFirstName"
+        m1."operator" = "contains"
+
+        filterData.params = param
+
+        def x = []
+        x.add(m)
+        x.add(m0)
+        x.add(m1)
+        filterData.criteria = x
+
+        def result = PersonPersonView.fetchSearchEntityList(filterData, pagingAndSortParams)
+
+        assertNotNull result
+        assertTrue result.size() == 1
+    }
+
+
     /**
      * Tests the list of persons for inquiry page.
      * Search by lastName, birthDate
@@ -171,6 +248,45 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
         assertNotNull result
 
         assert result.size() == 3
+    }
+
+    /**
+     * Tests the list of persons for inquiry page.
+     * Search by lastName, birthDate
+     */
+    def testDynamicFinder1_BirthDateEqualsCondition() {
+
+        def pagingAndSortParams = ["max": 8, "offset": 0]
+
+        def filterData = [:]
+        def param = [:]
+        param."searchLastName" = "duck%"
+        String strDateFrom = "1975/12/15";
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
+        Date birthDate = formatter.parse(strDateFrom);
+        param."birthDate" = birthDate
+        filterData.params = param
+
+        def m0 = [:]
+        m0."key" = "searchLastName"
+        m0."binding" = "searchLastName"
+        m0."operator" = "contains"
+
+        def m1 = [:]
+        m1."key" = "birthDate"
+        m1."binding" = "birthDate"
+        m1."operator" = "equals"
+
+        def x = []
+        x.add(m0)
+        x.add(m1)
+        filterData.criteria = x
+
+        def result = PersonPersonView.fetchSearchEntityList(filterData, pagingAndSortParams)
+
+        assertNotNull result
+
+        assert result.size() == 1
     }
 
     /**
@@ -400,9 +516,9 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
     /**
      * Tests the list of persons for inquiry page.
-     * Search by surnamePrefix, nameSuffix
+     * Search by surnamePrefix
      */
-    def testDynamicFinder7() {
+    def testDynamicFinderBySurnamePrefix() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
 
@@ -431,4 +547,37 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
         assertEquals "Bunte", result[0].lastName
     }
 
+
+    /**
+     * Tests the list of persons for inquiry page.
+     * Search by nameSuffix
+     */
+    def testDynamicFinderByNameSuffix() {
+
+        def pagingAndSortParams = ["max": 8, "offset": 0]
+
+        def filterData = [:]
+        def param = [:]
+
+        param."nameSuffix" = "PhD"
+
+        filterData.params = param
+
+        def m0 = [:]
+        m0."key" = "nameSuffix"
+        m0."binding" = "nameSuffix"
+        m0."operator" = "contains"
+
+        def x = []
+        x.add(m0)
+
+        filterData.criteria = x
+
+        def result = PersonPersonView.fetchSearchEntityList(filterData, pagingAndSortParams)
+
+        assertNotNull result
+        assertNotNull result.find{
+            it.nameSuffix == "PhD"
+        }
+    }
 }
