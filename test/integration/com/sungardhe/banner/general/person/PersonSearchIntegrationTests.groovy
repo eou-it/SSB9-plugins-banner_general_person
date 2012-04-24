@@ -17,6 +17,7 @@ import com.sungardhe.banner.testing.BaseIntegrationTestCase
 import com.sungardhe.banner.general.system.NameType
 import org.junit.Ignore
 import java.text.SimpleDateFormat
+import com.sungardhe.banner.person.dsl.NameTemplate
 
 class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
@@ -136,7 +137,6 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
         assert result.size() == 4
     }
 
-
     /**
      * Tests the list of persons for inquiry page.
      * Search by lastName with special characters
@@ -147,7 +147,7 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def filterData = [:]
         def param = [:]
-        param."searchLastName" = "W'est%".replaceAll('[^a-zA-Z0-9]+','')
+        param."searchLastName" = "W'est%".replaceAll('[^a-zA-Z0-9]+', '')
 
         def m = [:]
         m."key" = "searchLastName"
@@ -164,10 +164,10 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         assertNotNull result
 
-        assertNotNull result.find{ it.lastName == "W'est"
+        assertNotNull result.find {
+            it.lastName == "W'est"
         }
     }
-
 
     /**
      * Tests the list of persons for inquiry page.
@@ -211,7 +211,6 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
         assertNotNull result
         assertTrue result.size() == 1
     }
-
 
     /**
      * Tests the list of persons for inquiry page.
@@ -264,7 +263,8 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
         String strDateFrom = "1975/12/15";
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
         Date birthDate = formatter.parse(strDateFrom);
-        param."birthDate" = birthDate
+        Date t = Date.parse("yyyy-MM-dd", "1975-12-15")
+        param."birthDate" = t
         filterData.params = param
 
         def m0 = [:]
@@ -496,7 +496,6 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
         assert results.size() == 2
     }
 
-
     /**
      * Tests no parameters on query - fetch all.
      */
@@ -547,7 +546,6 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
         assertEquals "Bunte", result[0].lastName
     }
 
-
     /**
      * Tests the list of persons for inquiry page.
      * Search by nameSuffix
@@ -576,8 +574,53 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
         def result = PersonPersonView.fetchSearchEntityList(filterData, pagingAndSortParams)
 
         assertNotNull result
-        assertNotNull result.find{
+        assertNotNull result.find {
             it.nameSuffix == "PhD"
         }
+    }
+
+    /**
+     * Tests the name formatter.
+     */
+    def testNameFormatter() {
+        def name = NameTemplate.format {
+            lastName "Smith"
+            firstName "John"
+            mi "ZZ"
+            formatTemplate '$lastName, $firstName'
+            text
+        }
+        assertEquals "Smith, John", name
+
+        name = NameTemplate.format {
+            lastName "Smithaaaa"
+            firstName "John"
+            mi "ZZ"
+            formatTemplate "<%=lastName[0..4]%>, <%=firstName%> <%=mi[0]%>"
+            text
+        }
+        assertEquals "Smith, John Z", name
+
+        name = NameTemplate.format {
+            lastName "Smith"
+            firstName "John"
+            mi ""
+            surnamePrefix "Van Der"
+            nameSuffix "PhD"
+            formatTemplate '$surnamePrefix $lastName, $firstName $nameSuffix'
+            text
+        }
+        assertEquals "Van Der Smith, John PhD", name
+
+        name = NameTemplate.format {
+            lastName "Smith"
+            firstName "John"
+            mi ""
+            surnamePrefix "Van Der"
+            nameSuffix ""
+            formatTemplate '$surnamePrefix $lastName, $firstName $nameSuffix'
+            text
+        }
+        assertEquals "Van Der Smith, John ", name
     }
 }
