@@ -238,9 +238,10 @@ class PersonPersonView extends PersonView {
                     setString('midName', midNameCriteria).
                     setString("changeIndicator", changeIndicator).
                     setString("nameType", nameType)
-
-            query.setMaxResults(pagingAndSortParams.max);
-            query.setFirstResult(pagingAndSortParams.offset);
+            if (pagingAndSortParams) {
+                query.setMaxResults(pagingAndSortParams?.max)
+                query.setFirstResult(pagingAndSortParams?.offset)
+            }
             query.list()
         }
         return persons

@@ -61,6 +61,5 @@ class NameTemplate {
         SimpleTemplateEngine templateEngine = new SimpleTemplateEngine()
         def template = templateEngine.createTemplate(dsl.m.formatTemplate)
         Writable writable = template.make(dsl.m)
-        writable.toString()
     }
 }
