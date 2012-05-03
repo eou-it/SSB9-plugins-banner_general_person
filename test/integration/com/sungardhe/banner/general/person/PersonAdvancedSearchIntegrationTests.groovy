@@ -19,7 +19,6 @@ import com.sungardhe.banner.testing.BaseIntegrationTestCase
 import com.sungardhe.banner.general.person.view.PersonAdvancedSearchView
 import groovy.sql.Sql
 import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
-import org.junit.Ignore
 
 class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
 
@@ -37,7 +36,6 @@ class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests the list of additional ids for inquire page.
      */
-    @Ignore
     def testDynamicFinder() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
@@ -70,10 +68,13 @@ class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
     }
 
     /**
-     * Tests the advanced search..
+     * Tests the advanced search.
+     * 1. Filter
+     * 2. City
+     * 3. BirthDate
+     * 4. Zip
      */
-    @Ignore
-    def testAdvancedSearch() {
+    def testAdvancedSearchByFilterAndByCityAndByBirthDateAndByZip() {
         // Define text search based on LastName, FirstName, and Id
         def persons = personSearchService.fetchTextSearch(["33","STUDENT","104","S104"])
         assertNotNull persons
@@ -124,6 +125,52 @@ class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
 
         assertTrue result.size() == 1
         assertEquals "M", result[0].sex
+    }
+
+
+    /**
+     * Tests the advanced search.
+     * 1. Filter
+     * 2. LastName
+     */
+    def testAdvancedSearchByFilterAndByLastName() {
+        // Define text search based on LastName, FirstName, and Id
+        def persons = personSearchService.fetchTextSearch(["33","STUDENT","104","S104"])
+        assertNotNull persons
+
+        // Step 1: returns a list of pidms
+        assertNotNull(persons.collect { it.pidm } as HashSet)
+
+        def pidmSet = (persons.collect { new Integer(it.pidm.toString()) } as HashSet)
+
+        List<Integer> pidmList = new ArrayList<Integer>(pidmSet);
+
+        // Step 2: returns a list of persons based on list of pidms
+        // search criteria: LastName
+        def pagingAndSortParams = ["max": 8, "offset": 0]
+
+        def filterData = [:]
+        def param = [:]
+        param."lastName" = "%Langley%"
+
+        param."pidms" = pidmList
+
+        filterData.params = param
+
+        def m1 = [:]
+        m1."key" = "lastName"
+        m1."binding" = "lastName"
+        m1."operator" = "contains"
+
+
+        def x = []
+        x.add(m1)
+
+        filterData.criteria = x
+
+        def result = PersonAdvancedSearchView.fetchSearchEntityList(filterData, pagingAndSortParams)
+        assertTrue result.size() == 1
+        assertEquals "Langley", result[0].lastName
     }
 
     /**
@@ -181,6 +228,7 @@ class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
         assertTrue result.size() == 1
         assertEquals "M", result[0].sex
     }
+
 
     /**
      * Tests the advanced search for ssn
