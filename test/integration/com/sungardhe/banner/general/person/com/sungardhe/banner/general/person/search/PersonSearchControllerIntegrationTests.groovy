@@ -108,7 +108,7 @@ class PersonSearchControllerIntegrationTests extends BaseIntegrationTestCase {
 
         controller.request.contentType = "text/json"
 
-        controller.params.searchFilter = ["LINDBLOM","GANNON"]
+        controller.params.searchFilter = "LINDBLOM GANNON"
         controller.params.pagingAndSortParams = ["max": 8, "offset": 0]
 
         controller.searchText()

@@ -36,7 +36,7 @@ class PersonSearchService {
 
     def fetchTextSearch(searchFilter) {
 
-        def search = searchFilter.join("|")
+        def search = Arrays.asList(searchFilter.split()).join("|")
 
         def sql = new Sql(sessionFactory.getCurrentSession().connection())
 
@@ -78,7 +78,8 @@ class PersonSearchService {
     }
 
     def fetchTextWithSSNSearch(searchFilter) {
-        def search = searchFilter.join("|")
+
+        def search = Arrays.asList(searchFilter.split()).join("|")
 
         def sql = new Sql(sessionFactory.getCurrentSession().connection())
 
