@@ -1,7 +1,6 @@
 package com.sungardhe.banner.general.person.search
 
 import com.sungardhe.banner.testing.BaseIntegrationTestCase
-import com.sungardhe.banner.general.person.search.PersonSearchController
 import grails.converters.JSON
 
 /**
