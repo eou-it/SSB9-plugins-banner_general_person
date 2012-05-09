@@ -55,6 +55,17 @@ FETCH regex_cursor INTO hold_var;
 --
 END;
 --
+--
+PROCEDURE p_set_search_filter(search_var VARCHAR2) IS
+BEGIN
+   search_filter := search_var;
+END p_set_search_filter;
+--
+FUNCTION f_get_search_filter RETURN VARCHAR2 IS
+BEGIN
+     RETURN search_filter;
+END f_get_search_filter;
+--
 END soknsut;
 /
 SHOW ERRORS

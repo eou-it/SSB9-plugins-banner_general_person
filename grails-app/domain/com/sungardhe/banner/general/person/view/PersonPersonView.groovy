@@ -100,7 +100,7 @@ class PersonPersonView extends PersonView {
     String searchFirstName
 
     /**
-     * The MI (Mdle Initial) field with all spaces and punctuation removed and all letters capitalized.
+     * The MI (Middle Initial) field with all spaces and punctuation removed and all letters capitalized.
      */
     @Column(name = "SEARCH_MI", length = 60)
     String searchMiddleName

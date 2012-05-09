@@ -17,6 +17,12 @@ import groovy.sql.Sql
 import org.springframework.security.core.context.SecurityContextHolder
 import com.sungardhe.banner.exceptions.ApplicationException
 import com.sungardhe.banner.general.person.view.PersonView
+import com.sungardhe.banner.general.person.view.PersonAdvancedFilterView
+import com.sungardhe.banner.general.person.view.PersonAdvancedAlternateIdFilterView
+import com.sungardhe.banner.person.dsl.NameTemplate
+import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
+import org.springframework.context.i18n.LocaleContextHolder as LCH
+import org.springframework.context.ApplicationContext
 
 class PersonSearchService {
 
@@ -25,6 +31,8 @@ class PersonSearchService {
     private final Logger log = Logger.getLogger(getClass())
 
     def institutionalDescriptionService
+
+    private _nameFormat
 
     def findPerson(id, lastName, firstName, midName, soundexLastName, soundexFirstName, changeIndicator, nameType, pagingAndSortParams) {
         return PersonPersonView.fetchPerson(id, lastName, firstName, midName, soundexLastName, soundexFirstName, changeIndicator, nameType, pagingAndSortParams)
@@ -155,12 +163,97 @@ class PersonSearchService {
     }
 
 
+    def personSearch(searchFilter, filterData, pagingAndSortParams) {
+
+        def searchResult
+        def ssnSearchEnabledIndicator = institutionalDescriptionService.findByKey().ssnSearchEnabledIndicator
+        def ssn
+        def pii
+
+
+        def search = Arrays.asList(searchFilter.split()).join("|")
+
+        Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
+        //sets the search filter per search request
+        sql.call("{call soknsut.p_set_search_filter(${search})}")
+
+        if (ssnSearchEnabledIndicator) {
+
+            def userName = SecurityContextHolder.context?.authentication?.principal?.username?.toUpperCase()
+            try {
+                sql.call("{$Sql.VARCHAR = call g\$_chk_auth.g\$_check_authorization_fnc('SSN_SEARCH',${userName})}") {ssnSearch -> ssn = ssnSearch}
+
+                searchResult = searchComponent(ssn, filterData, pagingAndSortParams)
+
+                sql.call("{$Sql.VARCHAR = call gokfgac.f_spriden_pii_active}") { result -> pii = result }
+                if (searchResult?.size() == 0 && pii == "Y") {
+                    sql.execute("""call gokfgac.p_turn_fgac_off()""")
+                    searchResult = searchComponent(ssn, filterData, pagingAndSortParams)
+                    sql.execute("""call gokfgac.p_turn_fgac_on()""")
+                    if (searchResult?.size() > 0) {
+                        throw new ApplicationException(PersonView, "@@r1:invalidId@@")
+                    }
+                }
+            } finally {
+                sql?.close()
+            }
+        }
+
+        return searchResult
+    }
+
+
     def private searchComponent(ssn, searchFilter) {
 
         if (ssn == "YES") {
             return fetchTextWithSSNSearch(searchFilter)
         } else {
             return fetchTextSearch(searchFilter)
+        }
+    }
+
+
+    def private searchComponent(ssn, filterData, pagingAndSortParams) {
+
+        if (ssn == "YES") {
+            return PersonAdvancedAlternateIdFilterView.fetchSearchEntityList(filterData, pagingAndSortParams).each {
+                it ->
+                def lastNameValue = it.lastName
+                def firstNameValue = it.firstName
+                def middleNameValue = it.middleName
+                it.formattedName = NameTemplate.format {
+                    lastName lastNameValue
+                    firstName firstNameValue
+                    mi middleNameValue
+                    formatTemplate getNameFormat()
+                    text
+                }
+            }
+        } else {
+            return PersonAdvancedFilterView.fetchSearchEntityList(filterData, pagingAndSortParams).each {
+                it ->
+                def lastNameValue = it.lastName
+                def firstNameValue = it.firstName
+                def middleNameValue = it.middleName
+                it.formattedName = NameTemplate.format {
+                    lastName lastNameValue
+                    firstName firstNameValue
+                    mi middleNameValue
+                    formatTemplate getNameFormat()
+                    text
+                }
+            }
+        }
+    }
+
+    private def getNameFormat() {
+        if (!_nameFormat) {
+            def application = AH.application
+            ApplicationContext applicationContext = application.mainContext
+            def messageSource = applicationContext.getBean("messageSource")
+            messageSource.getMessage("default.name.format", null, LCH.getLocale())
+        } else {
+            _nameFormat
         }
     }
 }

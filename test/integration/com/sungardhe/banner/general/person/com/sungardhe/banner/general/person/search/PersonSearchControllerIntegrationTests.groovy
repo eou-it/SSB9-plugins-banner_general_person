@@ -1,4 +1,4 @@
-package com.sungardhe.banner.general.person.com.sungardhe.banner.general.person.search
+package com.sungardhe.banner.general.person.search
 
 import com.sungardhe.banner.testing.BaseIntegrationTestCase
 import com.sungardhe.banner.general.person.search.PersonSearchController
