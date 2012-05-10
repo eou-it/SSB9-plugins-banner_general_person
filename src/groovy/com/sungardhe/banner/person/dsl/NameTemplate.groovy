@@ -61,6 +61,18 @@ class NameTemplate {
         SimpleTemplateEngine templateEngine = new SimpleTemplateEngine()
         def template = templateEngine.createTemplate(dsl.m.formatTemplate)
         Writable writable = template.make(dsl.m)
-        writable.toString()
+
+        //removes all double spaces and empty <,,> placeholders
+        def str = writable.toString().replaceAll("\\s+", " ").replaceAll(", ,",",").trim()
+        def finalStr
+
+        //removes <,> from the ends of the string if they are first or last
+         if (str[-1]== ','){
+            return str[0..-2]
+         }else if(str[0]== ','){
+            return str[1..-1]
+         }
+
+        return str
     }
 }

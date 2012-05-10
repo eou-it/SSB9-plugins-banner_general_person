@@ -621,6 +621,30 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
             formatTemplate '$surnamePrefix $lastName, $firstName $nameSuffix'
             text
         }
-        assertEquals "Van Der Smith, John ", name
+        assertEquals "Van Der Smith, John", name
+
+
+         name = NameTemplate.format {
+            lastName "Smith"
+            firstName "John"
+            mi ""
+            surnamePrefix "Van Der"
+            nameSuffix ""
+            formatTemplate '$surnamePrefix $lastName, $firstName, $nameSuffix'
+            text
+        }
+        assertEquals "Van Der Smith, John", name
+
+        name = NameTemplate.format {
+            lastName "Smith"
+            firstName ""
+            mi ""
+            surnamePrefix "Van Der"
+            nameSuffix ""
+            formatTemplate '$surnamePrefix $lastName,  $firstName, $nameSuffix'
+            text
+        }
+
+        assertEquals "Van Der Smith", name
     }
 }

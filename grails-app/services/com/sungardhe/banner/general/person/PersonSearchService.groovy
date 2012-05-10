@@ -214,9 +214,10 @@ class PersonSearchService {
 
 
     def private searchComponent(ssn, filterData, pagingAndSortParams) {
-
+        def currentList
+        def list
         if (ssn == "YES") {
-            return PersonAdvancedAlternateIdFilterView.fetchSearchEntityList(filterData, pagingAndSortParams).each {
+            list = PersonAdvancedAlternateIdFilterView.fetchSearchEntityList(filterData, pagingAndSortParams).each {
                 it ->
                 def lastNameValue = it.lastName
                 def firstNameValue = it.firstName
@@ -229,8 +230,15 @@ class PersonSearchService {
                     text
                 }
             }
+               currentList = list.findAll { it.changeIndicator == null}
+
+                 if (currentList && currentList?.size() == 1) {
+                    return currentList
+                 }else{
+                     return list
+                 }
         } else {
-            return PersonAdvancedFilterView.fetchSearchEntityList(filterData, pagingAndSortParams).each {
+            list =  PersonAdvancedFilterView.fetchSearchEntityList(filterData, pagingAndSortParams).each {
                 it ->
                 def lastNameValue = it.lastName
                 def firstNameValue = it.firstName
@@ -243,6 +251,14 @@ class PersonSearchService {
                     text
                 }
             }
+
+                 currentList = list.findAll { it.changeIndicator == null}
+
+                 if (currentList && currentList?.size() == 1) {
+                    return currentList
+                 }else{
+                     return list
+                 }
         }
     }
 
