@@ -71,7 +71,8 @@ class PersonSearchControllerIntegrationTests extends BaseIntegrationTestCase {
     def testSearch_4() {
         controller.request.contentType = "text/json"
         controller.params.soundexLastName = "Duck"
-        controller.params.pagingAndSortParams = ["max": 8, "offset": 0]
+        controller.params.max = 8
+        controller.params.offset = 0
         controller.search()
         String actualJSON = controller.response.contentAsString
         def data = JSON.parse(actualJSON)

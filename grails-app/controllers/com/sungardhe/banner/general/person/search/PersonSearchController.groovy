@@ -8,6 +8,10 @@ class PersonSearchController {
     def index = { }
 
     def search = {
+        def pageOffset = params.int('offset') ? params?.int('offset') : 0
+        def pageMaxSize = params.int('max') ?  params?.int('max') : 100
+
+        params.pagingAndSortParams = ["max": pageMaxSize, "offset": pageOffset]
         def result = personSearchService.findPerson(params?.id, params?.lastName,
                 params?.firstName, params?.midName,
                 params?.soundexLastName, params?.soundexFirstName,
@@ -20,6 +24,10 @@ class PersonSearchController {
 
 
     def searchPidms = {
+        def pageOffset = params.int('offset') ? params?.int('offset') : 0
+        def pageMaxSize = params.int('max') ?  params?.int('max') : 100
+
+        params.pagingAndSortParams = ["max": pageMaxSize, "offset": pageOffset]
         def result = personSearchService.findPersonByPidm(params?.pidms, params?.id, params?.lastName,
                 params?.firstName, params?.midName,
                 params?.soundexLastName, params?.soundexFirstName,
