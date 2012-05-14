@@ -16,6 +16,7 @@ import com.sungardhe.banner.general.system.Originator
 import com.sungardhe.banner.service.DatabaseModifiesState
 import org.hibernate.annotations.Type
 import javax.persistence.*
+import com.sungardhe.banner.query.DynamicFinder
 
 /**
  * Person Related Holds model.
@@ -82,9 +83,10 @@ class PersonRelatedHold implements Serializable {
 
     /**
      * This field identifies the system user signon id initiating hold.
+     * **lastModifiedBy User is always set back to the original user by API
      */
     @Column(name = "SPRHOLD_USER")
-    String userData
+    String lastModifiedBy
 
     /**
      * This field identifies the effective begin date of hold.
@@ -136,19 +138,13 @@ class PersonRelatedHold implements Serializable {
     Date lastModified
 
     /**
-     * Last modified by column for SPRHOLD
-     */
-    @Column(name = "SPRHOLD_USER_ID")
-    String lastModifiedBy
-
-    /**
      * DATA SOURCE: Source system that created or updated the row
      */
     @Column(name = "SPRHOLD_DATA_ORIGIN")
     String dataOrigin
 
 
-    public static readonlyProperties = ['pidm', 'userData']
+    public static readonlyProperties = ['pidm']
 
 
     public String toString() {
@@ -157,8 +153,7 @@ class PersonRelatedHold implements Serializable {
 		            version=$version,
 					pidm=$pidm,
 					holdType=$holdType, 
-					userData=$userData, 
-					fromDate=$fromDate, 
+					fromDate=$fromDate,
 					toDate=$toDate, 
 					releaseIndicator=$releaseIndicator, 
 					reason=$reason, 
@@ -173,7 +168,6 @@ class PersonRelatedHold implements Serializable {
     static constraints = {
         pidm(nullable: false, maxsize: 22)
         holdType(nullable: false)
-        userData(nullable: false, maxSize: 30)
         fromDate(nullable: false, validator: {val, obj ->
             if ((val != null) && (val > obj.toDate)) {
                 return 'invalid.fromDateGreaterThanToDate'
@@ -202,7 +196,6 @@ class PersonRelatedHold implements Serializable {
         if (version != that.version) return false
         if (pidm != that.pidm) return false
         if (holdType != that.holdType) return false
-        if (userData != that.userData) return false
         if (fromDate != that.fromDate) return false
         if (toDate != that.toDate) return false
         if (releaseIndicator != that.releaseIndicator) return false
@@ -222,7 +215,6 @@ class PersonRelatedHold implements Serializable {
         result = 31 * result + (version != null ? version.hashCode() : 0)
         result = 31 * result + (pidm != null ? pidm.hashCode() : 0)
         result = 31 * result + (holdType != null ? holdType.hashCode() : 0)
-        result = 31 * result + (userData != null ? userData.hashCode() : 0)
         result = 31 * result + (fromDate != null ? fromDate.hashCode() : 0)
         result = 31 * result + (toDate != null ? toDate.hashCode() : 0)
         result = 31 * result + (releaseIndicator != null ? releaseIndicator.hashCode() : 0)
@@ -292,21 +284,37 @@ class PersonRelatedHold implements Serializable {
      * than or equal to the hold from date and less than the hold to date.  The person related hold type
      * must be defined as a registration hold on the STVHLDD record.
      */
-
     public static Boolean registrationHoldsExist(Integer pidm, Date compareDate) {
         def registrationHoldsExist = false
         def personRelatedHolds
         def registrationHoldType
-        PersonRelatedHold.withSession {session ->
-            personRelatedHolds = session.getNamedQuery('PersonRelatedHold.fetchByPidmAndDateCompare').setInteger('pidm', pidm).setDate('compareDate', compareDate).list()
-            if (!registrationHoldsExist) {
-                personRelatedHolds.each {
-                    registrationHoldType = HoldType.findWhere(registrationHoldIndicator: "Y", code: it.holdType.code)
-                    if (registrationHoldType != null)
-                        registrationHoldsExist = true
-                }
+
+        personRelatedHolds = fetchByPidmAndDateCompare(pidm, compareDate)
+        if (!registrationHoldsExist) {
+            personRelatedHolds.each {
+                registrationHoldType = HoldType.findWhere(registrationHoldIndicator: "Y", code: it.holdType.code)
+                if (registrationHoldType != null)
+                    registrationHoldsExist = true
             }
         }
         return registrationHoldsExist
+    }
+
+
+    def static countAll(filterData) {
+        finderByAll().count(filterData)
+    }
+
+
+    def static fetchSearch(filterData, pagingAndSortParams) {
+        def personRelatedHolds = finderByAll().find(filterData, pagingAndSortParams)
+        return personRelatedHolds
+    }
+
+
+    def private static finderByAll = {
+        def query = """FROM  PersonRelatedHold a
+                       WHERE a.pidm = :pidm """
+        return new DynamicFinder(PersonRelatedHold.class, query, "a")
     }
 }

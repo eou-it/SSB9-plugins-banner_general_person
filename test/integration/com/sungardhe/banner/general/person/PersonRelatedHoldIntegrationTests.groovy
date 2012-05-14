@@ -49,17 +49,16 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
         assertNotNull personRelatedHold.id
         assertEquals 0L, personRelatedHold.version
         assertEquals PersonIdentificationName.findByBannerIdAndChangeIndicatorIsNull("HOS00001").pidm, personRelatedHold.pidm
-        assertEquals "TTTTT", personRelatedHold.userData
         assertNotNull personRelatedHold.fromDate
         assertNotNull personRelatedHold.toDate
         assertEquals false, personRelatedHold.releaseIndicator
         assertEquals "TTTTT", personRelatedHold.reason
         assertEquals 1, personRelatedHold.amountOwed
+        assertEquals "grails_user", personRelatedHold.lastModifiedBy
 
         //Update the entity
         def testDate = new Date()
         personRelatedHold.pidm = PersonIdentificationName.findByBannerIdAndChangeIndicatorIsNull("HOS00001").pidm
-        personRelatedHold.userData = "UUUUU"
         personRelatedHold.fromDate = testDate
         personRelatedHold.toDate = testDate
         personRelatedHold.releaseIndicator = false
@@ -73,12 +72,14 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
         personRelatedHold = PersonRelatedHold.get(personRelatedHold.id)
         assertEquals 1L, personRelatedHold?.version
         assertEquals PersonIdentificationName.findByBannerIdAndChangeIndicatorIsNull("HOS00001").pidm, personRelatedHold.pidm
-        assertEquals "UUUUU", personRelatedHold.userData
         assertEquals testDate, personRelatedHold.fromDate
         assertEquals testDate, personRelatedHold.toDate
         assertEquals false, personRelatedHold.releaseIndicator
         assertEquals "UUUUU", personRelatedHold.reason
         assertEquals 0, personRelatedHold.amountOwed
+        //Make sure that last modified by user is not being updated
+        assertEquals "grails_user", personRelatedHold.lastModifiedBy
+
     }
 
 
@@ -95,7 +96,6 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
         }
         //Try to update the entity
         personRelatedHold.pidm = 1
-        personRelatedHold.userData = "UUUUU"
         personRelatedHold.fromDate = new Date()
         personRelatedHold.toDate = new Date()
         personRelatedHold.releaseIndicator = false
@@ -132,7 +132,6 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
         assertErrorsFor personRelatedHold, 'nullable',
                 [
                         'pidm',
-                        'userData',
                         'fromDate',
                         'toDate',
                         'holdType'
@@ -155,42 +154,13 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-
-    private def newPersonRelatedHold() {
-
-        def iholdType = HoldType.findWhere(code: "RG")
-        def ioriginator = Originator.findWhere(code: "ACCT")
-        def df1 = new SimpleDateFormat("yyyy-MM-dd")
-        def fromDate = df1.parse("2010-07-01")
-        def toDate = df1.parse("2010-09-01")
-        def pidm = PersonUtility.getPerson("HOS00001").pidm
-
-
-        def personRelatedHold = new PersonRelatedHold(
-                pidm: pidm,
-                userData: "TTTTT",
-                fromDate: fromDate,
-                toDate: toDate,
-                releaseIndicator: false,
-                reason: "TTTTT",
-                amountOwed: 1,
-                holdType: iholdType,
-                originator: ioriginator,
-                lastModified: new Date(),
-                lastModifiedBy: "test",
-                dataOrigin: "Banner"
-        )
-        return personRelatedHold
-    }
-
-
     void testInvalidBeginDatesEndDate() {
         testDates("2010-10-01", "2010-09-01", true)
         testDates("2010-10-01", "2010-09-01", false)
     }
 
 
-    private def testDates(String fromDate, String toDate, Boolean fromOk) {
+    void testDates(String fromDate, String toDate, Boolean fromOk) {
         def personRelatedHold = newPersonRelatedHold()
 
         def df1 = new SimpleDateFormat("yyyy-MM-dd")
@@ -261,5 +231,76 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
 
         def registrationHoldsExist = PersonRelatedHold.registrationHoldsExist(holdPidm, holdDate)
         assertTrue(registrationHoldsExist)
+    }
+
+
+    void testAdvanceFilter() {
+        def pidm = PersonUtility.getPerson("HOS00001").pidm
+        def personRelatedHold1 = newPersonRelatedHold()
+        save personRelatedHold1
+
+        def personRelatedHold2 = newPersonRelatedHold()
+        personRelatedHold2.holdType = HoldType.findByCode("AD")
+        save personRelatedHold2
+
+        def personRelatedHold3 = newPersonRelatedHold()
+        personRelatedHold3.holdType = HoldType.findByCode("PF")
+        save personRelatedHold3
+
+        def personRelatedHold4 = newPersonRelatedHold()
+        personRelatedHold4.holdType = HoldType.findByCode("FH")
+        save personRelatedHold4
+
+        def personRelatedHold5 = newPersonRelatedHold()
+        personRelatedHold5.holdType = HoldType.findByCode("WC")
+        save personRelatedHold5
+
+        Map pagingAndSortParams = [:]
+        Map filterData = [params: [pidm: pidm]]
+
+        pagingAndSortParams = [sortColumn: "holdType.code", sortDirection: "desc"]
+        def personRelatedHolds = PersonRelatedHold.fetchSearch(filterData, pagingAndSortParams)
+        assertNotNull personRelatedHolds
+        assertEquals personRelatedHolds[0].holdType.code, "WC"
+
+        Map paramsMap = [originator: "ACCT", pidm: pidm]
+        def criteriaMap = [[key: "originator", binding: "originator.code", operator: "equals"]]
+        filterData = [params: paramsMap, criteria: criteriaMap]
+        personRelatedHolds = PersonRelatedHold.fetchSearch(filterData, pagingAndSortParams)
+        personRelatedHolds.each { personRelatedHold ->
+            assertTrue personRelatedHold.originator.code == "ACCT"
+            assertTrue personRelatedHold.pidm == pidm
+        }
+
+        def count = PersonRelatedHold.countAll(filterData)
+        assertEquals count, personRelatedHolds.size()
+
+    }
+
+
+    private def newPersonRelatedHold() {
+
+        def iholdType = HoldType.findWhere(code: "RG")
+        def ioriginator = Originator.findWhere(code: "ACCT")
+        def df1 = new SimpleDateFormat("yyyy-MM-dd")
+        def fromDate = df1.parse("2010-07-01")
+        def toDate = df1.parse("2010-09-01")
+        def pidm = PersonUtility.getPerson("HOS00001").pidm
+
+
+        def personRelatedHold = new PersonRelatedHold(
+                pidm: pidm,
+                fromDate: fromDate,
+                toDate: toDate,
+                releaseIndicator: false,
+                reason: "TTTTT",
+                amountOwed: 1,
+                holdType: iholdType,
+                originator: ioriginator,
+                lastModified: new Date(),
+                lastModifiedBy: "test",
+                dataOrigin: "Banner"
+        )
+        return personRelatedHold
     }
 }

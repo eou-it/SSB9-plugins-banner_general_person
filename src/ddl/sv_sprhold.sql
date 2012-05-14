@@ -29,7 +29,6 @@ CREATE OR REPLACE FORCE VIEW sv_sprhold AS SELECT
       sprhold_orig_code,
       sprhold_surrogate_id,
       sprhold_version,
-      sprhold_user_id,
       sprhold_data_origin,
       sprhold_activity_date,
       ROWID sprhold_v_rowid

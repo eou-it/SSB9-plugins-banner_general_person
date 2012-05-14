@@ -36,31 +36,46 @@ class PersonRelatedHoldService extends ServiceBase {
         validateHoldForDelete(map.domainModel)
     }
 
-
+    /**
+     * User who created Hold record ==> Can always update the record
+     * User created hold type with Release Indicator flag checked ==> No other user can updated any field on this record except the one who originally created
+     * User create hold type with Release Indicator flag unchecked ==> Other users can update all the fields except Hold Type and Release Indicator
+     * @param hold
+     * @return
+     */
+    //Check view
     private validateHoldForUpdate(PersonRelatedHold hold) {
-        if (!(hold.userData == SecurityContextHolder.context?.authentication?.principal?.username)) {
-            println(hold.userData || SecurityContextHolder.context?.authentication?.principal?.username)
+
+        if (!(hold.lastModifiedBy == SecurityContextHolder.context?.authentication?.principal?.username)) {
             if (findDirty(hold, 'holdType'))
-                throw new ApplicationException(PesonRelatedHold, "@@r1:invalidHoldUser")
+                throw new ApplicationException(PersonRelatedHold, "@@r1:holdCodeUpdateNotAllowed")
             if (findDirty(hold, 'releaseIndicator'))
-                throw new ApplicationException(PersonRelatedHold, "@@r1:invalidHoldUser")
+                throw new ApplicationException(PersonRelatedHold, "@@r1:releaseIndicatorUpdateNotAllowed")
             if (hold.releaseIndicator) {
                 if (findDirty(hold, 'reason'))
-                    throw new ApplicationException(PersonRelatedHold, "@@r1:invalidHoldUser")
+                    throw new ApplicationException(PersonRelatedHold, "@@r1:updateNotAllowedByAnotherUser")
                 if (findDirty(hold, 'fromDate'))
-                    throw new ApplicationException(PersonRelatedHold, "@@r1:invalidHoldUser")
+                    throw new ApplicationException(PersonRelatedHold, "@@r1:updateNotAllowedByAnotherUser")
                 if (findDirty(hold, 'toDate'))
-                    throw new ApplicationException(PersonRelatedHold, "@@r1:invalidHoldUser")
+                    throw new ApplicationException(PersonRelatedHold, "@@r1:updateNotAllowedByAnotherUser")
+                if (findDirty(hold, 'amountOwed'))
+                    throw new ApplicationException(PersonRelatedHold, "@@r1:updateNotAllowedByAnotherUser")
+                if (findDirty(hold, 'originator'))
+                    throw new ApplicationException(PersonRelatedHold, "@@r1:updateNotAllowedByAnotherUser")
             }
         }
     }
 
-
+    /**
+     * User created hold type with Release Indicator flag checked ==> No other user can updated any field on this record except the one who originally created the record
+     *                                                            ==> No other user can delete the record.
+     * @param hold
+     * @return
+     */
     private validateHoldForDelete(PersonRelatedHold hold) {
-        println("user data " + hold.userData + SecurityContextHolder.context?.authentication?.principal?.username)
-        if (!(hold.userData == SecurityContextHolder.context?.authentication?.principal?.username)) {
+        if (!(hold.lastModifiedBy == SecurityContextHolder.context?.authentication?.principal?.username)) {
             if (hold.releaseIndicator) {
-                throw new ApplicationException(PersonRelatedHold, "@@r1:invalidHoldUserForDelete")
+                throw new ApplicationException(PersonRelatedHold, "@@r1:deleteNotAllowedByAnotherUser")
             }
         }
     }
