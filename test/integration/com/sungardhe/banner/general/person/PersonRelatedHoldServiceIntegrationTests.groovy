@@ -288,7 +288,24 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
         }
     }
 
-    //TODO add readOnly tests for pidm
+
+    void testReadOnlyPIDM() {
+        def personRelatedHold = newPersonRelatedHold()
+        personRelatedHold.releaseIndicator = true
+        def map = [domainModel: personRelatedHold]
+        personRelatedHold = personRelatedHoldService.create(map)
+        map = [domainModel: personRelatedHold]
+
+        map.domainModel.pidm = 222
+        try {
+            personRelatedHoldService.update([map.domainModel])
+            fail("This should have failed with @@r1:readonlyFieldsCannotBeModified")
+        }
+        catch (ApplicationException ae) {
+            assertApplicationException ae, "readonlyFieldsCannotBeModified"
+        }
+    }
+
 
     private def newPersonRelatedHold() {
 
