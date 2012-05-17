@@ -25,6 +25,8 @@ AS
    -- This Utility Package supports Banner ID/Name Search
    --
    -- DESCRIPTION END
+   -- Variables
+      search_filter       VARCHAR2(2000);
    --
    --
    -- Procedures
@@ -38,8 +40,17 @@ AS
    */
 FUNCTION name_search_booster(search_var VARCHAR2, expession_var VARCHAR2) RETURN NUMBER;
 --
-
+   /**
+   * This function returns the search filter for the advanced search component.
+   */
+FUNCTION f_get_search_filter RETURN VARCHAR2;
 --
+   /**
+   * This procedure set the search filter for the advanced search component.
+   */
+PROCEDURE p_set_search_filter(search_var VARCHAR2);
+--
+pragma restrict_references (f_get_search_filter, WNDS,WNPS);
 END soknsut;
 /
 SHOW ERRORS

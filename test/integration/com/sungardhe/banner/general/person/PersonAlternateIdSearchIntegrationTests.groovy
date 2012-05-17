@@ -56,4 +56,39 @@ class PersonAlternateIdSearchIntegrationTests extends BaseIntegrationTestCase {
         assertNotNull results
 
     }
+
+
+    /**
+     * Tests the list of persons for inquiry page.
+     * Search by preferredFirstName.
+     */
+    def testDynamicFinder1() {
+
+        def pagingAndSortParams = ["max": 8, "offset": 0]
+
+        def filterData = [:]
+        def param = [:]
+
+        param."preferredFirstName" = "Trouble"
+
+        filterData.params = param
+
+        def m0 = [:]
+        m0."key" = "preferredFirstName"
+        m0."binding" = "preferredFirstName"
+        m0."operator" = "contains"
+
+        def x = []
+        x.add(m0)
+
+        filterData.criteria = x
+
+        def result = PersonAlternateIdView.fetchSearchEntityList(filterData, pagingAndSortParams)
+
+        assertNotNull result
+
+        assert result.size() > 0
+        assertNotNull result[0].ssn
+    }
+
 }

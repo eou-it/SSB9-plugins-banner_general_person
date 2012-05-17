@@ -31,9 +31,7 @@ grails.project.dependency.resolution = {
         mavenRepo "http://repository.codehaus.org"
     }
 
-      plugins {
 
-    }
     dependencies {
 
     }

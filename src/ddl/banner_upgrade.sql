@@ -11,11 +11,11 @@
 -- *****************************************************************************************
 REM
 REM banner_upgrade.sql
-REM 
-REM AUDIT TRAIL: 9.0 
-REM 1. Horizon 
+REM
+REM AUDIT TRAIL: 9.0
+REM 1. Horizon
 REM Main common project schema maintenance script.
-REM AUDIT TRAIL END 
+REM AUDIT TRAIL END
 REM
 set scan on echo on termout on;
 REM
@@ -32,6 +32,10 @@ REM
 connect baninst1/&&baninst1_password
 start studbpr_bgp
 REM
+connect baninst1/&&baninst1_password
+start gordmcli.sql
+start gordmski.sql
+commit;
 spool off;
 REM
 select * from all_objects where status = 'INVALID';

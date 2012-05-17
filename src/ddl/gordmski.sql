@@ -1,0 +1,106 @@
+REM
+REM gordski.sql
+REM
+REM AUDIT TRAIL: 8.5
+REM AK 09/01/2009
+REM 1) New column surname prefix is added to few query
+REM forms in banner 9 and then are been masked from display
+REM by inserting into GORDMSK with display_ind='N'
+REM AUDIT TRAIL END
+REM
+set echo on
+set scan off
+REM
+
+insert into GORDMSK
+(GORDMSK_OBJS_CODE,
+GORDMSK_BLOCK_NAME,
+GORDMSK_COLUMN_NAME,
+GORDMSK_SEQNO,
+GORDMSK_DISPLAY_IND,
+GORDMSK_CONCEAL_IND,
+GORDMSK_ALL_USER_IND,
+GORDMSK_ACTIVITY_DATE,
+GORDMSK_USER_ID,
+GORDMSK_OBJS_COMP_NAME,
+GORDMSK_BLOCK_COMP_NAME,
+GORDMSK_COLUMN_COMP_NAME)
+SELECT 'SOAIDEN',
+'personPersonViewBlock',
+'surnamePrefix',
+1,
+'N',
+'N',
+'Y',
+sysdate,
+'GENERAL',
+'personsearch',
+'personPersonViewBlock',
+'surnamePrefix'
+FROM DUAL
+     WHERE NOT EXISTS
+    (SELECT 1 FROM GORDMSK WHERE GORDMSK_OBJS_CODE = 'SOAIDEN' and GORDMSK_BLOCK_NAME='personPersonViewBlock' and  GORDMSK_COLUMN_NAME='surnamePrefix');
+
+
+insert into GORDMSK
+(GORDMSK_OBJS_CODE,
+GORDMSK_BLOCK_NAME,
+GORDMSK_COLUMN_NAME,
+GORDMSK_SEQNO,
+GORDMSK_DISPLAY_IND,
+GORDMSK_CONCEAL_IND,
+GORDMSK_ALL_USER_IND,
+GORDMSK_ACTIVITY_DATE,
+GORDMSK_USER_ID,
+GORDMSK_OBJS_COMP_NAME,
+GORDMSK_BLOCK_COMP_NAME,
+GORDMSK_COLUMN_COMP_NAME)
+SELECT 'GUIALTI',
+'personAlternateIdViewBlock',
+'surnamePrefix',
+1,
+'N',
+'N',
+'Y',
+sysdate,
+'GENERAL',
+'alternateidsearch',
+'personAlternateIdViewBlock',
+'surnamePrefix'
+FROM DUAL
+     WHERE NOT EXISTS
+    (SELECT 1 FROM GORDMSK WHERE GORDMSK_OBJS_CODE = 'GUIALTI' and GORDMSK_BLOCK_NAME='personAlternateIdViewBlock' and  GORDMSK_COLUMN_NAME='surnamePrefix');
+
+
+insert into GORDMSK
+(GORDMSK_OBJS_CODE,
+GORDMSK_BLOCK_NAME,
+GORDMSK_COLUMN_NAME,
+GORDMSK_SEQNO,
+GORDMSK_DISPLAY_IND,
+GORDMSK_CONCEAL_IND,
+GORDMSK_ALL_USER_IND,
+GORDMSK_ACTIVITY_DATE,
+GORDMSK_USER_ID,
+GORDMSK_OBJS_COMP_NAME,
+GORDMSK_BLOCK_COMP_NAME,
+GORDMSK_COLUMN_COMP_NAME)
+SELECT 'GUISRCH',
+'teleEmailAdditionalIdViewBlock',
+'surnamePrefix',
+1,
+'N',
+'N',
+'Y',
+sysdate,
+'GENERAL',
+'telemailsearch',
+'teleEmailAdditionalIdViewBlock',
+'surnamePrefix'
+FROM DUAL
+     WHERE NOT EXISTS
+    (SELECT 1 FROM GORDMSK WHERE GORDMSK_OBJS_CODE = 'GUISRCH' and GORDMSK_BLOCK_NAME='teleEmailAdditionalIdViewBlock' and  GORDMSK_COLUMN_NAME='surnamePrefix');
+REM
+SET echo off
+SET scan on
+

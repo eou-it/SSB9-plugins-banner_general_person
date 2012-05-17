@@ -71,12 +71,12 @@ class PersonSearchServiceIntegrationTests extends BaseIntegrationTestCase {
 
     // advanced search by First Name and Last Name in any order
     def testAdvancedSearchByFistNameAndLastName() {
-        def persons = personSearchService.fetchTextSearch("LINDBLOM|GANNON")
+        def persons = personSearchService.fetchTextSearch("LINDBLOM GANNON")
         assertNotNull persons
         def lastName = persons[0].lastName
         assert (/Lindblom/ =~ lastName)
 
-        persons = personSearchService.fetchTextSearch("GANNON|LINDBLOM")
+        persons = personSearchService.fetchTextSearch("GANNON LINDBLOM")
         assertNotNull persons
         lastName = persons[0].lastName
         assert (/Lindblom/ =~ lastName)
@@ -200,7 +200,7 @@ class PersonSearchServiceIntegrationTests extends BaseIntegrationTestCase {
         // [pidm:30859, bannerId:A00010529, ssn:null, name:Craig, lastName:Le, mi:A, boosterSearch:2, changeIndicator:null],
         // [pidm:2167, bannerId:A00000700, ssn:null, name:A, lastName:Student, mi:null, boosterSearch:2, changeIndicator:null]]
 
-        persons = personSearchService.fetchTextWithSSNSearch("543-54|A0000070|1052|Dana")
+        persons = personSearchService.fetchTextWithSSNSearch("543-54 A0000070 1052 Dana")
         assertNotNull persons
         assertTrue persons.size() > 1
 

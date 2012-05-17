@@ -1,5 +1,4 @@
-
-/*******************************************************************************
+/** *****************************************************************************
  Copyright 2009-2011 SunGard Higher Education. All Rights Reserved.
 
  This copyrighted software contains confidential and proprietary information of 
@@ -10,7 +9,7 @@
  trademark of SunGard Data Systems in the U.S.A. and/or other regions and/or countries.
  Banner and Luminis are either registered trademarks or trademarks of SunGard Higher 
  Education in the U.S.A. and/or other regions and/or countries.
- *******************************************************************************/
+ ****************************************************************************** */
 /**
  Banner Automator Version: 1.29
  Generated: Thu Mar 08 11:17:12 EST 2012 
@@ -21,57 +20,66 @@ import com.sungardhe.banner.exceptions.ApplicationException
 import com.sungardhe.banner.service.ServiceBase
 import org.springframework.security.core.context.SecurityContextHolder
 
-// NOTE:
-// This service is injected with create, update, and delete methods that may throw runtime exceptions (listed below).  
-// These exceptions must be caught and handled by the controller using this service.
-// 
-// update and delete may throw com.sungardhe.banner.exceptions.NotFoundException if the entity cannot be found in the database
-// update and delete may throw org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException a runtime exception if an optimistic lock failure occurs
-// create, update, and delete may throw grails.validation.ValidationException a runtime exception when there is a validation failure
-
 class PersonRelatedHoldService extends ServiceBase {
 
     boolean transactional = true
 
     def sessionFactory
 
-    void preUpdate (map) {
-          validateHoldForUpdate(map.domainModel)
+
+    void preUpdate(map) {
+        validateHoldForUpdate(map.domainModel)
     }
 
 
-    void preDelete (map) {
-          validateHoldForDelete(map.domainModel)
+    void preDelete(map) {
+        validateHoldForDelete(map.domainModel)
     }
 
-
+    /**
+     * User who created Hold record ==> Can always update the record
+     * User created hold type with Release Indicator flag checked ==> No other user can updated any field on this record except the one who originally created
+     * User create hold type with Release Indicator flag unchecked ==> Other users can update all the fields except Hold Type and Release Indicator
+     * @param hold
+     * @return
+     */
+    //Check view
     private validateHoldForUpdate(PersonRelatedHold hold) {
-        if (!(hold.userData == SecurityContextHolder.context?.authentication?.principal?.username)) {
-            println(hold.userData || SecurityContextHolder.context?.authentication?.principal?.username)
-            if (findDirty(hold,'holdType'))
-                throw new ApplicationException(PesonRelatedHold, "@@r1:invalidHoldUser")
-            if (findDirty(hold,'releaseIndicator'))
-                    throw new ApplicationException(PersonRelatedHold, "@@r1:invalidHoldUser")
+
+        if (!(hold.lastModifiedBy == SecurityContextHolder.context?.authentication?.principal?.username)) {
+            if (findDirty(hold, 'holdType'))
+                throw new ApplicationException(PersonRelatedHold, "@@r1:holdCodeUpdateNotAllowed")
+            if (findDirty(hold, 'releaseIndicator'))
+                throw new ApplicationException(PersonRelatedHold, "@@r1:releaseIndicatorUpdateNotAllowed")
             if (hold.releaseIndicator) {
-                if (findDirty(hold,'reason'))
-                    throw new ApplicationException(PersonRelatedHold, "@@r1:invalidHoldUser")
-                if (findDirty(hold,'fromDate'))
-                    throw new ApplicationException(PersonRelatedHold, "@@r1:invalidHoldUser")
-                if (findDirty(hold,'toDate'))
-                    throw new ApplicationException(PersonRelatedHold, "@@r1:invalidHoldUser")
+                if (findDirty(hold, 'reason'))
+                    throw new ApplicationException(PersonRelatedHold, "@@r1:updateNotAllowedByAnotherUser")
+                if (findDirty(hold, 'fromDate'))
+                    throw new ApplicationException(PersonRelatedHold, "@@r1:updateNotAllowedByAnotherUser")
+                if (findDirty(hold, 'toDate'))
+                    throw new ApplicationException(PersonRelatedHold, "@@r1:updateNotAllowedByAnotherUser")
+                if (findDirty(hold, 'amountOwed'))
+                    throw new ApplicationException(PersonRelatedHold, "@@r1:updateNotAllowedByAnotherUser")
+                if (findDirty(hold, 'originator'))
+                    throw new ApplicationException(PersonRelatedHold, "@@r1:updateNotAllowedByAnotherUser")
             }
-    }
+        }
     }
 
-
+    /**
+     * User created hold type with Release Indicator flag checked ==> No other user can updated any field on this record except the one who originally created the record
+     *                                                            ==> No other user can delete the record.
+     * @param hold
+     * @return
+     */
     private validateHoldForDelete(PersonRelatedHold hold) {
-         println("user data " + hold.userData + SecurityContextHolder.context?.authentication?.principal?.username)
-        if (!(hold.userData == SecurityContextHolder.context?.authentication?.principal?.username)) {
+        if (!(hold.lastModifiedBy == SecurityContextHolder.context?.authentication?.principal?.username)) {
             if (hold.releaseIndicator) {
-                throw new ApplicationException(PersonRelatedHold, "@@r1:invalidHoldUserForDelete")
+                throw new ApplicationException(PersonRelatedHold, "@@r1:deleteNotAllowedByAnotherUser")
             }
+        }
     }
-    }
+
 
     private findDirty(hold, String field) {
         def content = ServiceBase.extractParams(PersonRelatedHold, hold)
@@ -79,13 +87,7 @@ class PersonRelatedHoldService extends ServiceBase {
         domainObject.properties = content
         def changedNames = domainObject.dirtyPropertyNames
         def changed = changedNames.find { it == field}
-        return changed       
+        return changed
     }
 
-    /**
-     * Please put all the custom methods in this protected section to protect the code
-     * from being overwritten on re-generation
-     */
-    /*PROTECTED REGION ID(personrelatedhold_custom_service_methods) ENABLED START*/
-    /*PROTECTED REGION END*/
 }
