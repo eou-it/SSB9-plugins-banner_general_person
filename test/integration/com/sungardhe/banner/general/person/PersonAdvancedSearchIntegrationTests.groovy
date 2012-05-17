@@ -299,14 +299,16 @@ class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
     }
 
     /**
-     * Tests the advanced search.
+     * Tests the advanced search -- Main WorkFlow.
      * MAIN FLOW
      */
     def testAllAdvancedSearchByIdMainWorkflow() {
 
         def filterData = [:]
         def param = [:]
-        def pagingAndSortParams = ["max": 8, "offset": 0]
+        //IMPORTANT!!!: Must provide Order to have people linked/displayed in order by pidm
+        def order = "@@table@@pidm asc, @@table@@lastName asc, @@table@@firstName asc"
+        def pagingAndSortParams = ["max": 8, "offset": 0, "sortColumn": order]
         filterData.params = param
         //Step 1.
         // Client submits a search query to find an exact match
@@ -330,7 +332,7 @@ class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
         result = personSearchService.personSearch("33 STUDENT 104 S104", filterData, pagingAndSortParams)
         assertNotNull result
         assertTrue result.size() == 8
-        assertEquals "101, Student", result[0].formattedName
+        assertEquals "Jones, Clara", result[0].formattedName
 
         //Step 3.
         // Client submits an additional filter search
@@ -438,7 +440,7 @@ class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
     }
 
     /**
-     * Tests the advanced search for multiple ssn match
+     * Tests the advanced search for multiple ssn match -- Main WorkFlow
      */
     /*
     [PersonAdvancedSearchView[
@@ -473,12 +475,15 @@ class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
                         zip=98199,
                         sex=N]
     */
-
     def testAllAdvancedSearchBySsnMainWorkflow() {
 
         def filterData = [:]
         def param = [:]
-        def pagingAndSortParams = ["max": 8, "offset": 0]
+
+        //IMPORTANT!!!:Must provide Order to have people linked/displayed in order by pidm
+        def order = "@@table@@pidm asc, @@table@@lastName asc, @@table@@firstName asc"
+
+        def pagingAndSortParams = ["max": 100, "offset": 0, "sortColumn": order]
         filterData.params = param
 
         def sql
@@ -503,11 +508,12 @@ class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
 
 
             //Step 2.
-            // Client submits a search query by SSN and other parameter
+            // Client submits a search query by SSN and other parameter(i.e Id)
             // Search by SSN
-            persons = personSearchService.personSearch("543-54-5432 88", filterData, pagingAndSortParams)
+            persons = personSearchService.personSearch("543-54-5432 218827281", filterData, pagingAndSortParams)
 
             assertNotNull persons
+            //println persons
             def ssnFound = persons.find {it.ssn == '543-54-5432'}
             assertNotNull ssnFound
 
@@ -529,11 +535,10 @@ class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
             //Step 2.
             // Client submits a search query by SSN and other parameter with an additional filter
             // Search by SSN
-            def result = personSearchService.personSearch("543-54-5432 88", filterData, pagingAndSortParams)
+            def result = personSearchService.personSearch("543-54-5432 218827281", filterData, pagingAndSortParams)
 
             assertTrue result.size() == 1
 
-            assertEquals "A00000721", result[0].bannerId
             assertEquals "543-54-5432", result[0].ssn
 
         } finally {

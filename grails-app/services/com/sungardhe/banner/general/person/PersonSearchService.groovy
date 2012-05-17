@@ -222,10 +222,14 @@ class PersonSearchService {
                 def lastNameValue = it.lastName
                 def firstNameValue = it.firstName
                 def middleNameValue = it.middleName
+                def surnamePrefixValue = it.surnamePrefix
+                def nameSuffixValue = it.nameSuffix
                 it.formattedName = NameTemplate.format {
                     lastName lastNameValue
                     firstName firstNameValue
                     mi middleNameValue
+                    surnamePrefix surnamePrefixValue
+                    nameSuffix nameSuffixValue
                     formatTemplate getNameFormat()
                     text
                 }
@@ -243,10 +247,14 @@ class PersonSearchService {
                 def lastNameValue = it.lastName
                 def firstNameValue = it.firstName
                 def middleNameValue = it.middleName
+                def surnamePrefixValue = it.surnamePrefix
+                def nameSuffixValue = it.nameSuffix
                 it.formattedName = NameTemplate.format {
                     lastName lastNameValue
                     firstName firstNameValue
                     mi middleNameValue
+                    surnamePrefix surnamePrefixValue
+                    nameSuffix nameSuffixValue
                     formatTemplate getNameFormat()
                     text
                 }
