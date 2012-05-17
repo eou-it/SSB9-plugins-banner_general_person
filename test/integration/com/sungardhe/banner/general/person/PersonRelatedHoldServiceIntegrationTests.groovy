@@ -38,10 +38,15 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
     void testCreateAndUpdatePersonRelatedHold() {
         //Create the new record by usr "grails_user"
         def personRelatedHold = newPersonRelatedHold()
-        def map = [domainModel: personRelatedHold]
+        personRelatedHold.pidm = null
+        def pidm = PersonUtility.getPerson("HOS00001").pidm
+        def keyBlockMap = [pidm: pidm]
+        def map = [domainModel: personRelatedHold, keyBlock: keyBlockMap]
         personRelatedHold = personRelatedHoldService.create(map)
+
         //Test if the generated entity now has an id assigned
         assertNotNull personRelatedHold.id
+        assertTrue personRelatedHold.pidm==pidm //This will test preCreate pidm population
         assertEquals "Hold Type not as expected", personRelatedHold.holdType.code, "RG"
         assertEquals "Originator not as expected", personRelatedHold.originator.code, "ACCT"
         personRelatedHold.reason = "YYYY"

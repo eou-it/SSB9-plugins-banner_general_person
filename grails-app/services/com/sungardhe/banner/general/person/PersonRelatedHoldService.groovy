@@ -26,6 +26,11 @@ class PersonRelatedHoldService extends ServiceBase {
 
     def sessionFactory
 
+    void preCreate(map) {
+        if(!map.domainModel.pidm)
+            map.domainModel.pidm = map.keyBlock.pidm
+    }
+
 
     void preUpdate(map) {
         validateHoldForUpdate(map.domainModel)
@@ -48,20 +53,20 @@ class PersonRelatedHoldService extends ServiceBase {
 
         if (!(hold.lastModifiedBy == SecurityContextHolder.context?.authentication?.principal?.username)) {
             if (findDirty(hold, 'holdType'))
-                throw new ApplicationException(PersonRelatedHold, "@@r1:holdCodeUpdateNotAllowed")
+                throw new ApplicationException(PersonRelatedHold, "@@r1:holdCodeUpdateNotAllowed@@")
             if (findDirty(hold, 'releaseIndicator'))
-                throw new ApplicationException(PersonRelatedHold, "@@r1:releaseIndicatorUpdateNotAllowed")
+                throw new ApplicationException(PersonRelatedHold, "@@r1:releaseIndicatorUpdateNotAllowed@@")
             if (hold.releaseIndicator) {
                 if (findDirty(hold, 'reason'))
-                    throw new ApplicationException(PersonRelatedHold, "@@r1:updateNotAllowedByAnotherUser")
+                    throw new ApplicationException(PersonRelatedHold, "@@r1:updateNotAllowedByAnotherUser@@")
                 if (findDirty(hold, 'fromDate'))
-                    throw new ApplicationException(PersonRelatedHold, "@@r1:updateNotAllowedByAnotherUser")
+                    throw new ApplicationException(PersonRelatedHold, "@@r1:updateNotAllowedByAnotherUser@@")
                 if (findDirty(hold, 'toDate'))
-                    throw new ApplicationException(PersonRelatedHold, "@@r1:updateNotAllowedByAnotherUser")
+                    throw new ApplicationException(PersonRelatedHold, "@@r1:updateNotAllowedByAnotherUser@@")
                 if (findDirty(hold, 'amountOwed'))
-                    throw new ApplicationException(PersonRelatedHold, "@@r1:updateNotAllowedByAnotherUser")
+                    throw new ApplicationException(PersonRelatedHold, "@@r1:updateNotAllowedByAnotherUser@@")
                 if (findDirty(hold, 'originator'))
-                    throw new ApplicationException(PersonRelatedHold, "@@r1:updateNotAllowedByAnotherUser")
+                    throw new ApplicationException(PersonRelatedHold, "@@r1:updateNotAllowedByAnotherUser@@")
             }
         }
     }
@@ -75,7 +80,7 @@ class PersonRelatedHoldService extends ServiceBase {
     private validateHoldForDelete(PersonRelatedHold hold) {
         if (!(hold.lastModifiedBy == SecurityContextHolder.context?.authentication?.principal?.username)) {
             if (hold.releaseIndicator) {
-                throw new ApplicationException(PersonRelatedHold, "@@r1:deleteNotAllowedByAnotherUser")
+                throw new ApplicationException(PersonRelatedHold, "@@r1:deleteNotAllowedByAnotherUser@@")
             }
         }
     }
