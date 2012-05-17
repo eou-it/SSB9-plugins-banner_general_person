@@ -27,23 +27,23 @@ class NameTemplate {
      * Store the parameter as a variable and use it later to output a formatted name
      */
     def lastName(def lastName) {
-        m.lastName = lastName
+        m.lastName = lastName ?:""
     }
 
     def firstName(def firstName) {
-        m.firstName = firstName
+        m.firstName = firstName ?:""
     }
 
     def mi(def mi) {
-        m.mi = mi
+        m.mi = mi ?:""
     }
 
     def surnamePrefix(def surnamePrefix) {
-        m.surnamePrefix = surnamePrefix
+        m.surnamePrefix = surnamePrefix ?:""
     }
 
     def nameSuffix(def nameSuffix) {
-        m.nameSuffix = nameSuffix
+        m.nameSuffix = nameSuffix ?:""
     }
 
     def formatTemplate(def formatTemplate) {
