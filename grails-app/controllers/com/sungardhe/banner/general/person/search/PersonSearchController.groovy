@@ -82,7 +82,9 @@ class PersonSearchController {
             filterData.criteria = x
         }
 
-        params.pagingAndSortParams = ["max": pageMaxSize, "offset": pageOffset]
+        def order = "@@table@@pidm asc, @@table@@lastName asc, @@table@@firstName asc"
+
+        params.pagingAndSortParams = ["max": pageMaxSize, "offset": pageOffset, "sortColumn": order]
 
         def result = personSearchService.personSearch(params?.searchFilter, filterData, params.pagingAndSortParams)
         def people = [people: result]
