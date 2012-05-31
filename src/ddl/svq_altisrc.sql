@@ -45,9 +45,8 @@ select rownum,
 from svq_spralti where pidm in (
             select pidm
               from svq_spralti a
-              where REGEXP_LIKE(a.search_last_name||'::'||a.search_first_name||'::'||a.search_mi||'::'||a.id||'::'||a.ssn, soknsut.f_get_search_filter())
-              )
-order by boost,last_name;
+              where soknsut.f_match_name(UPPER(a.last_name||'::'||a.first_name||'::'||a.mi||'::'||a.id||'::'||a.ssn)) = 1
+              );
 
 COMMENT ON TABLE SVQ_ALTISRC IS 'Read only view for Advanced Search Filter UI Component';
 COMMENT ON COLUMN SVQ_ALTISRC.SURROGATE_ID IS 'SURROGATE ID: Immutable unique key';

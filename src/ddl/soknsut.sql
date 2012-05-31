@@ -50,7 +50,22 @@ FUNCTION f_get_search_filter RETURN VARCHAR2;
    */
 PROCEDURE p_set_search_filter(search_var VARCHAR2);
 --
+   /*
+   * This function split the search string into tokens
+   * @param chaine The search parameters separated by |
+   * @param pos Position
+   * @param sep Separator
+   */
+FUNCTION f_split(chaine IN VARCHAR2, pos IN PLS_INTEGER, sep IN VARCHAR2 DEFAULT ',') RETURN VARCHAR2;
+--
+   /*
+   * This function returns 1 if match is found, 2 if match is not found.
+   * @param The name search string to be matched
+   */
+FUNCTION f_match_name(filter_str VARCHAR2) RETURN NUMBER;
+--
 pragma restrict_references (f_get_search_filter, WNDS,WNPS);
+--
 END soknsut;
 /
 SHOW ERRORS

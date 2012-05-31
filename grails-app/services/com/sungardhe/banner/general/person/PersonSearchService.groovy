@@ -171,7 +171,7 @@ class PersonSearchService {
         def pii
 
 
-        def search = Arrays.asList(searchFilter.split()).join("|")
+        def search = Arrays.asList(searchFilter?.toUpperCase().split()).join("|")
 
         Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
         //sets the search filter per search request

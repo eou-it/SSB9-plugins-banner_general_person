@@ -50,36 +50,44 @@ CREATE OR REPLACE FORCE VIEW SVQ_SADVSRC
 )
 AS
 SELECT   ROWNUM,
-         SPRIDEN_VERSION,
-         SPRIDEN_ACTIVITY_DATE,
-         SPRIDEN_USER_ID,
-         SPRIDEN_DATA_ORIGIN,
+         o.SPRIDEN_VERSION,
+         o.SPRIDEN_ACTIVITY_DATE,
+         o.SPRIDEN_USER_ID,
+         o.SPRIDEN_DATA_ORIGIN,
          SPBPERS_SSN,
-         SPRIDEN_PIDM,
-         SPRIDEN_ID,
-         SPRIDEN_LAST_NAME,
-         SPRIDEN_FIRST_NAME,
-         SPRIDEN_MI,
+         o.SPRIDEN_PIDM,
+         o.SPRIDEN_ID,
+         o.SPRIDEN_LAST_NAME,
+         o.SPRIDEN_FIRST_NAME,
+         o.SPRIDEN_MI,
          SPBPERS_BIRTH_DATE,
-         SPRIDEN_CHANGE_IND,
-         SPRIDEN_ENTITY_IND,
-         SPRIDEN_SEARCH_LAST_NAME,
-         SPRIDEN_SEARCH_FIRST_NAME,
-         SPRIDEN_SEARCH_MI,
-         SPRIDEN_NTYP_CODE,
+         o.SPRIDEN_CHANGE_IND,
+         o.SPRIDEN_ENTITY_IND,
+         o.SPRIDEN_SEARCH_LAST_NAME,
+         o.SPRIDEN_SEARCH_FIRST_NAME,
+         o.SPRIDEN_SEARCH_MI,
+         o.SPRIDEN_NTYP_CODE,
          SPRADDR_CITY,
          SPRADDR_STAT_CODE,
          SPRADDR_ZIP,
          SPBPERS_SEX,
-         SPRIDEN_SURNAME_PREFIX,
+         o.SPRIDEN_SURNAME_PREFIX,
          SPBPERS_PREF_FIRST_NAME,
          SPBPERS_NAME_PREFIX,
          SPBPERS_NAME_SUFFIX
-   FROM SPBPERS, SPRIDEN,spraddr
-  WHERE SPBPERS_PIDM(+) = SPRIDEN_PIDM
-    AND SPRADDR_PIDM(+) = SPRIDEN_PIDM
-    ORDER BY SPRIDEN_SEARCH_LAST_NAME,SPRIDEN_SEARCH_FIRST_NAME,SPRIDEN_SEARCH_MI,SPRIDEN_ID;
-
+   FROM SPBPERS, SPRIDEN n, SPRIDEN o, spraddr
+  WHERE SPBPERS_PIDM(+) = o.SPRIDEN_PIDM
+    AND SPRADDR_PIDM(+) = o.SPRIDEN_PIDM
+    AND spraddr_status_ind IS NULL
+    AND ((spraddr_from_date <= TO_DATE(SYSDATE,G$_DATE.GET_NLS_DATE_FORMAT)
+     OR   spraddr_from_date IS NULL)
+    AND  (spraddr_to_date >= TO_DATE(SYSDATE,G$_DATE.GET_NLS_DATE_FORMAT)
+       OR   spraddr_to_date IS NULL))
+    AND n.spriden_pidm = o.spriden_pidm
+    AND n.spriden_change_ind IS NULL
+    AND o.spriden_entity_ind = o.spriden_entity_ind
+    ORDER BY n.spriden_search_last_name, n.spriden_search_first_name,
+             n.spriden_search_mi, n.spriden_id, o.spriden_change_ind DESC;
 COMMENT ON TABLE SVQ_SADVSRC IS 'View On Person Advanced Search';
 COMMENT ON COLUMN SVQ_SADVSRC.SURROGATE_ID IS 'SURROGATE ID: Immutable unique key';
 COMMENT ON COLUMN SVQ_SADVSRC.VERSION IS 'VERSION: Optimistic lock token.';
