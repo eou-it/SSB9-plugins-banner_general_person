@@ -85,7 +85,7 @@ SELECT   ROWNUM,
        OR   spraddr_to_date IS NULL))
     AND n.spriden_pidm = o.spriden_pidm
     AND n.spriden_change_ind IS NULL
-    AND o.spriden_entity_ind = o.spriden_entity_ind
+    AND o.spriden_entity_ind = n.spriden_entity_ind
     ORDER BY n.spriden_search_last_name, n.spriden_search_first_name,
              n.spriden_search_mi, n.spriden_id, o.spriden_change_ind DESC;
 COMMENT ON TABLE SVQ_SADVSRC IS 'View On Person Advanced Search';
