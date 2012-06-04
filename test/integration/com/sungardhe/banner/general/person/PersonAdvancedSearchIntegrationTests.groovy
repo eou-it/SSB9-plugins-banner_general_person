@@ -328,15 +328,16 @@ class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def filterData = [:]
         def param = [:]
-        //IMPORTANT!!!: Must provide Order to have people linked/displayed in order by pidm
-        def order = "@@table@@pidm asc, @@table@@lastName asc, @@table@@firstName asc"
-        def pagingAndSortParams = ["max": 8, "offset": 0, "sortColumn": order]
+
+        def pagingAndSortParams = ["max": 8, "offset": 0]
         filterData.params = param
         //Step 1.
         // Client submits a search query to find an exact match
         // Search by ID , there are two records for this pidm with a name change
         def result = personSearchService.personSearch("A00000706", filterData, pagingAndSortParams)
         assertNotNull result
+        assertEquals "A00000706", result[0].bannerId
+        assertEquals "A00000706", result[0].currentBannerId
         assertTrue result.size() == 1
         //Step 1.1
         // Client submits a search query to find an exact match
@@ -345,18 +346,16 @@ class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
         assertNotNull result
         assertTrue result.size() == 1
         assertEquals "A00000747", result[0].bannerId
+        assertEquals "A00000747", result[0].currentBannerId
         assertEquals "104, Student", result[0].formattedName
 
         //Step 2.
         // Client submits a search query as 33 STUDENT 104 S104
         //Returned Result for the Advanced Search UI Component
         result = personSearchService.personSearch("Lindblom", filterData, pagingAndSortParams)
-        println "####"
-        println result
         assertNotNull result
         assertTrue result.size() == 8
-        println result
-        assertEquals "Lindblomery, Daniella", result[0].formattedName
+        assertEquals "Lindblom, Atlas", result[0].formattedName
 
         //Step 3.
         // Client submits an additional filter search
