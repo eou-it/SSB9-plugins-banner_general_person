@@ -59,7 +59,7 @@ class PersonSearchController {
         def x = []
 
         if (params.city) {
-            param."city" = "%"+params.city+"%"
+            param."city" = params.city
 
             def m1 = [:]
             m1."key" = "city"

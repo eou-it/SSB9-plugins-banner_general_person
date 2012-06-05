@@ -216,6 +216,21 @@ class PersonSearchService {
     def private searchComponent(ssn, filterData, pagingAndSortParams) {
         def currentList
         def list
+
+        def nameComparator = [
+                compare: { first, second ->
+                    if (first.pidm == second.pidm &&
+                            first.bannerId == second.bannerId &&
+                            first.lastName == second.lastName &&
+                            first.firstName == second.firstName &&
+                            first.middleName == second.middleName &&
+                            first.changeIndicator == second.changeIndicator)
+                        return 0
+                    return 1
+
+                }
+        ] as Comparator
+
         if (ssn == "YES") {
             list = PersonAdvancedAlternateIdFilterView.fetchSearchEntityList(filterData, pagingAndSortParams).each {
                 it ->
@@ -234,15 +249,16 @@ class PersonSearchService {
                     text
                 }
             }
-               currentList = list.findAll { it.changeIndicator == null}
+            currentList = list.findAll { it.changeIndicator == null}
 
-                 if (currentList && currentList?.size() == 1) {
-                    return currentList
-                 }else{
-                     return list
-                 }
+            if (currentList && currentList?.size() == 1) {
+                return currentList
+            } else {
+                //remove all duplicate values as a result of outer join to spraddr
+                return list.unique(nameComparator)
+            }
         } else {
-            list =  PersonAdvancedFilterView.fetchSearchEntityList(filterData, pagingAndSortParams).each {
+            list = PersonAdvancedFilterView.fetchSearchEntityList(filterData, pagingAndSortParams).each {
                 it ->
                 def lastNameValue = it.lastName
                 def firstNameValue = it.firstName
@@ -260,13 +276,14 @@ class PersonSearchService {
                 }
             }
 
-                 currentList = list.findAll { it.changeIndicator == null}
+            currentList = list.findAll { it.changeIndicator == null}
 
-                 if (currentList && currentList?.size() == 1) {
-                    return currentList
-                 }else{
-                     return list
-                 }
+            if (currentList && currentList?.size() == 1) {
+                return currentList
+            } else {
+                //remove all duplicate values as a result of outer join to spraddr
+                return list.unique(nameComparator)
+            }
         }
     }
 
