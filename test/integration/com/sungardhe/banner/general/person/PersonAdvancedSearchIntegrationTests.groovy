@@ -1,17 +1,17 @@
 /** *******************************************************************************
  Copyright 2009-2011 SunGard Higher Education. All Rights Reserved.
- This copyrighted software contains confidential and proprietary information of 
- SunGard Higher Education and its subsidiaries. Any use of this software is limited 
- solely to SunGard Higher Education licensees, and is further subject to the terms 
- and conditions of one or more written license agreements between SunGard Higher 
+ This copyrighted software contains confidential and proprietary information of
+ SunGard Higher Education and its subsidiaries. Any use of this software is limited
+ solely to SunGard Higher Education licensees, and is further subject to the terms
+ and conditions of one or more written license agreements between SunGard Higher
  Education and the licensee in question. SunGard is either a registered trademark or
  trademark of SunGard Data Systems in the U.S.A. and/or other regions and/or countries.
- Banner and Luminis are either registered trademarks or trademarks of SunGard Higher 
+ Banner and Luminis are either registered trademarks or trademarks of SunGard Higher
  Education in the U.S.A. and/or other regions and/or countries.
  ********************************************************************************* */
 /**
  Banner Automator Version: 1.24
- Generated: Thu Aug 04 14:06:16 EDT 2011 
+ Generated: Thu Aug 04 14:06:16 EDT 2011
  */
 package com.sungardhe.banner.general.person
 
@@ -179,6 +179,28 @@ class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
         assertEquals "Langley", result[0].lastName
     }
 
+
+    /**
+      * Tests the advanced search with special characters
+      */
+     def testAdvancedSearchWithSpecialCharacters() {
+
+        def filterData = [:]
+        def param = [:]
+        //IMPORTANT!!!: Must provide Order to have people linked/displayed in order by pidm
+        def order = "@@table@@pidm asc, @@table@@lastName asc, @@table@@firstName asc"
+        def pagingAndSortParams = ["max": 8, "offset": 0, "sortColumn": order]
+        filterData.params = param
+        //Step 1.
+        // Client submits a search query to find an exact match
+        // Search by ID , there are two records for this pidm with a name change
+        def result = personSearchService.personSearch("~~2``2@@2##2%%2&&2''2??2**2", filterData, pagingAndSortParams)
+        assertNotNull result
+        assertTrue result.size() == 1
+        assertEquals "~~2``2@@2##2%%2&&2''2??2**2" , result[0].lastName
+     }
+
+
     /**
      * Tests the advanced search..
      */
@@ -306,17 +328,17 @@ class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def filterData = [:]
         def param = [:]
-        //IMPORTANT!!!: Must provide Order to have people linked/displayed in order by pidm
-        def order = "@@table@@pidm asc, @@table@@lastName asc, @@table@@firstName asc"
-        def pagingAndSortParams = ["max": 8, "offset": 0, "sortColumn": order]
+
+        def pagingAndSortParams = ["max": 8, "offset": 0]
         filterData.params = param
         //Step 1.
         // Client submits a search query to find an exact match
         // Search by ID , there are two records for this pidm with a name change
         def result = personSearchService.personSearch("A00000706", filterData, pagingAndSortParams)
         assertNotNull result
+        assertEquals "A00000706", result[0].bannerId
+        assertEquals "A00000706", result[0].currentBannerId
         assertTrue result.size() == 1
-
         //Step 1.1
         // Client submits a search query to find an exact match
         // Search by the old ID , there are two records for this pidm with a name change
@@ -324,22 +346,23 @@ class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
         assertNotNull result
         assertTrue result.size() == 1
         assertEquals "A00000747", result[0].bannerId
+        assertEquals "A00000747", result[0].currentBannerId
         assertEquals "104, Student", result[0].formattedName
 
         //Step 2.
         // Client submits a search query as 33 STUDENT 104 S104
         //Returned Result for the Advanced Search UI Component
-        result = personSearchService.personSearch("33 STUDENT 104 S104", filterData, pagingAndSortParams)
+        result = personSearchService.personSearch("Lindblom", filterData, pagingAndSortParams)
         assertNotNull result
         assertTrue result.size() == 8
-        assertEquals "Jones, Clara", result[0].formattedName
+        assertEquals "Lindblom, Atlas", result[0].formattedName
 
         //Step 3.
         // Client submits an additional filter search
         //Parameters: city,zip, and birthDate
-        param."city" = "%seattle%"
-        param."zip" = "98199"
-        param."birthDate" = Date.parse("yyyy-MM-dd", "1970-12-31")
+        param."city" = "%Malvern%"
+        param."zip" = "19355"
+        param."birthDate" = Date.parse("yyyy-MM-dd", "1985-12-31")
 
         filterData.params = param
 
@@ -365,11 +388,10 @@ class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
         filterData.criteria = x
 
         //Filtered result
-        result = personSearchService.personSearch("33 STUDENT 104 S104", filterData, pagingAndSortParams)
-
+        result = personSearchService.personSearch("10 STUDENT", filterData, pagingAndSortParams)
         assertTrue result.size() == 1
-        assertEquals "M", result[0].sex
-        assertEquals "Student, International", result[0].formattedName
+        assertEquals "N", result[0].sex
+        assertEquals "101, Student", result[0].formattedName
 
     }
 
@@ -510,21 +532,19 @@ class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
             //Step 2.
             // Client submits a search query by SSN and other parameter(i.e Id)
             // Search by SSN
-            persons = personSearchService.personSearch("543-54-5432 218827281", filterData, pagingAndSortParams)
+            persons = personSearchService.personSearch("999999999", filterData, pagingAndSortParams)
 
             assertNotNull persons
-            //println persons
-            def ssnFound = persons.find {it.ssn == '543-54-5432'}
+            def ssnFound = persons.find {it.ssn == '999999999'}
             assertNotNull ssnFound
 
-
-            param."ssn" = "%543-54-5432%"
+            param."bannerId" = "%A0001034%"  // actual id = A00010347
 
             filterData.params = param
 
             def m1 = [:]
-            m1."key" = "ssn"
-            m1."binding" = "ssn"
+            m1."key" = "bannerId"
+            m1."binding" = "bannerId"
             m1."operator" = "contains"
 
             def x = []
@@ -535,11 +555,11 @@ class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
             //Step 2.
             // Client submits a search query by SSN and other parameter with an additional filter
             // Search by SSN
-            def result = personSearchService.personSearch("543-54-5432 218827281", filterData, pagingAndSortParams)
+            def result = personSearchService.personSearch("999999999", filterData, pagingAndSortParams)
 
             assertTrue result.size() == 1
 
-            assertEquals "543-54-5432", result[0].ssn
+            assertEquals "999999999", result[0].ssn
 
         } finally {
             sql.executeUpdate("update gubiprf set gubiprf_security_enabled_ind = 'Y' where gubiprf_inst_key = 'INST'")

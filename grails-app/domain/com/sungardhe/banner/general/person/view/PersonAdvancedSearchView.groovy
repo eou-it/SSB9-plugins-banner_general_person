@@ -22,6 +22,11 @@ import javax.persistence.*
 class PersonAdvancedSearchView extends PersonView {
 
     /**
+     * This field defines the current identification number.
+     */
+    @Column(name = "CURRENT_ID")
+    String currentBannerId
+    /**
      * This field defines whether type of change made to the record was an ID number change or a name change. Val values: I - ID change, N - name change.
      */
     @Column(name = "CHANGE_INDICATOR", length = 1)
@@ -95,6 +100,7 @@ class PersonAdvancedSearchView extends PersonView {
 					id=$id,
 					pidm=$pidm,
 					bannerId=$bannerId,
+					currentBannerId=$currentBannerId,
 					lastName=$lastName,
 					firstName=$firstName,
 					middleName=$middleName,
