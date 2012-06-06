@@ -164,7 +164,6 @@ class PersonSearchService {
 
 
     def personSearch(searchFilter, filterData, pagingAndSortParams) {
-
         def searchResult
         def ssnSearchEnabledIndicator = institutionalDescriptionService.findByKey().ssnSearchEnabledIndicator
         def ssn
@@ -174,15 +173,14 @@ class PersonSearchService {
         def search = Arrays.asList(searchFilter?.toUpperCase().split()).join("|")
 
         Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
-        //sets the search filter per search request
-        sql.call("{call soknsut.p_set_search_filter(${search})}")
 
-        if (ssnSearchEnabledIndicator) {
+        try {
+            //sets the search filter per search request
+            sql.call("{call soknsut.p_set_search_filter(${search})}")
 
-            def userName = SecurityContextHolder.context?.authentication?.principal?.username?.toUpperCase()
-            try {
+            if (ssnSearchEnabledIndicator) {
+                def userName = SecurityContextHolder.context?.authentication?.principal?.username?.toUpperCase()
                 sql.call("{$Sql.VARCHAR = call g\$_chk_auth.g\$_check_authorization_fnc('SSN_SEARCH',${userName})}") {ssnSearch -> ssn = ssnSearch}
-
                 searchResult = searchComponent(ssn, filterData, pagingAndSortParams)
 
                 sql.call("{$Sql.VARCHAR = call gokfgac.f_spriden_pii_active}") { result -> pii = result }
@@ -194,9 +192,13 @@ class PersonSearchService {
                         throw new ApplicationException(PersonView, "@@r1:invalidId@@")
                     }
                 }
-            } finally {
-                sql?.close()
+
+            } else {
+                searchResult = searchComponent('NO', filterData, pagingAndSortParams)
             }
+
+        } finally {
+            sql?.close()
         }
 
         return searchResult
