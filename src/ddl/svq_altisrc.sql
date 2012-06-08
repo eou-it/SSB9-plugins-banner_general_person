@@ -45,7 +45,7 @@ select rownum,
 from svq_spralti where pidm in (
             select pidm
               from svq_spralti a
-              where soknsut.f_match_name(UPPER(a.last_name||'::'||a.first_name||'::'||a.mi||'::'||a.id||'::'||a.ssn)) = 1
+              where soknsut.f_match_name(UPPER(a.last_name||'::'||a.first_name||'::'||a.mi||'::'||a.ssn)) = 1
               );
 
 COMMENT ON TABLE SVQ_ALTISRC IS 'Read only view for Advanced Search Filter UI Component';

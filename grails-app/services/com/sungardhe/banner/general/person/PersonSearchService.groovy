@@ -218,7 +218,6 @@ class PersonSearchService {
     def private searchComponent(ssn, filterData, pagingAndSortParams) {
         def currentList
         def list
-
         def nameComparator = [
                 compare: { first, second ->
                     if (first.pidm == second.pidm &&
@@ -234,6 +233,36 @@ class PersonSearchService {
         ] as Comparator
 
         if (ssn == "YES") {
+
+            //search by id first
+             list = PersonAdvancedFilterView.fetchSearchEntityList(filterData, pagingAndSortParams).each {
+                it ->
+                def lastNameValue = it.lastName
+                def firstNameValue = it.firstName
+                def middleNameValue = it.middleName
+                def surnamePrefixValue = it.surnamePrefix
+                def nameSuffixValue = it.nameSuffix
+                it.formattedName = NameTemplate.format {
+                    lastName lastNameValue
+                    firstName firstNameValue
+                    mi middleNameValue
+                    surnamePrefix surnamePrefixValue
+                    nameSuffix nameSuffixValue
+                    formatTemplate getNameFormat()
+                    text
+                }
+            }
+
+            currentList = list.findAll { it.changeIndicator == null}
+
+            if (currentList && currentList?.size() == 1) {
+                return currentList
+            } else if (currentList && currentList?.size() > 1){
+                //remove all duplicate values as a result of outer join to spraddr
+                return list.unique(nameComparator)
+            }
+
+            // if search by id return no data, then continue search by ssn
             list = PersonAdvancedAlternateIdFilterView.fetchSearchEntityList(filterData, pagingAndSortParams).each {
                 it ->
                 def lastNameValue = it.lastName
