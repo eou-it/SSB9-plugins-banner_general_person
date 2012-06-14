@@ -298,6 +298,19 @@ class PersonAdvancedSearchIntegrationTests extends BaseIntegrationTestCase {
     }
 
     /**
+     * Tests Pagination
+     */
+    def testPagination() {
+        def filterData = [:]
+        def param = [:]
+
+        def pagingAndSortParams = ["max": 100, "offset": 0]
+        filterData.params = param
+        def persons = personSearchService.personSearch("E",filterData, pagingAndSortParams)
+        assertNotNull persons
+    }
+
+    /**
      * Tests the advanced search for id
      */
     def testAllAdvancedSearchForId() {

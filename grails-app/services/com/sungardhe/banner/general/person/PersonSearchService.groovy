@@ -225,9 +225,11 @@ class PersonSearchService {
                             first.lastName == second.lastName &&
                             first.firstName == second.firstName &&
                             first.middleName == second.middleName &&
-                            first.changeIndicator == second.changeIndicator)
-                        return 0
-                    return 1
+                            first.changeIndicator == second.changeIndicator){
+                         return 0
+                    }else {
+                        return 1
+                    }
 
                 }
         ] as Comparator
@@ -285,6 +287,7 @@ class PersonSearchService {
             if (currentList && currentList?.size() == 1) {
                 return currentList
             } else {
+                println "@@@@@@@@@@@@@@@ " + list.size()
                 //remove all duplicate values as a result of outer join to spraddr
                 return list.unique(nameComparator)
             }
