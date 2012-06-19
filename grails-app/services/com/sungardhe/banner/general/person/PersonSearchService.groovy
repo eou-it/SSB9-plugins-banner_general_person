@@ -23,6 +23,7 @@ import com.sungardhe.banner.person.dsl.NameTemplate
 import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
 import org.springframework.context.i18n.LocaleContextHolder as LCH
 import org.springframework.context.ApplicationContext
+import com.sungardhe.banner.general.person.view.PersonAdvancedIdFilterView
 
 class PersonSearchService {
 
@@ -34,143 +35,30 @@ class PersonSearchService {
 
     private _nameFormat
 
-    def findPerson(id, lastName, firstName, midName, soundexLastName, soundexFirstName, changeIndicator, nameType, pagingAndSortParams) {
-        return PersonPersonView.fetchPerson(id, lastName, firstName, midName, soundexLastName, soundexFirstName, changeIndicator, nameType, pagingAndSortParams)
-    }
 
-    def findPersonByPidm(pidms, id, lastName, firstName, midName, soundexLastName, soundexFirstName, changeIndicator, nameType, pagingAndSortParams) {
-        return PersonPersonView.fetchPersonByPidms(pidms, id, lastName, firstName, midName, soundexLastName, soundexFirstName, changeIndicator, nameType, pagingAndSortParams)
-    }
+    def nameComparator = [
+                    compare: { first, second ->
+                        if (first.pidm == second.pidm &&
+                                first.bannerId == second.bannerId &&
+                                first.lastName == second.lastName &&
+                                first.firstName == second.firstName &&
+                                first.middleName == second.middleName &&
+                                first.changeIndicator == second.changeIndicator){
+                             return 0
+                        }else {
+                            return 1
+                        }
 
-    def fetchTextSearch(searchFilter) {
-
-        def search = Arrays.asList(searchFilter.split()).join("|")
-
-        def sql = new Sql(sessionFactory.getCurrentSession().connection())
-
-        def sqlStatement = """
-        select pidm, id, last_name, first_name, mi,change_indicator,
-                soknsut.name_search_booster(search_last_name,'${search}') as boost
-              from svq_spriden where pidm in (
-            select pidm
-              from svq_spriden a
-              where REGEXP_LIKE(a.search_last_name||'::'||a.search_first_name||'::'||a.search_mi||'::'||a.id, '${search}')
-              )
-              order by boost, last_name
-				              """
-
-        def personsList = []
-        def persons = sql.rows(sqlStatement)
-        persons.each { personRow ->
-            def person = [:]
-            person.pidm = personRow.PIDM
-            person.bannerId = personRow.ID
-            person.name = personRow.FIRST_NAME
-            person.lastName = personRow.LAST_NAME
-            person.mi = personRow.MI
-            person.boosterSearch = personRow.BOOST
-            person.changeIndicator = personRow.CHANGE_INDICATOR
-
-            personsList << person
-        }
-
-
-        def currentList = personsList.findAll { it.changeIndicator == null}
-
-
-        if (currentList && currentList?.size() == 1) {
-            return currentList
-        } else {
-            return personsList.sort {it.boosterSearch}
-        }
-    }
-
-    def fetchTextWithSSNSearch(searchFilter) {
-
-        def search = Arrays.asList(searchFilter.split()).join("|")
-
-        def sql = new Sql(sessionFactory.getCurrentSession().connection())
-
-        def sqlStatement = """
-        select pidm, id, ssn, last_name, first_name, mi,change_indicator,
-                soknsut.name_search_booster(search_last_name,'${search}') as boost
-              from svq_spralti where pidm in (
-            select pidm
-              from svq_spralti a
-              where REGEXP_LIKE(a.search_last_name||'::'||a.search_first_name||'::'||a.search_mi||'::'||a.id||'::'||a.ssn, '${search}')
-              )
-              order by boost,last_name
-				              """
-
-        def personsList = []
-        def persons = sql.rows(sqlStatement)
-        persons.each { personRow ->
-            def person = [:]
-            person.pidm = personRow.PIDM
-            person.bannerId = personRow.ID
-            person.ssn = personRow.SSN
-            person.name = personRow.FIRST_NAME
-            person.lastName = personRow.LAST_NAME
-            person.mi = personRow.MI
-            person.boosterSearch = personRow.BOOST
-            person.changeIndicator = personRow.CHANGE_INDICATOR
-
-            personsList << person
-        }
-
-
-        def currentList = personsList.findAll { it.changeIndicator == null}
-
-
-        if (currentList && currentList?.size() == 1) {
-            return currentList
-        } else {
-            return personsList.sort {it.boosterSearch}
-        }
-    }
-
-    def personSearch(searchFilter) {
-
-        def searchResult
-        def ssnSearchEnabledIndicator = institutionalDescriptionService.findByKey().ssnSearchEnabledIndicator
-        def ssn
-        def pii
-
-        Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
-        if (ssnSearchEnabledIndicator) {
-
-            def userName = SecurityContextHolder.context?.authentication?.principal?.username?.toUpperCase()
-            try {
-                sql.call("{$Sql.VARCHAR = call g\$_chk_auth.g\$_check_authorization_fnc('SSN_SEARCH',${userName})}") {ssnSearch -> ssn = ssnSearch}
-
-                searchResult = searchComponent(ssn, searchFilter)
-
-                sql.call("{$Sql.VARCHAR = call gokfgac.f_spriden_pii_active}") { result -> pii = result }
-                if (searchResult?.size() == 0 && pii == "Y") {
-                    sql.execute("""call gokfgac.p_turn_fgac_off()""")
-                    searchResult = searchComponent(ssn, searchFilter)
-                    sql.execute("""call gokfgac.p_turn_fgac_on()""")
-                    if (searchResult?.size() > 0) {
-                        throw new ApplicationException(PersonView, "@@r1:invalidId@@")
                     }
-                }
-            } finally {
-                sql?.close()
-            }
-        }
-
-        return searchResult
-    }
+            ] as Comparator
 
 
-    def personSearch(searchFilter, filterData, pagingAndSortParams) {
-        def searchResult
-        def ssnSearchEnabledIndicator = institutionalDescriptionService.findByKey().ssnSearchEnabledIndicator
-        def ssn
-        def pii
+    def personNameSearch(searchFilter, filterData, pagingAndSortParams) {
+        def currentList
+        def list
 
-
-        def search = Arrays.asList(searchFilter?.toUpperCase().split()).join("|")
+        //remove all special characters
+        def search = Arrays.asList(searchFilter?.replaceAll('[^a-zA-Z0-9%\\s]+', '').toUpperCase().split()).join("|")
 
         Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
 
@@ -178,6 +66,53 @@ class PersonSearchService {
             //sets the search filter per search request
             sql.call("{call soknsut.p_set_search_filter(${search})}")
 
+            list = PersonAdvancedFilterView.fetchSearchEntityList(filterData, pagingAndSortParams).each {
+                it ->
+                def lastNameValue = it.lastName
+                def firstNameValue = it.firstName
+                def middleNameValue = it.middleName
+                def surnamePrefixValue = it.surnamePrefix
+                def nameSuffixValue = it.nameSuffix
+                def namePrefixValue = it.namePrefix
+
+                it.formattedName = NameTemplate.format {
+                    lastName lastNameValue
+                    firstName firstNameValue
+                    mi middleNameValue
+                    surnamePrefix surnamePrefixValue
+                    nameSuffix nameSuffixValue
+                    namePrefix namePrefixValue
+                    formatTemplate getNameFormat()
+                    text
+                }
+            }
+
+            currentList = list.findAll { it.changeIndicator == null}
+
+            if (currentList && currentList?.size() == 1) {
+                return currentList
+            } else {
+                return list.unique(nameComparator)
+            }
+
+        } finally {
+            sql?.close()
+        }
+
+    }
+
+    def personIdSearch(searchFilter, filterData, pagingAndSortParams) {
+        def searchResult
+        def ssnSearchEnabledIndicator = institutionalDescriptionService.findByKey().ssnSearchEnabledIndicator
+        def ssn
+        def pii
+
+        Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
+
+        try {
+            searchFilter = "%"+searchFilter+"%"
+            //sets the search filter per search request
+            sql.call("{call soknsut.p_set_search_filter(${searchFilter})}")
             if (ssnSearchEnabledIndicator) {
                 def userName = SecurityContextHolder.context?.authentication?.principal?.username?.toUpperCase()
                 sql.call("{$Sql.VARCHAR = call g\$_chk_auth.g\$_check_authorization_fnc('SSN_SEARCH',${userName})}") {ssnSearch -> ssn = ssnSearch}
@@ -205,51 +140,30 @@ class PersonSearchService {
     }
 
 
-    def private searchComponent(ssn, searchFilter) {
-
-        if (ssn == "YES") {
-            return fetchTextWithSSNSearch(searchFilter)
-        } else {
-            return fetchTextSearch(searchFilter)
-        }
-    }
-
 
     def private searchComponent(ssn, filterData, pagingAndSortParams) {
         def currentList
         def list
-        def nameComparator = [
-                compare: { first, second ->
-                    if (first.pidm == second.pidm &&
-                            first.bannerId == second.bannerId &&
-                            first.lastName == second.lastName &&
-                            first.firstName == second.firstName &&
-                            first.middleName == second.middleName &&
-                            first.changeIndicator == second.changeIndicator){
-                         return 0
-                    }else {
-                        return 1
-                    }
-
-                }
-        ] as Comparator
 
         if (ssn == "YES") {
 
+        println "SSN = YES"
             //search by id first
-             list = PersonAdvancedFilterView.fetchSearchEntityList(filterData, pagingAndSortParams).each {
+            list = PersonAdvancedIdFilterView.fetchSearchEntityList(filterData, pagingAndSortParams).each {
                 it ->
                 def lastNameValue = it.lastName
                 def firstNameValue = it.firstName
                 def middleNameValue = it.middleName
                 def surnamePrefixValue = it.surnamePrefix
                 def nameSuffixValue = it.nameSuffix
+                def namePrefixValue = it.namePrefix
                 it.formattedName = NameTemplate.format {
                     lastName lastNameValue
                     firstName firstNameValue
                     mi middleNameValue
                     surnamePrefix surnamePrefixValue
                     nameSuffix nameSuffixValue
+                    namePrefix namePrefixValue
                     formatTemplate getNameFormat()
                     text
                 }
@@ -259,8 +173,7 @@ class PersonSearchService {
 
             if (currentList && currentList?.size() == 1) {
                 return currentList
-            } else if (currentList && currentList?.size() > 1){
-                //remove all duplicate values as a result of outer join to spraddr
+            } else if (currentList && currentList?.size() > 1) {
                 return list.unique(nameComparator)
             }
 
@@ -272,12 +185,14 @@ class PersonSearchService {
                 def middleNameValue = it.middleName
                 def surnamePrefixValue = it.surnamePrefix
                 def nameSuffixValue = it.nameSuffix
+                def namePrefixValue = it.namePrefix
                 it.formattedName = NameTemplate.format {
                     lastName lastNameValue
                     firstName firstNameValue
                     mi middleNameValue
                     surnamePrefix surnamePrefixValue
                     nameSuffix nameSuffixValue
+                    namePrefix namePrefixValue
                     formatTemplate getNameFormat()
                     text
                 }
@@ -287,24 +202,25 @@ class PersonSearchService {
             if (currentList && currentList?.size() == 1) {
                 return currentList
             } else {
-                println "@@@@@@@@@@@@@@@ " + list.size()
                 //remove all duplicate values as a result of outer join to spraddr
                 return list.unique(nameComparator)
             }
         } else {
-            list = PersonAdvancedFilterView.fetchSearchEntityList(filterData, pagingAndSortParams).each {
+            list = PersonAdvancedIdFilterView.fetchSearchEntityList(filterData, pagingAndSortParams).each {
                 it ->
                 def lastNameValue = it.lastName
                 def firstNameValue = it.firstName
                 def middleNameValue = it.middleName
                 def surnamePrefixValue = it.surnamePrefix
                 def nameSuffixValue = it.nameSuffix
+                def namePrefixValue = it.namePrefix
                 it.formattedName = NameTemplate.format {
                     lastName lastNameValue
                     firstName firstNameValue
                     mi middleNameValue
                     surnamePrefix surnamePrefixValue
                     nameSuffix nameSuffixValue
+                    namePrefix namePrefixValue
                     formatTemplate getNameFormat()
                     text
                 }

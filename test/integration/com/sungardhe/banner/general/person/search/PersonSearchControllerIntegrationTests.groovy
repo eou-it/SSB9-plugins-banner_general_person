@@ -25,96 +25,31 @@ class PersonSearchControllerIntegrationTests extends BaseIntegrationTestCase {
     }
 
     /**
-     * Test controller by lastName search.
+     * Test controller by Id.
      */
-    def testSearch() {
+    def testSearchById() {
         controller.request.contentType = "text/json"
-        controller.params.lastName = "Duck"
-        controller.search()
+        controller.params.searchFilter = "A00000721"
+        controller.searchById()
         String actualJSON = controller.response.contentAsString
         def data = JSON.parse(actualJSON)
         assertNotNull data
-        assertTrue data.people.size() == 4
-        assertEquals "Duck", data.people[0].lastName
+        assertTrue data.people.size() == 1
+       assertEquals "105, Student", data.people[0].formattedName
     }
 
     /**
-     * Test controller by lastName search.
+     * Test controller by Name.
      */
-    def testSearch_1() {
+    def testSearchByName() {
         controller.request.contentType = "text/json"
-        controller.params.lastName = "Duc"
-        controller.search()
+        controller.params.searchFilter = "Lindblom"
+        controller.searchByName()
         String actualJSON = controller.response.contentAsString
         def data = JSON.parse(actualJSON)
         assertNotNull data
-        assertTrue data.people.size() == 5
+        assertTrue data.people.size() > 1
+        assertEquals "Lindblom, Atlas", data.people[0].formattedName
     }
 
-    /**
-     * Test controller by soundexLastName, changeIndicator search.
-     */
-    def testSearch_2() {
-        controller.request.contentType = "text/json"
-        controller.params.soundexLastName = "Duck"
-        controller.params.changeIndicator = "N"
-        controller.search()
-        String actualJSON = controller.response.contentAsString
-        def data = JSON.parse(actualJSON)
-        assertNotNull data
-        assertTrue data.people.size() == 3
-    }
-
-    /**
-     * Test controller with pagination support.
-     */
-    def testSearch_4() {
-        controller.request.contentType = "text/json"
-        controller.params.soundexLastName = "Duck"
-        controller.params.max = 8
-        controller.params.offset = 0
-        controller.search()
-        String actualJSON = controller.response.contentAsString
-        def data = JSON.parse(actualJSON)
-        assertNotNull data
-        assertTrue data.people.size() == 8
-    }
-
-    /**
-     * Test controller by lastName and pidms search.
-     */
-    def testSearch_5() {
-        controller.request.contentType = "text/json"
-        def pidmList = []
-        pidmList.add(new Integer("1358"))
-        pidmList.add(new Integer("1355"))
-
-        controller.params.lastName = "Duck"
-        controller.params.pidms = pidmList
-        controller.params.pagingAndSortParams = ["max": 8, "offset": 0]
-        controller.searchPidms()
-        String actualJSON = controller.response.contentAsString
-        def data = JSON.parse(actualJSON)
-        assertNotNull data
-        assertTrue data.people.size() == 2
-        assertEquals "Duck", data.people[0].lastName
-        assertEquals "Duck", data.people[1].lastName
-    }
-
-     /**
-     * Test controller by text search.
-     */
-    def testSearch_6() {
-
-        controller.request.contentType = "text/json"
-
-        controller.params.searchFilter = "LINDBLOM GANNON"
-        controller.params.pagingAndSortParams = ["max": 8, "offset": 0]
-
-        controller.searchText()
-        String actualJSON = controller.response.contentAsString
-        def data = JSON.parse(actualJSON)
-        assertNotNull data
-        assertTrue data.people.size() > 10
-    }
 }

@@ -9,10 +9,10 @@
 -- * Banner and Luminis are either registered trademarks or trademarks of SunGard Higher   *
 -- * Education in the U.S.A. and/or other regions and/or countries.                        *
 -- *****************************************************************************************
---  SVQ_ADVSRCH.sql
+--  SVQ_ALTISRC.sql
 --
 -- AUDIT TRAIL: 9.0
--- Read only view for Advanced Search Filter UI Component    mhitrik 10-MAY-2012
+-- Read only view for Advanced Search Filter UI Component -- SSN Search    mhitrik 10-MAY-2012
 -- AUDIT TRAIL END
 --
 
@@ -29,7 +29,6 @@ CREATE OR REPLACE FORCE VIEW SVQ_ALTISRC
     FIRST_NAME,
     MI,
     CHANGE_INDICATOR,
-    BOOST,
     VERSION
 )
 AS
@@ -40,12 +39,11 @@ select rownum,
        first_name,
        mi,
        change_indicator,
-       soknsut.name_search_booster(search_last_name,soknsut.f_get_search_filter()) as boost,
        version
 from svq_spralti where pidm in (
             select pidm
               from svq_spralti a
-              where soknsut.f_match_name(UPPER(a.last_name||'::'||a.first_name||'::'||a.mi||'::'||a.ssn)) = 1
+              where a.ssn like soknsut.f_get_search_filter
               );
 
 COMMENT ON TABLE SVQ_ALTISRC IS 'Read only view for Advanced Search Filter UI Component';

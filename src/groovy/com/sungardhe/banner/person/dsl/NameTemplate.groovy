@@ -46,6 +46,10 @@ class NameTemplate {
         m.nameSuffix = nameSuffix ?:""
     }
 
+    def namePrefix(def namePrefix) {
+        m.namePrefix = namePrefix ?:""
+    }
+
     def formatTemplate(def formatTemplate) {
         m.formatTemplate = formatTemplate
     }

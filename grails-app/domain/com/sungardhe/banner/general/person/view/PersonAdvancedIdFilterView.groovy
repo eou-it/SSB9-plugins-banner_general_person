@@ -15,11 +15,11 @@ import com.sungardhe.banner.query.DynamicFinder
 import javax.persistence.*
 
 /**
- * Person Advanced Search model used for SSN search
+ * Person Advanced Search model Advanced Search Filter UI Component.
  */
 @Entity
-@Table(name = "SVQ_ALTISRC")
-class PersonAdvancedAlternateIdFilterView {
+@Table(name = "SVQ_IDSRCH")
+class PersonAdvancedIdFilterView {
 
     /**
      * Surrogate ID for SPRIDEN
@@ -74,7 +74,7 @@ class PersonAdvancedAlternateIdFilterView {
     Long version
 
     public String toString() {
-        """PersonAlternateIdFilterView[
+        """PersonAdvancedIdFilterView[
 					id=$id,
 					pidm=$pidm,
 					bannerId=$bannerId,
@@ -108,7 +108,7 @@ class PersonAdvancedAlternateIdFilterView {
      */
     def private static finderByAllEntityList = {filterData ->
         def query = """FROM PersonAdvancedSearchView a
-                       where exists( from PersonAdvancedAlternateIdFilterView as af where af.pidm = a.pidm )
+                       where exists( from PersonAdvancedIdFilterView as af where af.pidm = a.pidm )
                       """
 
         return new DynamicFinder(PersonAdvancedSearchView.class, query, "a")

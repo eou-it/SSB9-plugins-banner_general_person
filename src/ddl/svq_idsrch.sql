@@ -9,19 +9,19 @@
 -- * Banner and Luminis are either registered trademarks or trademarks of SunGard Higher   *
 -- * Education in the U.S.A. and/or other regions and/or countries.                        *
 -- *****************************************************************************************
---  SVQ_ADVSRCH.sql
+--  SVQ_IDSRCH.sql
 --
 -- AUDIT TRAIL: 9.0
--- Read only view for Advanced Search Filter UI Component -Name Search    mhitrik 10-MAY-2012
+-- Read only view for Advanced Search Filter UI Component - ID Search    mhitrik 10-MAY-2012
 -- AUDIT TRAIL END
 --
 
 SET SCAN OFF;
 whenever sqlerror continue;
-DROP PUBLIC SYNONYM SVQ_ADVSRCH;
+DROP PUBLIC SYNONYM SVQ_IDSRCH;
 Whenever sqlerror exit rollback;
 
-CREATE OR REPLACE FORCE VIEW SVQ_ADVSRCH
+CREATE OR REPLACE FORCE VIEW SVQ_IDSRCH
    (SURROGATE_ID,
     PIDM,
     ID,
@@ -43,19 +43,19 @@ select rownum,
 from svq_spralti where pidm in (
             select pidm
               from svq_spralti a
-              where soknsut.f_match_name(UPPER(a.search_last_name||'::'||a.search_first_name||'::'||a.search_mi)) = 1
+              where a.id like soknsut.f_get_search_filter
               );
 
-COMMENT ON TABLE SVQ_ADVSRCH IS 'Read only view for Advanced Search Filter UI Component';
-COMMENT ON COLUMN SVQ_ADVSRCH.SURROGATE_ID IS 'SURROGATE ID: Immutable unique key';
-COMMENT ON COLUMN SVQ_ADVSRCH.VERSION IS 'VERSION: Optimistic lock token.';
-COMMENT ON COLUMN SVQ_ADVSRCH.PIDM IS 'PIDM:Internal identification number of the person in SPRIDEN.';
-COMMENT ON COLUMN SVQ_ADVSRCH.ID IS 'ID: This field defines the identification number used to access person on-line.';
-COMMENT ON COLUMN SVQ_ADVSRCH.LAST_NAME IS 'LAST NAME: This field identifies the last name of person.';
-COMMENT ON COLUMN SVQ_ADVSRCH.FIRST_NAME IS 'FIRST NAME: This field identifies the first name of person.';
-COMMENT ON COLUMN SVQ_ADVSRCH.MI IS 'MI: This field identifies the middle name of person.';
-COMMENT ON COLUMN SVQ_ADVSRCH.CHANGE_INDICATOR IS 'CHANGE_INDICATOR: This field maintains the spriden change indicator.';
-CREATE PUBLIC SYNONYM SVQ_ADVSRCH FOR SVQ_ADVSRCH;
-SHOW ERRORS VIEW SVQ_ADVSRCH;
+COMMENT ON TABLE SVQ_IDSRCH IS 'Read only view for Advanced Search Filter UI Component';
+COMMENT ON COLUMN SVQ_IDSRCH.SURROGATE_ID IS 'SURROGATE ID: Immutable unique key';
+COMMENT ON COLUMN SVQ_IDSRCH.VERSION IS 'VERSION: Optimistic lock token.';
+COMMENT ON COLUMN SVQ_IDSRCH.PIDM IS 'PIDM:Internal identification number of the person in SPRIDEN.';
+COMMENT ON COLUMN SVQ_IDSRCH.ID IS 'ID: This field defines the identification number used to access person on-line.';
+COMMENT ON COLUMN SVQ_IDSRCH.LAST_NAME IS 'LAST NAME: This field identifies the last name of person.';
+COMMENT ON COLUMN SVQ_IDSRCH.FIRST_NAME IS 'FIRST NAME: This field identifies the first name of person.';
+COMMENT ON COLUMN SVQ_IDSRCH.MI IS 'MI: This field identifies the middle name of person.';
+COMMENT ON COLUMN SVQ_IDSRCH.CHANGE_INDICATOR IS 'CHANGE_INDICATOR: This field maintains the spriden change indicator.';
+CREATE PUBLIC SYNONYM SVQ_IDSRCH FOR SVQ_IDSRCH;
+SHOW ERRORS VIEW SVQ_IDSRCH;
 SET SCAN ON;
 

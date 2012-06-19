@@ -30,3 +30,4 @@ start svq_spralti
 start svq_sadvsrc
 start svq_advsrch
 start svq_altisrc
+srart svq_idsrch

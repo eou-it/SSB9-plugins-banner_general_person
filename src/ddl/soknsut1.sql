@@ -99,7 +99,7 @@ BEGIN
     LOOP
        LC$Token := soknsut.f_split( LC$String, i , '|') ;
        EXIT WHEN LC$Token IS NULL ;
-        IF INSTR (filter_str, LC$Token)	= 0 THEN
+          IF filter_str NOT LIKE '%'||LC$Token||'%' THEN
             name_match := 2;
             EXIT;
         END IF;
