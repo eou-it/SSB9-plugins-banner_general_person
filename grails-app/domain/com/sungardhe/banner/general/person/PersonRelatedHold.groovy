@@ -173,11 +173,7 @@ class PersonRelatedHold implements Serializable {
                 return 'invalid.fromDateGreaterThanToDate'
             }
         })
-        toDate(nullable: false, validator: {val, obj ->
-            if ((val != null) && (val < obj.fromDate)) {
-                return 'invalid.toDateLessThanFromDate'
-            }
-        })
+        toDate(nullable: false)
         releaseIndicator(nullable: false)
         reason(nullable: true, maxSize: 30)
         amountOwed(nullable: true, max: 99999.99, min: 00000.00, scale: 2)

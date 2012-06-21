@@ -154,13 +154,9 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-    void testInvalidBeginDatesEndDate() {
-        testDates("2010-10-01", "2010-09-01", true)
-        testDates("2010-10-01", "2010-09-01", false)
-    }
-
-
-    void testDates(String fromDate, String toDate, Boolean fromOk) {
+    void testDates() {
+        String fromDate = "2010-10-01"
+        String toDate = "2010-09-01"
         def personRelatedHold = newPersonRelatedHold()
 
         def df1 = new SimpleDateFormat("yyyy-MM-dd")
@@ -169,8 +165,7 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
         if (toDate) personRelatedHold.toDate = df1.parse(toDate)
 
         assertFalse "Should fail validation", personRelatedHold.validate()
-        if (!fromOk) assertErrorsFor personRelatedHold, 'validator', ['fromDate']
-        else assertErrorsFor personRelatedHold, 'validator', ['toDate']
+        assertErrorsFor personRelatedHold, 'validator', ['fromDate']
     }
 
 
