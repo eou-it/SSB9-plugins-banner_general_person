@@ -80,11 +80,6 @@ SELECT   ROWNUM,
    FROM SPBPERS, SPRIDEN n, SPRIDEN o, spraddr
   WHERE SPBPERS_PIDM(+) = o.SPRIDEN_PIDM
     AND SPRADDR_PIDM(+) = o.SPRIDEN_PIDM
-    AND spraddr_status_ind IS NULL
-    AND ((spraddr_from_date <= TO_DATE(SYSDATE,G$_DATE.GET_NLS_DATE_FORMAT)
-     OR   spraddr_from_date IS NULL)
-    AND  (spraddr_to_date >= TO_DATE(SYSDATE,G$_DATE.GET_NLS_DATE_FORMAT)
-       OR   spraddr_to_date IS NULL))
     AND n.spriden_pidm = o.spriden_pidm
     AND n.spriden_change_ind IS NULL
     AND o.spriden_entity_ind = n.spriden_entity_ind
