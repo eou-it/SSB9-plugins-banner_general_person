@@ -43,7 +43,8 @@ class PersonSearchService {
                                 first.lastName == second.lastName &&
                                 first.firstName == second.firstName &&
                                 first.middleName == second.middleName &&
-                                first.changeIndicator == second.changeIndicator){
+                                first.changeIndicator == second.changeIndicator
+                                ){
                              return 0
                         }else {
                             return 1
@@ -146,8 +147,6 @@ class PersonSearchService {
         def list
 
         if (ssn == "YES") {
-
-        println "SSN = YES"
             //search by id first
             list = PersonAdvancedIdFilterView.fetchSearchEntityList(filterData, pagingAndSortParams).each {
                 it ->
@@ -171,7 +170,7 @@ class PersonSearchService {
 
             currentList = list.findAll { it.changeIndicator == null}
 
-            if (currentList && currentList?.size() == 1) {
+            if (currentList && currentList?.unique(nameComparator).size() == 1) {
                 return currentList
             } else if (currentList && currentList?.size() > 1) {
                 return list.unique(nameComparator)
@@ -199,7 +198,7 @@ class PersonSearchService {
             }
             currentList = list.findAll { it.changeIndicator == null}
 
-            if (currentList && currentList?.size() == 1) {
+            if (currentList && currentList?.unique(nameComparator).size() == 1) {
                 return currentList
             } else {
                 //remove all duplicate values as a result of outer join to spraddr
@@ -228,7 +227,7 @@ class PersonSearchService {
 
             currentList = list.findAll { it.changeIndicator == null}
 
-            if (currentList && currentList?.size() == 1) {
+            if (currentList && currentList?.unique(nameComparator).size() == 1) {
                 return currentList
             } else {
                 //remove all duplicate values as a result of outer join to spraddr
