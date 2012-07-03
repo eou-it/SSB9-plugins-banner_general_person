@@ -14,6 +14,8 @@ grails.project.test.class.dir = "target/test-classes"
 grails.project.test.reports.dir = "target/test-reports"
 
 grails.plugin.location.'banner-core' = "../banner_core.git"
+grails.plugin.location.'banner-seeddata-catalog'="../banner_seeddata_catalog.git"
+grails.plugin.location.'banner-db-main'="../banner_db_main.git"
 grails.plugin.location.'banner-general-validation-common' = "../banner_general_validation_common.git"
 
 grails.project.dependency.resolution = {
