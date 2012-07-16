@@ -13,6 +13,10 @@ package com.sungardhe.banner.general.person.view
  ********************************************************************************* */
 
 import javax.persistence.*
+import org.springframework.context.ApplicationContext
+import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
+import org.springframework.context.i18n.LocaleContextHolder as LCH
+import com.sungardhe.banner.person.dsl.NameTemplate
 
 /**
  * Person Identification/Name model.
@@ -116,6 +120,29 @@ abstract class PersonView implements Serializable {
      */
     @Column(name = "NAME_SUFFIX", length = 20)
     String nameSuffix
+
+    @Transient
+    public String formattedName
+
+    public String getFormattedName() {
+        return NameTemplate.format {
+            lastName lastName
+            firstName firstName
+            mi middleName
+            surnamePrefix surnamePrefix
+            nameSuffix nameSuffix
+            namePrefix namePrefix
+            formatTemplate getNameFormat()
+            text
+        }
+    }
+
+    private def getNameFormat() {
+        def application = AH.application
+        ApplicationContext applicationContext = application.mainContext
+        def messageSource = applicationContext.getBean("messageSource")
+        messageSource.getMessage("default.name.format", null, LCH.getLocale())
+    }
 
 
     public static readonlyProperties = ['pidm']

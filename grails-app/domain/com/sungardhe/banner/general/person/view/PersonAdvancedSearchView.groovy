@@ -92,8 +92,8 @@ class PersonAdvancedSearchView extends PersonView {
     @Column(name = "SEX")
     String sex
 
-    @Transient
-    String formattedName
+    //@Transient
+    //String formattedName
 
     public String toString() {
         """PersonAdvancedSearchView[
