@@ -17,6 +17,7 @@ import javax.persistence.Entity
 import javax.persistence.Table
 import javax.persistence.Id
 import javax.persistence.Version
+import com.sungardhe.banner.query.QueryBuilder
 
 /**
  * Person Advanced Search model Advanced Search Filter UI Component.
@@ -117,5 +118,51 @@ class PersonAdvancedFilterView {
                       """
 
         return new DynamicFinder(PersonAdvancedSearchView.class, query, "a")
+    }
+
+    def public static fetchSearchEntityList2(filterData, pagingAndSortParams) {
+        finderByAllEntityList2(filterData, pagingAndSortParams).find(filterData, pagingAndSortParams)
+    }
+
+    def private static finderByAllEntityList2 = {filterData, pagingAndSortParams ->
+
+        def query = """from PersonAdvancedSearchView data
+                   where data.id in (select
+                   max(a.id)  from PersonAdvancedSearchView a
+                       where exists ( from PersonAdvancedFilterView as af where af.pidm = a.pidm )
+                   group by a.pidm, a.bannerId, a.lastName, a.firstName, a.middleName, a.changeIndicator  ${ QueryBuilder.dynamicGroupby("a", filterData?.params)}
+                   having CASE WHEN 1 =
+                           ( ${QueryBuilder.buildQuery("""select sum(count(distinct b.pidm)) as total from PersonAdvancedSearchView b
+                               where exists ( from PersonAdvancedFilterView as afb where afb.pidm = b.pidm )
+                               group by b.pidm, b.bannerId, b.lastName, b.firstName, b.middleName, b.changeIndicator ${ QueryBuilder.dynamicGroupby("b", filterData?.params)}
+                               having b.changeIndicator is null""", "b", filterData?.criteria ,pagingAndSortParams)}   )
+                           THEN a.changeIndicator
+                           ELSE null
+                           END is null   )
+                           """
+
+        return new DynamicFinder(PersonAdvancedSearchView.class, query, "data")
+    }
+
+    def private static finderByAllEntityList2Count = {filterData ->
+           def query = """from PersonAdvancedSearchView data
+                   where data.id in (select
+                   max(a.id)  from PersonAdvancedSearchView a
+                       where exists ( from PersonAdvancedFilterView as af where af.pidm = a.pidm )
+                   group by a.pidm, a.bannerId, a.lastName, a.firstName, a.middleName, a.changeIndicator  ${ QueryBuilder.dynamicGroupby("a", filterData?.params)}
+                   having CASE WHEN 1 =
+                           ( ${QueryBuilder.buildCountQuery("""select sum(count(distinct b.pidm)) as total from PersonAdvancedSearchView b
+                               where exists ( from PersonAdvancedFilterView as afb where afb.pidm = b.pidm )
+                               group by b.pidm, b.bannerId, b.lastName, b.firstName, b.middleName, b.changeIndicator ${ QueryBuilder.dynamicGroupby("b", filterData?.params)}
+                               having b.changeIndicator is null""", "b", filterData?.criteria)}   )
+                           THEN a.changeIndicator
+                           ELSE null
+                           END is null   )
+                           """
+        return new DynamicFinder(PersonAdvancedSearchView.class, query, "data")
+    }
+
+    def static countAllEntities2(filterData) {
+        finderByAllEntityList2Count(filterData).count(filterData)
     }
 }
