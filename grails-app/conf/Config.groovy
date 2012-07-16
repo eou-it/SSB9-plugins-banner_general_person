@@ -11,7 +11,7 @@
  **********************************************************************************/
 
 
-import com.sungardhe.banner.configuration.ApplicationConfigurationUtils as ConfigFinder
+import net.hedtech.banner.configuration.ApplicationConfigurationUtils as ConfigFinder
 
 
 // ******************************************************************************
@@ -36,7 +36,7 @@ def locationAdder = ConfigFinder.&addLocation.curry(grails.config.locations)
 
 
 
-grails.project.groupId = "com.sungardhe" // used when deploying to a maven repo
+grails.project.groupId = "net.hedtech" // used when deploying to a maven repo
 
 grails.mime.file.extensions = true // enables the parsing of file extensions from URLs into the request format
 grails.mime.use.accept.header = false
@@ -72,4 +72,4 @@ grails.views.gsp.sitemesh.preprocess = true
 
 
 
-seedDataTarget =  ['bgp': ['/src/groovy/com/sungardhe/banner/seeddata/Data/banner_general_person.xml']]
+seedDataTarget =  ['bgp': ['/src/groovy/net/hedtech/banner/seeddata/Data/banner_general_person.xml']]
