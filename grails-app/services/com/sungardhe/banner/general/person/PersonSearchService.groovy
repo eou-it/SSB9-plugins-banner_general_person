@@ -67,7 +67,7 @@ class PersonSearchService {
             //sets the search filter per search request
             sql.call("{call soknsut.p_set_search_filter(${search})}")
 
-            list = PersonAdvancedFilterView.fetchSearchEntityList(filterData, pagingAndSortParams).each {
+            list = PersonAdvancedFilterView.fetchSearchEntityList2(filterData, pagingAndSortParams).each {
                 it ->
                 def lastNameValue = it.lastName
                 def firstNameValue = it.firstName
@@ -87,14 +87,14 @@ class PersonSearchService {
                     text
                 }
             }
-
-            currentList = list.findAll { it.changeIndicator == null}
+            return list
+            /*currentList = list.findAll { it.changeIndicator == null}
 
             if (currentList && currentList?.size() == 1) {
                 return currentList
             } else {
                 return list.unique(nameComparator)
-            }
+            }*/
 
         } finally {
             sql?.close()
@@ -148,7 +148,7 @@ class PersonSearchService {
 
         if (ssn == "YES") {
             //search by id first
-            list = PersonAdvancedIdFilterView.fetchSearchEntityList(filterData, pagingAndSortParams).each {
+            list = PersonAdvancedIdFilterView.fetchSearchEntityList2(filterData, pagingAndSortParams).each {
                 it ->
                 def lastNameValue = it.lastName
                 def firstNameValue = it.firstName
@@ -168,16 +168,19 @@ class PersonSearchService {
                 }
             }
 
-            currentList = list.findAll { it.changeIndicator == null}
+            if(list && list?.size() > 0) {
+                return list
+            }
+            /*currentList = list.findAll { it.changeIndicator == null}
 
             if (currentList && currentList?.unique(nameComparator).size() == 1) {
                 return currentList
             } else if (currentList && currentList?.size() > 1) {
                 return list.unique(nameComparator)
-            }
+            }*/
 
             // if search by id return no data, then continue search by ssn
-            list = PersonAdvancedAlternateIdFilterView.fetchSearchEntityList(filterData, pagingAndSortParams).each {
+            list = PersonAdvancedAlternateIdFilterView.fetchSearchEntityList2(filterData, pagingAndSortParams).each {
                 it ->
                 def lastNameValue = it.lastName
                 def firstNameValue = it.firstName
@@ -196,16 +199,17 @@ class PersonSearchService {
                     text
                 }
             }
-            currentList = list.findAll { it.changeIndicator == null}
+            return list
+            /*currentList = list.findAll { it.changeIndicator == null}
 
             if (currentList && currentList?.unique(nameComparator).size() == 1) {
                 return currentList
             } else {
                 //remove all duplicate values as a result of outer join to spraddr
                 return list.unique(nameComparator)
-            }
+            }*/
         } else {
-            list = PersonAdvancedIdFilterView.fetchSearchEntityList(filterData, pagingAndSortParams).each {
+            list = PersonAdvancedIdFilterView.fetchSearchEntityList2(filterData, pagingAndSortParams).each {
                 it ->
                 def lastNameValue = it.lastName
                 def firstNameValue = it.firstName
@@ -224,15 +228,15 @@ class PersonSearchService {
                     text
                 }
             }
+            return list
 
-            currentList = list.findAll { it.changeIndicator == null}
-
+            /*currentList = list.findAll { it.changeIndicator == null}
             if (currentList && currentList?.unique(nameComparator).size() == 1) {
                 return currentList
             } else {
                 //remove all duplicate values as a result of outer join to spraddr
                 return list.unique(nameComparator)
-            }
+            }*/
         }
     }
 
