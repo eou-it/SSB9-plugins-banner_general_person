@@ -87,6 +87,7 @@ class PersonSearchService {
                     text
                 }
             }
+            filterData.dynamicdomain = "PersonAdvancedFilterView"
             return list
             /*currentList = list.findAll { it.changeIndicator == null}
 
@@ -169,6 +170,7 @@ class PersonSearchService {
             }
 
             if(list && list?.size() > 0) {
+                filterData.dynamicdomain = "PersonAdvancedIdFilterView"
                 return list
             }
             /*currentList = list.findAll { it.changeIndicator == null}
@@ -199,6 +201,7 @@ class PersonSearchService {
                     text
                 }
             }
+            filterData.dynamicdomain = "PersonAdvancedAlternateIdFilterView"
             return list
             /*currentList = list.findAll { it.changeIndicator == null}
 
@@ -228,6 +231,7 @@ class PersonSearchService {
                     text
                 }
             }
+            filterData.dynamicdomain = "PersonAdvancedIdFilterView"
             return list
 
             /*currentList = list.findAll { it.changeIndicator == null}

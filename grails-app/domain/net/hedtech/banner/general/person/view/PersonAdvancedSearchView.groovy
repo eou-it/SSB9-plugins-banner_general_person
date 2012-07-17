@@ -13,6 +13,7 @@ package net.hedtech.banner.general.person.view
 
 import net.hedtech.banner.query.DynamicFinder
 import javax.persistence.*
+import net.hedtech.banner.query.QueryBuilder
 
 /**
  * Person Advanced Search model.
@@ -143,6 +144,29 @@ class PersonAdvancedSearchView extends PersonView {
                       WHERE a.pidm IN (:pidms)"""
 
         return new DynamicFinder(PersonAdvancedSearchView.class, query, "a")
+    }
+
+    def private static finderByAllEntityList2Count = {filterData ->
+        def query = """from PersonAdvancedSearchView data
+                   where data.id in (select
+                   max(a.id)  from PersonAdvancedSearchView a
+                       where exists ( from ${filterData.dynamicdomain} as af where af.pidm = a.pidm )
+                   group by a.pidm, a.bannerId, a.lastName, a.firstName, a.middleName, a.changeIndicator  ${ QueryBuilder.dynamicGroupby("a", filterData?.params +  (null == filterData?.extraparams ? [:] : filterData?.extraparams) )}
+                   having CASE WHEN 1 =
+                           ( ${QueryBuilder.buildQuery("""select sum(count(distinct b.pidm)) as total from PersonAdvancedSearchView b
+                               where exists ( from ${filterData.dynamicdomain} as afb where afb.pidm = b.pidm )
+                               group by b.pidm, b.bannerId, b.lastName, b.firstName, b.middleName, b.changeIndicator ${ QueryBuilder.dynamicGroupby("b", filterData?.params + (null == filterData?.extraparams ? [:] : filterData?.extraparams))}
+                               having b.changeIndicator is null""", "b", filterData?.criteria,[:])}   )
+                           THEN a.changeIndicator
+                           ELSE null
+                           END is null   )
+                           """
+
+        return new DynamicFinder(PersonAdvancedSearchView.class, query, "data")
+    }
+
+    def static countAllEntities2(filterData) {
+        finderByAllEntityList2Count(filterData).count(filterData)
     }
 
 }
