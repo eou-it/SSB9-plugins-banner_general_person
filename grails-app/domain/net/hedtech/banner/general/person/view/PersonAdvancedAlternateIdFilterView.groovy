@@ -131,7 +131,7 @@ class PersonAdvancedAlternateIdFilterView {
                            ( ${QueryBuilder.buildQuery("""select sum(count(distinct b.pidm)) as total from PersonAdvancedSearchView b
                                where exists ( from PersonAdvancedAlternateIdFilterView as afb where afb.pidm = b.pidm )
                                group by b.pidm, b.bannerId, b.lastName, b.firstName, b.middleName, b.changeIndicator ${ QueryBuilder.dynamicGroupby("b", filterData?.params + (null == filterData?.extraparams ? [:] : filterData?.extraparams))}
-                               having b.changeIndicator is null""", "b", filterData?.criteria ,pagingAndSortParams)}   )
+                               having b.changeIndicator is null """, "b", filterData?.criteria ,[:])}   )
                            THEN a.changeIndicator
                            ELSE null
                            END is null   )
@@ -150,7 +150,7 @@ class PersonAdvancedAlternateIdFilterView {
                            ( ${QueryBuilder.buildCountQuery("""select sum(count(distinct b.pidm)) as total from PersonAdvancedSearchView b
                                where exists ( from PersonAdvancedAlternateIdFilterView as afb where afb.pidm = b.pidm )
                                group by b.pidm, b.bannerId, b.lastName, b.firstName, b.middleName, b.changeIndicator ${ QueryBuilder.dynamicGroupby("b", filterData?.params)}
-                               having b.changeIndicator is null""", "b", filterData?.criteria)}   )
+                               having b.changeIndicator is null """, "b", filterData?.criteria)}   )
                            THEN a.changeIndicator
                            ELSE null
                            END is null   )
