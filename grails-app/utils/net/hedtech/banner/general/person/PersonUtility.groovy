@@ -1,4 +1,4 @@
-/*********************************************************************************
+/** *******************************************************************************
  Copyright 2009-2011 SunGard Higher Education. All Rights Reserved.
  This copyrighted software contains confidential and proprietary information of 
  SunGard Higher Education and its subsidiaries. Any use of this software is limited 
@@ -8,7 +8,7 @@
  trademark of SunGard Data Systems in the U.S.A. and/or other regions and/or countries.
  Banner and Luminis are either registered trademarks or trademarks of SunGard Higher 
  Education in the U.S.A. and/or other regions and/or countries.
- **********************************************************************************/
+ ********************************************************************************* */
 package net.hedtech.banner.general.person
 
 import org.codehaus.groovy.grails.web.context.ServletContextHolder as SCH
@@ -31,17 +31,22 @@ class PersonUtility {
         else return true
     }
 
-
     public static Object getPerson(String bannerId) {
-        return PersonIdentificationName.fetchBannerPerson(bannerId)
+        def person = getAltPerson(bannerId)
+        if (person) {
+            return getPerson(person.pidm)
+        }
+        else return PersonIdentificationName.fetchBannerPerson(bannerId)
     }
 
+    public static Object getAltPerson(String bannerId) {
+        return PersonIdentificationName.fetchPersonByAlternativeBannerId(bannerId)
+    }
 
     public static Object getPerson(Integer pidm) {
         return PersonIdentificationName.fetchBannerPerson(pidm)
 
     }
-
 
     public static Boolean isPersonDeceased(Integer pidm) {
 
@@ -51,8 +56,8 @@ class PersonUtility {
         def ctx = SCH.servletContext.getAttribute(GA.APPLICATION_CONTEXT)
         def sessionFactory = ctx.sessionFactory
         def session = sessionFactory.currentSession
-        def sql = new Sql (session.connection ())
-        def bio = sql.firstRow (bioSql, [pidm])
+        def sql = new Sql(session.connection())
+        def bio = sql.firstRow(bioSql, [pidm])
         return bio?.dead == 'Y'
     }
 
@@ -87,7 +92,7 @@ class PersonUtility {
         def sessionFactory = ctx.sessionFactory
         def session = sessionFactory.currentSession
         def sql = new Sql(session.connection())
-        def conf = sql.firstRow(emailQuery, [pidm,'A', 'Y'])
+        def conf = sql.firstRow(emailQuery, [pidm, 'A', 'Y'])
         return conf?.email
     }
 

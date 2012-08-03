@@ -1,4 +1,4 @@
-/*********************************************************************************
+/** *******************************************************************************
  Copyright 2009-2011 SunGard Higher Education. All Rights Reserved.
  This copyrighted software contains confidential and proprietary information of
  SunGard Higher Education and its subsidiaries. Any use of this software is limited
@@ -8,7 +8,7 @@
  trademark of SunGard Data Systems in the U.S.A. and/or other regions and/or countries.
  Banner and Luminis are either registered trademarks or trademarks of SunGard Higher
  Education in the U.S.A. and/or other regions and/or countries.
- **********************************************************************************/
+ ********************************************************************************* */
 package net.hedtech.banner.general.person
 
 import net.hedtech.banner.general.system.FgacDomain
@@ -92,7 +92,12 @@ query = """FROM  PersonIdentificationName a
 query = """select count(a.bannerId) FROM  PersonIdentificationName a
 	  	                WHERE (a.bannerId like :filter
 	  	                or a.searchLastName like :filter)
-	  	                and a.entityIndicator = 'C' """)
+	  	                and a.entityIndicator = 'C' """),
+@NamedQuery(name = "PersonIdentificationName.fetchPersonByAlternativeBannerId",
+query = """FROM PersonIdentificationName a
+                        WHERE a.bannerId = :filter
+                        and a.entityIndicator = 'P'
+                        and a.changeIndicator = 'I' """)
 ])
 @DatabaseModifiesState
 class PersonIdentificationName implements Serializable {
@@ -251,7 +256,7 @@ class PersonIdentificationName implements Serializable {
      */
     @ManyToOne
     @JoinColumns([
-        @JoinColumn(name = "SPRIDEN_CREATE_FDMN_CODE", referencedColumnName = "GTVFDMN_CODE")
+    @JoinColumn(name = "SPRIDEN_CREATE_FDMN_CODE", referencedColumnName = "GTVFDMN_CODE")
     ])
     FgacDomain fgacDomain
 
@@ -435,8 +440,8 @@ class PersonIdentificationName implements Serializable {
 
     //Used for Lookup.
     public static def fetchBySomeBannerId(filter) {
-        if("%".equals(filter) || "%%".equals(filter)){
-               return [list: []]
+        if ("%".equals(filter) || "%%".equals(filter)) {
+            return [list: []]
         }
         def name
         if (filter) name = "%" + filter.toUpperCase() + "%"
@@ -451,8 +456,8 @@ class PersonIdentificationName implements Serializable {
 
     //Used for Lookup.
     public static def fetchBySomeName(filter) {
-        if("%".equals(filter) || "%%".equals(filter)){
-               return [list: []]
+        if ("%".equals(filter) || "%%".equals(filter)) {
+            return [list: []]
         }
         def name
         if (filter) name = "%" + filter.toUpperCase() + "%"
@@ -473,7 +478,13 @@ class PersonIdentificationName implements Serializable {
         }
         return object
     }
-
+    //Used to fetch the Banner Alternate ID
+    public static PersonIdentificationName fetchPersonByAlternativeBannerId(String bannerId) {
+        PersonIdentificationName object = PersonIdentificationName.withSession {session ->
+            def list = session.getNamedQuery('PersonIdentificationName.fetchPersonByAlternativeBannerId').setString('filter', bannerId).list()[0]
+        }
+        return object
+    }
 
     public static PersonIdentificationName fetchBannerPerson(Integer pidm) {
         PersonIdentificationName object = PersonIdentificationName.withSession {session ->
