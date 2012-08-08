@@ -31,10 +31,6 @@ start stuview_bgp
 REM
 connect baninst1/&&baninst1_password
 start studbpr_bgp
-REM
-connect baninst1/&&baninst1_password
-start gordmcli.sql
-start gordmski.sql
 commit;
 spool off;
 REM
