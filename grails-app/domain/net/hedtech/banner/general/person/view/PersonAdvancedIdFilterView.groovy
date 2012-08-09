@@ -108,11 +108,11 @@ class PersonAdvancedIdFilterView {
                    where data.id in (select
                    max(a.id)  from PersonAdvancedSearchView a
                        where exists ( from PersonAdvancedIdFilterView as af where af.pidm = a.pidm )
-                   group by a.pidm, a.bannerId, a.lastName, a.firstName, a.middleName, a.changeIndicator  ${ QueryBuilder.dynamicGroupby("a", filterData?.params + (null == filterData?.extraparams ? [:] : filterData?.extraparams) ) }
+                   group by a.pidm, a.bannerId, a.lastName, a.firstName, a.middleName, a.changeIndicator  ${ QueryBuilder.dynamicGroupby("a", filterData?.params + (null == filterData?.extraparams ? [:] : filterData?.extraparams) - (null == filterData?.removeparams ? [:] : filterData?.removeparams) ) }
                    having CASE WHEN 1 =
                            ( ${QueryBuilder.buildQuery("""select sum(count(distinct b.pidm)) as total from PersonAdvancedSearchView b
                                where exists ( from PersonAdvancedIdFilterView as afb where afb.pidm = b.pidm )
-                               group by b.pidm, b.bannerId, b.lastName, b.firstName, b.middleName, b.changeIndicator ${ QueryBuilder.dynamicGroupby("b", filterData?.params +(null == filterData?.extraparams ? [:] : filterData?.extraparams)) }
+                               group by b.pidm, b.bannerId, b.lastName, b.firstName, b.middleName, b.changeIndicator ${ QueryBuilder.dynamicGroupby("b", filterData?.params +(null == filterData?.extraparams ? [:] : filterData?.extraparams) - (null == filterData?.removeparams ? [:] : filterData?.removeparams)) }
                                having b.changeIndicator is null """, "b", filterData?.criteria ,[:])}   )
                            THEN a.changeIndicator
                            ELSE null
