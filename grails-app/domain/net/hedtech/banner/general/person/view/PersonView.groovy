@@ -137,7 +137,7 @@ abstract class PersonView implements Serializable {
         }
     }
 
-    private def getNameFormat() {
+    public def getNameFormat() {
         def application = AH.application
         ApplicationContext applicationContext = application.mainContext
         def messageSource = applicationContext.getBean("messageSource")

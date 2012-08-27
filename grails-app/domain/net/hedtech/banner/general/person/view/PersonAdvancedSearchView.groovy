@@ -14,6 +14,7 @@ package net.hedtech.banner.general.person.view
 import net.hedtech.banner.query.DynamicFinder
 import javax.persistence.*
 import net.hedtech.banner.query.QueryBuilder
+import net.hedtech.banner.person.dsl.NameTemplate
 
 /**
  * Person Advanced Search model.
@@ -92,6 +93,42 @@ class PersonAdvancedSearchView extends PersonView {
      */
     @Column(name = "SEX")
     String sex
+
+    /**
+     * This field defines the last name of person.
+     */
+    @Column(name = "CURRENT_LAST_NAME")
+    String currentLastName
+
+    /**
+     * This field entifies the first name of person.
+     */
+    @Column(name = "CURRENT_FIRST_NAME")
+    String currentFirstName
+
+    /**
+     * This field entifies the mdle name of person.
+     */
+    @Column(name = "CURRENT_MI")
+    String currentMiddleName
+
+    public String getFormattedName() {
+        if(changeIndicator != null) {
+             return NameTemplate.format {
+                    lastName currentLastName
+                    firstName currentFirstName
+                    mi currentMiddleName
+                    surnamePrefix surnamePrefix
+                    nameSuffix nameSuffix
+                    namePrefix namePrefix
+                    formatTemplate getNameFormat()
+                    text
+                }
+        }else {
+            return super.getFormattedName()
+        }
+
+    }
 
     //@Transient
     //String formattedName
