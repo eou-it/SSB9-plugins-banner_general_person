@@ -71,7 +71,7 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
         assertTrue result.size() == 1
         result[0].changeIndicator = ""
         //assertEquals "105, Student", result[0].formattedName
-        assertEquals "A00000721", result[0].bannerId
+        assertEquals "A00000721", result[0].currentBannerId
 
     }
 
@@ -95,7 +95,7 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
         assertTrue result.size() == 1
         result[0].changeIndicator = ""
         //assertEquals "105, Student", result[0].formattedName
-        assertEquals "A00000721", result[0].bannerId
+        assertEquals "A00000721", result[0].currentBannerId
 
     }
 
