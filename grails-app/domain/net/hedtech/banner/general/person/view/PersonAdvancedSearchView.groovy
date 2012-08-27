@@ -130,6 +130,10 @@ class PersonAdvancedSearchView extends PersonView {
 
     }
 
+    public String getBaseFormattedName() {
+        return super.getFormattedName()
+    }
+
     //@Transient
     //String formattedName
 
