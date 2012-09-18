@@ -19,7 +19,7 @@ REM AUDIT TRAIL END
 REM
 set scan on echo on termout on;
 REM
-REM spool horizon_upgrade.lis
+spool horizon_upgrade.lis
 REM
 connect dbeu_owner/&&dbeu_password
 REM
@@ -34,6 +34,6 @@ start studbpr_bgp
 commit;
 spool off;
 REM
-select * from all_objects where status = 'INVALID';
 conn sys/u_pick_it as sysdba;
 execute utl_recomp.recomp_parallel();
+select * from all_objects where status = 'INVALID';

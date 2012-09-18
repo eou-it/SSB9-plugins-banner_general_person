@@ -53,6 +53,11 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
 
     /**
      * Tests the id search.
+     * SPRIDEN_PIDM           SPRIDEN_ID SPRIDEN_LAST_NAME                                            SPRIDEN_FIRST_NAME                                           SPRIDEN_MI                                                   SPRIDEN_CHANGE_IND SPRIDEN_ENTITY_IND SPRIDEN_ACTIVITY_DATE     SPRIDEN_USER                   SPRIDEN_ORIGIN                 SPRIDEN_SEARCH_LAST_NAME                                     SPRIDEN_SEARCH_FIRST_NAME                                    SPRIDEN_SEARCH_MI                                            SPRIDEN_SOUNDEX_LAST_NAME SPRIDEN_SOUNDEX_FIRST_NAME SPRIDEN_NTYP_CODE SPRIDEN_CREATE_USER            SPRIDEN_CREATE_DATE       SPRIDEN_DATA_ORIGIN            SPRIDEN_CREATE_FDMN_CODE       SPRIDEN_SURNAME_PREFIX                                       SPRIDEN_SURROGATE_ID   SPRIDEN_VERSION        SPRIDEN_USER_ID                SPRIDEN_VPDI_CODE
+---------------------- ---------- ------------------------------------------------------------ ------------------------------------------------------------ ------------------------------------------------------------ ------------------ ------------------ ------------------------- ------------------------------ ------------------------------ ------------------------------------------------------------ ------------------------------------------------------------ ------------------------------------------------------------ ------------------------- -------------------------- ----------------- ------------------------------ ------------------------- ------------------------------ ------------------------------ ------------------------------------------------------------ ---------------------- ---------------------- ------------------------------ -----------------
+37859                  HOS00001   Jamison                                                      Emily                                                        Elizabeth                                                                       P                  07-JAN-11                 SAISUSR                        SPAIDEN                        JAMISON                                                      EMILY                                                        ELIZABETH                                                    J525                      E540                                         BANPROXY                       07-JAN-11                 GRAILS                                                                                                                     10558                  0
+
+
      */
     def testAdvancedSearchById() {
 
@@ -65,18 +70,17 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
         //Step 1.
         // Client submits a search query as Lindblom
         //Returned Result for the Advanced Search UI Component
-        def result = personSearchService.personIdSearch("A00000721", filterData, pagingAndSortParams)
+        def result = personSearchService.personIdSearch("HOS00001", filterData, pagingAndSortParams)
         println result
         assertNotNull result
-        assertTrue result.size() == 1
-        result[0].changeIndicator = ""
-        //assertEquals "105, Student", result[0].formattedName
-        //assertEquals "A00000721", result[0].currentBannerId
+        assertTrue result.size() > 0
+        assertNotNull result.find { it.bannerId == "HOS00001"}
 
     }
 
     /**
      * Tests the id search.
+     *
      */
     def testAdvancedSearchByCurrentId() {
 
@@ -89,13 +93,10 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
         //Step 1.
         // Client submits a search query as Lindblom
         //Returned Result for the Advanced Search UI Component
-        def result = personSearchService.personIdSearch("S105", filterData, pagingAndSortParams)
+        def result = personSearchService.personIdSearch("HOSWEB001", filterData, pagingAndSortParams)
         println result
         assertNotNull result
-        assertTrue result.size() == 1
-        result[0].changeIndicator = ""
-        //assertEquals "105, Student", result[0].formattedName
-        //assertEquals "A00000721", result[0].currentBannerId
+        assertTrue result.size() >= 1
 
     }
 

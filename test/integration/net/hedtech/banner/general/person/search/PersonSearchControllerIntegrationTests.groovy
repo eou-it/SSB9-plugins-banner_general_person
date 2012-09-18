@@ -29,12 +29,12 @@ class PersonSearchControllerIntegrationTests extends BaseIntegrationTestCase {
      */
     def testSearchById() {
         controller.request.contentType = "text/json"
-        controller.params.searchFilter = "A00000721"
+        controller.params.searchFilter = "HOS00001"
         controller.searchById()
         String actualJSON = controller.response.contentAsString
         def data = JSON.parse(actualJSON)
         assertNotNull data
-        assertTrue data.people.size() == 1
+        assertTrue data.people.size() > 1
         //assertEquals "105, Student", data.people[0].formattedName
     }
 

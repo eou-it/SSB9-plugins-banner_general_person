@@ -29,17 +29,19 @@ CREATE OR REPLACE FORCE VIEW SVQ_ADVSRCH
     FIRST_NAME,
     MI,
     CHANGE_INDICATOR,
-    VERSION
+    VERSION ,
+    row_number
 )
 AS
-select rownum,
+select SURROGATE_ID,
        pidm,
        id,
        last_name,
        first_name,
        mi,
        change_indicator,
-       version
+       version  ,
+       rownum
 from svq_spralti where pidm in (
             select pidm
               from svq_spralti a
