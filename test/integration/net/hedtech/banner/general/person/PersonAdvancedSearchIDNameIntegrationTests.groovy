@@ -244,7 +244,7 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
             // Search by SSN
             def persons = personSearchService.personIdSearch("543-54-5432", filterData, pagingAndSortParams)
             assertNotNull persons
-            assertTrue persons.size() == 1
+            assertTrue persons.size() >= 1
 
         } finally {
             sql.executeUpdate("update gubiprf set gubiprf_security_enabled_ind = 'Y' where gubiprf_inst_key = 'INST'")
@@ -282,9 +282,10 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
             //Step 1.
             // Client submits a search query to find an exact match
             // Search by SSN
-            def persons = personSearchService.personIdSearch("543-54-5432", filterData, pagingAndSortParams)
+            //   HOSK00009  999992359
+            def persons = personSearchService.personIdSearch("999-99-2359", filterData, pagingAndSortParams)
             assertNotNull persons
-            assertTrue persons.size() == 1
+            assertTrue persons.size() == 0
 
             //Step 2.
             // Client submits a search query by SSN and other parameter(i.e Id)
@@ -336,7 +337,7 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
         def pagingAndSortParams = ["max": 100, "offset": 0]
         filterData.params = param
         // Define text search based on LastName, FirstName, and Id 543-54-5432   123081212
-        def persons = personSearchService.personIdSearch("543-54-5432", filterData, pagingAndSortParams)
+        def persons = personSearchService.personIdSearch("999-99-2359", filterData, pagingAndSortParams)
         assertNotNull persons
         assertTrue persons.size() == 0
     }
