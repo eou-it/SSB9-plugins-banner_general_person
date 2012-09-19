@@ -33,6 +33,6 @@ CREATE OR REPLACE FORCE VIEW sv_sprmedi AS SELECT
       sprmedi_data_origin,
       sprmedi_activity_date,
       ROWID sprmedi_v_rowid
-  FROM saturn.sprmedi;
+  FROM sprmedi;
 REM
 CREATE OR REPLACE PUBLIC SYNONYM sv_sprmedi FOR sv_sprmedi;

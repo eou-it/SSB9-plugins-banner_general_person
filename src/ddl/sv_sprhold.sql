@@ -32,6 +32,6 @@ CREATE OR REPLACE FORCE VIEW sv_sprhold AS SELECT
       sprhold_data_origin,
       sprhold_activity_date,
       ROWID sprhold_v_rowid
-  FROM saturn.sprhold;
+  FROM sprhold;
 REM
 CREATE OR REPLACE PUBLIC SYNONYM sv_sprhold FOR sv_sprhold;

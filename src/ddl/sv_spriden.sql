@@ -46,6 +46,6 @@ CREATE OR REPLACE FORCE VIEW SV_SPRIDEN AS SELECT
          Decode(Spriden_Entity_Ind, 'C', F_Format_Name(spriden_pidm,'L'),
            f_format_name(spriden_pidm,'FML'))) as FULL_NAME,
       ROWID spriden_v_rowid
-  FROM saturn.spriden;
+  FROM spriden;
 REM
 CREATE OR REPLACE PUBLIC SYNONYM SV_SPRIDEN FOR SV_SPRIDEN;
