@@ -30,7 +30,7 @@ abstract class PersonView implements Serializable {
      */
     @Id
     @Column(name = "SURROGATE_ID")
-    Long id
+    String id
 
     /**
      * Internal identification number of the person.  This needs to be nullable = true
