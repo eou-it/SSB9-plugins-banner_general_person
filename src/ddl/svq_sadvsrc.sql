@@ -55,41 +55,41 @@ CREATE OR REPLACE FORCE VIEW SVQ_SADVSRC
     row_number
 )
 AS
-SELECT   o.spriden_surrogate_id,
+SELECT   o.rowid||n.rowid||pers.rowid||addr.rowid,
          o.SPRIDEN_VERSION,
          o.SPRIDEN_ACTIVITY_DATE,
          o.SPRIDEN_USER_ID,
          o.SPRIDEN_DATA_ORIGIN,
-         SPBPERS_SSN,
+         pers.SPBPERS_SSN,
          o.SPRIDEN_PIDM,
          o.SPRIDEN_ID,
          n.SPRIDEN_ID,
          o.SPRIDEN_LAST_NAME,
          o.SPRIDEN_FIRST_NAME,
          o.SPRIDEN_MI,
-         SPBPERS_BIRTH_DATE,
+         pers.SPBPERS_BIRTH_DATE,
          o.SPRIDEN_CHANGE_IND,
          o.SPRIDEN_ENTITY_IND,
          o.SPRIDEN_SEARCH_LAST_NAME,
          o.SPRIDEN_SEARCH_FIRST_NAME,
          o.SPRIDEN_SEARCH_MI,
          o.SPRIDEN_NTYP_CODE,
-         SPRADDR_CITY,
-         SPRADDR_STAT_CODE,
-         SPRADDR_ZIP,
-         SPBPERS_SEX,
+         addr.SPRADDR_CITY,
+         addr.SPRADDR_STAT_CODE,
+         addr.SPRADDR_ZIP,
+         pers.SPBPERS_SEX,
          o.SPRIDEN_SURNAME_PREFIX,
-         SPBPERS_PREF_FIRST_NAME,
-         SPBPERS_NAME_PREFIX,
-         SPBPERS_NAME_SUFFIX,
+         pers.SPBPERS_PREF_FIRST_NAME,
+         pers.SPBPERS_NAME_PREFIX,
+         pers.SPBPERS_NAME_SUFFIX,
          n.SPRIDEN_LAST_NAME,
          n.SPRIDEN_FIRST_NAME,
          n.SPRIDEN_MI,
          n.SPRIDEN_SURNAME_PREFIX ,
          rownum
-   FROM SPBPERS, SPRIDEN n, SPRIDEN o, spraddr
-  WHERE SPBPERS_PIDM(+) = o.SPRIDEN_PIDM
-    AND SPRADDR_PIDM(+) = o.SPRIDEN_PIDM
+   FROM SPBPERS pers, SPRIDEN n, SPRIDEN o, spraddr addr
+  WHERE pers.SPBPERS_PIDM(+) = o.SPRIDEN_PIDM
+    AND addr.SPRADDR_PIDM(+) = o.SPRIDEN_PIDM
     AND n.spriden_pidm = o.spriden_pidm
     AND n.spriden_change_ind IS NULL
     AND o.spriden_entity_ind = n.spriden_entity_ind

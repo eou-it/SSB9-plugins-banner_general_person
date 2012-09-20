@@ -197,8 +197,8 @@ class PersonAdvancedSearchView extends PersonView {
 
     def private static finderByAllEntityList2Count = {filterData ->
         def query = """from PersonAdvancedSearchView data
-                   where data.pidm in (select
-                    distinct a.pidm   from PersonAdvancedSearchView a
+                   where data.id in (select
+                    max ( a.id )    from PersonAdvancedSearchView a
                        where exists ( from ${filterData.dynamicdomain} as af where af.pidm = a.pidm )
                    group by a.pidm, a.bannerId, a.lastName, a.firstName, a.middleName, a.surnamePrefix, a.changeIndicator, a.nameType ${ QueryBuilder.dynamicGroupby("a", filterData?.params +  (null == filterData?.extraparams ? [:] : filterData?.extraparams) - (null == filterData?.removeparams ? [:] : filterData?.removeparams) )}
                    having CASE WHEN 1 =
