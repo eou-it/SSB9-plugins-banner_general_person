@@ -245,18 +245,15 @@ class PersonSearchService {
     }
 
     def isSSNSearchEnabled() {
-        def enabled = true
-        def ssnSearchEnabledIndicator = institutionalDescriptionService.findByKey().ssnSearchEnabledIndicator
-        if (ssnSearchEnabledIndicator) {
-            def userName = SecurityContextHolder.context?.authentication?.principal?.username?.toUpperCase()
-            Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
-            def ssn
-            sql.call("{$Sql.VARCHAR = call g\$_chk_auth.g\$_check_authorization_fnc('SSN_SEARCH',${userName})}") {ssnSearch -> ssn = ssnSearch}
-            if (ssn != "YES") {
-               enabled = false
-            }
+        boolean enabled = true
+        def userName = SecurityContextHolder.context?.authentication?.principal?.username?.toUpperCase()
+        Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
+        def ssn
+        sql.call("{$Sql.VARCHAR = call g\$_chk_auth.g\$_check_authorization_fnc('SSN_SEARCH',${userName})}") {ssnSearch -> ssn = ssnSearch}
+        if (ssn != "YES") {
+           enabled = false
         }
-        return  enabled
+        return enabled
     }
 
     private def getNameFormat() {
