@@ -105,6 +105,7 @@ class PersonSearchService {
 
     def personIdSearch(searchFilter, filterData, pagingAndSortParams) {
         def searchResult
+
         def ssnSearchEnabledIndicator = institutionalDescriptionService.findByKey().ssnSearchEnabledIndicator
         def ssn
         def pii
@@ -118,20 +119,19 @@ class PersonSearchService {
             if (ssnSearchEnabledIndicator) {
                 def userName = SecurityContextHolder.context?.authentication?.principal?.username?.toUpperCase()
                 sql.call("{$Sql.VARCHAR = call g\$_chk_auth.g\$_check_authorization_fnc('SSN_SEARCH',${userName})}") {ssnSearch -> ssn = ssnSearch}
-                searchResult = searchComponent(ssn, filterData, pagingAndSortParams)
-
-                sql.call("{$Sql.VARCHAR = call gokfgac.f_spriden_pii_active}") { result -> pii = result }
-                if (searchResult?.size() == 0 && pii == "Y") {
-                    sql.execute("""call gokfgac.p_turn_fgac_off()""")
-                    searchResult = searchComponent(ssn, filterData, pagingAndSortParams)
-                    sql.execute("""call gokfgac.p_turn_fgac_on()""")
-                    if (searchResult?.size() > 0) {
-                        throw new ApplicationException(PersonView, "@@r1:invalidId@@")
-                    }
-                }
 
             } else {
-                searchResult = searchComponent('NO', filterData, pagingAndSortParams)
+                ssn = 'NO'
+            }
+            searchResult = searchComponent(ssn, filterData, pagingAndSortParams)
+            sql.call("{$Sql.VARCHAR = call gokfgac.f_spriden_pii_active}") { result -> pii = result }
+            if (searchResult?.size() == 0 && pii == "Y") {
+                sql.execute("""call gokfgac.p_turn_fgac_off()""")
+                searchResult = searchComponent(ssn, filterData, pagingAndSortParams)
+                sql.execute("""call gokfgac.p_turn_fgac_on()""")
+                if (searchResult?.size() > 0) {
+                    throw new ApplicationException(PersonView, "@@r1:invalidId@@")
+                }
             }
 
         } finally {
