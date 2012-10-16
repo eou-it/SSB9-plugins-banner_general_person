@@ -33,19 +33,19 @@ CREATE OR REPLACE FORCE VIEW SVQ_ALTISRC
     row_number
 )
 AS
-select SURROGATE_ID,
-       pidm,
-       id,
-       last_name,
-       first_name,
-       mi,
-       change_indicator,
-       version ,
+select SPRIDEN_SURROGATE_ID,
+       SPRIDEN_PIDM,
+       SPRIDEN_ID,
+       SPRIDEN_LAST_NAME,
+       SPRIDEN_FIRST_NAME,
+       SPRIDEN_MI,
+       SPRIDEN_CHANGE_IND,
+       SPRIDEN_VERSION ,
        rownum
-from svq_spralti where pidm in (
-            select pidm
-              from svq_spralti a
-              where a.ssn like soknsut.f_get_search_filter
+from SPRIDEN where SPRIDEN_PIDM in (
+            select a.SPBPERS_PIDM
+              from SPBPERS a
+              where a.SPBPERS_SSN like soknsut.f_get_search_filter
               );
 
 COMMENT ON TABLE SVQ_ALTISRC IS 'Read only view for Advanced Search Filter UI Component';

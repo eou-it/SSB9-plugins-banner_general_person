@@ -24,6 +24,7 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
 import org.springframework.context.i18n.LocaleContextHolder as LCH
 import org.springframework.context.ApplicationContext
 import net.hedtech.banner.general.person.view.PersonAdvancedIdFilterView
+import net.hedtech.banner.general.person.view.PersonAdvancedSearchView
 
 class PersonSearchService {
 
@@ -66,8 +67,8 @@ class PersonSearchService {
         try {
             //sets the search filter per search request
             sql.call("{call soknsut.p_set_search_filter(${search})}")
-
-            list = PersonAdvancedFilterView.fetchSearchEntityList2(filterData, pagingAndSortParams).each {
+            filterData.dynamicdomain = "PersonAdvancedFilterView"
+            list = PersonAdvancedSearchView.fetchSearchEntityList2(filterData, pagingAndSortParams).each {
                 it ->
                 def lastNameValue = it.lastName
                 def firstNameValue = it.firstName
@@ -87,7 +88,7 @@ class PersonSearchService {
                     text
                 }
             }
-            filterData.dynamicdomain = "PersonAdvancedFilterView"
+
             return list
             /*currentList = list.findAll { it.changeIndicator == null}
 
@@ -149,7 +150,8 @@ class PersonSearchService {
 
         if (ssn == "YES") {
             //search by id first
-            list = PersonAdvancedIdFilterView.fetchSearchEntityList2(filterData, pagingAndSortParams).each {
+            filterData.dynamicdomain = "PersonAdvancedIdFilterView"
+            list = PersonAdvancedSearchView.fetchSearchEntityList2(filterData, pagingAndSortParams).each {
                 it ->
                 def lastNameValue = it.lastName
                 def firstNameValue = it.firstName
@@ -170,7 +172,6 @@ class PersonSearchService {
             }
 
             if(list && list?.size() > 0) {
-                filterData.dynamicdomain = "PersonAdvancedIdFilterView"
                 return list
             }
             /*currentList = list.findAll { it.changeIndicator == null}
@@ -182,7 +183,8 @@ class PersonSearchService {
             }*/
 
             // if search by id return no data, then continue search by ssn
-            list = PersonAdvancedAlternateIdFilterView.fetchSearchEntityList2(filterData, pagingAndSortParams).each {
+            filterData.dynamicdomain = "PersonAdvancedAlternateIdFilterView"
+            list = PersonAdvancedSearchView.fetchSearchEntityList2(filterData, pagingAndSortParams).each {
                 it ->
                 def lastNameValue = it.lastName
                 def firstNameValue = it.firstName
@@ -201,7 +203,7 @@ class PersonSearchService {
                     text
                 }
             }
-            filterData.dynamicdomain = "PersonAdvancedAlternateIdFilterView"
+
             return list
             /*currentList = list.findAll { it.changeIndicator == null}
 
@@ -212,7 +214,8 @@ class PersonSearchService {
                 return list.unique(nameComparator)
             }*/
         } else {
-            list = PersonAdvancedIdFilterView.fetchSearchEntityList2(filterData, pagingAndSortParams).each {
+            filterData.dynamicdomain = "PersonAdvancedIdFilterView"
+            list = PersonAdvancedSearchView.fetchSearchEntityList2(filterData, pagingAndSortParams).each {
                 it ->
                 def lastNameValue = it.lastName
                 def firstNameValue = it.firstName
@@ -231,7 +234,6 @@ class PersonSearchService {
                     text
                 }
             }
-            filterData.dynamicdomain = "PersonAdvancedIdFilterView"
             return list
 
             /*currentList = list.findAll { it.changeIndicator == null}

@@ -33,20 +33,16 @@ CREATE OR REPLACE FORCE VIEW SVQ_IDSRCH
     row_number
 )
 AS
-select surrogate_id,
-       pidm,
-       id,
-       last_name,
-       first_name,
-       mi,
-       change_indicator,
-       version ,
+select SPRIDEN_SURROGATE_ID,
+       SPRIDEN_PIDM,
+       SPRIDEN_ID,
+       SPRIDEN_LAST_NAME,
+       SPRIDEN_FIRST_NAME,
+       SPRIDEN_MI,
+       SPRIDEN_CHANGE_IND,
+       SPRIDEN_VERSION ,
        rownum
-from svq_spralti where pidm in (
-            select pidm
-              from svq_spralti a
-              where a.id like soknsut.f_get_search_filter
-              );
+from SPRIDEN where SPRIDEN_ID like soknsut.f_get_search_filter;
 
 COMMENT ON TABLE SVQ_IDSRCH IS 'Read only view for Advanced Search Filter UI Component';
 COMMENT ON COLUMN SVQ_IDSRCH.SURROGATE_ID IS 'SURROGATE ID: Immutable unique key';

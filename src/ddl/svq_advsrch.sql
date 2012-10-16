@@ -33,20 +33,16 @@ CREATE OR REPLACE FORCE VIEW SVQ_ADVSRCH
     row_number
 )
 AS
-select SURROGATE_ID,
-       pidm,
-       id,
-       last_name,
-       first_name,
-       mi,
-       change_indicator,
-       version  ,
+select SPRIDEN_SURROGATE_ID,
+       SPRIDEN_PIDM,
+       SPRIDEN_ID,
+       SPRIDEN_LAST_NAME,
+       SPRIDEN_FIRST_NAME,
+       SPRIDEN_MI,
+       SPRIDEN_CHANGE_IND,
+       SPRIDEN_VERSION ,
        rownum
-from svq_spralti where pidm in (
-            select pidm
-              from svq_spralti a
-              where soknsut.f_match_name(UPPER(a.search_last_name||'::'||a.search_first_name||'::'||a.search_mi)) = 1
-              );
+from SPRIDEN  where soknsut.f_match_name(UPPER(SPRIDEN_SEARCH_LAST_NAME||'::'||SPRIDEN_SEARCH_FIRST_NAME||'::'||SPRIDEN_SEARCH_MI)) = 1;
 
 COMMENT ON TABLE SVQ_ADVSRCH IS 'Read only view for Advanced Search Filter UI Component';
 COMMENT ON COLUMN SVQ_ADVSRCH.SURROGATE_ID IS 'SURROGATE ID: Immutable unique key';

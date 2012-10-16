@@ -71,24 +71,6 @@ class PersonAdvancedSearchView extends PersonView {
     String nameType
 
     /**
-     * The city
-     */
-    @Column(name = "CITY")
-    String city
-
-    /**
-     * The state
-     */
-    @Column(name = "STATE")
-    String state
-
-    /**
-     * The zip code
-     */
-    @Column(name = "ZIP")
-    String zip
-
-    /**
      * The sex of the person
      */
     @Column(name = "SEX")
@@ -159,9 +141,6 @@ class PersonAdvancedSearchView extends PersonView {
 					changeIndicator=$changeIndicator,
 					entityIndicator=$entityIndicator,
 					nameType=$nameType,
-					city=$city,
-					state=$state,
-					zip=$zip,
 					sex=$sex,
 					formattedName=$formattedName"""
     }
@@ -195,27 +174,77 @@ class PersonAdvancedSearchView extends PersonView {
         return new DynamicFinder(PersonAdvancedSearchView.class, query, "a")
     }
 
-    def private static finderByAllEntityList2Count = {filterData ->
-        def query = """from PersonAdvancedSearchView data
-                   where data.id in (select
-                    max ( a.id )    from PersonAdvancedSearchView a
-                       where exists ( from ${filterData.dynamicdomain} as af where af.pidm = a.pidm )
-                   group by a.pidm, a.bannerId, a.lastName, a.firstName, a.middleName, a.surnamePrefix, a.changeIndicator, a.nameType ${ QueryBuilder.dynamicGroupby("a", filterData?.params +  (null == filterData?.extraparams ? [:] : filterData?.extraparams) - (null == filterData?.removeparams ? [:] : filterData?.removeparams) )}
-                   having CASE WHEN 1 =
-                           ( ${QueryBuilder.buildQuery("""select sum(count(distinct b.pidm)) as total from PersonAdvancedSearchView b
-                               where exists ( from ${filterData.dynamicdomain} as afb where afb.pidm = b.pidm )
-                               group by b.pidm, b.bannerId, b.lastName, b.firstName, b.middleName, b.surnamePrefix, b.changeIndicator, b.nameType ${ QueryBuilder.dynamicGroupby("b", filterData?.params + (null == filterData?.extraparams ? [:] : filterData?.extraparams) - (null == filterData?.removeparams ? [:] : filterData?.removeparams) )}
-                               having b.changeIndicator is null """, "b", filterData?.criteria,[:])}   )
-                           THEN a.changeIndicator
+    def private static finderByAllEntityList2 = {filterData ->
+        def includeDuplicateIfSinglePersonFound = filterData.includeAlternate? filterData.includeAlternate: false
+//        if (filterData.containsKey('includeAlternate')) {
+//            includeDuplicateIfSinglePersonFound = true
+//        }
+
+        def query = """from PersonAdvancedSearchView data where exists ( from  ${filterData.dynamicdomain} as af where af.pidm = data.pidm)"""
+        if (filterData.params.containsKey('city') || filterData.params.containsKey('state') || filterData.params.containsKey('zip')) {
+            def addressfilterData = [params:[:], criteria:[]]
+            def count =0
+            def criteriaWithOutAddrCount = 0
+            def criteriaWithOutAddr = []
+            filterData.criteria.each {
+                if (it.key.equals("city")) {
+                    addressfilterData.params.city = filterData.params["city"]
+                    addressfilterData.criteria[count] = it
+                    count++
+                } else if (it.key.equals("state")) {
+                    addressfilterData.params.state = filterData.params["state"]
+                    addressfilterData.criteria[count] = it
+                    count++
+                } else if (it.key.equals("zip")) {
+                    addressfilterData.params.city = filterData.params["zip"]
+                    addressfilterData.criteria[count] = it
+                    count++
+                } else {
+                    criteriaWithOutAddr[criteriaWithOutAddrCount] = it
+                    criteriaWithOutAddrCount++
+                }
+            }
+             if (!addressfilterData.isEmpty()) {
+                 def addressQuery=QueryBuilder.buildQuery("""select distinct addr.pidm from PersonAddress addr
+                                   ""","addr", addressfilterData?.criteria,[:])
+                 query+=""" and data.pidm in (${addressQuery})"""
+                 filterData.criteria = criteriaWithOutAddr
+             }
+
+        }
+        if (!includeDuplicateIfSinglePersonFound)   {
+            query += """
+                       and CASE WHEN 1 =
+                               (select sum(count(distinct afb.pidm)) from  ${filterData.dynamicdomain} afb group by pidm)
+                           THEN data.changeIndicator
                            ELSE null
-                           END is null   )
-                           """
+                           END is null
+                      """
+        }
+
 
         return new DynamicFinder(PersonAdvancedSearchView.class, query, "data")
     }
 
+
     def static countAllEntities2(filterData) {
-        finderByAllEntityList2Count(filterData).count(filterData)
+         def tempFilterData = copyFilterData(filterData)
+        finderByAllEntityList2(tempFilterData).count(tempFilterData)
+    }
+
+     def public static fetchSearchEntityList2(filterData, pagingAndSortParams) {
+         def tempFilterData = copyFilterData(filterData)
+        finderByAllEntityList2(tempFilterData).find(tempFilterData, pagingAndSortParams)
+    }
+
+    def public static copyFilterData = { filterData->
+        def tempFilterData = [params:[:],criteria:[]]
+         tempFilterData.params = filterData.params
+         tempFilterData.criteria = filterData.criteria
+         tempFilterData.dynamicdomain = filterData.dynamicdomain
+         tempFilterData.sortColumn = filterData.sortColumn
+        tempFilterData.includeAlternate = filterData.includeAlternate
+        return tempFilterData
     }
 
 }

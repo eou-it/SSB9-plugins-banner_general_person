@@ -40,9 +40,6 @@ CREATE OR REPLACE FORCE VIEW SVQ_SADVSRC
     SEARCH_FIRST_NAME,
     SEARCH_MI,
     NAME_TYPE,
-    CITY,
-    STATE,
-    ZIP,
     SEX,
     SURNAME_PREFIX,
     PREFERRED_FIRST_NAME,
@@ -55,7 +52,7 @@ CREATE OR REPLACE FORCE VIEW SVQ_SADVSRC
     row_number
 )
 AS
-SELECT   o.rowid||n.rowid||pers.rowid||addr.rowid,
+SELECT   o.rowid||n.rowid||pers.rowid,
          o.SPRIDEN_VERSION,
          o.SPRIDEN_ACTIVITY_DATE,
          o.SPRIDEN_USER_ID,
@@ -74,9 +71,6 @@ SELECT   o.rowid||n.rowid||pers.rowid||addr.rowid,
          o.SPRIDEN_SEARCH_FIRST_NAME,
          o.SPRIDEN_SEARCH_MI,
          o.SPRIDEN_NTYP_CODE,
-         addr.SPRADDR_CITY,
-         addr.SPRADDR_STAT_CODE,
-         addr.SPRADDR_ZIP,
          pers.SPBPERS_SEX,
          o.SPRIDEN_SURNAME_PREFIX,
          pers.SPBPERS_PREF_FIRST_NAME,
@@ -87,9 +81,8 @@ SELECT   o.rowid||n.rowid||pers.rowid||addr.rowid,
          n.SPRIDEN_MI,
          n.SPRIDEN_SURNAME_PREFIX ,
          rownum
-   FROM SPBPERS pers, SPRIDEN n, SPRIDEN o, spraddr addr
+   FROM SPBPERS pers, SPRIDEN n, SPRIDEN o
   WHERE pers.SPBPERS_PIDM(+) = o.SPRIDEN_PIDM
-    AND addr.SPRADDR_PIDM(+) = o.SPRIDEN_PIDM
     AND n.spriden_pidm = o.spriden_pidm
     AND n.spriden_change_ind IS NULL
     AND o.spriden_entity_ind = n.spriden_entity_ind
@@ -114,9 +107,6 @@ COMMENT ON COLUMN SVQ_SADVSRC.SEARCH_LAST_NAME IS 'SEARCH_LAST_NAME: This field 
 COMMENT ON COLUMN SVQ_SADVSRC.SEARCH_FIRST_NAME IS 'SEARCH_FIRST_NAME: This field maintains the spriden search first name.';
 COMMENT ON COLUMN SVQ_SADVSRC.SEARCH_MI IS 'SEARCH_MI: This field maintains the spriden search middle name.';
 COMMENT ON COLUMN SVQ_SADVSRC.NAME_TYPE IS 'NAME_TYPE: This field maintains the name type.';
-COMMENT ON COLUMN SVQ_SADVSRC.CITY IS 'CITY: This field maintains the city.';
-COMMENT ON COLUMN SVQ_SADVSRC.STATE IS 'STATE: This field maintains the state code.';
-COMMENT ON COLUMN SVQ_SADVSRC.ZIP IS 'ZIP: This field maintains the zip code.';
 COMMENT ON COLUMN SVQ_SADVSRC.SEX IS 'SEX: This field maintains the sex code.';
 CREATE PUBLIC SYNONYM SVQ_SADVSRC FOR SVQ_SADVSRC;
 SHOW ERRORS VIEW SVQ_SADVSRC;
