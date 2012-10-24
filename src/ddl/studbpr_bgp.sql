@@ -44,6 +44,10 @@ start sv_sprtele_ins_trg
 start sv_sprtele_upd_trg
 start sv_sprtele_del_trg
 REM
+start gv_goremal_ins_trg
+start gv_goremal_upd_trg
+start gv_goremal_del_trg
+REM
 REM Create procedures
 REM
 start soknsut
