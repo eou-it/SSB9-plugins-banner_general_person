@@ -21,7 +21,6 @@ REM Create views.
 REM
 whenever oserror exit rollback;
 whenever sqlerror exit rollback;
-REM connect baninst1/&&baninst1_password
 REM
 REM Create triggers
 REM
