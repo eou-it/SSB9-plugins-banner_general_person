@@ -25,6 +25,7 @@ import org.springframework.context.i18n.LocaleContextHolder as LCH
 import org.springframework.context.ApplicationContext
 import net.hedtech.banner.general.person.view.PersonAdvancedIdFilterView
 import net.hedtech.banner.general.person.view.PersonAdvancedSearchView
+import net.hedtech.banner.general.system.SdaCrosswalkConversion
 
 class PersonSearchService {
 
@@ -142,6 +143,28 @@ class PersonSearchService {
         return searchResult
     }
 
+    def isSSNSearchEnabled() {
+        boolean enabled = true
+        def userName = SecurityContextHolder.context?.authentication?.principal?.username?.toUpperCase()
+        Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
+        def ssn
+        sql.call("{$Sql.VARCHAR = call g\$_chk_auth.g\$_check_authorization_fnc('SSN_SEARCH',${userName})}") {ssnSearch -> ssn = ssnSearch}
+        if (ssn != "YES") {
+           enabled = false
+        }
+        return enabled
+    }
+
+
+    def fetchNoOfRowsInPageForGUQSRCH() {
+        def lst = SdaCrosswalkConversion.findAllWhere(internalGroup: 'GUISRCH', internal:'SEARCH_MAX')
+        if (!lst.empty)  {
+             SdaCrosswalkConversion gtvsdax = lst.get(0)
+             return gtvsdax.external
+        }
+        return null
+    }
+
 
 
     def private searchComponent(ssn, filterData, pagingAndSortParams) {
@@ -246,17 +269,6 @@ class PersonSearchService {
         }
     }
 
-    def isSSNSearchEnabled() {
-        boolean enabled = true
-        def userName = SecurityContextHolder.context?.authentication?.principal?.username?.toUpperCase()
-        Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
-        def ssn
-        sql.call("{$Sql.VARCHAR = call g\$_chk_auth.g\$_check_authorization_fnc('SSN_SEARCH',${userName})}") {ssnSearch -> ssn = ssnSearch}
-        if (ssn != "YES") {
-           enabled = false
-        }
-        return enabled
-    }
 
     private def getNameFormat() {
         if (!_nameFormat) {

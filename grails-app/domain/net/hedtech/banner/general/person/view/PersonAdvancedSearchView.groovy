@@ -176,10 +176,6 @@ class PersonAdvancedSearchView extends PersonView {
 
     def private static finderByAllEntityList2 = {filterData ->
         def includeDuplicateIfSinglePersonFound = filterData.includeAlternate? filterData.includeAlternate: false
-//        if (filterData.containsKey('includeAlternate')) {
-//            includeDuplicateIfSinglePersonFound = true
-//        }
-
         def query = """from PersonAdvancedSearchView data where exists ( from  ${filterData.dynamicdomain} as af where af.pidm = data.pidm)"""
         if (filterData.params.containsKey('city') || filterData.params.containsKey('state') || filterData.params.containsKey('zip')) {
             def addressfilterData = [params:[:], criteria:[]]
