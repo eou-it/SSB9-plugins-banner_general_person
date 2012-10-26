@@ -342,4 +342,15 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
         assertTrue persons.size() == 0
     }
 
+   void testFetchNoOfRowsInPageForGUQSRCH() {
+         def sql
+        try {
+            sql = new Sql(sessionFactory.getCurrentSession().connection())
+            sql.executeUpdate("update gtvsdax  set GTVSDAX_EXTERNAL_CODE = ? where GTVSDAX_INTERNAL_CODE = ? and GTVSDAX_INTERNAL_CODE_GROUP=? ", [30,'SEARCH_MAX','GUISRCH'])
+        } finally {
+            sql?.close() // note that the test will close the connection, since it's our current session's connection
+        }
+       assertEquals "30", personSearchService.fetchNoOfRowsInPageForGUQSRCH()
+   }
+
 }
