@@ -107,7 +107,6 @@ class PersonSearchService {
 
     def personIdSearch(searchFilter, filterData, pagingAndSortParams) {
         def searchResult
-
         def ssnSearchEnabledIndicator = institutionalDescriptionService.findByKey().ssnSearchEnabledIndicator
         def ssn
         def pii
@@ -165,6 +164,31 @@ class PersonSearchService {
         return null
     }
 
+
+    def isFormFGACExcluded() {
+        boolean excluded = false
+        Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
+        def exclusionFlag = sql.firstRow(""" SELECT SYS_CONTEXT ('g\$_vbsi_context','ctx_fg_exclude_object') exclude_object FROM DUAL """).exclude_object
+        if(exclusionFlag == 'Y') {
+            excluded = true
+        }
+        return excluded
+    }
+
+
+    def isPIIRestrictionApplicable() {
+        boolean restrictionApplicable = false
+        Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
+        def pii
+        sql.call("{$Sql.VARCHAR = call gokfgac.f_spriden_pii_active}") { result -> pii = result }
+        def isUserExempt
+        sql.call("{$Sql.VARCHAR = call gokfgac.f_is_user_exempt}") { result -> isUserExempt = result }
+
+        if(pii == 'Y' && isUserExempt == 'N') {
+            restrictionApplicable = true
+        }
+        return restrictionApplicable
+    }
 
 
     def private searchComponent(ssn, filterData, pagingAndSortParams) {
