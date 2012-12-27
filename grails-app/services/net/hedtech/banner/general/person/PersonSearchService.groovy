@@ -26,6 +26,7 @@ import org.springframework.context.ApplicationContext
 import net.hedtech.banner.general.person.view.PersonAdvancedIdFilterView
 import net.hedtech.banner.general.person.view.PersonAdvancedSearchView
 import net.hedtech.banner.general.system.SdaCrosswalkConversion
+import net.hedtech.banner.security.FormContext
 
 class PersonSearchService {
 
@@ -142,7 +143,7 @@ class PersonSearchService {
         return searchResult
     }
 
-    def isSSNSearchEnabled() {
+    public String isSSNSearchEnabled() {
         boolean enabled = true
         def userName = SecurityContextHolder.context?.authentication?.principal?.username?.toUpperCase()
         Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
@@ -154,18 +155,40 @@ class PersonSearchService {
         return enabled
     }
 
-
-    def fetchNoOfRowsInPageForGUQSRCH() {
-        def lst = SdaCrosswalkConversion.findAllWhere(internalGroup: 'GUISRCH', internal:'SEARCH_MAX')
-        if (!lst.empty)  {
-             SdaCrosswalkConversion gtvsdax = lst.get(0)
-             return gtvsdax.external
+    public Boolean checkIfAutoCompleteIsEnabledForIDField() {
+        Boolean autoCompleteEnabled = false
+        String str = retrieveSdaCrosswalkConversionBannerCode('ID_AUTO', 'IDNAMESEARCH')
+        if (str && str.equals("YES")) {
+            autoCompleteEnabled = true
         }
-        return null
+        return autoCompleteEnabled
+    }
+
+    public Boolean checkIfAutoCompleteIsEnabledForNameField() {
+        Boolean autoCompleteEnabled = false
+        String str =  retrieveSdaCrosswalkConversionBannerCode( 'NAME_AUTO', 'IDNAMESEARCH' )
+        if (str && str.equals("YES")) {
+            autoCompleteEnabled = true
+        }
+        return autoCompleteEnabled
     }
 
 
-    def isFormFGACExcluded() {
+    public String fetchNoOfRowsInPageForGUQSRCH() {
+        return retrieveSdaCrosswalkConversionBannerCode( 'SEARCH_MAX','GUISRCH' )
+    }
+
+
+    public boolean isFormFGACExcluded() {
+        //FGAC related information is been stored in db session parameters.
+        //Everytime we open a page a new connection is esatablished and there are possibilities the db session param's are purged.
+        //So as of now to work around this issue we set FGAC context manually though it is handled in BannerDS.
+        //Then we access the session param and get the appropriate result.
+        String form = (FormContext.get() ? FormContext.get()[0] : null) // FormContext returns a list, but we'll just use the first entry
+        if (form) {
+            Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
+            sql.call("{call gokfgac.p_object_excluded (?) }", [form])
+        }
         boolean excluded = false
         Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
         def exclusionFlag = sql.firstRow(""" SELECT SYS_CONTEXT ('g\$_vbsi_context','ctx_fg_exclude_object') exclude_object FROM DUAL """).exclude_object
@@ -176,7 +199,7 @@ class PersonSearchService {
     }
 
 
-    def isPIIRestrictionApplicable() {
+    public boolean isPIIRestrictionApplicable() {
         boolean restrictionApplicable = false
         Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
         def pii
@@ -191,9 +214,9 @@ class PersonSearchService {
     }
 
 
-    def private searchComponent(ssn, filterData, pagingAndSortParams) {
+    private List searchComponent(ssn, filterData, pagingAndSortParams) {
         def currentList
-        def list
+        List list
 
         if (ssn == "YES") {
             //search by id first
@@ -294,7 +317,7 @@ class PersonSearchService {
     }
 
 
-    private def getNameFormat() {
+    private String getNameFormat() {
         if (!_nameFormat) {
             def application = AH.application
             ApplicationContext applicationContext = application.mainContext
@@ -303,5 +326,14 @@ class PersonSearchService {
         } else {
             _nameFormat
         }
+    }
+
+    private String retrieveSdaCrosswalkConversionBannerCode(String internal,  String internalGroup) {
+        List lst = SdaCrosswalkConversion.fetchAllByInternalAndInternalGroup( internal,internalGroup )
+        if (!lst.empty) {
+            SdaCrosswalkConversion gtvsdax = lst.get(0)
+            return gtvsdax.external
+        }
+        return null
     }
 }
