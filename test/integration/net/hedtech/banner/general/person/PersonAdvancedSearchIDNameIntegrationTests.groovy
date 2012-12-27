@@ -353,27 +353,27 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
        assertEquals "30", personSearchService.fetchNoOfRowsInPageForGUQSRCH()
    }
 
-    void testCheckIfAutoCompleteIsEnabledForIDField() {//('ID_AUTO', 'IDNAMESEARCH')
-           def sql
-          try {
-              sql = new Sql(sessionFactory.getCurrentSession().connection())
-              sql.executeUpdate("update gtvsdax  set GTVSDAX_EXTERNAL_CODE = ? where GTVSDAX_INTERNAL_CODE = ? and GTVSDAX_INTERNAL_CODE_GROUP=? ", ['YES','ID_AUTO','IDNAMESEARCH'])
-          } finally {
-              sql?.close() // note that the test will close the connection, since it's our current session's connection
-          }
-         assertTrue personSearchService.checkIfAutoCompleteIsEnabledForIDField()
-     }
-
-
-    void testCheckIfAutoCompleteIsEnabledForNameField() {//( 'NAME_AUTO', 'IDNAMESEARCH' )
-           def sql
-          try {
-              sql = new Sql(sessionFactory.getCurrentSession().connection())
-              sql.executeUpdate("update gtvsdax  set GTVSDAX_EXTERNAL_CODE = ? where GTVSDAX_INTERNAL_CODE = ? and GTVSDAX_INTERNAL_CODE_GROUP=? ", ['YES','NAME_AUTO','IDNAMESEARCH'])
-          } finally {
-              sql?.close() // note that the test will close the connection, since it's our current session's connection
-          }
-        assertTrue personSearchService.checkIfAutoCompleteIsEnabledForNameField()
-     }
+//    void testCheckIfAutoCompleteIsEnabledForIDField() {//('ID_AUTO', 'IDNAMESEARCH')
+//           def sql
+//          try {
+//              sql = new Sql(sessionFactory.getCurrentSession().connection())
+//              sql.executeUpdate("update gtvsdax  set GTVSDAX_EXTERNAL_CODE = ? where GTVSDAX_INTERNAL_CODE = ? and GTVSDAX_INTERNAL_CODE_GROUP=? ", ['YES','ID_AUTO','IDNAMESEARCH'])
+//          } finally {
+//              sql?.close() // note that the test will close the connection, since it's our current session's connection
+//          }
+//         assertTrue personSearchService.checkIfAutoCompleteIsEnabledForIDField()
+//     }
+//
+//
+//    void testCheckIfAutoCompleteIsEnabledForNameField() {//( 'NAME_AUTO', 'IDNAMESEARCH' )
+//           def sql
+//          try {
+//              sql = new Sql(sessionFactory.getCurrentSession().connection())
+//              sql.executeUpdate("update gtvsdax  set GTVSDAX_EXTERNAL_CODE = ? where GTVSDAX_INTERNAL_CODE = ? and GTVSDAX_INTERNAL_CODE_GROUP=? ", ['YES','NAME_AUTO','IDNAMESEARCH'])
+//          } finally {
+//              sql?.close() // note that the test will close the connection, since it's our current session's connection
+//          }
+//        assertTrue personSearchService.checkIfAutoCompleteIsEnabledForNameField()
+//     }
 
 }
