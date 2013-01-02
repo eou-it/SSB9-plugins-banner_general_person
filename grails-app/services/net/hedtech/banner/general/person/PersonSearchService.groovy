@@ -37,7 +37,11 @@ class PersonSearchService {
     def institutionalDescriptionService
 
     private _nameFormat
-
+    public static final String AUTO_COMPLETE_GROUP_NAME = 'IDNAMESEARCH'
+    public static final String AUTO_COMPLETE_ID_CODE='ID_AUTO'
+    public static final String AUTO_COMPLETE_NAME_CODE='NAME_AUTO'
+    public static final String SEARCH_GUISRCH_CODE='SEARCH_MAX'
+    public static final String SEARCH_GUISRCH_GROUP_NAME='GUISRCH'
 
     def nameComparator = [
                     compare: { first, second ->
@@ -157,7 +161,7 @@ class PersonSearchService {
 
     public Boolean checkIfAutoCompleteIsEnabledForIDField() {
         Boolean autoCompleteEnabled = false
-        String str = retrieveSdaCrosswalkConversionBannerCode('ID_AUTO', 'IDNAMESEARCH')
+        String str = retrieveSdaCrosswalkConversionBannerCode(this.AUTO_COMPLETE_ID_CODE, this.AUTO_COMPLETE_GROUP_NAME)
         if (str && str.equals("YES")) {
             autoCompleteEnabled = true
         }
@@ -166,7 +170,7 @@ class PersonSearchService {
 
     public Boolean checkIfAutoCompleteIsEnabledForNameField() {
         Boolean autoCompleteEnabled = false
-        String str =  retrieveSdaCrosswalkConversionBannerCode( 'NAME_AUTO', 'IDNAMESEARCH' )
+        String str =  retrieveSdaCrosswalkConversionBannerCode( this.AUTO_COMPLETE_NAME_CODE, this.AUTO_COMPLETE_GROUP_NAME )
         if (str && str.equals("YES")) {
             autoCompleteEnabled = true
         }
@@ -175,7 +179,7 @@ class PersonSearchService {
 
 
     public String fetchNoOfRowsInPageForGUQSRCH() {
-        return retrieveSdaCrosswalkConversionBannerCode( 'SEARCH_MAX','GUISRCH' )
+        return retrieveSdaCrosswalkConversionBannerCode( this.SEARCH_GUISRCH_CODE,this.SEARCH_GUISRCH_GROUP_NAME )
     }
 
 
