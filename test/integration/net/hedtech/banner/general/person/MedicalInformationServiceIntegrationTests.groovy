@@ -26,7 +26,7 @@ class MedicalInformationServiceIntegrationTests extends BaseIntegrationTestCase 
 
 
     protected void setUp() {
-        formContext = ['GOAMEDI']// Since we are not testing a controller, we need to explicitly set this
+        formContext = ['SOAIDEN']// Since we are not testing a controller, we need to explicitly set this  (removing GOAMEDI because of GUOBOBS_UI_VERSION = B)
         super.setUp()
     }
 

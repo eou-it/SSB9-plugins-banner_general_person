@@ -24,7 +24,7 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
     //def personRelatedHoldService
 
     protected void setUp() {
-        formContext = ['SOAHOLD', 'SOQHOLD'] // Since we are not testing a controller, we need to explicitly set this
+        formContext = ['SOAIDEN'] // Since we are not testing a controller, we need to explicitly set this  (removing SOAHOLD because of GUOBOBS_UI_VERSION = B)
         super.setUp()
     }
 

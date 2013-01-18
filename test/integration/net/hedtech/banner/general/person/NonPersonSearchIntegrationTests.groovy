@@ -19,7 +19,7 @@ import net.hedtech.banner.general.person.view.NonPersonPersonView
 class NonPersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
     protected void setUp() {
-        formContext = ['GEAPART'] // Since we are not testing a controller, we need to explicitly set this
+        formContext = ['SOAIDEN'] // Since we are not testing a controller, we need to explicitly set this (removing GEAPART because of GUOBOBS_UI_VERSION = B)
         super.setUp()
     }
 

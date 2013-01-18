@@ -25,7 +25,7 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
 
 
     protected void setUp() {
-        formContext = ['SOAHOLD']
+        formContext = ['SOAIDEN'] // (removing SOAHOLD because of GUOBOBS_UI_VERSION = B)
         super.setUp()
     }
 

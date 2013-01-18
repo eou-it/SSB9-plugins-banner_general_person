@@ -67,7 +67,7 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
 	/*PROTECTED REGION END*/
 	
 	protected void setUp() {
-		formContext = ['GEAPART'] // Since we are not testing a controller, we need to explicitly set this
+		formContext = ['SOAIDEN'] // Since we are not testing a controller, we need to explicitly set this (removing GEAPART because of GUOBOBS_UI_VERSION = B)
 		super.setUp()
 		initializeTestDataForReferences()
 	}

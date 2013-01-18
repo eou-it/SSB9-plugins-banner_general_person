@@ -15,7 +15,7 @@ class PersonSearchControllerIntegrationTests extends BaseIntegrationTestCase {
     def personSearchService
 
     protected void setUp() {
-        formContext = ['GEAPART']
+        formContext = ['SOAIDEN'] //(removing GEAPART because of GUOBOBS_UI_VERSION = B)
         controller = new PersonSearchController()
         super.setUp()
     }
