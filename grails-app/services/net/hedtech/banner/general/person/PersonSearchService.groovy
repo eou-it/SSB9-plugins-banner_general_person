@@ -147,7 +147,7 @@ class PersonSearchService {
         return searchResult
     }
 
-    public String isSSNSearchEnabled() {
+    public boolean isSSNSearchEnabled() {
         boolean enabled = true
         def userName = SecurityContextHolder.context?.authentication?.principal?.username?.toUpperCase()
         Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
