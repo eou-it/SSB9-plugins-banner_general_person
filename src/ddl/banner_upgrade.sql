@@ -32,8 +32,10 @@ REM
 connect baninst1/&&baninst1_password
 start studbpr_bgp
 commit;
-spool off;
 REM
-conn sys/u_pick_it as sysdba;
+REM Recompile invalid objects
+REM
+conn sys/u_pick_it as sysdba
 execute utl_recomp.recomp_parallel();
-select * from all_objects where status = 'INVALID';
+start showinv
+spool off;
