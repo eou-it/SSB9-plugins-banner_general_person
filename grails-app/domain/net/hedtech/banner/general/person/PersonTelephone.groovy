@@ -40,8 +40,7 @@ import net.hedtech.banner.general.system.AddressType
 /**
  * Telephone Table
  */
-/*PROTECTED REGION ID(persontelephone_namedqueries) ENABLED START*/
-//TODO: NamedQueries that needs to be ported:
+
 @NamedQueries(value = [
         @NamedQuery(name = "PersonTelephone.fetchByPidmSequenceNoAndAddressType",
                     query="""FROM PersonTelephone a
@@ -50,7 +49,18 @@ import net.hedtech.banner.general.system.AddressType
                              AND  addressType  = :addressType
                              AND  primaryIndicator IS NOT NULL
                     """),
-                    @NamedQuery(name = "PersonTelephone.fetchByPidmTelephoneTypeAndAddressType",
+        @NamedQuery(name = "PersonTelephone.fetchByPidmSequenceNoAndAddressTypeWithoutPrimaryCheck",
+                    query="""FROM PersonTelephone a
+                             WHERE  pidm = :pidm
+                             AND  addressSequenceNumber = :addressSequenceNumber
+                             AND  addressType  = :addressType
+                    """),
+        @NamedQuery(name = "PersonTelephone.fetchMaxSequenceNumber",
+                    query="""select max(a.sequenceNumber)
+                             FROM  PersonTelephone a
+	  	                     WHERE a.pidm = :pidm
+                    """),
+        @NamedQuery(name = "PersonTelephone.fetchByPidmTelephoneTypeAndAddressType",
                     query="""FROM PersonTelephone a
                              WHERE  pidm = :pidm
                              AND addressType IS NOT NULL
@@ -289,32 +299,11 @@ class PersonTelephone implements Serializable {
 		dataOrigin(nullable:true, maxSize:30)
 		telephoneType(nullable:false)
 		addressType(nullable:true)
-		/**
-	     * Please put all the custom constraints in this protected section to protect the code
-	     * from being overwritten on re-generation
-	     */
-	    /*PROTECTED REGION ID(persontelephone_custom_constraints) ENABLED START*/
-
-	    /*PROTECTED REGION END*/
     }
 
-    /*PROTECTED REGION ID(persontelephone_readonly_properties) ENABLED START*/
-    //Read Only fields that should be protected against update
+
     public static readonlyProperties = [ 'pidm', 'sequenceNumber', 'telephoneType' ]
-    /*PROTECTED REGION END*/
-    /**
-     * Please put all the custom/transient attributes with @Transient annotations in this protected section to protect the code
-     * from being overwritten on re-generation
-     */
-    /*PROTECTED REGION ID(persontelephone_custom_attributes) ENABLED START*/
 
-    /*PROTECTED REGION END*/
-
-    /**
-     * Please put all the custom methods/code in this protected section to protect the code
-     * from being overwritten on re-generation
-     */
-    /*PROTECTED REGION ID(persontelephone_custom_methods) ENABLED START*/
 
     public static PersonTelephone fetchByPidmSequenceNoAndAddressType(Integer pidm, Integer addressSequenceNumber, AddressType addressType) {
         PersonTelephone.withSession { session ->
@@ -325,6 +314,27 @@ class PersonTelephone implements Serializable {
             return personTelephone
         }
     }
+
+
+    static def fetchByPidmSequenceNoAndAddressTypeWithoutPrimaryCheck(Integer pidm, Integer addressSequenceNumber, AddressType addressType) {
+        PersonTelephone.withSession { session ->
+            def personTelephone = session.getNamedQuery('PersonTelephone.fetchByPidmSequenceNoAndAddressTypeWithoutPrimaryCheck')
+                    .setInteger('pidm', pidm)
+                    .setInteger('addressSequenceNumber', addressSequenceNumber)
+                    .setString('addressType', addressType.code).list()
+            return personTelephone
+        }
+    }
+
+
+    static def Integer fetchMaxSequenceNumber(Integer pidm) {
+       PersonTelephone.withSession { session ->
+            def maxSequenceNumber = session.getNamedQuery('PersonTelephone.fetchMaxSequenceNumber')
+                    .setInteger('pidm', pidm).list()[0]
+            return maxSequenceNumber
+       }
+    }
+
 
     static def fetchByPidmTelephoneTypeAndAddressType(map) {
         if (map && map.pidm) {

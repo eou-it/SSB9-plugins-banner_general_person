@@ -16,14 +16,13 @@
  */
 package net.hedtech.banner.general.person
 
-import net.hedtech.banner.testing.BaseIntegrationTestCase
-import net.hedtech.banner.exceptions.ApplicationException
 import groovy.sql.Sql
-import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
-import net.hedtech.banner.general.system.TelephoneType
+import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.system.AddressType
+import net.hedtech.banner.general.system.TelephoneType
+import net.hedtech.banner.testing.BaseIntegrationTestCase
 import org.junit.Ignore
-
+import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
 
 class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
 
@@ -315,6 +314,24 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
 		assertErrorsFor personTelephone, 'maxSize', [ 'phoneArea', 'phoneNumber', 'phoneExtension', 'statusIndicator', 'primaryIndicator', 'unlistIndicator', 'commentData', 'internationalAccess', 'countryPhone' ]
     }
 
+
+    void testFetchByPidmAndAddressSequenceAndType() {
+        def pidm = PersonUtility.getPerson("HOS00001").pidm
+        def addressType = AddressType.findByCode("MA")
+        def maxSeqNo = PersonTelephone.fetchMaxSequenceNumber(pidm)
+        def personTelephone = newValidForCreatePersonTelephone()
+        personTelephone.pidm = pidm
+        personTelephone.sequenceNumber = maxSeqNo +1
+        personTelephone.telephoneType = TelephoneType.findByCode("MA")
+        personTelephone.addressType = addressType
+        personTelephone.addressSequenceNumber = 1
+        personTelephone.primaryIndicator = null
+        personTelephone.save()
+        def phones1 = PersonTelephone.fetchByPidmSequenceNoAndAddressTypeWithoutPrimaryCheck(pidm,1,addressType)
+        def phone2 = PersonTelephone.fetchByPidmSequenceNoAndAddressType(pidm,1,addressType)
+        assertNotNull "The phone for student with primary checked is not as expected ", phone2
+        assertTrue "The number of phones for student of address type and address sequence number irrespective of primary checked is not correct ", phones1.size() == 2
+    }
 
 
 	private def newValidForCreatePersonTelephone() {
