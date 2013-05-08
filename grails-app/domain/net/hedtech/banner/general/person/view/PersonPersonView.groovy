@@ -123,6 +123,9 @@ class PersonPersonView extends PersonView {
     @Column(name = "NAME_TYPE", length = 4)
     String nameType
 
+    @Column(name = "GENDER", length = 1)
+    String gender
+
 
     public String toString() {
         """PersonPersonView[
@@ -133,6 +136,7 @@ class PersonPersonView extends PersonView {
 					firstName=$firstName,
 					middleName=$middleName,
 					birthDate=$birthDate,
+					gender=$gender,
 					nameType=$nameType,
 					changeIndicator=$changeIndicator,
 					entityIndicator=$entityIndicator]"""
