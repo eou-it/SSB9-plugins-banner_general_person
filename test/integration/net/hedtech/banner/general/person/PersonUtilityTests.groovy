@@ -8,12 +8,16 @@
  trademark of SunGard Data Systems in the U.S.A. and/or other regions and/or countries.
  Banner and Luminis are either registered trademarks or trademarks of SunGard Higher
  Education in the U.S.A. and/or other regions and/or countries.
- **********************************************************************************/
+ ********************************************************************************* */
 
 package net.hedtech.banner.general.person
 
+import net.hedtech.banner.person.dsl.NameTemplate
 import net.hedtech.banner.testing.BaseIntegrationTestCase
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.junit.Ignore
+import org.springframework.context.ApplicationContext
+import org.springframework.context.i18n.LocaleContextHolder
 
 class PersonUtilityTests extends BaseIntegrationTestCase {
 
@@ -64,6 +68,28 @@ class PersonUtilityTests extends BaseIntegrationTestCase {
     }
 
 
+    void testFormatName() {
+        //get the name format from General Person Plugin messages.properties
+        def application = ApplicationHolder.application
+        ApplicationContext applicationContext = application.mainContext
+        def messageSource = applicationContext.getBean("messageSource")
+        def nameFormat = messageSource.getMessage("default.name.format", null, LocaleContextHolder.getLocale())
+
+        def instructor = PersonUtility.getPerson("HOF00714")
+        def formattedName = PersonUtility.formatName([lastName: instructor.lastName, firstName: instructor.firstName, middleName: instructor.middleName, surnamePrefix: ""])
+        //get the name using the NameTemplate directly
+        def displayName = NameTemplate.format {
+            lastName instructor.lastName
+            firstName instructor.firstName
+            mi instructor.middleName
+            surnamePrefix instructor.surnamePrefix
+            formatTemplate nameFormat
+            text
+        }
+        assertEquals displayName, formattedName
+    }
+
+
     void testIsPersonDeceased() {
         def pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("JCSYS0001", null).pidm
         assertNotNull pidm
@@ -89,10 +115,10 @@ class PersonUtilityTests extends BaseIntegrationTestCase {
         assertTrue testPidm.confidential
         assertFalse testPidm.deceased
 
-         pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("EVT00024", null).pidm
+        pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("EVT00024", null).pidm
         assertNotNull pidm
         testPidm = PersonUtility.isPersonConfidentialOrDeceased(pidm)
-         assertFalse testPidm.confidential
+        assertFalse testPidm.confidential
         assertTrue testPidm.deceased
     }
 

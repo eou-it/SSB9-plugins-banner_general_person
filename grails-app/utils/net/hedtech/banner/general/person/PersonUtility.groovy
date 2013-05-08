@@ -13,7 +13,12 @@ package net.hedtech.banner.general.person
 
 import org.codehaus.groovy.grails.web.context.ServletContextHolder as SCH
 import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes as GA
+
 import groovy.sql.Sql
+import net.hedtech.banner.person.dsl.NameTemplate
+import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.springframework.context.ApplicationContext
+import org.springframework.context.i18n.LocaleContextHolder
 
 /**
  * This is a helper class that is used to help common validation and other processing for
@@ -51,7 +56,7 @@ class PersonUtility {
     public static Boolean isPersonDeceased(Integer pidm) {
 
         def bioSql =
-        """select nvl (spbpers_dead_ind,  'N') dead
+            """select nvl (spbpers_dead_ind,  'N') dead
         from spbpers where spbpers_pidm = ? """
         def ctx = SCH.servletContext.getAttribute(GA.APPLICATION_CONTEXT)
         def sessionFactory = ctx.sessionFactory
@@ -96,4 +101,24 @@ class PersonUtility {
         return conf?.email
     }
 
+    //Public method for formatting a person's name based on the LinkedHashMap passed in.
+    public static String formatName(person) {
+        def displayName = NameTemplate.format {
+            lastName person.lastName
+            firstName person.firstName
+            mi person.middleName
+            surnamePrefix person.surnamePrefix
+            formatTemplate getNameFormat()
+            text
+        }
+        return displayName
+    }
+
+    //This will retrieve the default.name.format from the messages.properties.
+    public static getNameFormat() {
+        def application = ApplicationHolder.application
+        ApplicationContext applicationContext = application.mainContext
+        def messageSource = applicationContext.getBean("messageSource")
+        messageSource.getMessage("default.name.format", null, LocaleContextHolder.getLocale())
+    }
 }
