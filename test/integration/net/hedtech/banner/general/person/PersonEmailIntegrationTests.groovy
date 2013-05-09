@@ -1,5 +1,4 @@
-
-/*********************************************************************************
+/** *******************************************************************************
  Copyright 2009-2011 SunGard Higher Education. All Rights Reserved.
  This copyrighted software contains confidential and proprietary information of 
  SunGard Higher Education and its subsidiaries. Any use of this software is limited 
@@ -9,92 +8,91 @@
  trademark of SunGard Data Systems in the U.S.A. and/or other regions and/or countries.
  Banner and Luminis are either registered trademarks or trademarks of SunGard Higher 
  Education in the U.S.A. and/or other regions and/or countries.
- **********************************************************************************/
+ ********************************************************************************* */
 /**
  Banner Automator Version: 1.24
  Generated: Thu Aug 04 14:06:16 EDT 2011 
  */
 package net.hedtech.banner.general.person
 
+import net.hedtech.banner.general.system.EmailType
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 
-import net.hedtech.banner.general.system.EmailType
-import java.sql.Timestamp
-
-
 class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
-	
-	/*PROTECTED REGION ID(personemail_domain_integration_test_data) ENABLED START*/
-	//Test data for creating new domain instance
-	//Valid test data (For success tests)
-	def i_success_emailType
 
-	def i_success_pidm = 1
-	def i_success_emailAddress = "TTTTT"
-	def i_success_statusIndicator = "I"
-	def i_success_preferredIndicator = true
-	def i_success_commentData = "TTTTT"
-	def i_success_displayWebIndicator = true    
-	//Invalid test data (For failure tests)
-	def i_failure_emailType
+    /*PROTECTED REGION ID(personemail_domain_integration_test_data) ENABLED START*/
+    //Test data for creating new domain instance
+    //Valid test data (For success tests)
+    def i_success_emailType
 
-	def i_failure_pidm = 1
-	def i_failure_emailAddress = "TTTTT"
-	def i_failure_statusIndicator = "I"
-	def i_failure_preferredIndicator = true
-	def i_failure_commentData = "TTTTT"
-	def i_failure_displayWebIndicator = true
-	
-	//Test data for creating updating domain instance
-	//Valid test data (For success tests)
-	def u_success_emailType
+    def i_success_pidm = 1
+    def i_success_emailAddress = "TTTTT"
+    def i_success_statusIndicator = "I"
+    def i_success_preferredIndicator = true
+    def i_success_commentData = "TTTTT"
+    def i_success_displayWebIndicator = true
+    //Invalid test data (For failure tests)
+    def i_failure_emailType
 
-	def u_success_pidm = 1
-	def u_success_emailAddress = "TTTTT"
-	def u_success_statusIndicator = "I"
-	def u_success_preferredIndicator = true
-	def u_success_commentData = "TTTTT"
-	def u_success_displayWebIndicator = true	
-	//Valid test data (For failure tests)
-	def u_failure_emailType
+    def i_failure_pidm = 1
+    def i_failure_emailAddress = "TTTTT"
+    def i_failure_statusIndicator = "I"
+    def i_failure_preferredIndicator = true
+    def i_failure_commentData = "TTTTT"
+    def i_failure_displayWebIndicator = true
 
-	def u_failure_pidm = 1
-	def u_failure_emailAddress = "TTTTT"
-	def u_failure_statusIndicator = "I"
-	def u_failure_preferredIndicator = true
-	def u_failure_commentData = "TTTTT"
-	def u_failure_displayWebIndicator = true	
-	/*PROTECTED REGION END*/
-	
-	protected void setUp() {
-		formContext = ['SOAIDEN'] // Since we are not testing a controller, we need to explicitly set this (removing GEAPART because of GUOBOBS_UI_VERSION = B)
-		super.setUp()
-		initializeTestDataForReferences()
-	}
+    //Test data for creating updating domain instance
+    //Valid test data (For success tests)
+    def u_success_emailType
 
-	//This method is used to initialize test data for references. 
-	//A method is required to execute database calls as it requires a active transaction
-	void initializeTestDataForReferences() {
-		/*PROTECTED REGION ID(personemail_domain_integration_test_data_initialization) ENABLED START*/
-		//Valid test data (For success tests)	
-    	i_success_emailType = EmailType.findWhere(code: "CAMP")
+    def u_success_pidm = 1
+    def u_success_emailAddress = "TTTTT"
+    def u_success_statusIndicator = "I"
+    def u_success_preferredIndicator = true
+    def u_success_commentData = "TTTTT"
+    def u_success_displayWebIndicator = true
+    //Valid test data (For failure tests)
+    def u_failure_emailType
 
-		//Invalid test data (For failure tests)
-	    i_failure_emailType = EmailType.findWhere() //TODO: fill in the query condition 
+    def u_failure_pidm = 1
+    def u_failure_emailAddress = "TTTTT"
+    def u_failure_statusIndicator = "I"
+    def u_failure_preferredIndicator = true
+    def u_failure_commentData = "TTTTT"
+    def u_failure_displayWebIndicator = true
+    /*PROTECTED REGION END*/
 
-		//Valid test data (For success tests)
-	    u_success_emailType = EmailType.findWhere() //TODO: fill in the query condition 
 
-		//Valid test data (For failure tests)
-    	u_failure_emailType = EmailType.findWhere() //TODO: fill in the query condition 
-		
-		//Test data for references for custom tests
-		/*PROTECTED REGION END*/
-	}
-	
-	protected void tearDown() {
-		super.tearDown()
-	}
+    protected void setUp() {
+        formContext = ['SOAIDEN'] // Since we are not testing a controller, we need to explicitly set this (removing GEAPART because of GUOBOBS_UI_VERSION = B)
+        super.setUp()
+        initializeTestDataForReferences()
+    }
+
+    //This method is used to initialize test data for references.
+    //A method is required to execute database calls as it requires a active transaction
+    void initializeTestDataForReferences() {
+        /*PROTECTED REGION ID(personemail_domain_integration_test_data_initialization) ENABLED START*/
+        //Valid test data (For success tests)
+        i_success_emailType = EmailType.findWhere(code: "CAMP")
+
+        //Invalid test data (For failure tests)
+        i_failure_emailType = EmailType.findWhere() //TODO: fill in the query condition
+
+        //Valid test data (For success tests)
+        u_success_emailType = EmailType.findWhere() //TODO: fill in the query condition
+
+        //Valid test data (For failure tests)
+        u_failure_emailType = EmailType.findWhere() //TODO: fill in the query condition
+
+        //Test data for references for custom tests
+        /*PROTECTED REGION END*/
+    }
+
+
+    protected void tearDown() {
+        super.tearDown()
+    }
 
     /*
 	void testCreateValidPersonEMail() {
@@ -204,78 +202,101 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
 
     */
 //	void testValidationMessages() {
-//	    def personEMail = newInvalidForCreatePersonEMail()
-//	    personEMail.pidm = null
-//	    assertFalse personEMail.validate()
-//	    assertLocalizedError personEMail, 'nullable', /.*Field.*pidm.*of class.*PersonEmail.*cannot be null.*/, 'pidm'
-//	    personEMail.emailAddress = null
-//	    assertFalse personEMail.validate()
-//	    assertLocalizedError personEMail, 'nullable', /.*Field.*emailAddress.*of class.*PersonEmail.*cannot be null.*/, 'emailAddress'
-//	    personEMail.statusIndicator = null
-//	    assertFalse personEMail.validate()
-//	    assertLocalizedError personEMail, 'nullable', /.*Field.*statusIndicator.*of class.*PersonEmail.*cannot be null.*/, 'statusIndicator'
-//	    personEMail.preferredIndicator = null
-//	    assertFalse personEMail.validate()
-//	    assertLocalizedError personEMail, 'nullable', /.*Field.*preferredIndicator.*of class.*PersonEmail.*cannot be null.*/, 'preferredIndicator'
-//	    personEMail.displayWebIndicator = null
-//	    assertFalse personEMail.validate()
-//	    assertLocalizedError personEMail, 'nullable', /.*Field.*displayWebIndicator.*of class.*PersonEmail.*cannot be null.*/, 'displayWebIndicator'
-//	    personEMail.emailType = null
-//	    assertFalse personEMail.validate()
-//	    assertLocalizedError personEMail, 'nullable', /.*Field.*emailType.*of class.*PersonEmail.*cannot be null.*/, 'emailType'
-//	}
-  
-    
-	private def newValidForCreatePersonEMail() {
-		def personEMail = new PersonEmail(
-			pidm: i_success_pidm, 
-			emailAddress: i_success_emailAddress, 
-			statusIndicator: i_success_statusIndicator, 
-			preferredIndicator: i_success_preferredIndicator, 
-			commentData: i_success_commentData, 
-			displayWebIndicator: i_success_displayWebIndicator, 
-			emailType: i_success_emailType
-		)
-		return personEMail
-	}
-
-	private def newInvalidForCreatePersonEMail() {
-		def personEMail = new PersonEmail(
-			pidm: i_failure_pidm, 
-			emailAddress: i_failure_emailAddress, 
-			statusIndicator: i_failure_statusIndicator, 
-			preferredIndicator: i_failure_preferredIndicator, 
-			commentData: i_failure_commentData, 
-			displayWebIndicator: i_failure_displayWebIndicator, 
-			emailType: i_failure_emailType, 
-		)
-		return personEMail
-	}
-
-   /**
-     * Please put all the custom tests in this protected section to protect the code
-     * from being overwritten on re-generation
-     */
-    /*PROTECTED REGION ID(personemail_custom_integration_test_methods) ENABLED START*/
-
-   def testFetchByPidmAndStatusAndWebDisplayAndPreferredIndicator() {
-       def results = PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator(PersonUtility.getPerson("966049236").pidm, 'A', 'Y', 'Y')
-
-       assertTrue results.size() == 1
-
-       def res = results.get(0)
+    //	    def personEMail = newInvalidForCreatePersonEMail()
+    //	    personEMail.pidm = null
+    //	    assertFalse personEMail.validate()
+    //	    assertLocalizedError personEMail, 'nullable', /.*Field.*pidm.*of class.*PersonEmail.*cannot be null.*/, 'pidm'
+    //	    personEMail.emailAddress = null
+    //	    assertFalse personEMail.validate()
+    //	    assertLocalizedError personEMail, 'nullable', /.*Field.*emailAddress.*of class.*PersonEmail.*cannot be null.*/, 'emailAddress'
+    //	    personEMail.statusIndicator = null
+    //	    assertFalse personEMail.validate()
+    //	    assertLocalizedError personEMail, 'nullable', /.*Field.*statusIndicator.*of class.*PersonEmail.*cannot be null.*/, 'statusIndicator'
+    //	    personEMail.preferredIndicator = null
+    //	    assertFalse personEMail.validate()
+    //	    assertLocalizedError personEMail, 'nullable', /.*Field.*preferredIndicator.*of class.*PersonEmail.*cannot be null.*/, 'preferredIndicator'
+    //	    personEMail.displayWebIndicator = null
+    //	    assertFalse personEMail.validate()
+    //	    assertLocalizedError personEMail, 'nullable', /.*Field.*displayWebIndicator.*of class.*PersonEmail.*cannot be null.*/, 'displayWebIndicator'
+    //	    personEMail.emailType = null
+    //	    assertFalse personEMail.validate()
+    //	    assertLocalizedError personEMail, 'nullable', /.*Field.*emailType.*of class.*PersonEmail.*cannot be null.*/, 'emailType'
+    //	}
 
 
-       assertEquals res.version, 0
-       assertEquals res.pidm, 33784
-       assertEquals res.emailAddress, "einstein2be@verizon.net"
-       assertEquals res.statusIndicator, "A"
-       assertEquals res.preferredIndicator, true
-       assertEquals res.commentData, null
-       assertEquals res.displayWebIndicator, true
-       assertEquals res.dataOrigin, "Banner"
+    private def newValidForCreatePersonEMail() {
+        def personEMail = new PersonEmail(
+                pidm: i_success_pidm,
+                emailAddress: i_success_emailAddress,
+                statusIndicator: i_success_statusIndicator,
+                preferredIndicator: i_success_preferredIndicator,
+                commentData: i_success_commentData,
+                displayWebIndicator: i_success_displayWebIndicator,
+                emailType: i_success_emailType
+        )
+        return personEMail
+    }
 
-   }
 
-    /*PROTECTED REGION END*/
+    private def newInvalidForCreatePersonEMail() {
+        def personEMail = new PersonEmail(
+                pidm: i_failure_pidm,
+                emailAddress: i_failure_emailAddress,
+                statusIndicator: i_failure_statusIndicator,
+                preferredIndicator: i_failure_preferredIndicator,
+                commentData: i_failure_commentData,
+                displayWebIndicator: i_failure_displayWebIndicator,
+                emailType: i_failure_emailType,
+        )
+        return personEMail
+    }
+
+
+    def testFetchByPidmAndStatusAndWebDisplayAndPreferredIndicator() {
+        def results = PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator(PersonUtility.getPerson("966049236").pidm, 'A', 'Y', 'Y')
+
+        assertTrue results.size() == 1
+
+        def res = results.get(0)
+
+
+        assertEquals res.version, 0
+        assertEquals res.pidm, 33784
+        assertEquals res.emailAddress, "einstein2be@verizon.net"
+        assertEquals res.statusIndicator, "A"
+        assertEquals res.preferredIndicator, true
+        assertEquals res.commentData, null
+        assertEquals res.displayWebIndicator, true
+        assertEquals res.dataOrigin, "Banner"
+
+    }
+
+
+    def testFetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicator() {
+        def results = PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator(PersonUtility.getPerson("966049236").pidm, 'A', 'Y', 'Y')
+
+        assertTrue results.size() == 1
+
+        def res = results.get(0)
+
+        def email = PersonEmail.fetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicator(PersonUtility.getPerson("966049236").pidm, 'A', 'Y', 'Y')
+
+        assertEquals res.emailAddress, email
+
+    }
+
+
+    def testFetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicatorWhenNoneExists() {
+        def pidm = PersonUtility.getPerson("HOSL0003").pidm
+        assertNotNull pidm
+        def results = PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator(PersonUtility.getPerson("HOSL0003").pidm, 'A', 'Y', 'Y')
+
+        assertTrue results.size() == 0
+
+        def email = PersonEmail.fetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicator(PersonUtility.getPerson("HOSL0003").pidm, 'A', 'Y', 'Y')
+
+        assertNull email
+
+    }
+
 }
