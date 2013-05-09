@@ -38,6 +38,14 @@ query = """ FROM PersonAddress a
                             NVL(SPRADDR_FROM_DATE,sysdate-1) AND
                             NVL(SPRADDR_TO_DATE,sysdate+1)
                 """),
+@NamedQuery(name = "PersonAddress.fetchActiveAddressesByPidm",
+query = """ FROM PersonAddress a
+                            WHERE  a.pidm = :pidm
+                            AND NVL(a.statusIndicator,'Y') <> 'I'
+                            AND  SYSDATE BETWEEN
+                            NVL(SPRADDR_FROM_DATE,sysdate-1) AND
+                            NVL(SPRADDR_TO_DATE,sysdate+1)
+                """),
 @NamedQuery(name = "PersonAddress.fetchAllByPidmAddressTypeAndStateOrderByStatusIndAddressTypeToDateFromDateAndSeqNo",
 query = """ FROM PersonAddress a
                             WHERE a.pidm = :pidm
@@ -470,28 +478,7 @@ class PersonAddress implements Serializable {
         county(nullable: true)
         nation(nullable: true)
         addressSource(nullable: true)
-        /**
-         * Please put all the custom constraints in this protected section to protect the code
-         * from being overwritten on re-generation
-         */
-        /*PROTECTED REGION ID(personaddress_custom_constraints) ENABLED START*/
-
-        /*PROTECTED REGION END*/
     }
-
-    /**
-     * Please put all the custom/transient attributes with @Transient annotations in this protected section to protect the code
-     * from being overwritten on re-generation
-     */
-    /*PROTECTED REGION ID(personaddress_custom_attributes) ENABLED START*/
-
-    /*PROTECTED REGION END*/
-
-    /**
-     * Please put all the custom methods/code in this protected section to protect the code
-     * from being overwritten on re-generation
-     */
-    /*PROTECTED REGION ID(personaddress_custom_methods) ENABLED START*/
 
 
     static def fetchActiveAddressByPidmAndAddressType(Integer pidm, AddressType addressType) {
@@ -499,6 +486,18 @@ class PersonAddress implements Serializable {
             PersonAddress.withSession { session ->
                 List personAddressList = session.getNamedQuery('PersonAddress.fetchActiveAddressByPidmAndAddressType').setInteger('pidm', pidm).setString('addressType', addressType.code).list()
                 return personAddressList[0]
+            }
+        } else {
+            return null
+        }
+    }
+
+
+    static def fetchActiveAddressesByPidm(map)  {
+         if (map.pidm) {
+            PersonAddress.withSession { session ->
+                List personAddressList = session.getNamedQuery('PersonAddress.fetchActiveAddressesByPidm').setInteger('pidm', map?.pidm).list()
+                return [list:personAddressList]
             }
         } else {
             return null
@@ -525,6 +524,19 @@ class PersonAddress implements Serializable {
         } else {
             return null
         }
+    }
+
+
+    public static Object fetchActiveAddressByPidmAndAddressType(String filter, Map params) {
+         if (params?.pidm && params?.addressType) {
+            PersonAddress.withSession { session ->
+                List personAddressList = session.getNamedQuery('PersonAddress.fetchActiveAddressByPidmAndAddressType').setInteger('pidm', pidm).setString('addressType', filter.toUpperCase()).list()
+                return personAddressList[0]
+            }
+        } else {
+            return null
+        }
+
     }
 
     /*PROTECTED REGION END*/

@@ -396,6 +396,16 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 	}
 
 
+     void testFetchByPidm() {
+        def personAddress = newValidForCreatePersonAddress()
+		save personAddress
+
+        def activeAddresses = PersonAddress.fetchActiveAddressesByPidm([pidm:i_success_pidm])
+        assertNotNull "The address for student is not as expected ", activeAddresses
+        assertTrue "The number of active addresses for person is not correct " + activeAddresses.list.size(), activeAddresses.list.size() == 2
+    }
+
+
     void testOptimisticLock() {
         def sql1 = new Sql(sessionFactory.getCurrentSession().connection())
         sql1.executeUpdate("update gubinst set gubinst_finance_installed = 'Y'")
