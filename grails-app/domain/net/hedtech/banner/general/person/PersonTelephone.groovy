@@ -54,6 +54,7 @@ import net.hedtech.banner.general.system.AddressType
                              WHERE  pidm = :pidm
                              AND  addressSequenceNumber = :addressSequenceNumber
                              AND  addressType  = :addressType
+                             AND NVL(statusIndicator,'A') <> 'I'
                     """),
         @NamedQuery(name = "PersonTelephone.fetchMaxSequenceNumber",
                     query="""select max(a.sequenceNumber)

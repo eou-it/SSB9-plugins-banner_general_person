@@ -326,6 +326,7 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
         personTelephone.addressType = addressType
         personTelephone.addressSequenceNumber = 1
         personTelephone.primaryIndicator = null
+        personTelephone.statusIndicator = null
         personTelephone.save()
         def phones1 = PersonTelephone.fetchByPidmSequenceNoAndAddressTypeWithoutPrimaryCheck(pidm,1,addressType)
         def phone2 = PersonTelephone.fetchByPidmSequenceNoAndAddressType(pidm,1,addressType)
