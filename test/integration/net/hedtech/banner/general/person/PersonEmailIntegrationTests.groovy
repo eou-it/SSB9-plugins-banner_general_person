@@ -286,6 +286,20 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+    def testFetchFirstByPidmAndStatus() {
+        def emails = PersonEmail.findAllByPidm(PersonUtility.getPerson("HOS00003").pidm)
+        assertEquals 2, emails.size()
+        emails.each {
+            assertTrue it.statusIndicator == "A"
+        }
+        assertNotNull emails.find { it.displayWebIndicator }
+        assertNotNull emails.find { !it.displayWebIndicator }
+        def results = PersonEmail.fetchByPidmAndStatus(PersonUtility.getPerson("HOS00003").pidm, 'A')
+
+        assertEquals 2, results.size()
+    }
+
+
     def testFetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicatorWhenNoneExists() {
         def pidm = PersonUtility.getPerson("HOSL0003").pidm
         assertNotNull pidm
