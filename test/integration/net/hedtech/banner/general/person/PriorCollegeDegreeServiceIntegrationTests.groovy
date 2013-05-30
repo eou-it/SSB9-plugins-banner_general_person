@@ -5,7 +5,6 @@ package net.hedtech.banner.general.person
 
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.system.*
-import net.hedtech.banner.student.system.EducationGoal
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 
 class PriorCollegeDegreeServiceIntegrationTests extends BaseIntegrationTestCase {
@@ -33,7 +32,6 @@ class PriorCollegeDegreeServiceIntegrationTests extends BaseIntegrationTestCase 
         assertNotNull "PriorCollegeDegree degree is null in PriorCollegeDegree Service Tests", priorCollegeDegree.degree
         assertNotNull "PriorCollegeDegree college is null in PriorCollegeDegree Service Tests", priorCollegeDegree.college
         assertNotNull "PriorCollegeDegree institutionalHonor is null in PriorCollegeDegree Service Tests", priorCollegeDegree.institutionalHonor
-        assertNotNull "PriorCollegeDegree educationGoal is null in PriorCollegeDegree Service Tests", priorCollegeDegree.educationGoal
         assertNotNull priorCollegeDegree.pidm
         assertNotNull priorCollegeDegree.degreeSequenceNumber
         assertNotNull priorCollegeDegree.hoursTransferred
@@ -41,6 +39,7 @@ class PriorCollegeDegreeServiceIntegrationTests extends BaseIntegrationTestCase 
         assertNotNull priorCollegeDegree.degreeYear
         assertNotNull priorCollegeDegree.termDegree
         assertNotNull priorCollegeDegree.primaryIndicator
+        assertNotNull priorCollegeDegree.educationGoal
         assertNotNull priorCollegeDegree.version
         assertNotNull priorCollegeDegree.dataOrigin
         assertNotNull priorCollegeDegree.lastModifiedBy
@@ -66,7 +65,6 @@ class PriorCollegeDegreeServiceIntegrationTests extends BaseIntegrationTestCase 
         assertNotNull "PriorCollegeDegree degree is null in PriorCollegeDegree Service Tests", priorCollegeDegree.degree
         assertNotNull "PriorCollegeDegree college is null in PriorCollegeDegree Service Tests", priorCollegeDegree.college
         assertNotNull "PriorCollegeDegree institutionalHonor is null in PriorCollegeDegree Service Tests", priorCollegeDegree.institutionalHonor
-        assertNotNull "PriorCollegeDegree educationGoal is null in PriorCollegeDegree Service Tests", priorCollegeDegree.educationGoal
         assertNotNull priorCollegeDegree.pidm
         assertNotNull priorCollegeDegree.degreeSequenceNumber
         assertNotNull priorCollegeDegree.hoursTransferred
@@ -74,6 +72,7 @@ class PriorCollegeDegreeServiceIntegrationTests extends BaseIntegrationTestCase 
         assertNotNull priorCollegeDegree.degreeYear
         assertNotNull priorCollegeDegree.termDegree
         assertNotNull priorCollegeDegree.primaryIndicator
+        assertNotNull priorCollegeDegree.educationGoal
         assertNotNull priorCollegeDegree.version
         assertNotNull priorCollegeDegree.dataOrigin
         assertNotNull priorCollegeDegree.lastModifiedBy
@@ -92,7 +91,7 @@ class PriorCollegeDegreeServiceIntegrationTests extends BaseIntegrationTestCase 
         priorCollegeDegree.degree = Degree.findByCode("MA")
         priorCollegeDegree.college = College.findByCode("BU")
         priorCollegeDegree.institutionalHonor = institutionalHonorNew
-        priorCollegeDegree.educationGoal = EducationGoal.findByCode("PH")
+        priorCollegeDegree.educationGoal = "PH"
         priorCollegeDegree.degreeSequenceNumber = 2
         priorCollegeDegree.hoursTransferred = 201.00
         priorCollegeDegree.gpaTransferred = 1001.00
@@ -115,7 +114,7 @@ class PriorCollegeDegreeServiceIntegrationTests extends BaseIntegrationTestCase 
         assertEquals "MA", priorCollegeDegree.degree.code
         assertEquals "BU", priorCollegeDegree.college.code
         assertEquals "TTTTT2", priorCollegeDegree.institutionalHonor.code
-        assertEquals "PH", priorCollegeDegree.educationGoal.code
+        assertEquals "PH", priorCollegeDegree.educationGoal
     }
 
 
@@ -128,7 +127,6 @@ class PriorCollegeDegreeServiceIntegrationTests extends BaseIntegrationTestCase 
         assertNotNull "PriorCollegeDegree degree is null in PriorCollegeDegree Service Tests", priorCollegeDegree.degree
         assertNotNull "PriorCollegeDegree college is null in PriorCollegeDegree Service Tests", priorCollegeDegree.college
         assertNotNull "PriorCollegeDegree institutionalHonor is null in PriorCollegeDegree Service Tests", priorCollegeDegree.institutionalHonor
-        assertNotNull "PriorCollegeDegree educationGoal is null in PriorCollegeDegree Service Tests", priorCollegeDegree.educationGoal
         assertNotNull priorCollegeDegree.pidm
         assertNotNull priorCollegeDegree.degreeSequenceNumber
         assertNotNull priorCollegeDegree.hoursTransferred
@@ -136,6 +134,7 @@ class PriorCollegeDegreeServiceIntegrationTests extends BaseIntegrationTestCase 
         assertNotNull priorCollegeDegree.degreeYear
         assertNotNull priorCollegeDegree.termDegree
         assertNotNull priorCollegeDegree.primaryIndicator
+        assertNotNull priorCollegeDegree.educationGoal
         assertNotNull priorCollegeDegree.version
         assertNotNull priorCollegeDegree.dataOrigin
         assertNotNull priorCollegeDegree.lastModifiedBy
@@ -184,7 +183,7 @@ class PriorCollegeDegreeServiceIntegrationTests extends BaseIntegrationTestCase 
                 degree: Degree.findByCode("PHD"),
                 college: College.findByCode("AH"),
                 institutionalHonor: institutionalHonor,
-                educationGoal: EducationGoal.findByCode("MA"),
+                educationGoal: "MA",
         )
         return priorCollegeDegree
     }

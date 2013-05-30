@@ -4,16 +4,9 @@
 package net.hedtech.banner.general.person
 
 import grails.validation.ValidationException
-import groovy.sql.Sql
 import net.hedtech.banner.exceptions.ApplicationException
-import net.hedtech.banner.general.system.AdmissionRequest
-import net.hedtech.banner.general.system.College
-import net.hedtech.banner.general.system.Degree
-import net.hedtech.banner.general.system.MajorMinorConcentration
-import net.hedtech.banner.general.system.SourceAndBackgroundInstitution
-import net.hedtech.banner.student.system.EducationGoal
+import net.hedtech.banner.general.system.*
 import net.hedtech.banner.testing.BaseIntegrationTestCase
-import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
 
 import java.text.SimpleDateFormat
 
@@ -146,6 +139,7 @@ class PriorCollegeMinorIntegrationTests extends BaseIntegrationTestCase {
         return priorCollegeMinor
     }
 
+
     private def newValidForCreatePriorCollegeDegree() {
         def priorCollege = newValidForCreatePriorCollege()
         priorCollege.save(failOnError: true, flush: true)
@@ -165,7 +159,7 @@ class PriorCollegeMinorIntegrationTests extends BaseIntegrationTestCase {
                 degree: Degree.findByCode("PHD"),
                 college: College.findByCode("AH"),
                 institutionalHonor: null,
-                educationGoal: EducationGoal.findByCode("MA"),
+                educationGoal: "MA",
         )
         return priorCollegeDegree
     }

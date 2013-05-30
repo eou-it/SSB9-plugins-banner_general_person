@@ -4,7 +4,6 @@
 package net.hedtech.banner.general.person
 
 import net.hedtech.banner.general.system.*
-import net.hedtech.banner.student.system.EducationGoal
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 
 class PriorCollegeCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
@@ -305,7 +304,7 @@ class PriorCollegeCompositeServiceIntegrationTests extends BaseIntegrationTestCa
                 degree: Degree.findByCode("PHD"),
                 college: College.findByCode("AH"),
                 institutionalHonor: null,
-                educationGoal: EducationGoal.findByCode("MA"),
+                educationGoal: "MA",
         )
         return priorCollegeDegree
     }

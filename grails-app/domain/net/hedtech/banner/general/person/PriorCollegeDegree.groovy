@@ -7,7 +7,7 @@ import net.hedtech.banner.general.system.College
 import net.hedtech.banner.general.system.Degree
 import net.hedtech.banner.general.system.InstitutionalHonor
 import net.hedtech.banner.general.system.SourceAndBackgroundInstitution
-import net.hedtech.banner.student.system.EducationGoal
+import net.hedtech.banner.query.DynamicFinder
 
 import javax.persistence.*
 
@@ -153,20 +153,18 @@ class PriorCollegeDegree implements Serializable {
     InstitutionalHonor institutionalHonor
 
     /**
-     * Foreign Key : FKV_SORDEGR_INV_STVEGOL_CODE
+     * Foreign Key : FKV_SORDEGR_INV_STVEGOL_CODE;
+     * Not enforced.  This was removed so this plugin is not dependent on student validation
      */
-    @ManyToOne
-    @JoinColumns([
-    @JoinColumn(name = "SORDEGR_EGOL_CODE", referencedColumnName = "STVEGOL_CODE")
-    ])
-    EducationGoal educationGoal
+    @Column(name = "SORDEGR_EGOL_CODE")
+    String educationGoal
 
 
     public String toString() {
         """PriorCollegeDegree[
 					id=$id, 
 					version=$version, 
-                    pidm=\$pidm,
+                    pidm=$pidm,
 					degreeSequenceNumber=$degreeSequenceNumber,
 					attendenceFrom=$attendenceFrom, 
 					attendenceTo=$attendenceTo, 
@@ -259,9 +257,27 @@ class PriorCollegeDegree implements Serializable {
         degree(nullable: true)
         college(nullable: true)
         institutionalHonor(nullable: true)
-        educationGoal(nullable: true)
+        educationGoal(nullable: true, maxSize: 2)
     }
 
     //Read Only fields that should be protected against update
     public static readonlyProperties = ['pidm', 'sourceAndBackgroundInstitution']
+
+
+    def static countAll(filterData) {
+        finderByAll().count(filterData)
+    }
+
+
+    def static fetchSearch(filterData, pagingAndSortParams) {
+        finderByAll().find(filterData, pagingAndSortParams)
+    }
+
+
+    def private static finderByAll = {
+        def query = """ FROM PriorCollegeDegree a
+	                   WHERE a.pidm = :pidm AND a.sourceAndBackgroundInstitution.code = :sourceAndBackgroundInstitutionCode
+	            	"""
+        return new DynamicFinder(PriorCollegeDegree.class, query, "a")
+    }
 }

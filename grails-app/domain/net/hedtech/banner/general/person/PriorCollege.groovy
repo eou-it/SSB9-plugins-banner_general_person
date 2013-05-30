@@ -5,6 +5,7 @@ package net.hedtech.banner.general.person
 
 import net.hedtech.banner.general.system.AdmissionRequest
 import net.hedtech.banner.general.system.SourceAndBackgroundInstitution
+import net.hedtech.banner.query.DynamicFinder
 
 import javax.persistence.*
 
@@ -161,4 +162,22 @@ class PriorCollege implements Serializable {
 
     //Read Only fields that should be protected against update
     public static readonlyProperties = ['pidm', 'sourceAndBackgroundInstitution']
+
+
+    def static countAll(filterData) {
+        finderByAll().count(filterData)
+    }
+
+
+    def static fetchSearch(filterData, pagingAndSortParams) {
+        finderByAll().find(filterData, pagingAndSortParams)
+    }
+
+
+    def private static finderByAll = {
+        def query = """ FROM PriorCollege a
+	                   WHERE a.pidm = :pidm
+	            	"""
+        return new DynamicFinder(PriorCollege.class, query, "a")
+    }
 }

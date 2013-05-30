@@ -5,7 +5,6 @@ package net.hedtech.banner.general.person
 
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.system.*
-import net.hedtech.banner.student.system.EducationGoal
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 
 import java.text.SimpleDateFormat
@@ -151,7 +150,7 @@ class PriorCollegeConcentrationAreaIntegrationTests extends BaseIntegrationTestC
                 degree: Degree.findByCode("PHD"),
                 college: College.findByCode("AH"),
                 institutionalHonor: null,
-                educationGoal: EducationGoal.findByCode("MA"),
+                educationGoal: "MA",
         )
         return priorCollegeDegree
     }

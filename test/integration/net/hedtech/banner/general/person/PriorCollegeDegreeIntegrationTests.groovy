@@ -6,7 +6,6 @@ package net.hedtech.banner.general.person
 import grails.validation.ValidationException
 import groovy.sql.Sql
 import net.hedtech.banner.general.system.*
-import net.hedtech.banner.student.system.EducationGoal
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
 
@@ -40,6 +39,7 @@ class PriorCollegeDegreeIntegrationTests extends BaseIntegrationTestCase {
         }
     }
 
+
     void testUpdateValidPriorCollegeDegree() {
         def priorCollegeDegree = newValidForCreatePriorCollegeDegree()
         priorCollegeDegree.save(failOnError: true, flush: true)
@@ -56,7 +56,7 @@ class PriorCollegeDegreeIntegrationTests extends BaseIntegrationTestCase {
         assertEquals "PHD", priorCollegeDegree.degree.code
         assertEquals "AH", priorCollegeDegree.college.code
         assertEquals "TTTTTT", priorCollegeDegree.institutionalHonor.code
-        assertEquals "MA", priorCollegeDegree.educationGoal.code
+        assertEquals "MA", priorCollegeDegree.educationGoal
 
         //Update the entity
         def institutionalHonorNew = new InstitutionalHonor(
@@ -77,7 +77,7 @@ class PriorCollegeDegreeIntegrationTests extends BaseIntegrationTestCase {
         priorCollegeDegree.degree = Degree.findByCode("MA")
         priorCollegeDegree.college = College.findByCode("BU")
         priorCollegeDegree.institutionalHonor = institutionalHonorNew
-        priorCollegeDegree.educationGoal = EducationGoal.findByCode("PH")
+        priorCollegeDegree.educationGoal = "PH"
         priorCollegeDegree.save(failOnError: true, flush: true)
 
         //Assert for sucessful update
@@ -92,7 +92,7 @@ class PriorCollegeDegreeIntegrationTests extends BaseIntegrationTestCase {
         assertEquals "MA", priorCollegeDegree.degree.code
         assertEquals "BU", priorCollegeDegree.college.code
         assertEquals "TTTTT2", priorCollegeDegree.institutionalHonor.code
-        assertEquals "PH", priorCollegeDegree.educationGoal.code
+        assertEquals "PH", priorCollegeDegree.educationGoal
     }
 
 
@@ -112,7 +112,7 @@ class PriorCollegeDegreeIntegrationTests extends BaseIntegrationTestCase {
         assertEquals "PHD", priorCollegeDegree.degree.code
         assertEquals "AH", priorCollegeDegree.college.code
         assertEquals "TTTTTT", priorCollegeDegree.institutionalHonor.code
-        assertEquals "MA", priorCollegeDegree.educationGoal.code
+        assertEquals "MA", priorCollegeDegree.educationGoal
 
         //Update the entity with invalid values
         priorCollegeDegree.degreeSequenceNumber = 100
@@ -243,7 +243,7 @@ class PriorCollegeDegreeIntegrationTests extends BaseIntegrationTestCase {
                 degree: Degree.findByCode("PHD"),
                 college: College.findByCode("AH"),
                 institutionalHonor: institutionalHonor,
-                educationGoal: EducationGoal.findByCode("MA"),
+                educationGoal: "MA",
         )
         return priorCollegeDegree
     }
