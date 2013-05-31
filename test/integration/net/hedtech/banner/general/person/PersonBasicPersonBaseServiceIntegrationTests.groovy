@@ -22,8 +22,6 @@ class PersonBasicPersonBaseServiceIntegrationTests extends BaseIntegrationTestCa
     def i_success_stateBirth
     def i_success_stateDriver
     def i_success_nationDriver
-    def i_success_unitOfMeasureHeight
-    def i_success_unitOfMeasureWeight
     def i_success_pidm
     def i_success_bannerId
     def i_success_ssn = "TTTTT"
@@ -65,8 +63,6 @@ class PersonBasicPersonBaseServiceIntegrationTests extends BaseIntegrationTestCa
     def i_failure_stateBirth
     def i_failure_stateDriver
     def i_failure_nationDriver
-    def i_failure_unitOfMeasureHeight
-    def i_failure_unitOfMeasureWeight
     def i_failure_pidm = 1
     def i_failure_ssn = "TTTTT"
     def i_failure_birthDate = new Date()
@@ -183,11 +179,6 @@ class PersonBasicPersonBaseServiceIntegrationTests extends BaseIntegrationTestCa
     def u_failure_confirmedReDate = new Date()
     def u_failure_armedServiceMedalVetIndicator = true
 
-    def i_success_keyBlockMap = [pidm: i_success_pidm]
-    def i_failure_keyBlockMap = [pidm: i_success_pidm]
-    def u_success_keyBlockMap = [pidm: i_success_pidm]
-    def u_failure_keyBlockMap = [pidm: i_success_pidm]
-
 
     protected void setUp() {
         formContext = ['GUAGMNU']
@@ -237,16 +228,6 @@ class PersonBasicPersonBaseServiceIntegrationTests extends BaseIntegrationTestCa
         u_failure_stateBirth = State.findByCode("DE")
         u_failure_stateDriver = State.findByCode("DE")
         u_failure_nationDriver = Nation.findByCode("157")
-
-        //Test data for references for custom tests
-        def sql = new Sql(sessionFactory.getCurrentSession().connection())
-        String idSql = """select gb_common.f_generate_id bannerId, gb_common.f_generate_pidm pidm from dual """
-        def bannerValues = sql.firstRow(idSql)
-        def ibannerId = bannerValues.bannerId
-        def ipidm = bannerValues.pidm
-        i_success_pidm = ipidm
-        i_success_bannerId = ibannerId
-
     }
 
 
