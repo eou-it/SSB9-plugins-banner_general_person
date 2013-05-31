@@ -50,7 +50,7 @@ query = """ FROM PersonAddress a
 query = """ FROM PersonAddress a
                             WHERE  a.pidm = :pidm
                             AND NVL(a.statusIndicator,'Y') <> 'I'
-                            AND a.addressType LIKE :filter
+                            AND a.addressType.code LIKE :filter
                             AND  SYSDATE BETWEEN
                             NVL(SPRADDR_FROM_DATE,sysdate-1) AND
                             NVL(SPRADDR_TO_DATE,sysdate+1)
@@ -517,7 +517,7 @@ class PersonAddress implements Serializable {
      static def fetchActiveAddressesByPidm(String filter, map)  {
          if (map.pidm) {
             PersonAddress.withSession { session ->
-                List personAddressList = session.getNamedQuery('PersonAddress.fetchSomeActiveAddressesByPidm').setInteger('pidm', map?.pidm).setString('filter', '%').list()
+                List personAddressList = session.getNamedQuery('PersonAddress.fetchSomeActiveAddressesByPidm').setInteger('pidm', map?.pidm).setString('filter', filter + "%").list()
                 return [list:personAddressList]
             }
         } else {
