@@ -23,3 +23,10 @@ start svq_sadvsrc
 start svq_advsrch
 start svq_altisrc
 start svq_idsrch
+REM
+start sv_sorpcol
+start sv_sorconc
+start sv_sordegr
+start sv_sormajr
+start sv_sorminr
+start sv_spbpers

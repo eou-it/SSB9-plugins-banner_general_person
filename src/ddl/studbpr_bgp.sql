@@ -40,6 +40,30 @@ start gv_goremal_ins_trg
 start gv_goremal_upd_trg
 start gv_goremal_del_trg
 REM
+start sv_sorpcol_ins_trg
+start sv_sorpcol_upd_trg
+start sv_sorpcol_del_trg
+REM
+start sv_sorconc_ins_trg
+start sv_sorconc_upd_trg
+start sv_sorconc_del_trg
+REM
+start sv_sordegr_ins_trg
+start sv_sordegr_upd_trg
+start sv_sordegr_del_trg
+REM
+start sv_sormajr_ins_trg
+start sv_sormajr_upd_trg
+start sv_sormajr_del_trg
+REM
+start sv_sorminr_ins_trg
+start sv_sorminr_upd_trg
+start sv_sorminr_del_trg
+REM
+start sv_spbpers_ins_trg
+start sv_spbpers_upd_trg
+start sv_spbpers_del_trg
+REM
 REM Create procedures
 REM
 start soknsut
