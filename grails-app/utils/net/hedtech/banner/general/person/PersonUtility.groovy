@@ -14,8 +14,8 @@ package net.hedtech.banner.general.person
 import org.codehaus.groovy.grails.web.context.ServletContextHolder as SCH
 import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes as GA
 
+//import net.hedtech.banner.general.common.MessageUtility
 import groovy.sql.Sql
-import net.hedtech.banner.person.dsl.NameTemplate
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.springframework.context.ApplicationContext
 import org.springframework.context.i18n.LocaleContextHolder
@@ -103,22 +103,29 @@ class PersonUtility {
 
     //Public method for formatting a person's name based on the LinkedHashMap passed in.
     public static String formatName(person) {
-        def displayName = NameTemplate.format {
-            lastName person.lastName
-            firstName person.firstName
-            mi person.middleName
-            surnamePrefix person.surnamePrefix
-            formatTemplate getNameFormat()
-            text
-        }
+        def nameFormat = getNameFormat()
+        def displayName = nameFormat
+        if (nameFormat.contains("\$lastName")) displayName = displayName.replace("\$lastName", person?.lastName)
+        if (nameFormat.contains("\$firstName")) displayName =  displayName.replace("\$firstName", person?.firstName?:'')
+        if (nameFormat.contains("\$mi"))  displayName =  displayName.replace("\$mi", person?.middleName?:'')
+        if (nameFormat.contains("\$surnamePrefix"))  displayName =  displayName.replace("\$surnamePrefix", person?.surnamePrefix?:'')
+        displayName = displayName.trim()
         return displayName
     }
 
     //This will retrieve the default.name.format from the messages.properties.
-    public static getNameFormat() {
-        def application = ApplicationHolder.application
-        ApplicationContext applicationContext = application.mainContext
-        def messageSource = applicationContext.getBean("messageSource")
-        messageSource.getMessage("default.name.format", null, LocaleContextHolder.getLocale())
+    public static String getNameFormat() {
+        def message = ''
+        try {
+  //          message = MessageUtility.message("default.name.format")
+            def application = ApplicationHolder.application
+            ApplicationContext applicationContext = application.mainContext
+            def messageSource = applicationContext.getBean("messageSource")
+            messageSource.getMessage("default.name.format", null, LocaleContextHolder.getLocale())
+        }
+        catch (org.springframework.context.NoSuchMessageException ae) {
+            message = "\$lastName, \$firstName"
+        }
+
     }
 }

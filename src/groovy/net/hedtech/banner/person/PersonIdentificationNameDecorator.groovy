@@ -65,7 +65,7 @@ class PersonIdentificationNameDecorator {
     }
 
 
-    def formatDisplayName(def showSurname = 'N') {
+    public String formatDisplayName(def showSurname = 'N') {
         def surname
         if (showSurname == "Y" && surnamePrefix) {
             surname = surnamePrefix
