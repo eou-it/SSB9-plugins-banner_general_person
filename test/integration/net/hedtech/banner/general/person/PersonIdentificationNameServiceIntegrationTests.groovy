@@ -12,18 +12,21 @@
 
 package net.hedtech.banner.general.person
 
+import groovy.sql.Sql
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.system.NameType
 import net.hedtech.banner.testing.BaseIntegrationTestCase
-import groovy.sql.Sql
+import org.apache.log4j.Logger
 
 class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTestCase {
 
     def personIdentificationNameService
 
+    def log = Logger.getLogger(this.getClass())
+
 
     protected void setUp() {
-        formContext = ['SOAIDEN']
+        formContext = ['GUAMENU']
         super.setUp()
     }
 
@@ -211,6 +214,203 @@ class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTes
     }
 
 
+    void testCreateOrUpdate() {
+        def person = newPersonIdentificationName()
+        person = personIdentificationNameService.createOrUpdate([domainModel: person])
+        assertEquals 0L, person.version
+
+        def origBannerId = person.bannerId
+
+        // Update the Banner ID
+        person.bannerId = "UPD_ID"
+        def updatedPerson = personIdentificationNameService.createOrUpdate([domainModel: person])
+        assertEquals 1L, updatedPerson.version
+
+        def persons = PersonIdentificationName.findAllByPidm(person.pidm)
+        assertEquals 2, persons.size()
+
+        // Check the current id
+        def currentPerson = persons.find { it.changeIndicator == null }
+        assertNotNull currentPerson?.pidm
+        assertEquals updatedPerson.bannerId, currentPerson.bannerId
+        assertEquals 1L, currentPerson.version
+
+        // Check the alternative id
+        def alternativePerson = persons.find { it.changeIndicator == "I" }
+        assertNotNull alternativePerson?.pidm
+        assertEquals origBannerId, alternativePerson.bannerId
+        assertEquals 0L, alternativePerson.version
+    }
+
+
+    void testUpdateBannerId() {
+        def person = newPersonIdentificationName()
+        person = personIdentificationNameService.create([domainModel: person])
+        assertEquals 0L, person.version
+
+        def origBannerId = person.bannerId
+
+        // Update the Banner ID
+        person.bannerId = "UPD_ID"
+        def updatedPerson = personIdentificationNameService.update([domainModel: person])
+        assertEquals 1L, updatedPerson.version
+
+        def persons = PersonIdentificationName.findAllByPidm(person.pidm)
+        assertEquals 2, persons.size()
+
+        // Check the current id
+        def currentPerson = persons.find { it.changeIndicator == null }
+        assertNotNull currentPerson?.pidm
+        assertEquals updatedPerson.bannerId, currentPerson.bannerId
+        assertEquals 1L, currentPerson.version
+
+        // Check the alternative id
+        def alternativePerson = persons.find { it.changeIndicator == "I" }
+        assertNotNull alternativePerson?.pidm
+        assertEquals origBannerId, alternativePerson.bannerId
+        assertEquals 0L, alternativePerson.version
+    }
+
+
+    void testUpdateName() {
+        def person = newPersonIdentificationName()
+        person = personIdentificationNameService.create([domainModel: person])
+        assertEquals 0L, person.version
+
+        def origLastName = person.lastName
+        def origFirstName = person.firstName
+        def origMiddleName = person.middleName
+
+        // Update the Banner id
+        person.lastName = "UPDATED_LAST_NAME"
+        person.firstName = "UPDATED_FIRST_NAME"
+        person.middleName = "UPDATED_MIDDLE_NAME"
+        def updatedPerson = personIdentificationNameService.update([domainModel: person])
+        assertEquals 1L, updatedPerson.version
+
+        def persons = PersonIdentificationName.findAllByPidm(person.pidm)
+        assertEquals 2, persons.size()
+
+        // Check the current id
+        def currentPerson = persons.find { it.changeIndicator == null }
+        assertNotNull currentPerson?.pidm
+        assertEquals updatedPerson.lastName, currentPerson.lastName
+        assertEquals updatedPerson.firstName, currentPerson.firstName
+        assertEquals updatedPerson.middleName, currentPerson.middleName
+        assertEquals 1L, currentPerson.version
+
+        // Check the alternative id
+        def alternativePerson = persons.find { it.changeIndicator == "N" }
+        assertNotNull alternativePerson?.pidm
+        assertEquals origLastName, alternativePerson.lastName
+        assertEquals origFirstName, alternativePerson.firstName
+        assertEquals origMiddleName, alternativePerson.middleName
+        assertEquals 0L, alternativePerson.version
+    }
+
+
+    void testUpdateNameType() {
+        def person = newPersonIdentificationName()
+        person = personIdentificationNameService.create([domainModel: person])
+        assertEquals 0L, person.version
+
+        def origNameType = person.nameType
+
+        // Update the nameType
+        person.nameType = NameType.findWhere(code: "BRTH")
+        def updatedPerson = personIdentificationNameService.update([domainModel: person])
+        assertEquals 1L, updatedPerson.version
+        assertEquals "BRTH", updatedPerson.nameType.code
+        assertEquals 1L, updatedPerson.version
+
+        // Make sure an alternative id is not created for a name type update.
+        def persons = PersonIdentificationName.findAllByPidm(person.pidm)
+        assertEquals 1, persons.size()
+    }
+
+
+    void testCreateAndUpdateListOfPersons() {
+        def person1 = newPersonIdentificationName()
+        def person2 = newPersonIdentificationName()
+        def persons = [person1, person2]
+        persons = personIdentificationNameService.create(persons)
+        assertEquals 2, persons.size()
+        persons.each {
+            assertNotNull it.id
+        }
+
+        // Update the last names
+        persons.each {
+            it.lastName = "UPDATED_LAST_NAME"
+        }
+
+        persons = personIdentificationNameService.update(persons)
+
+        persons.each {
+            def allPersons = PersonIdentificationName.findAllByPidm(it.pidm)
+            assertEquals 2, allPersons.size()
+
+            // Check the current id
+            def currentPerson = allPersons.find { it.changeIndicator == null }
+            assertNotNull currentPerson?.pidm
+            assertEquals "UPDATED_LAST_NAME", currentPerson.lastName
+            assertEquals 1L, currentPerson.version
+
+            // Check the alternative id
+            def alternativePerson = allPersons.find { it.changeIndicator == "N" }
+            assertNotNull alternativePerson?.pidm
+            assertEquals "Adams", alternativePerson.lastName
+            assertEquals 0L, alternativePerson.version
+        }
+    }
+
+
+    void testInvalidUpdateBannerIdAndName() {
+
+        def person = newPersonIdentificationName()
+        person = personIdentificationNameService.create([domainModel: person])
+        assertNotNull person.id
+        assertEquals 0L, person.version
+
+        // Update the Banner id and name
+        person.bannerId = "UPD_ID"
+        person.lastName = "UPDATED_LAST_NAME"
+        person.firstName = "UPDATED_FIRST_NAME"
+        person.middleName = "UPDATED_MIDDLE_NAME"
+
+        try {
+            def updatedPerson = personIdentificationNameService.update([domainModel: person])
+            fail "should have failed because you cannot update both the banner id and name"
+        }
+        catch (ApplicationException ae) {
+            assertApplicationException ae, "ID and Name cannot be changed at the same time."
+        }
+    }
+
+
+    void testInvalidUpdateNoChange() {
+
+        def person = newPersonIdentificationName()
+        person = personIdentificationNameService.create([domainModel: person])
+        assertNotNull person.id
+        assertEquals 0L, person.version
+
+        // No changes at all (not dirty)
+        def updatedPerson = personIdentificationNameService.update([domainModel: person])
+        assertEquals 0L, person.version
+
+        // Now test a change to any field other than id, name, or name type.
+        try {
+            person.origin = "UPDATED"
+            updatedPerson = personIdentificationNameService.update([domainModel: person])
+            fail "Should have failed because you must update either banner id, name, or name type"
+        }
+        catch (ApplicationException ae) {
+            assertApplicationException ae, "Must update at least ID, Name, or Name Type."
+        }
+    }
+
+
     private def newPersonIdentificationName() {
         def inameType = NameType.findWhere(code: "PROF")
         // leave the pidm null to get a generated on, and the ID equal to GENERATED to get a newly
@@ -218,9 +418,9 @@ class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTes
         def personIdentificationName = new PersonIdentificationName(
                 pidm: null,
                 bannerId: 'GENERATED',
-                lastName: "TTTTT",
-                firstName: "TTTTT",
-                middleName: "TTTTT",
+                lastName: "Adams",
+                firstName: "Troy",
+                middleName: "W",
                 changeIndicator: null,
                 entityIndicator: "P",
                 nameType: inameType
@@ -236,18 +436,11 @@ class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTes
         def personIdentificationName = new PersonIdentificationName(
                 pidm: null,
                 bannerId: 'GENERATED',
-                lastName: "TTTTT",
+                lastName: "Adams",
                 changeIndicator: null,
                 entityIndicator: "C",
                 nameType: inameType
         )
         return personIdentificationName
     }
-
-    /**
-     * Please put all the custom service tests in this protected section to protect the code
-     * from being overwritten on re-generation
-     */
-    /*PROTECTED REGION ID(personidentificationname_custom_service_integration_test_methods) ENABLED START*/
-    /*PROTECTED REGION END*/
 }
