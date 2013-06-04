@@ -14,11 +14,11 @@ package net.hedtech.banner.general.person
 import org.codehaus.groovy.grails.web.context.ServletContextHolder as SCH
 import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes as GA
 
-//import net.hedtech.banner.general.common.MessageUtility
 import groovy.sql.Sql
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.springframework.context.ApplicationContext
 import org.springframework.context.i18n.LocaleContextHolder
+import net.hedtech.banner.MessageUtility
 
 /**
  * This is a helper class that is used to help common validation and other processing for
@@ -117,11 +117,7 @@ class PersonUtility {
     public static String getNameFormat() {
         def message = ''
         try {
-  //          message = MessageUtility.message("default.name.format")
-            def application = ApplicationHolder.application
-            ApplicationContext applicationContext = application.mainContext
-            def messageSource = applicationContext.getBean("messageSource")
-            messageSource.getMessage("default.name.format", null, LocaleContextHolder.getLocale())
+            message = MessageUtility.message("default.name.format")
         }
         catch (org.springframework.context.NoSuchMessageException ae) {
             message = "\$lastName, \$firstName"
