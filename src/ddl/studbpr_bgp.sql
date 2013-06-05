@@ -40,6 +40,10 @@ start gv_goremal_ins_trg
 start gv_goremal_upd_trg
 start gv_goremal_del_trg
 REM
+start gv_gorprac_ins_trg
+start gv_gorprac_upd_trg
+start gv_gorprac_del_trg
+REM
 start sv_spbpers_ins_trg
 start sv_spbpers_upd_trg
 start sv_spbpers_del_trg
