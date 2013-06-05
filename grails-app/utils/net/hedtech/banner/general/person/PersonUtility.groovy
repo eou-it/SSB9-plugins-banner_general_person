@@ -15,7 +15,9 @@ import org.codehaus.groovy.grails.web.context.ServletContextHolder as SCH
 import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes as GA
 
 import groovy.sql.Sql
-import net.hedtech.banner.MessageUtility
+import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.springframework.context.ApplicationContext
+import org.springframework.context.i18n.LocaleContextHolder
 
 /**
  * This is a helper class that is used to help common validation and other processing for
@@ -114,7 +116,10 @@ class PersonUtility {
     public static String getNameFormat() {
         def message = ''
         try {
-            message = MessageUtility.message("default.name.format")
+            def application = ApplicationHolder.application
+            ApplicationContext applicationContext = application.mainContext
+            def messageSource = applicationContext.getBean("messageSource")
+            messageSource.getMessage("default.name.format", null, LocaleContextHolder.getLocale())
         }
         catch (org.springframework.context.NoSuchMessageException ae) {
             message = "\$lastName, \$firstName"
