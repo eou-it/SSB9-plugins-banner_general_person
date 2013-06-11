@@ -30,6 +30,7 @@ class PersonEmailCompositeService {
         }
     }
 
+
     /**
      *    Insert all new records
      *    If the existing record's e-mail code or e-mail address was changed delete it and reinsert
@@ -48,7 +49,7 @@ class PersonEmailCompositeService {
                     def newMap = [domainModel: newEmail]
                     service.create(newMap)
                 } else {
-                    service.update(domain)
+                    service.update([domainModel:domain])
                 }
             }
         }
