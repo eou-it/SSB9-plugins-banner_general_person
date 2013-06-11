@@ -108,7 +108,6 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
         personEmail.preferredIndicator = u_success_preferredIndicator
         personEmail.commentData = u_success_commentData
         personEmail.displayWebIndicator = u_success_displayWebIndicator
-        personEmail.emailAddress = u_success_emailAddress
 
         map.domainModel = personEmail
         personEmail = personEmailService.update(map)
@@ -117,7 +116,6 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
         assertEquals u_success_preferredIndicator, personEmail.preferredIndicator
         assertEquals u_success_commentData, personEmail.commentData
         assertEquals u_success_displayWebIndicator, personEmail.displayWebIndicator
-        assertEquals u_success_emailAddress, personEmail.emailAddress
     }
 
 
@@ -140,6 +138,28 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
         map.domainModel = personEmail
         shouldFail(ApplicationException) {
             personEmail = personEmailService.update(map)
+        }
+    }
+
+
+    void testPersonEmailPrimaryKeyUpdate() {
+        def personEmail = newValidForCreatePersonEmail()
+        def map = [domainModel: personEmail]
+        personEmail = personEmailService.create(map)
+        assertNotNull "PersonEmail ID is null in PersonEmail Service Tests Create", personEmail.id
+        assertNotNull "PersonEmail emailType is null in PersonEmail Service Tests", personEmail.emailType
+        assertNotNull personEmail.version
+        assertNotNull personEmail.dataOrigin
+        assertNotNull personEmail.lastModifiedBy
+        assertNotNull personEmail.lastModified
+
+        personEmail.emailType = EmailType.findByCode("HOME")
+        try {
+            personEmailService.update([domainModel: personEmail])
+            fail("This should have failed with @@r1:primaryKeyFieldsCannotBeModified")
+        }
+        catch (ApplicationException ae) {
+            assertApplicationException ae, "primaryKeyFieldsCannotBeModified"
         }
     }
 

@@ -73,7 +73,6 @@ class PersonEmailCompositeServiceIntegrationTests extends BaseIntegrationTestCas
     }
 
 
-    @Ignore
     void testUpdateOfEmailType() {
 
         def personEmail = newSinglePersonEmail()
@@ -90,7 +89,71 @@ class PersonEmailCompositeServiceIntegrationTests extends BaseIntegrationTestCas
         def keyBlock = [pidm: pidm]
         personEmailCompositeService.createOrUpdate([personEmails: personEmails, keyBlock: keyBlock])
         def cntPersonEmail = PersonEmail.findByPidm(pidm)
-        assertEquals cntPersonEmail.emailType, "DEN"
+        assertEquals cntPersonEmail.emailType, EmailType.findByCode("DEN")
+    }
+
+
+      void testUpdateOfEmailAddress() {
+
+        def personEmail = newSinglePersonEmail()
+        personEmailCompositeService.createOrUpdate(
+                [
+                        personEmails: personEmail,
+                ])
+        def pidm = personEmail.pidm
+        assertNotNull personEmail.id
+
+        personEmail.emailAddress = "updatedAddress@domain.edu"
+        def personEmails = []
+        personEmails << personEmail
+        def keyBlock = [pidm: pidm]
+        personEmailCompositeService.createOrUpdate([personEmails: personEmails, keyBlock: keyBlock])
+        def cntPersonEmail = PersonEmail.findByPidm(pidm)
+        assertEquals cntPersonEmail.emailAddress, "updatedAddress@domain.edu"
+    }
+
+
+      void testUpdateOfEmailAddressAndType() {
+
+        def personEmail = newSinglePersonEmail()
+        personEmailCompositeService.createOrUpdate(
+                [
+                        personEmails: personEmail,
+                ])
+        def pidm = personEmail.pidm
+        assertNotNull personEmail.id
+        personEmail.emailType = EmailType.findByCode("DEN")
+        personEmail.emailAddress = "updatedAddress@domain.edu"
+        def personEmails = []
+        personEmails << personEmail
+        def keyBlock = [pidm: pidm]
+        personEmailCompositeService.createOrUpdate([personEmails: personEmails, keyBlock: keyBlock])
+        def cntPersonEmail = PersonEmail.findByPidm(pidm)
+        assertEquals cntPersonEmail.emailAddress, "updatedAddress@domain.edu"
+        assertEquals cntPersonEmail.emailType, EmailType.findByCode("DEN")
+    }
+
+
+     void testUpdateOfEmailAddressAndTypeAndComment() {
+
+        def personEmail = newSinglePersonEmail()
+        personEmailCompositeService.createOrUpdate(
+                [
+                        personEmails: personEmail,
+                ])
+        def pidm = personEmail.pidm
+        assertNotNull personEmail.id
+        personEmail.emailType = EmailType.findByCode("DEN")
+        personEmail.emailAddress = "updatedAddress@domain.edu"
+        personEmail.commentData = "testing multiple updates"
+        def personEmails = []
+        personEmails << personEmail
+        def keyBlock = [pidm: pidm]
+        personEmailCompositeService.createOrUpdate([personEmails: personEmails, keyBlock: keyBlock])
+        def cntPersonEmail = PersonEmail.findByPidm(pidm)
+        assertEquals cntPersonEmail.emailAddress, "updatedAddress@domain.edu"
+        assertEquals cntPersonEmail.emailType, EmailType.findByCode("DEN")
+        assertEquals cntPersonEmail.commentData, "testing multiple updates"
     }
 
 

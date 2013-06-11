@@ -50,11 +50,11 @@ class MedicalInformationCompositeService {
 
     }
 
+
     /**
      *    Insert all new records
      *    If the existing record's medi  code was changed delete it and reinsert
      */
-
     private void processInsertUpdates(medicalList, service, Map keyBlock) {
 
 
@@ -81,6 +81,7 @@ class MedicalInformationCompositeService {
             }
         }
     }
+
 
     /**
      * find out if the medical condition has been changed

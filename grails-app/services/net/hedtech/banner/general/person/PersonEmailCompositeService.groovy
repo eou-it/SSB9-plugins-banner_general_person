@@ -40,9 +40,7 @@ class PersonEmailCompositeService {
             if (domain.id == null)
                 service.create(domain)
             else if (domain.id) {
-                def oldPersonEmail = findDirtyPersonEmail(domain)
-                if (oldPersonEmail) {
-                    validateEmail(domain, oldPersonEmail)
+                if (findIfPrimaryKeyChanged(domain)) {
                     PersonEmail newEmail = new PersonEmail(domain.properties)
                     def delMap = [domainModel: domain]
 
@@ -56,12 +54,11 @@ class PersonEmailCompositeService {
         }
     }
 
+
     /**
      * find out if email type or address has been changed
      */
-    private def findDirtyPersonEmail(domain) {
-
-        def keyMap = ["emailType"]
+    private def findIfPrimaryKeyChanged(domain) {
 
         def content = ServiceBase.extractParams(PersonEmail, domain)
         def domainObject = PersonEmail.get(content?.id) //  ServiceBase.fetch(PersonEmail, content?.id, log)
@@ -70,27 +67,13 @@ class PersonEmailCompositeService {
         def changedNames = domainObject.dirtyPropertyNames
 
         if (changedNames.size() > 0) {
-            def diff = changedNames - keyMap
-            if (!(diff == changedNames))
-                return domainObject.getPersistentValue('emailType')
-            else return null
-        } else return null
+           def diff = changedNames.findAll{ it == "emailType" || it == 'emailAddress'}
+           if (diff.size() > 0)
+                return true
+           else return false
+        } else return false
     }
 
-
-
-    private def validateEmail(domain, oldPersonEmail) {
-        def personEmail = domain
-        PersonEmail previousPersonEmail = oldPersonEmail
-        if (previousPersonEmail != personEmail.personEmail) {
-            String Emailsql = """select goremal_emal_code from goremal where goremal_pidm = ? and goremal_emal_code= ?"""
-            Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
-            def emailType = sql.rows(Emailsql, [personEmail.pidm, previousPersonEmail.emailType])
-            if (emailType.size() > 0) {
-                throw new ApplicationException(PersonEmail, "@@r1:cannotChangeEmailType@@")
-            }
-        }
-    }
 
     /**
      *  Delete  domain
