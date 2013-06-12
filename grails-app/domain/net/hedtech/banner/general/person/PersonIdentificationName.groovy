@@ -11,24 +11,12 @@
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
+import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.system.FgacDomain
 import net.hedtech.banner.general.system.NameType
 import net.hedtech.banner.service.DatabaseModifiesState
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
-import javax.persistence.JoinColumn
-import javax.persistence.JoinColumns
-import javax.persistence.ManyToOne
-import javax.persistence.NamedQueries
-import javax.persistence.NamedQuery
-import javax.persistence.SequenceGenerator
-import javax.persistence.Table
-import javax.persistence.Temporal
-import javax.persistence.TemporalType
-import javax.persistence.Version
+
+import javax.persistence.*
 
 /**
  * Person Identification/Name model.
@@ -53,6 +41,11 @@ query = """FROM  PersonIdentificationName a
 query = """FROM  PersonIdentificationName a
 	  	                WHERE a.bannerId = :filter
 	  	                and a.entityIndicator = 'P'
+	  	                and a.changeIndicator is null    """),
+@NamedQuery(name = "PersonIdentificationName.fetchNonPersonByBannerId",
+query = """FROM  PersonIdentificationName a
+	  	                WHERE a.bannerId = :filter
+	  	                and a.entityIndicator = 'C'
 	  	                and a.changeIndicator is null    """),
 @NamedQuery(name = "PersonIdentificationName.fetchPersonByPidm",
 query = """FROM  PersonIdentificationName a
@@ -97,7 +90,11 @@ query = """select count(a.bannerId) FROM  PersonIdentificationName a
 query = """FROM PersonIdentificationName a
                         WHERE a.bannerId = :filter
                         and a.entityIndicator = 'P'
-                        and a.changeIndicator = 'I' """)
+                        and a.changeIndicator = 'I' """),
+@NamedQuery(name = "PersonIdentificationName.fetchAllPersonByPidmAndChangeIndicatorNotNull",
+query = """FROM  PersonIdentificationName a
+	  	                WHERE a.pidm = :pidm
+	  	                and a.changeIndicator IS NOT NULL """)
 ])
 @DatabaseModifiesState
 class PersonIdentificationName implements Serializable {
@@ -263,7 +260,22 @@ class PersonIdentificationName implements Serializable {
     @Column(name = "FULL_NAME", nullable = true)
     String fullName
 
-    public static readonlyProperties = ['pidm']
+    @Column(name = "SPRIDEN_V_ROWID", updatable = false, insertable = false)
+    String personRowid
+
+    public static readonlyProperties = [
+            'pidm',
+            'changeIndicator',
+            'createUser',
+            'createDate',
+            'searchLastName',
+            'searchFirstName',
+            'searchMiddleName',
+            'soundexLastName',
+            'soundexFirstName',
+            'fgacDomain',
+            'fullName',
+            'personRowid']
 
 
     public String toString() {
@@ -292,6 +304,7 @@ class PersonIdentificationName implements Serializable {
 					lastModifiedBy=$lastModifiedBy,
 					nameType=$nameType,
 					fullName=$fullName,
+                    personRowid=$personRowid,
 					fgacDomain=$fgacDomain]"""
     }
 
@@ -305,6 +318,7 @@ class PersonIdentificationName implements Serializable {
         PersonIdentificationName that = (PersonIdentificationName) o;
 
         if (bannerId != that.bannerId) return false;
+        if (beforeUpdate != that.beforeUpdate) return false;
         if (changeIndicator != that.changeIndicator) return false;
         if (createDate != that.createDate) return false;
         if (createUser != that.createUser) return false;
@@ -321,6 +335,7 @@ class PersonIdentificationName implements Serializable {
         if (nameType != that.nameType) return false;
         if (origin != that.origin) return false;
         if (pidm != that.pidm) return false;
+        if (personRowid != that.personRowid) return false;
         if (searchFirstName != that.searchFirstName) return false;
         if (searchLastName != that.searchLastName) return false;
         if (searchMiddleName != that.searchMiddleName) return false;
@@ -348,6 +363,7 @@ class PersonIdentificationName implements Serializable {
         result = 31 * result + (lastModified != null ? lastModified.hashCode() : 0);
         result = 31 * result + (userData != null ? userData.hashCode() : 0);
         result = 31 * result + (origin != null ? origin.hashCode() : 0);
+        result = 31 * result + (personRowid != null ? personRowid.hashCode() : 0);
         result = 31 * result + (searchLastName != null ? searchLastName.hashCode() : 0);
         result = 31 * result + (searchFirstName != null ? searchFirstName.hashCode() : 0);
         result = 31 * result + (searchMiddleName != null ? searchMiddleName.hashCode() : 0);
@@ -362,6 +378,7 @@ class PersonIdentificationName implements Serializable {
         result = 31 * result + (nameType != null ? nameType.hashCode() : 0);
         result = 31 * result + (fgacDomain != null ? fgacDomain.hashCode() : 0);
         result = 31 * result + (fullName != null ? fullName.hashCode() : 0);
+        result = 31 * result + (beforeUpdate != null ? beforeUpdate.hashCode() : 0);
         return result;
     }
 
@@ -376,6 +393,7 @@ class PersonIdentificationName implements Serializable {
         lastModified(nullable: true)
         userData(nullable: true, maxSize: 30)
         origin(nullable: true, maxSize: 30)
+        personRowid(nullable: true)
         searchLastName(nullable: true, maxSize: 60)
         searchFirstName(nullable: true, maxSize: 60)
         searchMiddleName(nullable: true, maxSize: 60)
@@ -390,21 +408,9 @@ class PersonIdentificationName implements Serializable {
         nameType(nullable: true)
         fgacDomain(nullable: true)
         fullName(nullable: true)
-        /**
-         * Please put all the custom tests in this protected section to protect the code
-         * from being overwritten on re-generation
-         */
-        /*PROTECTED REGION ID(personentificationname_custom_constraints) ENABLED START*/
-
-        /*PROTECTED REGION END*/
     }
 
-    /**
-     * Please put all the custom methods/code in this protected section to protect the code
-     * from being overwritten on re-generation
-     */
-    /*PROTECTED REGION ID(personentificationname_custom_methods) ENABLED START*/
-    // methods used in id and name search lookups
+
     public static List fetchByBannerIdAutoComplete(filter) {
 
         return []
@@ -416,7 +422,7 @@ class PersonIdentificationName implements Serializable {
         def queryCriteria
         if (filter) queryCriteria = "%" + filter.toUpperCase() + "%"
         else queryCriteria = "%"
-        def names = PersonIdentificationName.withSession {session ->
+        def names = PersonIdentificationName.withSession { session ->
             session.getNamedQuery('PersonIdentificationName.fetchByBannerId').setString('filter', queryCriteria).list()
         }
         return names
@@ -428,7 +434,7 @@ class PersonIdentificationName implements Serializable {
         def queryCriteria
         if (filter) queryCriteria = "%" + filter.toUpperCase() + "%"
         else queryCriteria = "%"
-        def names = PersonIdentificationName.withSession {session ->
+        def names = PersonIdentificationName.withSession { session ->
             session.getNamedQuery('PersonIdentificationName.fetchByName').setString('filter', queryCriteria).list()
         }
         return names
@@ -473,21 +479,31 @@ class PersonIdentificationName implements Serializable {
 
     // Method used in utils to validate and return the name
     public static PersonIdentificationName fetchBannerPerson(String bannerId) {
-        PersonIdentificationName object = PersonIdentificationName.withSession {session ->
+        PersonIdentificationName object = PersonIdentificationName.withSession { session ->
             def list = session.getNamedQuery('PersonIdentificationName.fetchPersonByBannerId').setString('filter', bannerId).list()[0]
         }
         return object
     }
+
+    // Method used to fetch the current non-person record.
+    public static PersonIdentificationName fetchBannerNonPerson(String bannerId) {
+        PersonIdentificationName object = PersonIdentificationName.withSession { session ->
+            def list = session.getNamedQuery('PersonIdentificationName.fetchNonPersonByBannerId').setString('filter', bannerId).list()[0]
+        }
+        return object
+    }
+
     //Used to fetch the Banner Alternate ID
     public static PersonIdentificationName fetchPersonByAlternativeBannerId(String bannerId) {
-        PersonIdentificationName object = PersonIdentificationName.withSession {session ->
+        PersonIdentificationName object = PersonIdentificationName.withSession { session ->
             def list = session.getNamedQuery('PersonIdentificationName.fetchPersonByAlternativeBannerId').setString('filter', bannerId).list()[0]
         }
         return object
     }
 
+
     public static PersonIdentificationName fetchBannerPerson(Integer pidm) {
-        PersonIdentificationName object = PersonIdentificationName.withSession {session ->
+        PersonIdentificationName object = PersonIdentificationName.withSession { session ->
             session.getNamedQuery('PersonIdentificationName.fetchPersonByPidm').setInteger('filter', pidm).list()[0]
         }
         return object
@@ -495,7 +511,7 @@ class PersonIdentificationName implements Serializable {
 
 
     public static PersonIdentificationName fetchPersonOrNonPersonByPidm(Integer pidm) {
-        PersonIdentificationName object = PersonIdentificationName.withSession {session ->
+        PersonIdentificationName object = PersonIdentificationName.withSession { session ->
             session.getNamedQuery('PersonIdentificationName.fetchPersonOrNonPersonByPidm').setInteger('filter', pidm).list()[0]
         }
         return object
@@ -506,7 +522,7 @@ class PersonIdentificationName implements Serializable {
         def queryCriteria
         if (!filter) return []
         queryCriteria = filter.toUpperCase() + "%"
-        def persons = PersonIdentificationName.withSession {session ->
+        def persons = PersonIdentificationName.withSession { session ->
             org.hibernate.Query query = session.getNamedQuery('PersonIdentificationName.fetchAllPersonByNameOrBannerId').setString('filter', queryCriteria)
             query.setMaxResults(pagingAndSortParams.max)
             query.setFirstResult(pagingAndSortParams.offset)
@@ -521,7 +537,7 @@ class PersonIdentificationName implements Serializable {
         def queryCriteria
         if (!filter) return 0
         queryCriteria = filter.toUpperCase() + "%"
-        def count = PersonIdentificationName.withSession {session ->
+        def count = PersonIdentificationName.withSession { session ->
             org.hibernate.Query query = session.getNamedQuery('PersonIdentificationName.fetchCountPersonByNameOrBannerId').setString('filter', queryCriteria)
             query.list().get(0)
         }
@@ -534,7 +550,7 @@ class PersonIdentificationName implements Serializable {
         def queryCriteria
         if (!filter) return []
         queryCriteria = filter.toUpperCase() + "%"
-        def nonPersons = PersonIdentificationName.withSession {session ->
+        def nonPersons = PersonIdentificationName.withSession { session ->
             org.hibernate.Query query = session.getNamedQuery('PersonIdentificationName.fetchAllNonPersonByNameOrBannerId').setString('filter', queryCriteria)
             query.setMaxResults(pagingAndSortParams.max);
             query.setFirstResult(pagingAndSortParams.offset);
@@ -549,7 +565,7 @@ class PersonIdentificationName implements Serializable {
         def queryCriteria
         if (!filter) return 0
         queryCriteria = filter.toUpperCase() + "%"
-        def count = PersonIdentificationName.withSession {session ->
+        def count = PersonIdentificationName.withSession { session ->
             org.hibernate.Query query = session.getNamedQuery('PersonIdentificationName.fetchCountNonPersonByNameOrBannerId').setString('filter', queryCriteria)
             query.list().get(0)
         }
@@ -558,7 +574,7 @@ class PersonIdentificationName implements Serializable {
 
 
     public static PersonIdentificationName fetchBannerPersonOrNonPerson(String bannerId) {
-        PersonIdentificationName object = PersonIdentificationName.withSession {session ->
+        PersonIdentificationName object = PersonIdentificationName.withSession { session ->
             session.getNamedQuery('PersonIdentificationName.fetchPersonOrNonPersonByBannerId').setString('filter', bannerId).list()[0]
         }
         return object
@@ -596,5 +612,25 @@ class PersonIdentificationName implements Serializable {
         return [list: []]
     }
 
-    /*PROTECTED REGION END*/
+    /**
+     * This fetchBy is used to retrieve all alternate ids (person or non-person) for a given pidm.
+     */
+    public static List fetchAllPersonByPidmAndChangeIndicatorNotNull(Integer pidm) {
+        def personIdentificationNames
+        PersonIdentificationName.withSession { session ->
+            personIdentificationNames = session.getNamedQuery(
+                    'PersonIdentificationName.fetchAllPersonByPidmAndChangeIndicatorNotNull').setInteger('pidm', pidm).list()
+        }
+
+        return personIdentificationNames
+    }
+
+    /**
+     * Update operations on this domain have been disabled.
+     * See the PersonIdentificationCompositeService for details.
+     */
+    transient beforeUpdate = {
+        throw new ApplicationException(PersonIdentificationName, "@@r1:unsupported.operation@@")
+    }
+
 }

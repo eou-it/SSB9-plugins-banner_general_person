@@ -16,14 +16,13 @@ import grails.validation.ValidationException
 import groovy.sql.Sql
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.service.ServiceBase
-import org.springframework.transaction.interceptor.TransactionAspectSupport
 
 import java.sql.CallableStatement
 
 // NOTE:
-// This service is injected with create, update, and delete methods that may throw runtime exceptions (listed below).  
+// This service is injected with create, update, and delete methods that may throw runtime exceptions (listed below).
 // These exceptions must be caught and handled by the controller using this service.
-// 
+//
 // update and delete may throw net.hedtech.banner.exceptions.NotFoundException if the entity cannot be found in the database
 // update and delete may throw org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException a runtime exception if an optimistic lock failure occurs
 // create, update, and delete may throw grails.validation.ValidationException a runtime exception when there is a validation failure
@@ -31,72 +30,7 @@ import java.sql.CallableStatement
 class PersonIdentificationNameService extends ServiceBase {
 
     boolean transactional = true
-
     def sessionFactory
-
-/**
- * !! OVERRIDES THE SERVICE BASE UPDATE METHOD !!
- * We override this method because the PL/SQL API will perform both an update and an insert on the same table (SPRIDEN)
- * when a name change or id change happens. Due to the behavior of the ON INSTEAD and surrogate id triggers, this causes a unique key constraint
- * error to occur on the insert statement.
- */
-    public def update(domainModelOrMap, flushImmediately = true) {
-        log.debug " ${this.class.simpleName} .update IS AN OVERRIDE TO THE NORMAL UPDATE METHOD"
-        log.debug "${this.class.simpleName}.create invoked with domainModelOrMap = $domainModelOrMap and flushImmediately = $flushImmediately"
-        log.trace "${this.class.simpleName}.create transaction attributes: ${TransactionAspectSupport?.currentTransactionInfo()?.getTransactionAttribute()}"
-        setDbmsApplicationInfo " ${this.class.simpleName} .update()"
-
-        def content
-        def domainObject
-        def connection
-
-        try {
-            content = extractParams(getDomainClass(), domainModelOrMap, log)
-            domainObject = fetch(getDomainClass(), content?.id, log)
-
-            // Now we'll set the provided properties (content) onto our pristine domainObject instance -- this may make the model dirty
-            domainObject.properties = content
-
-            if (isDirty(domainObject)) {
-                log.trace "${this.class.simpleName}.update will update model with dirty properties ${domainObject.getDirtyPropertyNames()?.join(", ")}"
-
-                checkOptimisticLock(domainObject, content, log)
-                validateReadOnlyPropertiesNotDirty(domainObject)
-
-                domainObject = invokeServicePreUpdate(domainModelOrMap, domainObject)
-
-                connection = sessionFactory.getCurrentSession().connection()
-                CallableStatement sqlCall = buildUpdateCall(connection, domainObject)
-                sqlCall.executeUpdate()
-            }
-
-            refreshIfNeeded(domainObject)
-
-            log.trace "${this.class.simpleName}.update will now invoke the postUpdate callback if it exists"
-            if (this.respondsTo('postUpdate')) {
-                this.postUpdate([before: domainModelOrMap, after: domainObject])
-            }
-
-            domainObject
-        }
-        catch (ApplicationException ae) {
-            log.debug "Could not update an existing ${this.class.simpleName} with id = ${domainModelOrMap?.id} due to exception: ${ae.message}", ae
-            throw ae
-        }
-        catch (ValidationException e) {
-            def ae = new ApplicationException(getDomainClass(), e)
-            log.debug "Could not update an existing ${this.class.simpleName} with id = ${domainObject?.id} due to exception: $ae", e
-            checkOptimisticLock(domainObject, content, log) // optimistic lock trumps validation errors
-            throw ae
-        }
-        catch (e) {
-            log.debug "Could not update an existing ${this.class.simpleName} with id = ${domainModelOrMap?.id} due to exception: ${e.message}", e
-            throw new ApplicationException(getDomainClass(), e)
-        } finally {
-            connection?.close()
-            clearDbmsApplicationInfo()
-        }
-    }
 
 
     def fetchEntityOfPerson(pidm) {
@@ -160,30 +94,4 @@ class PersonIdentificationNameService extends ServiceBase {
         return formattedName
     }
 
-
-    private def buildUpdateCall(connection, domainObject) {
-
-        String createIdentification = "{ call gb_identification.p_update(?,?,?,?,?,?,?,?,?,?,?,?,?) }"
-        CallableStatement sqlCall = connection.prepareCall(createIdentification)
-
-        if (domainObject.pidm == null) {
-            sqlCall.setNull(1, java.sql.Types.INTEGER)
-        } else {
-            sqlCall.setInt(1, domainObject.pidm)
-        }
-        sqlCall.setString(2, domainObject.bannerId)
-        sqlCall.setString(3, domainObject.lastName)
-        sqlCall.setString(4, domainObject.firstName)
-        sqlCall.setString(5, domainObject.middleName)
-        sqlCall.setString(6, domainObject.changeIndicator)
-        sqlCall.setString(7, domainObject.entityIndicator)
-        sqlCall.setString(8, domainObject.createUser)
-        sqlCall.setString(9, domainObject.origin)
-        sqlCall.setString(10, domainObject.nameType.code)
-        sqlCall.setString(11, domainObject.dataOrigin)
-        sqlCall.setString(12, domainObject.surnamePrefix)
-        sqlCall.setNull(13, java.sql.Types.VARCHAR)   // rowid is passed as null since domain doesn't track it
-
-        sqlCall
-    }
 }

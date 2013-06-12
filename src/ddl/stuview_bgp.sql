@@ -24,5 +24,4 @@ start svq_sadvsrc
 start svq_advsrch
 start svq_altisrc
 start svq_idsrch
-REM
 start sv_spbpers

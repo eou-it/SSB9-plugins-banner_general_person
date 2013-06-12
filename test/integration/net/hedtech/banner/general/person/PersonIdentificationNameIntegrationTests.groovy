@@ -12,6 +12,7 @@
 
 package net.hedtech.banner.general.person
 
+import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.system.NameType
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 import groovy.sql.Sql
@@ -37,6 +38,25 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
         save personIdentificationName
         //Test if the generated entity now has an id assigned
         assertNotNull personIdentificationName.id
+    }
+
+
+    void testUpdatePersonIdentificationName() {
+        def personIdentificationName = newPersonIdentificationName()
+        personIdentificationName.save(flush: true, failOnError: true)
+        //Test if the generated entity now has an id assigned
+        assertNotNull personIdentificationName.id
+
+        personIdentificationName.nameType = NameType.findWhere(code: "PROF")
+
+        try {
+            personIdentificationName.save(flush: true, failOnError: true)
+            fail("this should have failed, updates not allowed for sorlcur")
+        }
+        catch (ApplicationException ae) {
+            assertApplicationException ae, "unsupported.operation"
+
+        }
     }
 
 
@@ -352,22 +372,4 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
         return personIdentificationName
     }
 
-    void testUpdateNameType() {
-        // Name type is the only field that can be updated on SPRIDEN without causing an alternate id
-        // to be created.  That functionality is tested in the service integration test.
-        // For this test we just update the name type.
-
-        def personIdentificationName = newPersonIdentificationName()
-        save personIdentificationName
-        //Test if the generated entity now has an id assigned
-        assertNotNull personIdentificationName.id
-
-
-        personIdentificationName.nameType = NameType.findWhere(code: "PROF")
-        save personIdentificationName
-
-        def updated = personIdentificationName.get(personIdentificationName.id)
-        assertEquals new Long(1), updated.version
-        assertEquals "PROF",  updated.nameType.code
-    }
 }
