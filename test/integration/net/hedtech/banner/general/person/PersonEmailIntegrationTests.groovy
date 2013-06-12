@@ -15,8 +15,11 @@
  */
 package net.hedtech.banner.general.person
 
+import grails.validation.ValidationException
+import groovy.sql.Sql
 import net.hedtech.banner.general.system.EmailType
 import net.hedtech.banner.testing.BaseIntegrationTestCase
+import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
 
 class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
 
@@ -26,8 +29,8 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     def i_success_emailType
 
     def i_success_pidm = 1
-    def i_success_emailAddress = "TTTTT"
-    def i_success_statusIndicator = "I"
+    def i_success_emailAddress = "TTTTT@msn.com"
+    def i_success_statusIndicator = "A"
     def i_success_preferredIndicator = true
     def i_success_commentData = "TTTTT"
     def i_success_displayWebIndicator = true
@@ -46,18 +49,18 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     def u_success_emailType
 
     def u_success_pidm = 1
-    def u_success_emailAddress = "TTTTT"
-    def u_success_statusIndicator = "I"
+    def u_success_emailAddress = "TTTTT@yahoo.com"
+    def u_success_statusIndicator = "A"
     def u_success_preferredIndicator = true
-    def u_success_commentData = "TTTTT"
+    def u_success_commentData = "TTTTTest"
     def u_success_displayWebIndicator = true
     //Valid test data (For failure tests)
     def u_failure_emailType
 
     def u_failure_pidm = 1
-    def u_failure_emailAddress = "TTTTT"
-    def u_failure_statusIndicator = "I"
-    def u_failure_preferredIndicator = true
+    def u_failure_emailAddress = "TTTTT@msn.com"
+    def u_failure_statusIndicator = "A"
+    def u_failure_preferredIndicator = null
     def u_failure_commentData = "TTTTT"
     def u_failure_displayWebIndicator = true
     /*PROTECTED REGION END*/
@@ -72,21 +75,8 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     //This method is used to initialize test data for references.
     //A method is required to execute database calls as it requires a active transaction
     void initializeTestDataForReferences() {
-        /*PROTECTED REGION ID(personemail_domain_integration_test_data_initialization) ENABLED START*/
         //Valid test data (For success tests)
-        i_success_emailType = EmailType.findWhere(code: "CAMP")
-
-        //Invalid test data (For failure tests)
-        i_failure_emailType = EmailType.findWhere() //TODO: fill in the query condition
-
-        //Valid test data (For success tests)
-        u_success_emailType = EmailType.findWhere() //TODO: fill in the query condition
-
-        //Valid test data (For failure tests)
-        u_failure_emailType = EmailType.findWhere() //TODO: fill in the query condition
-
-        //Test data for references for custom tests
-        /*PROTECTED REGION END*/
+        i_success_emailType = EmailType.findByCode("CAMP")
     }
 
 
@@ -94,139 +84,156 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
         super.tearDown()
     }
 
-    /*
-	void testCreateValidPersonEMail() {
-		def personEMail = newValidForCreatePersonEMail()
-		personEMail.save( failOnError: true, flush: true )
-		//Test if the generated entity now has an id assigned		
-        assertNotNull personEMail.id
-	}
 
-	void testCreateInvalidPersonEMail() {
-		def personEMail = newInvalidForCreatePersonEMail()
-		shouldFail(ValidationException) {
-            personEMail.save( failOnError: true, flush: true )		
-		}
-	}
-
-	void testUpdateValidPersonEMail() {
-		def personEMail = newValidForCreatePersonEMail()
-		personEMail.save( failOnError: true, flush: true )
-        assertNotNull personEMail.id
-        assertEquals 0L, personEMail.version
-        assertEquals i_success_pidm, personEMail.pidm
-        assertEquals i_success_emailAddress, personEMail.emailAddress
-        assertEquals i_success_statusIndicator, personEMail.statusIndicator
-        assertEquals i_success_preferredIndicator, personEMail.preferredIndicator
-        assertEquals i_success_commentData, personEMail.commentData
-        assertEquals i_success_displayWebIndicator, personEMail.displayWebIndicator
-        
-		//Update the entity
-		personEMail.statusIndicator = u_success_statusIndicator 
-		personEMail.preferredIndicator = u_success_preferredIndicator 
-		personEMail.commentData = u_success_commentData 
-		personEMail.displayWebIndicator = u_success_displayWebIndicator 
-		
-		personEMail.save( failOnError: true, flush: true )
-		//Assert for sucessful update        
-        personEMail = PersonEmail.get( personEMail.id )
-        assertEquals 1L, personEMail?.version
-        assertEquals u_success_statusIndicator, personEMail.statusIndicator
-        assertEquals u_success_preferredIndicator, personEMail.preferredIndicator
-        assertEquals u_success_commentData, personEMail.commentData
-        assertEquals u_success_displayWebIndicator, personEMail.displayWebIndicator
-		
-	}
-	
-	void testUpdateInvalidPersonEMail() {
-		def personEMail = newValidForCreatePersonEMail()
-		personEMail.save( failOnError: true, flush: true )
-        assertNotNull personEMail.id
-        assertEquals 0L, personEMail.version
-        assertEquals i_success_pidm, personEMail.pidm
-        assertEquals i_success_emailAddress, personEMail.emailAddress
-        assertEquals i_success_statusIndicator, personEMail.statusIndicator
-        assertEquals i_success_preferredIndicator, personEMail.preferredIndicator
-        assertEquals i_success_commentData, personEMail.commentData
-        assertEquals i_success_displayWebIndicator, personEMail.displayWebIndicator
-        
-		//Update the entity with invalid values
-		personEMail.statusIndicator = u_failure_statusIndicator 
-		personEMail.preferredIndicator = u_failure_preferredIndicator 
-		personEMail.commentData = u_failure_commentData 
-		personEMail.displayWebIndicator = u_failure_displayWebIndicator 
-		
-		shouldFail(ValidationException) {
-            personEMail.save( failOnError: true, flush: true )		
-		}
-	}
-
-    void testDeletePersonEMail() {
-		def personEMail = newValidForCreatePersonEMail()
-		personEMail.save( failOnError: true, flush: true )
-		def id = personEMail.id
-		assertNotNull id
-		personEMail.delete()
-		assertNull PersonEmail.get( id )
-	}
-	
-    void testValidation() {
-       def personEMail = newInvalidForCreatePersonEMail()
-       assertFalse "PersonEmail could not be validated as expected due to ${personEMail.errors}", personEMail.validate()
+    void testCreateValidPersonEmail() {
+        def personEmail = newValidForCreatePersonEmail()
+        personEmail.save(failOnError: true, flush: true)
+        //Test if the generated entity now has an id assigned
+        assertNotNull personEmail.id
     }
+
+
+    void testCreateInvalidPersonEmail() {
+        def personEmail = newInvalidForCreatePersonEmail()
+        shouldFail(ValidationException) {
+            personEmail.save(failOnError: true, flush: true)
+        }
+    }
+
+
+    void testUpdateValidPersonEmail() {
+        def personEmail = newValidForCreatePersonEmail()
+        personEmail.save(failOnError: true, flush: true)
+        assertNotNull personEmail.id
+        assertEquals 0L, personEmail.version
+        assertEquals i_success_emailAddress, personEmail.emailAddress
+        assertEquals i_success_statusIndicator, personEmail.statusIndicator
+        assertEquals i_success_preferredIndicator, personEmail.preferredIndicator
+        assertEquals i_success_commentData, personEmail.commentData
+        assertEquals i_success_displayWebIndicator, personEmail.displayWebIndicator
+
+        //Update the entity
+        personEmail.preferredIndicator = u_success_preferredIndicator
+        personEmail.commentData = u_success_commentData
+        personEmail.displayWebIndicator = u_success_displayWebIndicator
+        personEmail.save(failOnError: true, flush: true)
+        //Assert for sucessful update
+        personEmail = PersonEmail.get(personEmail.id)
+        assertEquals 1L, personEmail?.version
+        assertEquals u_success_statusIndicator, personEmail.statusIndicator
+        assertEquals u_success_preferredIndicator, personEmail.preferredIndicator
+        assertEquals u_success_commentData, personEmail.commentData
+        assertEquals u_success_displayWebIndicator, personEmail.displayWebIndicator
+    }
+
+
+    void testUpdateInvalidPersonEmail() {
+        def personEmail = newValidForCreatePersonEmail()
+        personEmail.save(failOnError: true, flush: true)
+        assertNotNull personEmail.id
+        assertEquals 0L, personEmail.version
+        assertEquals i_success_emailAddress, personEmail.emailAddress
+        assertEquals i_success_statusIndicator, personEmail.statusIndicator
+        assertEquals i_success_preferredIndicator, personEmail.preferredIndicator
+        assertEquals i_success_commentData, personEmail.commentData
+        assertEquals i_success_displayWebIndicator, personEmail.displayWebIndicator
+
+        //Update the entity with invalid values
+        personEmail.preferredIndicator = u_failure_preferredIndicator
+        personEmail.commentData = u_failure_commentData
+        personEmail.displayWebIndicator = u_failure_displayWebIndicator
+
+        shouldFail(ValidationException) {
+            personEmail.save(failOnError: true, flush: true)
+        }
+    }
+
+
+    void testDeletePersonEmail() {
+        def personEmail = newValidForCreatePersonEmail()
+        personEmail.save(failOnError: true, flush: true)
+        def id = personEmail.id
+        assertNotNull id
+        personEmail.delete()
+        assertNull PersonEmail.get(id)
+    }
+
+
+    void testValidation() {
+        def personEmail = newInvalidForCreatePersonEmail()
+        assertFalse "PersonEmail could not be validated as expected due to ${personEmail.errors}", personEmail.validate()
+    }
+
 
     void testNullValidationFailure() {
-        def personEMail = new PersonEmail()
-        assertFalse "PersonEmail should have failed validation", personEMail.validate()
-        assertErrorsFor personEMail, 'nullable', 
-                                               [ 
-                                                 'pidm', 
-                                                 'emailAddress', 
-                                                 'statusIndicator', 
-                                                 'preferredIndicator', 
-                                                 'displayWebIndicator',                                                  
-                                                 'emailType'
-                                               ]
-        assertNoErrorsFor personEMail,
-        									   [ 
-             									 'commentData'                                                 
-											   ]
+        def personEmail = new PersonEmail()
+        assertFalse "PersonEmail should have failed validation", personEmail.validate()
+        assertErrorsFor personEmail, 'nullable',
+                [
+                        'pidm',
+                        'emailAddress',
+                        'statusIndicator',
+                        'preferredIndicator',
+                        'displayWebIndicator',
+                        'emailType'
+                ]
+        assertNoErrorsFor personEmail,
+                [
+                        'commentData'
+                ]
     }
-    
+
+
     void testMaxSizeValidationFailures() {
-        def personEMail = new PersonEmail(
-        commentData:'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX' )
-		assertFalse "PersonEmail should have failed validation", personEMail.validate()
-		assertErrorsFor personEMail, 'maxSize', [ 'commentData' ]    
+        def personEmail = new PersonEmail(
+                commentData: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
+        assertFalse "PersonEmail should have failed validation", personEmail.validate()
+        assertErrorsFor personEmail, 'maxSize', ['commentData']
     }
 
-    */
-//	void testValidationMessages() {
-    //	    def personEMail = newInvalidForCreatePersonEMail()
-    //	    personEMail.pidm = null
-    //	    assertFalse personEMail.validate()
-    //	    assertLocalizedError personEMail, 'nullable', /.*Field.*pidm.*of class.*PersonEmail.*cannot be null.*/, 'pidm'
-    //	    personEMail.emailAddress = null
-    //	    assertFalse personEMail.validate()
-    //	    assertLocalizedError personEMail, 'nullable', /.*Field.*emailAddress.*of class.*PersonEmail.*cannot be null.*/, 'emailAddress'
-    //	    personEMail.statusIndicator = null
-    //	    assertFalse personEMail.validate()
-    //	    assertLocalizedError personEMail, 'nullable', /.*Field.*statusIndicator.*of class.*PersonEmail.*cannot be null.*/, 'statusIndicator'
-    //	    personEMail.preferredIndicator = null
-    //	    assertFalse personEMail.validate()
-    //	    assertLocalizedError personEMail, 'nullable', /.*Field.*preferredIndicator.*of class.*PersonEmail.*cannot be null.*/, 'preferredIndicator'
-    //	    personEMail.displayWebIndicator = null
-    //	    assertFalse personEMail.validate()
-    //	    assertLocalizedError personEMail, 'nullable', /.*Field.*displayWebIndicator.*of class.*PersonEmail.*cannot be null.*/, 'displayWebIndicator'
-    //	    personEMail.emailType = null
-    //	    assertFalse personEMail.validate()
-    //	    assertLocalizedError personEMail, 'nullable', /.*Field.*emailType.*of class.*PersonEmail.*cannot be null.*/, 'emailType'
-    //	}
+
+    void testOptimisticLock() {
+        def personEmail = newValidForCreatePersonEmail()
+        personEmail.save(failOnError: true, flush: true)
+
+        def sql
+        try {
+            sql = new Sql(sessionFactory.getCurrentSession().connection())
+            sql.executeUpdate("update GOREMAL set GOREMAL_VERSION = 999 where GOREMAL_SURROGATE_ID = ?", [personEmail.id])
+        } finally {
+            sql?.close() // note that the test will close the connection, since it's our current session's connection
+        }
+        //Try to update the entity
+        //Update the entity
+        personEmail.preferredIndicator = u_success_preferredIndicator
+        personEmail.commentData = u_success_commentData
+        personEmail.displayWebIndicator = u_success_displayWebIndicator
+        shouldFail(HibernateOptimisticLockingFailureException) {
+            personEmail.save(failOnError: true, flush: true)
+        }
+    }
 
 
-    private def newValidForCreatePersonEMail() {
-        def personEMail = new PersonEmail(
-                pidm: i_success_pidm,
+    private def newValidForCreatePersonEmail() {
+        def sql = new Sql(sessionFactory.getCurrentSession().connection())
+        String idSql = """select gb_common.f_generate_id bannerId, gb_common.f_generate_pidm pidm from dual """
+        def bannerValues = sql.firstRow(idSql)
+        def ibannerId = bannerValues.bannerId
+        def ipidm = bannerValues.pidm
+        def person = new PersonIdentificationName(
+                pidm: ipidm,
+                bannerId: ibannerId,
+                lastName: "TTTTT",
+                firstName: "TTTTT",
+                middleName: "TTTTT",
+                changeIndicator: null,
+                entityIndicator: "P"
+        )
+        person.save(flush: true, failOnError: true)
+        assert person.id
+
+        def personEmail = new PersonEmail(
+                pidm: ipidm,
                 emailAddress: i_success_emailAddress,
                 statusIndicator: i_success_statusIndicator,
                 preferredIndicator: i_success_preferredIndicator,
@@ -234,21 +241,39 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
                 displayWebIndicator: i_success_displayWebIndicator,
                 emailType: i_success_emailType
         )
-        return personEMail
+        return personEmail
     }
 
 
-    private def newInvalidForCreatePersonEMail() {
-        def personEMail = new PersonEmail(
-                pidm: i_failure_pidm,
+    private def newInvalidForCreatePersonEmail() {
+        def sql = new Sql(sessionFactory.getCurrentSession().connection())
+        String idSql = """select gb_common.f_generate_id bannerId, gb_common.f_generate_pidm pidm from dual """
+        def bannerValues = sql.firstRow(idSql)
+        def ibannerId = bannerValues.bannerId
+        def ipidm = bannerValues.pidm
+        def person = new PersonIdentificationName(
+                pidm: ipidm,
+                bannerId: ibannerId,
+                lastName: "TTTTT",
+                firstName: "TTTTT",
+                middleName: "TTTTT",
+                changeIndicator: null,
+                entityIndicator: "P"
+        )
+        person.save(flush: true, failOnError: true)
+        assert person.id
+
+        def personEmail = new PersonEmail(
+                pidm: ipidm,
                 emailAddress: i_failure_emailAddress,
                 statusIndicator: i_failure_statusIndicator,
                 preferredIndicator: i_failure_preferredIndicator,
                 commentData: i_failure_commentData,
                 displayWebIndicator: i_failure_displayWebIndicator,
-                emailType: i_failure_emailType,
+
+                emailType: i_failure_emailType
         )
-        return personEMail
+        return personEmail
     }
 
 

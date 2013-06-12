@@ -14,6 +14,7 @@ start sv_spriden
 start sv_sprmedi
 start sv_sprtele
 start gv_goremal
+start gv_gorprac
 start svq_sprtele
 start gvq_goradid
 start gvq_goremal
@@ -24,9 +25,4 @@ start svq_advsrch
 start svq_altisrc
 start svq_idsrch
 REM
-start sv_sorpcol
-start sv_sorconc
-start sv_sordegr
-start sv_sormajr
-start sv_sorminr
 start sv_spbpers

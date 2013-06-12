@@ -106,25 +106,19 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
 	//This method is used to initialize test data for references.
 	//A method is required to execute database calls as it requires a active transaction
 	void initializeTestDataForReferences() {
-		/*PROTECTED REGION ID(persontelephone_domain_integration_test_data_initialization) ENABLED START*/
 		//Valid test data (For success tests)
-    	i_success_telephoneType = TelephoneType.findWhere(code: "GR")
-//    	i_success_addressType = AddressType.findWhere(code: "PR")
+    	i_success_telephoneType = TelephoneType.findByCode("GR")
 
 		//Invalid test data (For failure tests)
-	    i_failure_telephoneType = TelephoneType.findWhere(code: "GR")
-//	    i_failure_addressType = AddressType.findWhere(code: "PR")
+	    i_failure_telephoneType = TelephoneType.findByCode("GR")
 
 		//Valid test data (For success tests)
-	    u_success_telephoneType = TelephoneType.findWhere(code: "GR")
-//	    u_success_addressType = AddressType.findWhere(code: "GV")
+	    u_success_telephoneType = TelephoneType.findByCode("GR")
 
 		//Valid test data (For failure tests)
-    	u_failure_telephoneType = TelephoneType.findWhere(code: "GR")
-//    	u_failure_addressType = AddressType.findWhere(code: "PR")
+    	u_failure_telephoneType = TelephoneType.findByCode("GR")
 
 		//Test data for references for custom tests
-		/*PROTECTED REGION END*/
 	}
 
 	protected void tearDown() {
@@ -380,11 +374,4 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
 		)
 		return personTelephone
 	}
-
-   /**
-     * Please put all the custom tests in this protected section to protect the code
-     * from being overwritten on re-generation
-     */
-    /*PROTECTED REGION ID(persontelephone_custom_integration_test_methods) ENABLED START*/
-    /*PROTECTED REGION END*/
 }

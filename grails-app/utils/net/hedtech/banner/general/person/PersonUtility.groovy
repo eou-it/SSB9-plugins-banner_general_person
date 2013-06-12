@@ -14,7 +14,6 @@ package net.hedtech.banner.general.person
 import org.codehaus.groovy.grails.web.context.ServletContextHolder as SCH
 import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes as GA
 
-//import net.hedtech.banner.general.common.MessageUtility
 import groovy.sql.Sql
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.springframework.context.ApplicationContext
@@ -117,7 +116,6 @@ class PersonUtility {
     public static String getNameFormat() {
         def message = ''
         try {
-  //          message = MessageUtility.message("default.name.format")
             def application = ApplicationHolder.application
             ApplicationContext applicationContext = application.mainContext
             def messageSource = applicationContext.getBean("messageSource")

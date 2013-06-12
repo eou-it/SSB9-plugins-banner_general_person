@@ -200,8 +200,9 @@ class PersonEmail implements Serializable {
 
     }
     //Read Only fields that should be protected against update
-    public static readonlyProperties = ['pidm', 'emailAddress', 'emailType']
+//    public static readonlyProperties = ['pidm', 'emailAddress', 'emailType']
 
+    public static readonlyProperties = ['pidm']
 
     public static List fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator(Integer pidm, String statusIndicator,
                                                                               String displayWebIndicator, String preferredIndicator) {
