@@ -10,9 +10,6 @@ import javax.persistence.GeneratedValue
 import javax.persistence.Id
 import javax.persistence.Table
 import javax.persistence.Version
-import javax.persistence.NamedQueries
-import javax.persistence.NamedQuery
-import javax.persistence.Transient
 import javax.persistence.GenerationType
 import javax.persistence.SequenceGenerator
 import javax.persistence.Temporal
@@ -20,8 +17,7 @@ import javax.persistence.TemporalType
 import javax.persistence.JoinColumn
 import javax.persistence.JoinColumns
 import javax.persistence.ManyToOne
-import org.hibernate.annotations.GenericGenerator
-import org.hibernate.annotations.Type
+
 import net.hedtech.banner.general.system.AdditionalIdentificationType
 
 
@@ -30,7 +26,7 @@ import net.hedtech.banner.general.system.AdditionalIdentificationType
  */
 @Entity
 @Table(name = "GV_GORADID")
-class AlternativeID implements Serializable {
+class AdditionalID implements Serializable {
 	
 	/**
 	 * Surrogate ID for GORADID
@@ -91,7 +87,7 @@ class AlternativeID implements Serializable {
 
 	
 	public String toString() {
-		"""AlternativeID[
+		"""AdditionalID[
 					id=$id, 
 					version=$version, 
 					pidm=$pidm, 
@@ -105,8 +101,8 @@ class AlternativeID implements Serializable {
 	
 	boolean equals(o) {
 	    if (this.is(o)) return true
-	    if (!(o instanceof AlternativeID)) return false
-	    AlternativeID that = (AlternativeID) o
+	    if (!(o instanceof AdditionalID)) return false
+	    AdditionalID that = (AdditionalID) o
         if(id != that.id) return false
         if(version != that.version) return false
         if(pidm != that.pidm) return false
