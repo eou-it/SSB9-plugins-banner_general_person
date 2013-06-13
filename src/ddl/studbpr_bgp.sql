@@ -48,6 +48,10 @@ start sv_spbpers_ins_trg
 start sv_spbpers_upd_trg
 start sv_spbpers_del_trg
 REM
+start gv_goradid_ins_trg
+start gv_goradid_upd_trg
+start gv_goradid_del_trg
+REM
 REM Create procedures
 REM
 start soknsut
