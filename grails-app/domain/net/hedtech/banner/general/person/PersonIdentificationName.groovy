@@ -166,7 +166,7 @@ class PersonIdentificationName implements Serializable {
     String userData
 
     /**
-     * ORIGIN: The name of the Banner Object that was used most recently to update the row in the spren table.
+     * ORIGIN: The name of the Banner Object that was used most recently to update the row in the spriden table.
      */
     @Column(name = "SPRIDEN_ORIGIN", length = 30)
     String origin
@@ -285,7 +285,7 @@ class PersonIdentificationName implements Serializable {
 					bannerId=$bannerId,
 					lastName=$lastName,
 					firstName=$firstName,
-					mdleInitial=$middleName,
+					middleName=$middleName,
 					changeIndicator=$changeIndicator,
 					entityIndicator=$entityIndicator,
 					lastModified=$lastModified,
