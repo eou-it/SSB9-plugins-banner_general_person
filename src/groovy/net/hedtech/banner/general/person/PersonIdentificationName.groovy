@@ -318,7 +318,7 @@ class PersonIdentificationName implements Serializable {
         PersonIdentificationName that = (PersonIdentificationName) o;
 
         if (bannerId != that.bannerId) return false;
-        if (beforeUpdate != that.beforeUpdate) return false;
+//        if (beforeUpdate != that.beforeUpdate) return false;
         if (changeIndicator != that.changeIndicator) return false;
         if (createDate != that.createDate) return false;
         if (createUser != that.createUser) return false;
@@ -378,7 +378,7 @@ class PersonIdentificationName implements Serializable {
         result = 31 * result + (nameType != null ? nameType.hashCode() : 0);
         result = 31 * result + (fgacDomain != null ? fgacDomain.hashCode() : 0);
         result = 31 * result + (fullName != null ? fullName.hashCode() : 0);
-        result = 31 * result + (beforeUpdate != null ? beforeUpdate.hashCode() : 0);
+//        result = 31 * result + (beforeUpdate != null ? beforeUpdate.hashCode() : 0);
         return result;
     }
 

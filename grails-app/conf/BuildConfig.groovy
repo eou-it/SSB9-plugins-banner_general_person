@@ -36,4 +36,10 @@ grails.project.dependency.resolution = {
 
     }
 
+    plugins {
+        compile ":hibernate:$grailsVersion"
+        compile ":tomcat:$grailsVersion"
+        test ':code-coverage:1.2.5'
+    }
+
 }
