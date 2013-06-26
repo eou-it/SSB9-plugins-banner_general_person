@@ -12,6 +12,7 @@
 
 package net.hedtech.banner.general.person
 
+import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.service.ServiceBase
 import groovy.sql.Sql
 
@@ -29,11 +30,10 @@ class PersonIdentificationNameService extends ServiceBase {
 
     def sessionFactory
 
-    /**
-     * Please put all the custom methods in this protected section to protect the code
-     * from being overwritten on re-generation
-     */
-    /*PROTECTED REGION ID(personidentificationname_custom_service_methods) ENABLED START*/
+
+    def preUpdate(map) {
+        throw new ApplicationException(PersonIdentificationNameCurrent, "@@r1:unsupported.operation@@")
+    }
 
 
     def fetchEntityOfPerson(pidm) {
@@ -98,6 +98,4 @@ class PersonIdentificationNameService extends ServiceBase {
         return formattedName
     }
 
-
-    /*PROTECTED REGION END*/
 }

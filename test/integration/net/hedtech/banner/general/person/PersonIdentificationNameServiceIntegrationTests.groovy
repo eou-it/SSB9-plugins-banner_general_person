@@ -12,20 +12,14 @@
 
 package net.hedtech.banner.general.person
 
-import grails.validation.ValidationException
-import groovy.sql.Sql
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.system.NameType
 import net.hedtech.banner.testing.BaseIntegrationTestCase
-import org.apache.log4j.Logger
-
-import java.sql.CallableStatement
+import groovy.sql.Sql
 
 class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTestCase {
 
     def personIdentificationNameService
-
-    def log = Logger.getLogger(this.getClass())
 
 
     protected void setUp() {
@@ -242,9 +236,9 @@ class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTes
         def personIdentificationName = new PersonIdentificationName(
                 pidm: null,
                 bannerId: 'GENERATED',
-                lastName: "Adams",
-                firstName: "Troy",
-                middleName: "W",
+                lastName: "TTTTT",
+                firstName: "TTTTT",
+                middleName: "TTTTT",
                 changeIndicator: null,
                 entityIndicator: "P",
                 nameType: inameType
@@ -260,7 +254,7 @@ class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTes
         def personIdentificationName = new PersonIdentificationName(
                 pidm: null,
                 bannerId: 'GENERATED',
-                lastName: "Adams",
+                lastName: "TTTTT",
                 changeIndicator: null,
                 entityIndicator: "C",
                 nameType: inameType
@@ -268,4 +262,10 @@ class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTes
         return personIdentificationName
     }
 
+    /**
+     * Please put all the custom service tests in this protected section to protect the code
+     * from being overwritten on re-generation
+     */
+    /*PROTECTED REGION ID(personidentificationname_custom_service_integration_test_methods) ENABLED START*/
+    /*PROTECTED REGION END*/
 }

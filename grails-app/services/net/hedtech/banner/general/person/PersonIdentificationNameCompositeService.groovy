@@ -45,7 +45,7 @@ class PersonIdentificationNameCompositeService extends ServiceBase {
         }
 
         if (map?.personIdentificationNameCurrent) {
-            def personIdentificationNameCurrents = [map?.personIdentificationNameCurrent]  // Make into a list to conform to composite service
+            def personIdentificationNameCurrents = [map?.personIdentificationNameCurrent]  // Convert to a list
             processInsertUpdates(personIdentificationNameCurrents, personIdentificationNameCurrentService)
         }
 
@@ -73,9 +73,8 @@ class PersonIdentificationNameCompositeService extends ServiceBase {
             // This will refresh any hibernate objects that the PL/SQL api may have updated.
             // Note that the current id (changeIndicator = null) cannot be deleted and the PL/SQL api will throw an
             // exception if an attempt is made to do so.
-            // TODO Change following query to use the alternate service
             if (domain?.changeIndicator) {
-                def updatedPersons = PersonIdentificationName.fetchAllByPidmAndChangeIndicatorNotNull(domain.pidm)
+                def updatedPersons = PersonIdentificationNameAlternate.fetchAllByPidm(domain.pidm)
             }
         }
     }
@@ -127,7 +126,7 @@ class PersonIdentificationNameCompositeService extends ServiceBase {
                 // Refresh all alternate id records if the current id is updated.
                 // This will refresh any hibernate objects that the PL/SQL api might have created or updated.
                 if (!domainObject?.changeIndicator) {
-                    def updatedPersons = PersonIdentificationName.fetchAllByPidmAndChangeIndicatorNotNull(domainObject.pidm)
+                    def updatedPersons = PersonIdentificationNameAlternate.fetchAllByPidm(domainObject.pidm)
                 }
             }
 

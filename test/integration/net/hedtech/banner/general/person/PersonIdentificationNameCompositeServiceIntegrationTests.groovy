@@ -561,7 +561,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
         personIdentificationNameCompositeService.createOrUpdate([personIdentificationNameAlternates: updatedPersonList])
 
         // We should have 3 alternate id records
-        def updatedPersons = PersonIdentificationName.fetchAllByPidmAndChangeIndicatorNotNull(person.pidm)
+        def updatedPersons = PersonIdentificationNameAlternate.fetchAllByPidm(person.pidm)
         assertEquals 3, updatedPersons.size()
 
         def deleteList = []
