@@ -12,6 +12,8 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
 
     def personIdentificationNameCompositeService
     def personIdentificationNameService
+    def personIdentificationNameCurrentService
+    def personIdentificationNameAlternateService
 
 
     protected void setUp() {
@@ -28,22 +30,23 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
     //  Perform current ID tests first.  Alternate Id tests follow these tests.
     // *************************************************************************************************************
 
-    void testCreateCurrentPersonIdentificationName() {
+    // TODO test with GENERATED in id
+    void testCreatePersonIdentificationNameCurrent() {
         def bannerId = "ID-T00001"
         def personList = []
 
-        def person = newPersonIdentificationName(bannerId)
+        def person = newPersonIdentificationNameCurrent(bannerId)
         personList << person
-        personIdentificationNameCompositeService.createOrUpdate([currentPersonIdentificationNames: personList])
+        personIdentificationNameCompositeService.createOrUpdate([personIdentificationNameCurrents: personList])
 
-        def currentPerson = PersonIdentificationName.fetchBannerPerson(bannerId)
+        def currentPerson = PersonIdentificationNameCurrent.fetchByBannerId(bannerId)
         assertNotNull currentPerson.pidm
         assertEquals "Adams", currentPerson.lastName
         assertEquals "P", currentPerson.entityIndicator
         assertEquals 0L, currentPerson.version
 
         // Make sure no alternate person records were created.
-        def alternatePersons = PersonIdentificationName.fetchAllPersonByPidmAndChangeIndicatorNotNull(currentPerson.pidm)
+        def alternatePersons = PersonIdentificationNameAlternate.fetchAllByPidm(currentPerson.pidm)
         assertEquals 0, alternatePersons.size()
     }
 
@@ -52,11 +55,11 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
         def bannerId = "ID-T00001"
         def personList = []
 
-        def person = newNonPersonIdentificationName(bannerId)
+        def person = newNonPersonIdentificationNameCurrent(bannerId)
         personList << person
-        personIdentificationNameCompositeService.createOrUpdate([currentPersonIdentificationNames: personList])
+        personIdentificationNameCompositeService.createOrUpdate([personIdentificationNameCurrents: personList])
 
-        def currentPerson = PersonIdentificationName.fetchBannerNonPerson(bannerId)
+        def currentPerson = PersonIdentificationNameCurrent.fetchByBannerId(bannerId)
         assertNotNull currentPerson.pidm
         assertEquals "Acme Rocket and Anvils", currentPerson.lastName
         assertNull currentPerson.firstName
@@ -65,37 +68,38 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
         assertEquals 0L, currentPerson.version
 
         // Make sure no alternate person records were created.
-        def alternatePersons = PersonIdentificationName.fetchAllPersonByPidmAndChangeIndicatorNotNull(currentPerson.pidm)
+        def alternatePersons = PersonIdentificationNameAlternate.fetchAllByPidm(currentPerson.pidm)
         assertEquals 0, alternatePersons.size()
     }
 
 
-    void testCreateCurrentPersonIdentificationNameWithGeneratedId() {
-//        def personList = []
-//
-//        def person = newPersonIdentificationName("GENERATED")
-//        personList << person
-//        personIdentificationNameCompositeService.createOrUpdate([currentPersonIdentificationNames: personList])
-//
-//        def persons = PersonIdentificationName.findAllByBannerId("ID-T00001")
-//        assertEquals 1, persons.size()
-//
-//        def currentPerson = persons.get(0)
-//        assertNotNull currentPerson.pidm
-//        assertEquals "Adams", currentPerson.lastName
-//        assertEquals 0L, currentPerson.version
+    void testCreateCurrentPersonIdentificationNameWithInvalidChangeIndicator() {
+        def bannerId = "ID-T00001"
+        def personList = []
+
+        def person = newPersonIdentificationNameCurrent(bannerId)
+        person.changeIndicator = "I"
+        personList << person
+
+        try {
+            personIdentificationNameCompositeService.createOrUpdate([personIdentificationNameCurrents: personList])
+            fail "Should have failed because change indicator must be null."
+        }
+        catch (ApplicationException ae) {
+            assertApplicationException ae, "changeIndicatorMustBeNull"
+        }
     }
 
 
     void testCreateCurrentWhereBannerIdExists() {
         def personList = []
-        def person1 = newPersonIdentificationName("ID-T00001")
-        def person2 = newPersonIdentificationName("ID-T00001")
+        def person1 = newPersonIdentificationNameCurrent("ID-T00001")
+        def person2 = newPersonIdentificationNameCurrent("ID-T00001")
         personList << person1
         personList << person2
 
         try {
-            personIdentificationNameCompositeService.createOrUpdate([currentPersonIdentificationNames: personList])
+            personIdentificationNameCompositeService.createOrUpdate([personIdentificationNameCurrents: personList])
             fail "should have failed because you cannot create two person with the same banner id"
         }
         catch (ApplicationException ae) {
@@ -108,22 +112,22 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
         def origBannerId = "ID-T00001"
         def updateBannerId = "ID-U00001"
 
-        def person = setupNewPersonIdentificationName(origBannerId)
+        def person = setupNewPersonIdentificationNameCurrent(origBannerId)
 
         // Update the person's banner id
         person.bannerId = updateBannerId
 
         def updatedPersonList = []
         updatedPersonList << person
-        personIdentificationNameCompositeService.createOrUpdate([currentPersonIdentificationNames: updatedPersonList])
+        personIdentificationNameCompositeService.createOrUpdate([personIdentificationNameCurrents: updatedPersonList])
 
-        def currentPerson = PersonIdentificationName.fetchBannerPerson(updateBannerId)
+        def currentPerson = PersonIdentificationNameCurrent.fetchByBannerId(updateBannerId)
         assertNotNull currentPerson
         assertEquals person.pidm, currentPerson.pidm
         assertEquals updateBannerId, currentPerson.bannerId
         assertEquals 1L, currentPerson.version
 
-        def alternatePersons = PersonIdentificationName.fetchAllPersonByPidmAndChangeIndicatorNotNull(currentPerson.pidm)
+        def alternatePersons = PersonIdentificationNameAlternate.fetchAllByPidm(currentPerson.pidm)
         assertEquals 1, alternatePersons.size()
 
         // Check the alternate id
@@ -139,23 +143,23 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
         def origBannerId = "ID-T00001"
         def updateBannerId = "ID-U00001"
 
-        def person = setupNewNonPersonIdentificationName(origBannerId)
+        def person = setupNewNonPersonIdentificationNameCurrent(origBannerId)
 
         // Update the non-person's banner id
         person.bannerId = updateBannerId
 
         def updatedPersonList = []
         updatedPersonList << person
-        personIdentificationNameCompositeService.createOrUpdate([currentPersonIdentificationNames: updatedPersonList])
+        personIdentificationNameCompositeService.createOrUpdate([personIdentificationNameCurrents: updatedPersonList])
 
-        def currentPerson = PersonIdentificationName.fetchBannerNonPerson(updateBannerId)
+        def currentPerson = PersonIdentificationNameCurrent.fetchByBannerId(updateBannerId)
         assertNotNull currentPerson
         assertEquals person.pidm, currentPerson.pidm
         assertEquals updateBannerId, currentPerson.bannerId
         assertEquals 1L, currentPerson.version
 
         // Check the alternate id
-        def alternatePersons = PersonIdentificationName.fetchAllPersonByPidmAndChangeIndicatorNotNull(currentPerson.pidm)
+        def alternatePersons = PersonIdentificationNameAlternate.fetchAllByPidm(currentPerson.pidm)
         assertEquals 1, alternatePersons.size()
 
         def alternatePerson = alternatePersons.get(0)
@@ -167,8 +171,8 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
 
 
     void testUpdateBannerIdToExistingBannerId() {
-        def person1 = setupNewPersonIdentificationName("ID-T00001")
-        def person2 = setupNewPersonIdentificationName("ID-T00002")
+        def person1 = setupNewPersonIdentificationNameCurrent("ID-T00001")
+        def person2 = setupNewPersonIdentificationNameCurrent("ID-T00002")
 
         // Update the person1 banner id to one that already exists
         person1.bannerId = "ID-T00002"
@@ -177,7 +181,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
         updatedPersonList << person1
 
         try {
-            personIdentificationNameCompositeService.createOrUpdate([currentPersonIdentificationNames: updatedPersonList])
+            personIdentificationNameCompositeService.createOrUpdate([personIdentificationNameCurrents: updatedPersonList])
             fail "should have failed because you cannot create two person with the same banner id"
         }
         catch (ApplicationException ae) {
@@ -192,7 +196,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
         def updateFirstName = "UPDATED_FIRST_NAME"
         def updateMiddleName = "UPDATED_MIDDLE_NAME"
 
-        def person = setupNewPersonIdentificationName(origBannerId)
+        def person = setupNewPersonIdentificationNameCurrent(origBannerId)
         def origLastName = person.lastName
         def origFirstName = person.firstName
         def origMiddleName = person.middleName
@@ -204,10 +208,10 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
 
         def updatedPersonList = []
         updatedPersonList << person
-        personIdentificationNameCompositeService.createOrUpdate([currentPersonIdentificationNames: updatedPersonList])
+        personIdentificationNameCompositeService.createOrUpdate([personIdentificationNameCurrents: updatedPersonList])
 
         // Check the current id
-        def currentPerson = PersonIdentificationName.fetchBannerPerson(origBannerId)
+        def currentPerson = PersonIdentificationNameCurrent.fetchByBannerId(origBannerId)
         assertNotNull currentPerson?.pidm
         assertEquals updateLastName, currentPerson.lastName
         assertEquals updateFirstName, currentPerson.firstName
@@ -215,7 +219,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
         assertEquals 1L, currentPerson.version
 
         // Check the alternate id
-        def alternatePersons = PersonIdentificationName.fetchAllPersonByPidmAndChangeIndicatorNotNull(currentPerson.pidm)
+        def alternatePersons = PersonIdentificationNameAlternate.fetchAllByPidm(currentPerson.pidm)
         assertEquals 1, alternatePersons.size()
 
         def alternatePerson = alternatePersons.get(0)
@@ -231,7 +235,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
         def origBannerId = "ID-T00001"
         def updateLastName = "UPDATED_LAST_NAME"
 
-        def person = setupNewNonPersonIdentificationName(origBannerId)
+        def person = setupNewNonPersonIdentificationNameCurrent(origBannerId)
         def origLastName = person.lastName
 
         // Update the person's name
@@ -239,16 +243,16 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
 
         def updatedPersonList = []
         updatedPersonList << person
-        personIdentificationNameCompositeService.createOrUpdate([currentPersonIdentificationNames: updatedPersonList])
+        personIdentificationNameCompositeService.createOrUpdate([personIdentificationNameCurrents: updatedPersonList])
 
         // Check the current id
-        def currentPerson = PersonIdentificationName.fetchBannerNonPerson(origBannerId)
+        def currentPerson = PersonIdentificationNameCurrent.fetchByBannerId(origBannerId)
         assertNotNull currentPerson?.pidm
         assertEquals updateLastName, currentPerson.lastName
         assertEquals 1L, currentPerson.version
 
         // Check the alternate id
-        def alternatePersons = PersonIdentificationName.fetchAllPersonByPidmAndChangeIndicatorNotNull(currentPerson.pidm)
+        def alternatePersons = PersonIdentificationNameAlternate.fetchAllByPidm(currentPerson.pidm)
         assertEquals 1, alternatePersons.size()
 
         def alternatePerson = alternatePersons.get(0)
@@ -259,7 +263,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
 
 
     void testUpdateCurrentBannerIdAndName() {
-        def person = setupNewPersonIdentificationName("ID-T00001")
+        def person = setupNewPersonIdentificationNameCurrent("ID-T00001")
 
         // Update the person's name
         person.bannerId = "ID-U00001"
@@ -271,7 +275,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
         updatedPersonList << person
 
         try {
-            personIdentificationNameCompositeService.createOrUpdate([currentPersonIdentificationNames: updatedPersonList])
+            personIdentificationNameCompositeService.createOrUpdate([personIdentificationNameCurrents: updatedPersonList])
             fail "should have failed because you cannot update both the banner id and name"
         }
         catch (ApplicationException ae) {
@@ -283,30 +287,30 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
     void testUpdateCurrentNameType() {
         def bannerId = "ID-T00001"
 
-        def person = setupNewPersonIdentificationName(bannerId)
+        def person = setupNewPersonIdentificationNameCurrent(bannerId)
 
         // Update the person's name
-        person.nameType = NameType.findWhere(code: "BRTH")
+        person.nameType = NameType.findWhere(code: "PROF")
 
         def updatedPersonList = []
         updatedPersonList << person
-        personIdentificationNameCompositeService.createOrUpdate([currentPersonIdentificationNames: updatedPersonList])
+        personIdentificationNameCompositeService.createOrUpdate([personIdentificationNameCurrents: updatedPersonList])
 
         // Check the current id
-        def currentPerson = PersonIdentificationName.fetchBannerPerson(bannerId)
+        def currentPerson = PersonIdentificationNameCurrent.fetchByBannerId(bannerId)
         assertNotNull currentPerson
         assertEquals person.pidm, currentPerson.pidm
-        assertEquals "BRTH", currentPerson.nameType.code
+        assertEquals "PROF", currentPerson.nameType.code
         assertEquals 1L, currentPerson.version
 
         // Make sure no alternate person records were created.
-        def alternatePersons = PersonIdentificationName.fetchAllPersonByPidmAndChangeIndicatorNotNull(currentPerson.pidm)
+        def alternatePersons = PersonIdentificationNameAlternate.fetchAllByPidm(currentPerson.pidm)
         assertEquals 0, alternatePersons.size()
     }
 
 
     void testUpdateCurrentEntityIndicator() {
-        def person = setupNewPersonIdentificationName("ID-T00001")
+        def person = setupNewPersonIdentificationNameCurrent("ID-T00001")
 
         // Change from person entity to non-person entity
         person.entityIndicator = "C"
@@ -316,7 +320,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
         updatedPersonList << person
 
         try {
-            personIdentificationNameCompositeService.createOrUpdate([currentPersonIdentificationNames: updatedPersonList])
+            personIdentificationNameCompositeService.createOrUpdate([personIdentificationNameCurrents: updatedPersonList])
             fail "should have failed because you cannot update the entity indicator"
         }
         catch (ApplicationException ae) {
@@ -326,13 +330,15 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
 
 
     void testUpdateCurrentNoChanges() {
-        def person = setupNewPersonIdentificationName("ID-T00001")
+        def person = setupNewPersonIdentificationNameCurrent("ID-T00001")
+
+        person.dataOrigin = "TEST"
 
         def updatedPersonList = []
         updatedPersonList << person
 
         try {
-            personIdentificationNameCompositeService.createOrUpdate([currentPersonIdentificationNames: updatedPersonList])
+            personIdentificationNameCompositeService.createOrUpdate([personIdentificationNameCurrents: updatedPersonList])
             fail "should have failed because you cannot update both the banner id and name"
         }
         catch (ApplicationException ae) {
@@ -342,7 +348,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
 
 
     void testUpdateReadOnlyFields() {
-        def person = setupNewPersonIdentificationName("ID-T00001")
+        def person = setupNewPersonIdentificationNameCurrent("ID-T00001")
         def alternatePerson = setupNewAlternateBannerId(person, "ID-A00001")
 
         alternatePerson.changeIndicator = "N"
@@ -350,7 +356,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
         alternateList << alternatePerson
 
         try {
-            personIdentificationNameCompositeService.createOrUpdate([alternatePersonIdentificationNames: alternateList])
+            personIdentificationNameCompositeService.createOrUpdate([personIdentificationNameCurrents: alternateList])
             fail "This should have failed with @@r1:readonlyFieldsCannotBeModified"
         }
         catch (ApplicationException ae) {
@@ -360,13 +366,13 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
 
 
     void testDeleteCurrent() {
-        def person = setupNewPersonIdentificationName("ID-T00001")
+        def person = setupNewPersonIdentificationNameCurrent("ID-T00001")
 
         def deletePersonList = []
         deletePersonList << person
 
         try {
-            personIdentificationNameCompositeService.createOrUpdate([deleteAlternatePersonIdentificationNames: deletePersonList])
+            personIdentificationNameCompositeService.createOrUpdate([deletePersonIdentificationNameCurrents: deletePersonList])
             fail "should have failed because you cannot delete the current id"
         }
         catch (ApplicationException ae) {
@@ -382,10 +388,10 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
         def origBannerId = "ID-T00001"
         def altBannerId = "ID-U00001"
 
-        def person = setupNewPersonIdentificationName(origBannerId)
+        def person = setupNewPersonIdentificationNameCurrent(origBannerId)
 
         // Instantiate an alternate id change
-        def alternatePerson = new PersonIdentificationName(
+        def alternatePerson = new PersonIdentificationNameAlternate(
                 pidm: person.pidm,
                 bannerId: altBannerId,
                 lastName: person.lastName,
@@ -398,17 +404,17 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
 
         def alternatePersonList = []
         alternatePersonList << alternatePerson
-        personIdentificationNameCompositeService.createOrUpdate([alternatePersonIdentificationNames: alternatePersonList])
+        personIdentificationNameCompositeService.createOrUpdate([personIdentificationNameAlternates: alternatePersonList])
 
         // Check the current id
-        def currentPerson = PersonIdentificationName.fetchBannerPerson(origBannerId)
+        def currentPerson = PersonIdentificationNameCurrent.fetchByBannerId(origBannerId)
         assertNotNull currentPerson
         assertEquals person.pidm, currentPerson.pidm
         assertEquals origBannerId, currentPerson.bannerId
         assertEquals 0L, currentPerson.version
 
         // Check the alternate id
-        def alternatePersons = PersonIdentificationName.fetchAllPersonByPidmAndChangeIndicatorNotNull(currentPerson.pidm)
+        def alternatePersons = PersonIdentificationNameAlternate.fetchAllByPidm(currentPerson.pidm)
         assertEquals 1, alternatePersons.size()
 
         alternatePerson = alternatePersons.get(0)
@@ -426,10 +432,10 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
         def altFirstName = "ALTERNATE_FIRST_NAME"
         def altMiddleName = "ALTERNATE_MIDDLE_NAME"
 
-        def person = setupNewPersonIdentificationName(origBannerId)
+        def person = setupNewPersonIdentificationNameCurrent(origBannerId)
 
         // Instantiate an alternate id change
-        def alternatePerson = new PersonIdentificationName(
+        def alternatePerson = new PersonIdentificationNameAlternate(
                 pidm: person.pidm,
                 bannerId: person.bannerId,
                 lastName: altLastName,
@@ -442,17 +448,17 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
 
         def alternatePersonList = []
         alternatePersonList << alternatePerson
-        personIdentificationNameCompositeService.createOrUpdate([alternatePersonIdentificationNames: alternatePersonList])
+        personIdentificationNameCompositeService.createOrUpdate([personIdentificationNameAlternates: alternatePersonList])
 
         // Check the current id
-        def currentPerson = PersonIdentificationName.fetchBannerPerson(origBannerId)
+        def currentPerson = PersonIdentificationNameCurrent.fetchByBannerId(origBannerId)
         assertNotNull currentPerson?.pidm
         assertEquals origBannerId, currentPerson.bannerId
         assertEquals "Adams", currentPerson.lastName
         assertEquals 0L, currentPerson.version
 
         // Check the alternate id
-        def alternatePersons = PersonIdentificationName.fetchAllPersonByPidmAndChangeIndicatorNotNull(currentPerson.pidm)
+        def alternatePersons = PersonIdentificationNameAlternate.fetchAllByPidm(currentPerson.pidm)
         assertEquals 1, alternatePersons.size()
 
         alternatePerson = alternatePersons.get(0)
@@ -464,21 +470,52 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
         assertEquals 0L, alternatePerson.version
     }
 
+    void testCreateAlternatePersonIdentificationNameWithNullChangeIndicator() {
+        def origBannerId = "ID-T00001"
+        def altBannerId = "ID-U00001"
+
+        def person = setupNewPersonIdentificationNameCurrent(origBannerId)
+
+        // Instantiate an alternate id change
+        def alternatePerson = new PersonIdentificationNameAlternate(
+                pidm: person.pidm,
+                bannerId: altBannerId,
+                lastName: person.lastName,
+                firstName: person.firstName,
+                middleName: person.middleName,
+                changeIndicator: null,
+                entityIndicator: "P",
+                nameType: NameType.findByCode("BRTH")
+        )
+
+        def alternatePersonList = []
+        alternatePersonList << alternatePerson
+
+        try {
+            personIdentificationNameCompositeService.createOrUpdate([personIdentificationNameAlternates: alternatePersonList])
+            fail "Should have failed because change indicator must be null."
+        }
+        catch (ApplicationException ae) {
+            assertApplicationException ae, "changeIndicatorCannotBeNull"
+        }
+    }
+
 
     void testUpdateAlternateNameType() {
         def origBannerId = "ID-T00001"
         def altBannerId = "ID-A00001"
 
-        def person = setupNewPersonIdentificationName(origBannerId)
+        def person = setupNewPersonIdentificationNameCurrent(origBannerId)
         def alternatePerson = setupNewAlternateBannerId(person, altBannerId)
 
-        alternatePerson.nameType = NameType.findByCode("BRTH")
+        alternatePerson.nameType = NameType.findByCode("PROF")
         def alternateList = []
         alternateList << alternatePerson
+        personIdentificationNameCompositeService.createOrUpdate([personIdentificationNameAlternates: alternateList])
 
-        alternatePerson = PersonIdentificationName.get(alternatePerson.id)
+        alternatePerson = PersonIdentificationNameAlternate.get(alternatePerson.id)
         assertNotNull alternatePerson
-        assertEquals "BRTH", alternatePerson.nameType.code
+        assertEquals "PROF", alternatePerson.nameType.code
     }
 
 
@@ -487,7 +524,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
         def altBannerId = "ID-A00001"
         def updateBannerId = "ID-U00001"
 
-        def person = setupNewPersonIdentificationName(origBannerId)
+        def person = setupNewPersonIdentificationNameCurrent(origBannerId)
         def alternatePerson = setupNewAlternateBannerId(person, altBannerId)
 
         alternatePerson.bannerId = updateBannerId
@@ -495,7 +532,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
         alternateList << alternatePerson
 
         try {
-            personIdentificationNameCompositeService.createOrUpdate([alternatePersonIdentificationNames: alternateList])
+            personIdentificationNameCompositeService.createOrUpdate([personIdentificationNameAlternates: alternateList])
             fail "should have failed because you can only update name type on alternate id records"
         }
         catch (ApplicationException ae) {
@@ -511,7 +548,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
         def altLastName = "ALTERNATE_LAST_NAME"
         def altFirstName = "ALTERNATE_FIRST_NAME"
 
-        def person = setupNewPersonIdentificationName(origBannerId)
+        def person = setupNewPersonIdentificationNameCurrent(origBannerId)
 
         // Create some alternate id records
         def alternatePerson1 = setupNewAlternateBannerId(person, altBannerId)
@@ -521,18 +558,18 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
         person.bannerId = updateBannerId
         def updatedPersonList = []
         updatedPersonList << person
-        personIdentificationNameCompositeService.createOrUpdate([currentPersonIdentificationNames: updatedPersonList])
+        personIdentificationNameCompositeService.createOrUpdate([personIdentificationNameAlternates: updatedPersonList])
 
         // We should have 3 alternate id records
-        def updatedPersons = PersonIdentificationName.fetchAllPersonByPidmAndChangeIndicatorNotNull(person.pidm)
+        def updatedPersons = PersonIdentificationName.fetchAllByPidmAndChangeIndicatorNotNull(person.pidm)
         assertEquals 3, updatedPersons.size()
 
         def deleteList = []
         deleteList << alternatePerson1
         deleteList << alternatePerson2
-        personIdentificationNameCompositeService.createOrUpdate([deleteAlternatePersonIdentificationNames: deleteList])
+        personIdentificationNameCompositeService.createOrUpdate([deletePersonIdentificationNameAlternates: deleteList])
 
-        def personList = PersonIdentificationName.fetchAllPersonByPidmAndChangeIndicatorNotNull(person.pidm)
+        def personList = PersonIdentificationNameAlternate.fetchAllByPidm(person.pidm)
         assertEquals 1, personList.size()
     }
 
@@ -543,10 +580,10 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
     /**
      * Creates a new person current id record.
      */
-    private def setupNewPersonIdentificationName(String bannerId) {
+    private def setupNewPersonIdentificationNameCurrent(bannerId) {
 
-        def person = newPersonIdentificationName(bannerId)
-        person = personIdentificationNameService.create([domainModel: person])
+        def person = newPersonIdentificationNameCurrent(bannerId)
+        person = personIdentificationNameCurrentService.create([domainModel: person])
         assertNotNull person?.id
 
         person
@@ -555,10 +592,10 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
     /**
      * Creates a new non-person current id record.
      */
-    private def setupNewNonPersonIdentificationName(String bannerId) {
+    private def setupNewNonPersonIdentificationNameCurrent(String bannerId) {
 
-        def person = newNonPersonIdentificationName(bannerId)
-        person = personIdentificationNameService.create([domainModel: person])
+        def person = newNonPersonIdentificationNameCurrent(bannerId)
+        person = personIdentificationNameCurrentService.create([domainModel: person])
         assertNotNull person.id
 
         person
@@ -569,7 +606,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
      */
     private def setupNewAlternateBannerId(currentPerson, String altBannerId) {
 
-        def alternatePerson = new PersonIdentificationName(
+        def alternatePerson = new PersonIdentificationNameAlternate(
                 pidm: currentPerson.pidm,
                 bannerId: altBannerId,
                 lastName: currentPerson.lastName,
@@ -580,7 +617,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
                 nameType: currentPerson.nameType
         )
 
-        alternatePerson = personIdentificationNameService.create([domainModel: alternatePerson])
+        alternatePerson = personIdentificationNameAlternateService.create([domainModel: alternatePerson])
         assertNotNull alternatePerson?.id
         assertEquals altBannerId, alternatePerson.bannerId
         assertEquals 0L, alternatePerson.version
@@ -593,7 +630,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
      */
     private def setupNewAlternateName(currentPerson, names) {
 
-        def alternatePerson = new PersonIdentificationName(
+        def alternatePerson = new PersonIdentificationNameAlternate(
                 pidm: currentPerson.pidm,
                 bannerId: currentPerson.bannerId,
                 lastName: names["lastName"],
@@ -604,7 +641,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
                 nameType: currentPerson.nameType
         )
 
-        alternatePerson = personIdentificationNameService.create([domainModel: alternatePerson])
+        alternatePerson = personIdentificationNameAlternateService.create([domainModel: alternatePerson])
         assertNotNull alternatePerson?.id
         assertEquals names["lastName"], alternatePerson.lastName
         assertEquals 0L, alternatePerson.version
@@ -613,8 +650,8 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
     }
 
 
-    private def newPersonIdentificationName(String bannerId) {
-        def personIdentificationName = new PersonIdentificationName(
+    private def newPersonIdentificationNameCurrent(String bannerId) {
+        def personIdentificationNameCurrent = new PersonIdentificationNameCurrent(
                 pidm: null,
                 bannerId: bannerId,
                 lastName: "Adams",
@@ -622,16 +659,15 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
                 middleName: "W",
                 changeIndicator: null,
                 entityIndicator: "P",
-                nameType: NameType.findByCode("PROF")
+                nameType: NameType.findByCode("BRTH")
         )
 
-        return personIdentificationName
+        return personIdentificationNameCurrent
     }
 
 
-
-    private def newNonPersonIdentificationName(String bannerId) {
-        def personIdentificationName = new PersonIdentificationName(
+    private def newNonPersonIdentificationNameCurrent(String bannerId) {
+        def personIdentificationNameCurrent = new PersonIdentificationNameCurrent(
                 pidm: null,
                 bannerId: bannerId,
                 lastName: "Acme Rocket and Anvils",
@@ -641,7 +677,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
                 nameType: NameType.findByCode("CORP")
         )
 
-        return personIdentificationName
+        return personIdentificationNameCurrent
     }
 
 }

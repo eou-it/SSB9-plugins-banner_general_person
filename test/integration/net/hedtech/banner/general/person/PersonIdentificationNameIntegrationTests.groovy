@@ -12,7 +12,6 @@
 
 package net.hedtech.banner.general.person
 
-import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.system.NameType
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 import groovy.sql.Sql
@@ -38,25 +37,6 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
         save personIdentificationName
         //Test if the generated entity now has an id assigned
         assertNotNull personIdentificationName.id
-    }
-
-
-    void testUpdatePersonIdentificationName() {
-        def personIdentificationName = newPersonIdentificationName()
-        personIdentificationName.save(flush: true, failOnError: true)
-        //Test if the generated entity now has an id assigned
-        assertNotNull personIdentificationName.id
-
-        personIdentificationName.nameType = NameType.findWhere(code: "PROF")
-
-        try {
-            personIdentificationName.save(flush: true, failOnError: true)
-            fail("this should have failed, updates not allowed for sorlcur")
-        }
-        catch (ApplicationException ae) {
-            assertApplicationException ae, "unsupported.operation"
-
-        }
     }
 
 
@@ -372,4 +352,78 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
         return personIdentificationName
     }
 
+    void testAltId() {
+        // you cannot update the spriden ID or name using the sv_spriden
+        // you need to use the API. The reason is the sv_spriden trigger sets the surrogate ID
+        // the API to update will insert a new spriden with the new ID and the surrogate ID is not set correctly
+        // create the new ID using pl/sql block
+        def sql = new Sql(sessionFactory.getCurrentSession().connection())
+        def idSql = """select gb_common.f_generate_id bannerId from dual"""
+        def bannerId = sql.firstRow(idSql).bannerId
+        assertNotNull bannerId
+        def bannerPidm = null
+
+        sql.call("""
+         declare
+
+         Lv_Id_Ref Gb_Identification.Identification_Ref;
+         spriden_current Gb_Identification.identification_rec;
+         test_pidm spriden.spriden_pidm%type;
+         test_rowid varchar2(30);
+         begin
+
+         gb_identification.p_create(
+         P_ID_INOUT => ${bannerId},
+         P_LAST_NAME => 'Miller',
+         P_FIRST_NAME => 'Ann',
+         P_MI => 'Elizabeth',
+         P_CHANGE_IND => NULL,
+         P_ENTITY_IND => 'P',
+         P_User => User,
+         P_ORIGIN => 'banner',
+         P_NTYP_CODE => NULL,
+         P_DATA_ORIGIN => 'banner',
+         P_PIDM_INOUT => test_pidm,
+         P_Rowid_Out => Test_Rowid);
+
+         Lv_Id_Ref := Gb_Identification.F_Query_One(test_Pidm);
+         Fetch Lv_Id_Ref Into spriden_current;
+         CLOSE lv_id_ref;
+
+         GB_IDENTIFICATION.P_UPDATE(p_PIDM => test_pidm,
+         p_ID =>'TTT001',
+         p_LAST_NAME => spriden_current.r_LAST_NAME,
+         p_FIRST_NAME => spriden_current.r_FIRST_NAME,
+         p_MI => spriden_current.r_MI,
+         p_CHANGE_IND => spriden_current.r_CHANGE_IND,
+         p_ENTITY_IND => spriden_current.r_ENTITY_IND,
+         p_USER =>user,
+         P_Ntyp_Code => Spriden_Current.r_Ntyp_Code,
+         p_DATA_ORIGIN =>'banner',
+         p_SURNAME_PREFIX => spriden_current.r_SURNAME_PREFIX,
+         P_Origin => Spriden_Current.R_Origin,
+         P_Rowid => Spriden_Current.r_internal_record_id);
+
+        ${Sql.VARCHAR} := test_pidm ;
+         end ;
+         """) { output_info -> bannerPidm = output_info }
+
+        def persons = PersonIdentificationName.findAllByPidm(bannerPidm)
+        assertEquals 2, persons.size()
+        // this is the alternative id
+        def alternativePerson = persons.find { it.changeIndicator == "I"}
+        assertNotNull alternativePerson.pidm
+        assertEquals bannerId, alternativePerson.bannerId
+        // this is the current ID
+        def currentPerson = persons.find { it.changeIndicator == null}
+        assertNotNull currentPerson.pidm
+        assertEquals "TTT001", currentPerson.bannerId
+
+    }
+    /**
+     * Please put all the custom tests in this protected section to protect the code
+     * from being overwritten on re-generation
+     */
+    /*PROTECTED REGION ID(personidentificationname_custom_integration_test_methods) ENABLED START*/
+    /*PROTECTED REGION END*/
 }

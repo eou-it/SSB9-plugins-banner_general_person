@@ -1,66 +1,94 @@
 /*********************************************************************************
- Copyright 2009-2011 SunGard Higher Education. All Rights Reserved.
- This copyrighted software contains confidential and proprietary information of 
- SunGard Higher Education and its subsidiaries. Any use of this software is limited 
- solely to SunGard Higher Education licensees, and is further subject to the terms 
- and conditions of one or more written license agreements between SunGard Higher 
- Education and the licensee in question. SunGard is either a registered trademark or
- trademark of SunGard Data Systems in the U.S.A. and/or other regions and/or countries.
- Banner and Luminis are either registered trademarks or trademarks of SunGard Higher 
- Education in the U.S.A. and/or other regions and/or countries.
+ Copyright 2013 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
-import grails.util.GrailsNameUtils
 import net.hedtech.banner.exceptions.ApplicationException
+import net.hedtech.banner.service.ServiceBase
 import org.apache.log4j.Logger
-import org.codehaus.groovy.grails.commons.GrailsClassUtils
 
 import java.sql.CallableStatement
 
-class PersonIdentificationNameCompositeService {
+/**
+ *  This service is used to process PersonIdentificationName, PersonIdentificationNameCurrent,
+ *  and PersonIdentificationNameAlternate changes.
+ *  The standard service update behavior for PersonIdentificationNameService, PersonIdentificationNameCurrentService,
+ *  and PersonIdentificationNameAlternateService has been overridden in this composite service.
+ */
+class PersonIdentificationNameCompositeService extends ServiceBase {
 
-    def personIdentificationNameService
     boolean transactional = true
     def sessionFactory
     def log = Logger.getLogger(this.getClass())
 
+    def personIdentificationNameService
+    def personIdentificationNameCurrentService
+    def personIdentificationNameAlternateService
+
 
     public def createOrUpdate(map) {
 
-        if (map?.deleteAlternatePersonIdentificationNames) {
-            deleteAlternatePersonIdentificationNames(map?.deleteAlternatePersonIdentificationNames, personIdentificationNameService)
+        if (map?.deletePersonIdentificationNames) {
+            deleteDomains(map?.deletePersonIdentificationNames, personIdentificationNameService)
         }
 
-        processCurrentInsertUpdates(map?.currentPersonIdentificationNames, personIdentificationNameService)
+        if (map?.deletePersonIdentificationNameCurrents) {
+            deleteDomains(map?.deletePersonIdentificationNameCurrents, personIdentificationNameCurrentService)
+        }
 
-        processAlternateInsertUpdates(map?.alternatePersonIdentificationNames, personIdentificationNameService)
+        if (map?.deletePersonIdentificationNameAlternates) {
+            deleteDomains(map?.deletePersonIdentificationNameAlternates, personIdentificationNameAlternateService)
+        }
+
+        if (map?.personIdentificationNames) {
+            processInsertUpdates(map?.personIdentificationNames, personIdentificationNameService)
+        }
+
+        if (map?.personIdentificationNameCurrent) {
+            def personIdentificationNameCurrents = [map?.personIdentificationNameCurrent]  // Make into a list to conform to composite service
+            processInsertUpdates(personIdentificationNameCurrents, personIdentificationNameCurrentService)
+        }
+
+        if (map?.personIdentificationNameCurrents) {
+            processInsertUpdates(map?.personIdentificationNameCurrents, personIdentificationNameCurrentService)
+        }
+
+        if (map?.personIdentificationNameAlternates) {
+            processInsertUpdates(map?.personIdentificationNameAlternates, personIdentificationNameAlternateService)
+        }
     }
 
-
     /**
-     *  Delete alternate id domains
+     *  Delete PersonIdentificationName, PersonIdentificationNameCurrent, or PersonIdentificationNameAlternate domains.
      */
-    private def deleteAlternatePersonIdentificationNames(deleteList, service) {
+    private def deleteDomains(deleteList, service) {
 
         deleteList.each { domain ->
             def map = [domainModel: domain]
             service.delete(map)
 
-            // Refresh all alternate id records when is an alternate id is deleted.
-            // This will refresh any hibernate objects that the PL/SQL api might have deleted/created/updated.
-            def updatedPersons = PersonIdentificationName.fetchAllPersonByPidmAndChangeIndicatorNotNull(domain.pidm)
+            // Refresh all alternate id records when an alternate id is deleted.
+            // Within the PL/SQL api, a delete to an alternate id record (changeIndicator not = null)
+            // will also update other alternate id record.
+            // This will refresh any hibernate objects that the PL/SQL api may have updated.
+            // Note that the current id (changeIndicator = null) cannot be deleted and the PL/SQL api will throw an
+            // exception if an attempt is made to do so.
+            // TODO Change following query to use the alternate service
+            if (domain?.changeIndicator) {
+                def updatedPersons = PersonIdentificationName.fetchAllByPidmAndChangeIndicatorNotNull(domain.pidm)
+            }
         }
     }
 
     /**
-     *    Insert or update the current person identification records
+     * Insert or update the PersonIdentificationName,  PersonIdentificationNameCurrent,
+     * or PersonIdentificationNameAlternate domains
      */
-    private def processCurrentInsertUpdates(domainList, service) {
+    private def processInsertUpdates(domainList, service) {
 
         domainList.each { domain ->
             if (domain.id) {
-                updatePersonIdentificationName(domain)
+                updateDomain(domain)
             } else {
                 service.create(domainModel: domain)
             }
@@ -68,35 +96,41 @@ class PersonIdentificationNameCompositeService {
     }
 
     /**
-     *    Insert or update the alternate person identification records
+     * This is a custom update method for the person identification record.
+     * If an update is made to the current id record (changeIndicator = null),
+     * the PL/SQL api will update the current id record and then an alternate id record
+     * is created to track the old values.
      */
-    private def processAlternateInsertUpdates(domainList, service) {
+    private def updateDomain(domain) {
 
-        domainList.each { domain ->
-            if (domain.id) {
-                updatePersonIdentificationName(domain)
-            } else {
-                service.create(domainModel: domain)
-            }
-        }
-    }
-
-    /**
-     * Update the current person identification record.
-     * This is a custom update method for the current id record.
-     * Within the PL/SQL api, an update is made to the current record
-     * and then an alternate id record is created to track the old values.
-     */
-    private def updatePersonIdentificationName(domain) {
+        preUpdate(domain)
 
         def connection
-
-        checkReadOnlyProperties(domain)
+        def domainObject
 
         try {
-            connection = sessionFactory.currentSession.connection()
-            CallableStatement sqlCall = buildUpdateCall(connection, domain)
-            sqlCall.executeUpdate()
+            def content = extractParams(domain.class, domain, log)
+            domainObject = fetch(domain.class, content?.id, log)
+            domainObject.properties = content
+            def dirty = isDirty(domainObject)
+
+            if (dirty) {
+                checkOptimisticLock(domainObject, content, log)
+                validateReadOnlyPropertiesNotDirty(domainObject)
+
+                connection = sessionFactory.currentSession.connection()
+                CallableStatement sqlCall = buildUpdateCall(connection, domainObject)
+                sqlCall.executeUpdate()
+
+                domainObject.refresh()
+
+                // Refresh all alternate id records if the current id is updated.
+                // This will refresh any hibernate objects that the PL/SQL api might have created or updated.
+                if (!domainObject?.changeIndicator) {
+                    def updatedPersons = PersonIdentificationName.fetchAllByPidmAndChangeIndicatorNotNull(domainObject.pidm)
+                }
+            }
+
         }
         catch (ApplicationException ae) {
             log.debug "Could not update an existing ${this.class.simpleName} with id = ${domain?.id} due to exception: ${ae.message}", ae
@@ -109,15 +143,7 @@ class PersonIdentificationNameCompositeService {
             connection?.close()
         }
 
-        domain.refresh()
-
-        // Refresh all alternate id records when is the current id is being updated.
-        // This will refresh any hibernate objects that the PL/SQL api might have created/updated.
-        if (domain.changeIndicator == null) {
-            def updatedPersons = PersonIdentificationName.fetchAllPersonByPidmAndChangeIndicatorNotNull(domain.pidm)
-        }
-
-        domain
+        domainObject
     }
 
     /**
@@ -141,7 +167,7 @@ class PersonIdentificationNameCompositeService {
         sqlCall.setString(7, domainObject.entityIndicator)
         sqlCall.setString(8, domainObject.createUser)
         sqlCall.setString(9, domainObject.origin)
-        sqlCall.setString(10, domainObject.nameType.code)
+        sqlCall.setString(10, domainObject.nameType?.code)
         sqlCall.setString(11, domainObject.dataOrigin)
         sqlCall.setString(12, domainObject.surnamePrefix)
         sqlCall.setString(13, domainObject.personRowid)
@@ -150,20 +176,19 @@ class PersonIdentificationNameCompositeService {
     }
 
     /**
-     * Since the update operation calls the PL/SQL API directly (instead of using ServiceBase), we need to
-     * manually check the readOnly properties.
+     *  Verify that the change indicator is correct for the type of identification (current versus alternate).
      */
-    private def checkReadOnlyProperties(domain) {
-        def readonlyProperties = GrailsClassUtils.getPropertyOrStaticPropertyOrFieldValue(domain, 'readonlyProperties')
-        if (readonlyProperties) {
-            def dirtyProperties = domain.getDirtyPropertyNames()
-            def modifiedReadOnlyProperties = dirtyProperties?.findAll { it in readonlyProperties }
-            if (modifiedReadOnlyProperties.size() > 0) {
-                log.warn "Attempt to modify ${domain.class} read-only properties ${modifiedReadOnlyProperties}"
-                def cleanNames = modifiedReadOnlyProperties.collect { GrailsNameUtils.getNaturalName(it as String) }
-                throw new ApplicationException(domain, "@@r1:readonlyFieldsCannotBeModified:${cleanNames.join(', ')}@@")
+    private def preUpdate(domain) {
+        if (domain instanceof PersonIdentificationNameCurrent) {
+            if (domain?.changeIndicator) {
+                throw new ApplicationException(PersonIdentificationNameCurrent, "@@r1:changeIndicatorMustBeNull@@")
+            }
+        } else if (domain instanceof PersonIdentificationNameAlternate) {
+            if (!domain?.changeIndicator) {
+                throw new ApplicationException(PersonIdentificationNameAlternate, "@@r1:changeIndicatorCannotBeNull@@")
             }
         }
+
     }
 
 }

@@ -26,7 +26,15 @@ start sv_sprhold_upd_trg
 REM
 start sv_spriden_del_trg
 start sv_spriden_ins_trg
-REM  NOTE: SPRIDEN SHOULD NOT HAVE AN "INSTEAD OF UPDATE" TRIGGER
+REM   SV_SPRIDEN SHOULD NOT HAVE AN "INSTEAD OF UPDATE" TRIGGER
+REM
+start sv_spriden_cur_del_trg
+start sv_spriden_cur_ins_trg
+REM   SV_SPRIDEN_CURRENT SHOULD NOT HAVE AN "INSTEAD OF UPDATE" TRIGGER
+REM
+start sv_spriden_alt_del_trg
+start sv_spriden_alt_ins_trg
+REM   SV_SPRIDEN_ALTERNATE SHOULD NOT HAVE AN "INSTEAD OF UPDATE" TRIGGER
 REM
 start sv_sprmedi_del_trg
 start sv_sprmedi_ins_trg

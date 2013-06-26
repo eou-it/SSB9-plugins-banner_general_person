@@ -11,6 +11,8 @@ REM
 start sv_spraddr
 start sv_sprhold
 start sv_spriden
+start sv_spriden_cur
+start sv_spriden_alt
 start sv_sprmedi
 start sv_sprtele
 start gv_goremal

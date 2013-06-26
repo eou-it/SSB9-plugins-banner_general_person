@@ -8,16 +8,12 @@
  trademark of SunGard Data Systems in the U.S.A. and/or other regions and/or countries.
  Banner and Luminis are either registered trademarks or trademarks of SunGard Higher 
  Education in the U.S.A. and/or other regions and/or countries.
- ********************************************************************************* */
+ **********************************************************************************/
 
 package net.hedtech.banner.general.person
 
-import grails.validation.ValidationException
-import groovy.sql.Sql
-import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.service.ServiceBase
-
-import java.sql.CallableStatement
+import groovy.sql.Sql
 
 // NOTE:
 // This service is injected with create, update, and delete methods that may throw runtime exceptions (listed below).
@@ -30,7 +26,14 @@ import java.sql.CallableStatement
 class PersonIdentificationNameService extends ServiceBase {
 
     boolean transactional = true
+
     def sessionFactory
+
+    /**
+     * Please put all the custom methods in this protected section to protect the code
+     * from being overwritten on re-generation
+     */
+    /*PROTECTED REGION ID(personidentificationname_custom_service_methods) ENABLED START*/
 
 
     def fetchEntityOfPerson(pidm) {
@@ -55,7 +58,7 @@ class PersonIdentificationNameService extends ServiceBase {
     }
 
 
-    def getPrefixDisplayIndicatorForSelfService() {
+     def getPrefixDisplayIndicatorForSelfService() {
         def sql
         def prefixInd
         sql = new Sql(sessionFactory.getCurrentSession().connection())
@@ -65,25 +68,26 @@ class PersonIdentificationNameService extends ServiceBase {
         return prefixInd
     }
 
-/**
- *  Calls stand alone function (sufname.sql) f_format_name to return a formatted name.
- * @param pidm The pidm of the name to be returned
- * @parm fmt The format of the name to be returned.
- * @return formattedName
- *
- *      LF30 - Last name, first name for 30 characters
- *      L30 -  Last name for 30 characters
- *      L60 -  Last name for 60 characters
- *      FL30 - First name, last name for 30 characters
- *      FL   - Last name, first name
- *      FMIL - First name, middle initial, last name
- *      FML  - First name, middle name, last name
- *      LFMI - Last name, first name, middle initial
- *      LFM  - Last name, first name, middle
- *      LFIMI30 - Last name, first name initial, middle name initial
- *                for 30 characters
- *
- */
+
+     /**
+      *  Calls stand alone function (sufname.sql) f_format_name to return a formatted name.
+      * @param pidm The pidm of the name to be returned
+      * @parm fmt The format of the name to be returned.
+      * @return formattedName
+      *
+      *      LF30 - Last name, first name for 30 characters
+      *      L30 -  Last name for 30 characters
+      *      L60 -  Last name for 60 characters
+      *      FL30 - First name, last name for 30 characters
+      *      FL   - Last name, first name
+      *      FMIL - First name, middle initial, last name
+      *      FML  - First name, middle name, last name
+      *      LFMI - Last name, first name, middle initial
+      *      LFM  - Last name, first name, middle
+      *      LFIMI30 - Last name, first name initial, middle name initial
+      *                for 30 characters
+      *
+     */
     def getFormattedName(pidm, fmt) {
         def sql
         def formattedName
@@ -94,4 +98,6 @@ class PersonIdentificationNameService extends ServiceBase {
         return formattedName
     }
 
+
+    /*PROTECTED REGION END*/
 }
