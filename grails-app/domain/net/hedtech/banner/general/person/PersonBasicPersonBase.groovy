@@ -14,6 +14,11 @@ import javax.persistence.*
  */
 @Entity
 @Table(name = "SV_SPBPERS")
+@NamedQueries(value = [
+@NamedQuery(name = "PersonBasicPersonBase.fetchByPidm",
+query = """FROM  PersonBasicPersonBase a
+	       WHERE a.pidm = :pidm """)
+])
 class PersonBasicPersonBase implements Serializable {
 
     /**
@@ -551,5 +556,14 @@ class PersonBasicPersonBase implements Serializable {
     def private static finderByAll = {
         def query = """FROM  PersonBasicPersonBase a where a.pidm = :pidm """
         return new DynamicFinder(PersonBasicPersonBase.class, query, "a")
+    }
+
+
+    def static fetchByPidm(Integer pidm) {
+        PersonBasicPersonBase object = PersonBasicPersonBase.withSession { session ->
+            def list = session.getNamedQuery('PersonBasicPersonBase.fetchByPidm').setInteger('pidm', pidm).list()[0]
+        }
+
+        return object
     }
 }

@@ -630,6 +630,16 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
         assertErrorsFor personBasicPersonBase, 'maxSize', ['ssn', 'sex', 'confidIndicator', 'deadIndicator', 'vetcFileNumber', 'legalName', 'preferenceFirstName', 'namePrefix', 'nameSuffix', 'veraIndicator', 'citizenshiopIndicator', 'hair', 'eyeColor', 'cityBirth', 'driverLicense', 'sdvetIndicator', 'incarcerationIndicator', 'ethnic', 'confirmedRe']
     }
 
+    void testFindByPidm() {
+        def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()
+        personBasicPersonBase.save(failOnError: true, flush: true)
+        assertNotNull personBasicPersonBase.id
+
+        def newPersonBasicPersonBase = PersonBasicPersonBase.fetchByPidm(personBasicPersonBase.pidm)
+        //Test if the generated entity now has an id assigned
+        assertNotNull newPersonBasicPersonBase.id
+    }
+
 
     private def newValidForCreatePersonBasicPersonBase() {
         def sql = new Sql(sessionFactory.getCurrentSession().connection())
