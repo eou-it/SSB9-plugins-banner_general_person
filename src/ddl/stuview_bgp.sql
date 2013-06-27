@@ -28,3 +28,4 @@ start svq_altisrc
 start svq_idsrch
 start sv_spbpers
 start gv_goradid
+start sv_spremrg
