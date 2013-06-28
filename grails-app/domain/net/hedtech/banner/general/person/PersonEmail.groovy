@@ -61,45 +61,45 @@ class PersonEmail implements Serializable {
      * Optimistic lock token for GOREMAL
      */
     @Version
-    @Column(name = "GOREMAL_VERSION", nullable = false, precision = 19)
+    @Column(name = "GOREMAL_VERSION")
     Long version
 
     /**
      * The pidm of the entity who owns this e-mail information.
      */
-    @Column(name = "GOREMAL_PIDM", nullable = false, unique = true, precision = 8)
+    @Column(name = "GOREMAL_PIDM")
     Integer pidm
 
     /**
      * The e-mail address.
      */
-    @Column(name = "GOREMAL_EMAIL_ADDRESS", nullable = false, unique = true, length = 128)
+    @Column(name = "GOREMAL_EMAIL_ADDRESS")
     String emailAddress
 
     /**
      * The status of the e-mail address: (A)ctive, (I)nactive
      */
-    @Column(name = "GOREMAL_STATUS_IND", nullable = false, length = 1)
+    @Column(name = "GOREMAL_STATUS_IND")
     String statusIndicator
 
     /**
      * This column indicates if the e-mail address is the preferred contact address.
      */
     @Type(type = "yes_no")
-    @Column(name = "GOREMAL_PREFERRED_IND", nullable = false, length = 1)
+    @Column(name = "GOREMAL_PREFERRED_IND")
     Boolean preferredIndicator
 
     /**
      * This is a free format comment regarding the e-mail information.
      */
-    @Column(name = "GOREMAL_COMMENT", length = 60)
+    @Column(name = "GOREMAL_COMMENT")
     String commentData
 
     /**
      * Indicate whether a e-mail address should appear on Web.
      */
     @Type(type = "yes_no")
-    @Column(name = "GOREMAL_DISP_WEB_IND", nullable = false, length = 1)
+    @Column(name = "GOREMAL_DISP_WEB_IND")
     Boolean displayWebIndicator
 
     /**
@@ -112,13 +112,13 @@ class PersonEmail implements Serializable {
     /**
      * The user id when the row was added or modified.
      */
-    @Column(name = "GOREMAL_USER_ID", length = 30)
+    @Column(name = "GOREMAL_USER_ID")
     String lastModifiedBy
 
     /**
      * DATA ORIGIN: Source system that created or updated the row
      */
-    @Column(name = "GOREMAL_DATA_ORIGIN", length = 30)
+    @Column(name = "GOREMAL_DATA_ORIGIN")
     String dataOrigin
 
     /**
