@@ -17,6 +17,7 @@ package net.hedtech.banner.general.person
 
 import net.hedtech.banner.general.system.AddressType
 import net.hedtech.banner.general.system.TelephoneType
+import net.hedtech.banner.query.DynamicFinder
 
 import javax.persistence.*
 
@@ -82,79 +83,79 @@ class PersonTelephone implements Serializable {
      * Optimistic lock token for SPRTELE
      */
     @Version
-    @Column(name = "SPRTELE_VERSION", nullable = false, precision = 19)
+    @Column(name = "SPRTELE_VERSION")
     Long version
 
     /**
      * Internal identification number.
      */
-    @Column(name = "SPRTELE_PIDM", nullable = false, unique = true, precision = 8)
+    @Column(name = "SPRTELE_PIDM")
     Integer pidm
 
     /**
      * Unique sequence number for telephone numbers associated with PIDM.
      */
-    @Column(name = "SPRTELE_SEQNO", nullable = false, unique = true, precision = 3)
+    @Column(name = "SPRTELE_SEQNO")
     Integer sequenceNumber
 
     /**
      * Telephone number area code.
      */
-    @Column(name = "SPRTELE_PHONE_AREA", length = 6)
+    @Column(name = "SPRTELE_PHONE_AREA")
     String phoneArea
 
     /**
      * Telephone number.
      */
-    @Column(name = "SPRTELE_PHONE_NUMBER", length = 12)
+    @Column(name = "SPRTELE_PHONE_NUMBER")
     String phoneNumber
 
     /**
      * Telephone number extention.
      */
-    @Column(name = "SPRTELE_PHONE_EXT", length = 10)
+    @Column(name = "SPRTELE_PHONE_EXT")
     String phoneExtension
 
     /**
      * STATUS: Status of telephone number, active or inactive.
      */
-    @Column(name = "SPRTELE_STATUS_IND", length = 1)
+    @Column(name = "SPRTELE_STATUS_IND")
     String statusIndicator
 
     /**
      * Address type sequence number associated with address type.
      */
-    @Column(name = "SPRTELE_ADDR_SEQNO", precision = 2)
+    @Column(name = "SPRTELE_ADDR_SEQNO")
     Integer addressSequenceNumber
 
     /**
      * Primary indicator to denote primary telephone numbers based on telephone types.
      */
-    @Column(name = "SPRTELE_PRIMARY_IND", length = 1)
+    @Column(name = "SPRTELE_PRIMARY_IND")
     String primaryIndicator
 
     /**
      * Unlisted telephone number indicator.
      */
-    @Column(name = "SPRTELE_UNLIST_IND", length = 1)
+    @Column(name = "SPRTELE_UNLIST_IND")
     String unlistIndicator
 
     /**
      * Comment relating to telephone number.
      */
-    @Column(name = "SPRTELE_COMMENT", length = 60)
+    @Column(name = "SPRTELE_COMMENT")
     String commentData
 
     /**
      * Free format International access code for telephone number including country and city code.
      */
-    @Column(name = "SPRTELE_INTL_ACCESS", length = 16)
+    @Column(name = "SPRTELE_INTL_ACCESS")
     String internationalAccess
 
     /**
      * COUNTRY CODE: Telephone code that designates the region and country.
      */
-    @Column(name = "SPRTELE_CTRY_CODE_PHONE", length = 4)
+    @Column(name = "SPRTELE_CTRY_CODE_PHONE")
     String countryPhone
 
     /**
@@ -167,13 +168,13 @@ class PersonTelephone implements Serializable {
     /**
      * USER ID: User who inserted or last update the data
      */
-    @Column(name = "SPRTELE_USER_ID", length = 30)
+    @Column(name = "SPRTELE_USER_ID")
     String lastModifiedBy
 
     /**
      * DATA SOURCE: Source system that generated the data
      */
-    @Column(name = "SPRTELE_DATA_ORIGIN", length = 30)
+    @Column(name = "SPRTELE_DATA_ORIGIN")
     String dataOrigin
 
     /**
@@ -273,7 +274,7 @@ class PersonTelephone implements Serializable {
 
     static constraints = {
         pidm(nullable: false, min: -99999999, max: 99999999)
-        sequenceNumber(nullable: false, min: -999, max: 999)
+        sequenceNumber(nullable: true, min: -999, max: 999)
         phoneArea(nullable: true, maxSize: 6)
         phoneNumber(nullable: true, maxSize: 12)
         phoneExtension(nullable: true, maxSize: 10)
@@ -293,6 +294,28 @@ class PersonTelephone implements Serializable {
 
 
     public static readonlyProperties = ['pidm', 'sequenceNumber', 'telephoneType']
+
+
+    /**
+     * Finder for advanced filtering and sorting
+     * @param filterData , pagingAndSortParams
+     * @return filtered and sorted data
+     */
+    def static countAllAlternate(filterData) {
+        finderByAll().count(filterData)
+    }
+
+
+    def static fetchSearch(filterData, pagingAndSortParams) {
+        def personTelephones = finderByAll().find(filterData, pagingAndSortParams)
+        return personTelephones
+    }
+
+
+    def private static finderByAll = {
+        def query = """FROM PersonTelephone a WHERE a.pidm = :pidm"""
+        return new DynamicFinder(PersonTelephone.class, query, "a")
+    }
 
 
     public static PersonTelephone fetchByPidmSequenceNoAndAddressType(Integer pidm, Integer addressSequenceNumber, AddressType addressType) {
