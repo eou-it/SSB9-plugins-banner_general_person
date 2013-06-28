@@ -128,19 +128,19 @@ class PersonAddress implements Serializable {
      * Optimistic lock token for SPRADDR
      */
     @Version
-    @Column(name = "SPRADDR_VERSION", nullable = false, precision = 19)
+    @Column(name = "SPRADDR_VERSION")
     Long version
 
     /**
      * Internal identification number of person.
      */
-    @Column(name = "SPRADDR_PIDM", nullable = false, precision = 8)
+    @Column(name = "SPRADDR_PIDM")
     Integer pidm
 
     /**
      * This field assigns an internal sequence number to each address type associated with person. This field does not display on screen.
      */
-    @Column(name = "SPRADDR_SEQNO", precision = 2)
+    @Column(name = "SPRADDR_SEQNO")
     Integer sequenceNumber
 
     /**
@@ -160,116 +160,116 @@ class PersonAddress implements Serializable {
     /**
      * This field maintains the first line of the address associated with person.
      */
-    @Column(name = "SPRADDR_STREET_LINE1", length = 75)
+    @Column(name = "SPRADDR_STREET_LINE1")
     String streetLine1
 
     /**
      * This field maintains the second line of the address associated with person.
      */
-    @Column(name = "SPRADDR_STREET_LINE2", length = 75)
+    @Column(name = "SPRADDR_STREET_LINE2")
     String streetLine2
 
     /**
      * This field maintains the third line of the address associated with person.
      */
-    @Column(name = "SPRADDR_STREET_LINE3", length = 75)
+    @Column(name = "SPRADDR_STREET_LINE3")
     String streetLine3
 
     /**
      * This field maintains the city associated with the address of person.
      */
-    @Column(name = "SPRADDR_CITY", nullable = false, length = 50)
+    @Column(name = "SPRADDR_CITY")
     String city
 
     /**
      * This field maintains the zip code associated with the address of person.
      */
-    @Column(name = "SPRADDR_ZIP", length = 30)
+    @Column(name = "SPRADDR_ZIP")
     String zip
 
     /**
      * This field maintains the area code of the phone number associated with address of person.
      */
-    @Column(name = "SPRADDR_PHONE_AREA", length = 6)
+    @Column(name = "SPRADDR_PHONE_AREA")
     String phoneArea
 
     /**
      * This field maintains the phone number associated with address of person.
      */
-    @Column(name = "SPRADDR_PHONE_NUMBER", length = 12)
+    @Column(name = "SPRADDR_PHONE_NUMBER")
     String phoneNumber
 
     /**
      * This field maintains the extension of the phone number associated with address of person.
      */
-    @Column(name = "SPRADDR_PHONE_EXT", length = 10)
+    @Column(name = "SPRADDR_PHONE_EXT")
     String phoneExtension
 
     /**
      * This field identifies if address information is inactive. Valid value is I - Inactive.
      */
-    @Column(name = "SPRADDR_STATUS_IND", length = 1)
+    @Column(name = "SPRADDR_STATUS_IND")
     String statusIndicator
 
     /**
      * The Id for the User who create or update the record.
      */
-    @Column(name = "SPRADDR_USER", length = 30)
+    @Column(name = "SPRADDR_USER")
     String userData
 
     /**
      * DELIVERY POINT: This field is used to designate the delivery point for mail as established by the Postal Service.
      */
-    @Column(name = "SPRADDR_DELIVERY_POINT", precision = 2)
+    @Column(name = "SPRADDR_DELIVERY_POINT")
     Integer deliveryPoint
 
     /**
      * CORRECTION DIGIT: The Correction Digit field is defined by the Postal Service and is used to determine the digits used for delivery related to the ZIP code.
      */
-    @Column(name = "SPRADDR_CORRECTION_DIGIT", precision = 1)
+    @Column(name = "SPRADDR_CORRECTION_DIGIT")
     Integer correctionDigit
 
     /**
      * CARRIER ROUTE: The addresses to which a carrier delivers mail. In common usage, carrier route includes city routes, rural routes, highway contract routes, post office box sections, and general delivery u
      nits.
      */
-    @Column(name = "SPRADDR_CARRIER_ROUTE", length = 4)
+    @Column(name = "SPRADDR_CARRIER_ROUTE")
     String carrierRoute
 
     /**
      * GST TAX IDENTIFICATION NUMBER: Goods and Services Tax Identification of vendor at this address
      */
-    @Column(name = "SPRADDR_GST_TAX_ID", length = 15)
+    @Column(name = "SPRADDR_GST_TAX_ID")
     String goodsAndServiceTaxTaxId
 
     /**
      * Reviewed Indicator, Y indicates the address has been reviewed
      */
-    @Column(name = "SPRADDR_REVIEWED_IND", length = 1)
+    @Column(name = "SPRADDR_REVIEWED_IND")
     String reviewedIndicator
 
     /**
      * Reviewed User, indicates the user who reviewed the address.
      */
-    @Column(name = "SPRADDR_REVIEWED_USER", length = 30)
+    @Column(name = "SPRADDR_REVIEWED_USER")
     String reviewedUser
 
     /**
      * COUNTRY CODE: Telephone code that designates the region and country.
      */
-    @Column(name = "SPRADDR_CTRY_CODE_PHONE", length = 4)
+    @Column(name = "SPRADDR_CTRY_CODE_PHONE")
     String countryPhone
 
     /**
      * HOUSE NUMBER: Building or lot number on a street or in an area.
      */
-    @Column(name = "SPRADDR_HOUSE_NUMBER", length = 10)
+    @Column(name = "SPRADDR_HOUSE_NUMBER")
     String houseNumber
 
     /**
      * STREET LINE 4: This field maintains the fourth line of the address associated with person.
      */
-    @Column(name = "SPRADDR_STREET_LINE4", length = 75)
+    @Column(name = "SPRADDR_STREET_LINE4")
     String streetLine4
 
     /**
@@ -282,13 +282,13 @@ class PersonAddress implements Serializable {
     /**
      * Last modified by column for SPRADDR
      */
-    @Column(name = "SPRADDR_USER_ID", length = 30)
+    @Column(name = "SPRADDR_USER_ID")
     String lastModifiedBy
 
     /**
      * DATA SOURCE: Source system that generated the data
      */
-    @Column(name = "SPRADDR_DATA_ORIGIN", length = 30)
+    @Column(name = "SPRADDR_DATA_ORIGIN")
     String dataOrigin
 
     /**
