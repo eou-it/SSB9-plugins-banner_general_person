@@ -283,7 +283,6 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
         assertErrorsFor personTelephone, 'nullable',
                 [
                         'pidm',
-                        'sequenceNumber',
                         'telephoneType'
                 ]
         assertNoErrorsFor personTelephone,

@@ -24,14 +24,11 @@ class PersonIdentificationNameCompositeService extends ServiceBase {
     def personIdentificationNameService
     def personIdentificationNameCurrentService
     def personIdentificationNameAlternateService
+    def personBasicPersonBaseService
+
 
 
     public def createOrUpdate(map) {
-
-        if (map?.deletePersonIdentificationNames) {
-            deleteDomains(map?.deletePersonIdentificationNames, personIdentificationNameService)
-        }
-
         if (map?.deletePersonIdentificationNameCurrents) {
             deleteDomains(map?.deletePersonIdentificationNameCurrents, personIdentificationNameCurrentService)
         }
@@ -40,13 +37,14 @@ class PersonIdentificationNameCompositeService extends ServiceBase {
             deleteDomains(map?.deletePersonIdentificationNameAlternates, personIdentificationNameAlternateService)
         }
 
-        if (map?.personIdentificationNames) {
-            processInsertUpdates(map?.personIdentificationNames, personIdentificationNameService)
-        }
-
         if (map?.personIdentificationNameCurrent) {
             def personIdentificationNameCurrents = [map?.personIdentificationNameCurrent]  // Convert to a list
             processInsertUpdates(personIdentificationNameCurrents, personIdentificationNameCurrentService)
+        }
+
+        if (map?.personBasicPersonBase) {
+            def personBasicPersonBases = [map?.personBasicPersonBase]  // Convert to a list
+            processInsertUpdates(personBasicPersonBases, personBasicPersonBaseService)
         }
 
         if (map?.personIdentificationNameCurrents) {
@@ -87,7 +85,12 @@ class PersonIdentificationNameCompositeService extends ServiceBase {
 
         domainList.each { domain ->
             if (domain.id) {
-                updateDomain(domain)
+                if ((domain instanceof PersonIdentificationNameCurrent)
+                        || (domain instanceof PersonIdentificationNameAlternate)) {
+                    updatePersonIdentificationNameDomain(domain)
+                } else {
+                    service.update(domainModel: domain)
+                }
             } else {
                 service.create(domainModel: domain)
             }
@@ -100,7 +103,7 @@ class PersonIdentificationNameCompositeService extends ServiceBase {
      * the PL/SQL api will update the current id record and then an alternate id record
      * is created to track the old values.
      */
-    private def updateDomain(domain) {
+    private def updatePersonIdentificationNameDomain(domain) {
 
         preUpdate(domain)
 

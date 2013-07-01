@@ -368,19 +368,29 @@ class PersonIdentificationNameCurrent implements Serializable {
 
 
     public static fetchByBannerId(String bannerId) {
-        PersonIdentificationNameCurrent object = PersonIdentificationNameCurrent.withSession { session ->
-            def list = session.getNamedQuery('PersonIdentificationNameCurrent.fetchByBannerId').setString('filter', bannerId).list()[0]
+        def personIdentificationNameCurrent
+
+        if (bannerId) {
+            personIdentificationNameCurrent = PersonIdentificationNameCurrent.withSession { session ->
+                def list = session.getNamedQuery('PersonIdentificationNameCurrent.fetchByBannerId').setString('filter', bannerId).list()[0]
+            }
         }
 
-        return object
+        return personIdentificationNameCurrent
     }
 
 
     public static fetchByPidm(Integer pidm) {
-        PersonIdentificationNameCurrent object = PersonIdentificationNameCurrent.withSession { session ->
-            def list = session.getNamedQuery('PersonIdentificationNameCurrent.fetchByPidm').setInteger('filter', pidm).list()[0]
+        def personIdentificationNameCurrent
+
+        if (pidm) {
+            personIdentificationNameCurrent = PersonIdentificationNameCurrent.withSession { session ->
+                def list = session.getNamedQuery('PersonIdentificationNameCurrent.fetchByPidm').setInteger('filter', pidm).list()[0]
+            }
         }
 
-        return object
+        return personIdentificationNameCurrent
     }
+
+
 }
