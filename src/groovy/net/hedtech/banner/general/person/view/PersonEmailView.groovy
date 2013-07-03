@@ -13,7 +13,6 @@ package net.hedtech.banner.general.person.view
 
 import javax.persistence.*
 import net.hedtech.banner.query.DynamicFinder
-import org.hsqldb.Expression
 
 /**
  * Person Email model.

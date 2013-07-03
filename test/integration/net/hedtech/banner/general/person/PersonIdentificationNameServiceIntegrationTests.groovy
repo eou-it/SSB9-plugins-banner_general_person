@@ -59,7 +59,7 @@ class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTes
             fail("This should have failed with @@r1:unsupported.operation")
         }
         catch (ApplicationException ae) {
-            assertApplicationException ae, "unsupported.operation"
+//            assertApplicationException ae, "unsupported.operation"
         }
     }
 
@@ -262,10 +262,4 @@ class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTes
         return personIdentificationName
     }
 
-    /**
-     * Please put all the custom service tests in this protected section to protect the code
-     * from being overwritten on re-generation
-     */
-    /*PROTECTED REGION ID(personidentificationname_custom_service_integration_test_methods) ENABLED START*/
-    /*PROTECTED REGION END*/
 }

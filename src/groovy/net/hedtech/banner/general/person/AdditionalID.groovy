@@ -27,7 +27,7 @@ import net.hedtech.banner.general.system.AdditionalIdentificationType
 @Entity
 @Table(name = "GV_GORADID")
 class AdditionalID implements Serializable {
-	
+
 	/**
 	 * Surrogate ID for GORADID
 	 */
@@ -75,7 +75,7 @@ class AdditionalID implements Serializable {
 	@Column(name = "GORADID_DATA_ORIGIN")
 	String dataOrigin
 
-	
+
 	/**
 	 * Foreign Key : FK1_GORADID_INV_GTVADID_CODE
 	 */
@@ -85,20 +85,20 @@ class AdditionalID implements Serializable {
 		])
 	AdditionalIdentificationType additionalIdentificationType
 
-	
+
 	public String toString() {
 		"""AdditionalID[
-					id=$id, 
-					version=$version, 
-					pidm=$pidm, 
-					additionalId=$additionalId, 
-					lastModified=$lastModified, 
-					lastModifiedBy=$lastModifiedBy, 
-					dataOrigin=$dataOrigin, 
-					additionalIdentificationTypesAndDescription=$additionalIdentificationTypesAndDescription]"""
+					id=$id,
+					version=$version,
+					pidm=$pidm,
+					additionalId=$additionalId,
+					lastModified=$lastModified,
+					lastModifiedBy=$lastModifiedBy,
+					dataOrigin=$dataOrigin,
+					additionalIdentificationType=$additionalIdentificationType]"""
 	}
 
-	
+
 	boolean equals(o) {
 	    if (this.is(o)) return true
 	    if (!(o instanceof AdditionalID)) return false
@@ -114,7 +114,7 @@ class AdditionalID implements Serializable {
         return true
     }
 
-	
+
 	int hashCode() {
 		int result
 	    result = (id != null ? id.hashCode() : 0)
@@ -135,7 +135,7 @@ class AdditionalID implements Serializable {
 		dataOrigin(nullable:true, maxSize:30)
 		additionalIdentificationType(nullable:false)
     }
-    
+
     //Read Only fields that should be protected against update
     public static readonlyProperties = [ 'pidm', 'additionalId', 'additionalIdentificationType' ]
 }

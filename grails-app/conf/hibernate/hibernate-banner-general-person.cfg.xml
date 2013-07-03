@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- *****************************************************************************
+
+Copyright 2012 SunGard Higher Education.  All Rights Reserved.
+
+CONFIDENTIAL BUSINESS INFORMATION
+
+THIS PROGRAM IS PROPRIETARY INFORMATION OF SUNGARD HIGHER EDUCATION
+AND IS NOT TO BE COPIED, REPRODUCED, LENT, OR DISPOSED OF,
+NOR USED FOR ANY PURPOSE OTHER THAN THAT WHICH IT IS SPECIFICALLY PROVIDED
+WITHOUT THE WRITTEN PERMISSION OF THE SAID COMPANY
+****************************************************************************** -->
+
+<!--
+Hibernate configuration file. All mapped classes must be identified within this
+configuration file.  Note: Annotations within the class files are used in lieu
+of additional mapping files.  JPA is not used, hence while annotations are leveraged
+there is no concept of an 'entity manager' within this project.
+-->
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+        <property name="dialect">org.hibernate.dialect.Oracle10gDialect</property>
+        <mapping class="net.hedtech.banner.general.person.AdditionalID"/>
+        <mapping class="net.hedtech.banner.general.person.MedicalInformation"/>
+        <mapping class="net.hedtech.banner.general.person.PersonAddress"/>
+        <mapping class="net.hedtech.banner.general.person.PersonBasicPersonBase"/>
+        <mapping class="net.hedtech.banner.general.person.PersonEmail"/>
+        <mapping class="net.hedtech.banner.general.person.PersonIdentificationName"/>
+        <mapping class="net.hedtech.banner.general.person.PersonRace"/>
+        <mapping class="net.hedtech.banner.general.person.PersonRelatedHold"/>
+        <mapping class="net.hedtech.banner.general.person.PersonTelephone"/>
+        <mapping class="net.hedtech.banner.general.person.view.NonPersonPersonView"/>
+        <mapping class="net.hedtech.banner.general.person.view.PersonAdditionalIdView"/>
+        <mapping class="net.hedtech.banner.general.person.view.PersonAdvancedAlternateIdFilterView"/>
+        <mapping class="net.hedtech.banner.general.person.view.PersonAdvancedFilterView"/>
+        <mapping class="net.hedtech.banner.general.person.view.PersonAdvancedIdFilterView"/>
+        <mapping class="net.hedtech.banner.general.person.view.PersonAdvancedSearchView"/>
+        <mapping class="net.hedtech.banner.general.person.view.PersonAlternateIdView"/>
+        <mapping class="net.hedtech.banner.general.person.view.PersonEmailView"/>
+        <mapping class="net.hedtech.banner.general.person.view.PersonPersonView"/>
+        <mapping class="net.hedtech.banner.general.person.view.PersonPhoneView"/>
+        <mapping class="net.hedtech.banner.general.person.PersonEmergencyContact"/>
+        <mapping class="net.hedtech.banner.general.person.PersonIdentificationNameAlternate"/>
+        <mapping class="net.hedtech.banner.general.person.PersonIdentificationNameCurrent"/>
+
+    </session-factory>
+</hibernate-configuration>
+   
