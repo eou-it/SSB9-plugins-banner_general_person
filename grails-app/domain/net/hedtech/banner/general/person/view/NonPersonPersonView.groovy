@@ -13,6 +13,7 @@ package net.hedtech.banner.general.person.view
 
 import net.hedtech.banner.query.DynamicFinder
 import javax.persistence.*
+import net.hedtech.banner.query.criteria.CriteriaParamUtil
 
 /**
  * NonPerson Spriden model.
@@ -187,7 +188,11 @@ class NonPersonPersonView extends PersonView {
     def public static fetchSearchEntityList(filterData, pagingAndSortParams) {
 
         if (filterData?.params?.searchLastName) {
-            filterData?.params?.searchLastName = filterData?.params?.searchLastName?.replaceAll("[\\s]", "")
+            //filterData?.params?.searchLastName = filterData?.params?.searchLastName?.replaceAll("[\\s]", "")
+
+            String value = CriteriaParamUtil.getValue(filterData?.params?.searchLastName);
+            value = value.replaceAll("[\\s]", "")
+            CriteriaParamUtil.setValue(filterData?.params?.searchLastName, value);
         }
 
         finderByAllEntityList().find(filterData, pagingAndSortParams)

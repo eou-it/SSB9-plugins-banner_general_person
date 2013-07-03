@@ -202,7 +202,7 @@ class PersonAdvancedSearchView extends PersonView {
             }
              if (!addressfilterData.isEmpty()) {
                  def addressQuery=QueryBuilder.buildQuery("""select distinct addr.pidm from PersonAddress addr
-                                   ""","addr", addressfilterData?.criteria,[:])
+                                   ""","addr", addressfilterData,[:])
                  query+=""" and data.pidm in (${addressQuery})"""
                  filterData.criteria = criteriaWithOutAddr
              }
