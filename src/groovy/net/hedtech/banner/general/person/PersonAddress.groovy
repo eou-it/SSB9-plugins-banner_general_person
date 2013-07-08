@@ -29,6 +29,56 @@ import net.hedtech.banner.service.DatabaseModifiesState
  */
 /*PROTECTED REGION ID(personaddress_namedqueries) ENABLED START*/
 @NamedQueries(value = [
+@NamedQuery(name = "PersonAddress.fetchNotInactiveAddressByPidmAndAddressType",
+query = """FROM PersonAddress a
+          WHERE a.pidm = :pidm
+            AND a.addressType.code = :addressType
+            AND a.statusIndicator is null"""),
+@NamedQuery(name = "PersonAddress.fetchNotInactiveAddressByPidmAndAddressTypeExcludingId",
+query = """FROM PersonAddress a
+          WHERE a.id <> :id
+            AND a.pidm = :pidm
+            AND a.addressType.code = :addressType
+            AND a.statusIndicator is null"""),
+@NamedQuery(name = "PersonAddress.fetchActiveAddressByPidmAndAddressTypeAndDates",
+query = """ FROM PersonAddress a
+     WHERE a.pidm = :pidm
+       AND a.addressType.code = :addressType
+       AND  a.statusIndicator IS NULL
+       AND  ((a.toDate IS NULL
+       AND    a.fromDate IS NULL)
+        OR   ((NVL(:fromDate, TO_DATE('01-01-1900', 'DD-MM-YYYY'))
+               BETWEEN NVL(a.fromDate, TO_DATE('01-01-1900', 'DD-MM-YYYY'))
+                   AND NVL(a.toDate, TO_DATE('31-12-2099', 'DD-MM-YYYY')))
+        OR    (NVL(:toDate, TO_DATE('31-12-2099', 'DD-MM-YYYY'))
+               BETWEEN NVL(a.fromDate, TO_DATE('01-01-1900', 'DD-MM-YYYY'))
+                   AND NVL(a.toDate, TO_DATE('31-12-2099', 'DD-MM-YYYY')))
+        OR   (NVL(a.fromDate, TO_DATE('01-01-1900', 'DD-MM-YYYY'))
+               BETWEEN NVL(:fromDate, TO_DATE('01-01-1900', 'DD-MM-YYYY'))
+                   AND NVL(:toDate, TO_DATE('31-12-2099', 'DD-MM-YYYY')))
+        OR    (NVL(a.toDate, TO_DATE('31-12-2099', 'DD-MM-YYYY'))
+               BETWEEN NVL(:fromDate, TO_DATE('01-01-1900', 'DD-MM-YYYY'))
+                   AND NVL(:toDate, TO_DATE('31-12-2099', 'DD-MM-YYYY')))))"""),
+@NamedQuery(name = "PersonAddress.fetchActiveAddressByPidmAndAddressTypeAndDatesExcludingId",
+query = """ FROM PersonAddress a
+     WHERE a.id <> :id
+       AND a.pidm = :pidm
+       AND a.addressType.code = :addressType
+       AND  a.statusIndicator IS NULL
+       AND  ((a.toDate IS NULL
+       AND    a.fromDate IS NULL)
+        OR   ((NVL(:fromDate, TO_DATE('01-01-1900', 'DD-MM-YYYY'))
+               BETWEEN NVL(a.fromDate, TO_DATE('01-01-1900', 'DD-MM-YYYY'))
+                   AND NVL(a.toDate, TO_DATE('31-12-2099', 'DD-MM-YYYY')))
+        OR    (NVL(:toDate, TO_DATE('31-12-2099', 'DD-MM-YYYY'))
+               BETWEEN NVL(a.fromDate, TO_DATE('01-01-1900', 'DD-MM-YYYY'))
+                   AND NVL(a.toDate, TO_DATE('31-12-2099', 'DD-MM-YYYY')))
+        OR   (NVL(a.fromDate, TO_DATE('01-01-1900', 'DD-MM-YYYY'))
+               BETWEEN NVL(:fromDate, TO_DATE('01-01-1900', 'DD-MM-YYYY'))
+                   AND NVL(:toDate, TO_DATE('31-12-2099', 'DD-MM-YYYY')))
+        OR    (NVL(a.toDate, TO_DATE('31-12-2099', 'DD-MM-YYYY'))
+               BETWEEN NVL(:fromDate, TO_DATE('01-01-1900', 'DD-MM-YYYY'))
+                   AND NVL(:toDate, TO_DATE('31-12-2099', 'DD-MM-YYYY')))))"""),
 @NamedQuery(name = "PersonAddress.fetchActiveAddressByPidmAndAddressType",
 query = """ FROM PersonAddress a
                             WHERE  a.pidm = :pidm
@@ -560,5 +610,51 @@ class PersonAddress implements Serializable {
 
     }
 
-    /*PROTECTED REGION END*/
+
+     static def fetchNotInactiveAddressByPidmAndAddressType(Map map)  {
+         if (map.pidm) {
+            PersonAddress.withSession { session ->
+                List personAddressList = session.getNamedQuery('PersonAddress.fetchNotInactiveAddressByPidmAndAddressType').setInteger('pidm', map?.pidm).setString('addressType',map?.addressType.code).list()
+                return [list:personAddressList]
+            }
+        } else {
+            return null
+        }
+    }
+
+
+     static def fetchNotInactiveAddressByPidmAndAddressTypeExcludingId(Map map)  {
+         if (map.pidm) {
+            PersonAddress.withSession { session ->
+                List personAddressList = session.getNamedQuery('PersonAddress.fetchActiveAddressesByPidm').setInteger('pidm', map?.pidm).setString('addressType',map?.addressType.code).setString('id',map?.id).list()
+                return [list:personAddressList]
+            }
+        } else {
+            return null
+        }
+    }
+
+
+     static def fetchActiveAddressByPidmAndAddressTypeAndDates(Map map)  {
+         if (map.pidm) {
+            PersonAddress.withSession { session ->
+                List personAddressList = session.getNamedQuery('PersonAddress.fetchActiveAddressByPidmAndAddressTypeAndDates').setInteger('pidm', map?.pidm).setString('addressType',map?.addressType.code).setDate('fromDate',map?.fromDate).setDate('toDate',map?.toDate).list()
+                return [list:personAddressList]
+            }
+        } else {
+            return null
+        }
+    }
+
+
+     static def fetchActiveAddressByPidmAndAddressTypeAndDatesExcludingId(Map map)  {
+         if (map.pidm) {
+            PersonAddress.withSession { session ->
+                List personAddressList = session.getNamedQuery('PersonAddress.fetchActiveAddressByPidmAndAddressTypeAndDatesExcludingId').setInteger('pidm', map?.pidm).setString('addressType',map?.addressType.code).setDate('fromDate',map?.fromDate).setDate('toDate',map?.toDate).setLong('id',map?.id).list()
+                return [list:personAddressList]
+            }
+        } else {
+            return null
+        }
+    }
 }

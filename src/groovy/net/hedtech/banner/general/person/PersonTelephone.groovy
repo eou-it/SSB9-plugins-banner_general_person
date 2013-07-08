@@ -17,7 +17,7 @@ package net.hedtech.banner.general.person
 
 import net.hedtech.banner.general.system.AddressType
 import net.hedtech.banner.general.system.TelephoneType
-import net.hedtech.banner.query.DynamicFinder
+import net.hedtech.banner.service.DatabaseModifiesState
 
 import javax.persistence.*
 
@@ -26,6 +26,12 @@ import javax.persistence.*
  */
 
 @NamedQueries(value = [
+@NamedQuery(name = "PersonTelephone.fetchByPidmTelephoneTypeAndTelephoneSequence",
+query = """FROM PersonTelephone a
+                             WHERE  pidm = :pidm
+                             AND  telephoneType = :telephoneType
+                             AND  sequenceNumber = :sequenceNumber
+                    """),
 @NamedQuery(name = "PersonTelephone.fetchByPidmSequenceNoAndAddressType",
 query = """FROM PersonTelephone a
                              WHERE  pidm = :pidm
@@ -68,6 +74,7 @@ query = """FROM PersonTelephone a
  */
 /*PROTECTED REGION END*/ @Entity
 @Table(name = "SV_SPRTELE")
+@DatabaseModifiesState
 class PersonTelephone implements Serializable {
 
     /**
@@ -83,79 +90,79 @@ class PersonTelephone implements Serializable {
      * Optimistic lock token for SPRTELE
      */
     @Version
-    @Column(name = "SPRTELE_VERSION")
+    @Column(name = "SPRTELE_VERSION", nullable = false, precision = 19)
     Long version
 
     /**
      * Internal identification number.
      */
-    @Column(name = "SPRTELE_PIDM")
+    @Column(name = "SPRTELE_PIDM", nullable = false, unique = true, precision = 8)
     Integer pidm
 
     /**
      * Unique sequence number for telephone numbers associated with PIDM.
      */
-    @Column(name = "SPRTELE_SEQNO")
+    @Column(name = "SPRTELE_SEQNO", unique = true, precision = 3)
     Integer sequenceNumber
 
     /**
      * Telephone number area code.
      */
-    @Column(name = "SPRTELE_PHONE_AREA")
+    @Column(name = "SPRTELE_PHONE_AREA", length = 6)
     String phoneArea
 
     /**
      * Telephone number.
      */
-    @Column(name = "SPRTELE_PHONE_NUMBER")
+    @Column(name = "SPRTELE_PHONE_NUMBER", length = 12)
     String phoneNumber
 
     /**
      * Telephone number extention.
      */
-    @Column(name = "SPRTELE_PHONE_EXT")
+    @Column(name = "SPRTELE_PHONE_EXT", length = 10)
     String phoneExtension
 
     /**
      * STATUS: Status of telephone number, active or inactive.
      */
-    @Column(name = "SPRTELE_STATUS_IND")
+    @Column(name = "SPRTELE_STATUS_IND", length = 1)
     String statusIndicator
 
     /**
      * Address type sequence number associated with address type.
      */
-    @Column(name = "SPRTELE_ADDR_SEQNO")
+    @Column(name = "SPRTELE_ADDR_SEQNO", precision = 2)
     Integer addressSequenceNumber
 
     /**
      * Primary indicator to denote primary telephone numbers based on telephone types.
      */
-    @Column(name = "SPRTELE_PRIMARY_IND")
+    @Column(name = "SPRTELE_PRIMARY_IND", length = 1)
     String primaryIndicator
 
     /**
      * Unlisted telephone number indicator.
      */
-    @Column(name = "SPRTELE_UNLIST_IND")
+    @Column(name = "SPRTELE_UNLIST_IND", length = 1)
     String unlistIndicator
 
     /**
      * Comment relating to telephone number.
      */
-    @Column(name = "SPRTELE_COMMENT")
+    @Column(name = "SPRTELE_COMMENT", length = 60)
     String commentData
 
     /**
      * Free format International access code for telephone number including country and city code.
      */
-    @Column(name = "SPRTELE_INTL_ACCESS")
+    @Column(name = "SPRTELE_INTL_ACCESS", length = 16)
     String internationalAccess
 
     /**
      * COUNTRY CODE: Telephone code that designates the region and country.
      */
-    @Column(name = "SPRTELE_CTRY_CODE_PHONE")
+    @Column(name = "SPRTELE_CTRY_CODE_PHONE", length = 4)
     String countryPhone
 
     /**
@@ -168,13 +175,13 @@ class PersonTelephone implements Serializable {
     /**
      * USER ID: User who inserted or last update the data
      */
-    @Column(name = "SPRTELE_USER_ID")
+    @Column(name = "SPRTELE_USER_ID", length = 30)
     String lastModifiedBy
 
     /**
      * DATA SOURCE: Source system that generated the data
      */
-    @Column(name = "SPRTELE_DATA_ORIGIN")
+    @Column(name = "SPRTELE_DATA_ORIGIN", length = 30)
     String dataOrigin
 
     /**
@@ -296,34 +303,14 @@ class PersonTelephone implements Serializable {
     public static readonlyProperties = ['pidm', 'sequenceNumber', 'telephoneType']
 
 
-    /**
-     * Finder for advanced filtering and sorting
-     * @param filterData , pagingAndSortParams
-     * @return filtered and sorted data
-     */
-    def static countAllAlternate(filterData) {
-        finderByAll().count(filterData)
-    }
-
-
-    def static fetchSearch(filterData, pagingAndSortParams) {
-        def personTelephones = finderByAll().find(filterData, pagingAndSortParams)
-        return personTelephones
-    }
-
-
-    def private static finderByAll = {
-        def query = """FROM PersonTelephone a WHERE a.pidm = :pidm"""
-        return new DynamicFinder(PersonTelephone.class, query, "a")
-    }
-
-
     public static PersonTelephone fetchByPidmSequenceNoAndAddressType(Integer pidm, Integer addressSequenceNumber, AddressType addressType) {
+        println "inside telephone " + pidm + addressSequenceNumber + addressType
         PersonTelephone.withSession { session ->
             def personTelephone = session.getNamedQuery('PersonTelephone.fetchByPidmSequenceNoAndAddressType')
                     .setInteger('pidm', pidm)
                     .setInteger('addressSequenceNumber', addressSequenceNumber)
                     .setString('addressType', addressType.code).list()[0]
+            println " the tele " + personTelephone
             return personTelephone
         }
     }
@@ -383,5 +370,13 @@ class PersonTelephone implements Serializable {
         }
     }
 
-    /*PROTECTED REGION END*/
+     static def fetchByPidmTelephoneTypeAndTelephoneSequence(Map map) {
+         PersonTelephone.withSession { session ->
+            def personTelephone = session.getNamedQuery('PersonTelephone.fetchByPidmTelephoneTypeAndTelephoneSequence')
+                    .setInteger('pidm', map.pidm)
+                    .setString('telephoneType', map.telephoneType.code)
+                    .setInteger('sequenceNumber', map.telephoneSequenceNumber).list()[0]
+            return personTelephone
+        }
+    }
 }
