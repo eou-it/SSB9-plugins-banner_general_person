@@ -30,9 +30,10 @@ there is no concept of an 'entity manager' within this project.
         <mapping class="net.hedtech.banner.general.person.PersonBasicPersonBase"/>
         <mapping class="net.hedtech.banner.general.person.PersonEmail"/>
         <mapping class="net.hedtech.banner.general.person.PersonIdentificationName"/>
+        <mapping class="net.hedtech.banner.general.person.PersonIdentificationNameAlternate"/>
+        <mapping class="net.hedtech.banner.general.person.PersonIdentificationNameCurrent"/>
         <mapping class="net.hedtech.banner.general.person.PersonRace"/>
         <mapping class="net.hedtech.banner.general.person.PersonRelatedHold"/>
-        <mapping class="net.hedtech.banner.general.person.PersonTelephone"/>
         <mapping class="net.hedtech.banner.general.person.view.NonPersonPersonView"/>
         <mapping class="net.hedtech.banner.general.person.view.PersonAdditionalIdView"/>
         <mapping class="net.hedtech.banner.general.person.view.PersonAdvancedAlternateIdFilterView"/>
@@ -43,10 +44,7 @@ there is no concept of an 'entity manager' within this project.
         <mapping class="net.hedtech.banner.general.person.view.PersonEmailView"/>
         <mapping class="net.hedtech.banner.general.person.view.PersonPersonView"/>
         <mapping class="net.hedtech.banner.general.person.view.PersonPhoneView"/>
-        <mapping class="net.hedtech.banner.general.person.PersonEmergencyContact"/>
-        <mapping class="net.hedtech.banner.general.person.PersonIdentificationNameAlternate"/>
-        <mapping class="net.hedtech.banner.general.person.PersonIdentificationNameCurrent"/>
-
+   
     </session-factory>
 </hibernate-configuration>
    
