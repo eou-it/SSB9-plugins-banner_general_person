@@ -15,6 +15,7 @@ import net.hedtech.banner.query.DynamicFinder
 import javax.persistence.*
 import net.hedtech.banner.query.QueryBuilder
 import net.hedtech.banner.person.dsl.NameTemplate
+import net.hedtech.banner.general.person.PersonUtility
 
 /**
  * Person Advanced Search model.
@@ -103,18 +104,9 @@ class PersonAdvancedSearchView extends PersonView {
 
 
     public String getFormattedName() {
-        if(changeIndicator != null) {
-             return NameTemplate.format {
-                    lastName currentLastName
-                    firstName currentFirstName
-                    mi currentMiddleName
-                    surnamePrefix surnamePrefix
-                    nameSuffix nameSuffix
-                    namePrefix namePrefix
-                    formatTemplate getNameFormat()
-                    text
-                }
-        }else {
+        if (changeIndicator != null) {
+            return PersonUtility.formatName(this)
+        } else {
             return super.getFormattedName()
         }
 
@@ -155,7 +147,6 @@ class PersonAdvancedSearchView extends PersonView {
         finderByAllEntityList().find(filterData, pagingAndSortParams)
     }
 
-
     /*
     * Returns the count of the filtered data.
     */
@@ -175,11 +166,10 @@ class PersonAdvancedSearchView extends PersonView {
     }
 
     def private static finderByAllEntityList2 = {filterData ->
-        def includeDuplicateIfSinglePersonFound = filterData.includeAlternate? filterData.includeAlternate: false
         def query = """from PersonAdvancedSearchView data where exists ( from  ${filterData.dynamicdomain} as af where af.pidm = data.pidm)"""
         if (filterData.params.containsKey('city') || filterData.params.containsKey('state') || filterData.params.containsKey('zip')) {
-            def addressfilterData = [params:[:], criteria:[]]
-            def count =0
+            def addressfilterData = [params: [:], criteria: []]
+            def count = 0
             def criteriaWithOutAddrCount = 0
             def criteriaWithOutAddr = []
             filterData.criteria.each {
@@ -200,45 +190,34 @@ class PersonAdvancedSearchView extends PersonView {
                     criteriaWithOutAddrCount++
                 }
             }
-             if (!addressfilterData.isEmpty()) {
-                 def addressQuery=QueryBuilder.buildQuery("""select distinct addr.pidm from PersonAddress addr
-                                   ""","addr", addressfilterData,[:])
-                 query+=""" and data.pidm in (${addressQuery})"""
-                 filterData.criteria = criteriaWithOutAddr
-             }
+            if (!addressfilterData.isEmpty()) {
+                def addressQuery = QueryBuilder.buildQuery("""select distinct addr.pidm from PersonAddress addr
+                                   """, "addr", addressfilterData, [:])
+                query += """ and data.pidm in (${addressQuery})"""
+                filterData.criteria = criteriaWithOutAddr
+            }
 
         }
-        if (!includeDuplicateIfSinglePersonFound)   {
-            query += """
-                       and CASE WHEN 1 =
-                               (select sum(count(distinct afb.pidm)) from  ${filterData.dynamicdomain} afb group by pidm)
-                           THEN data.changeIndicator
-                           ELSE null
-                           END is null
-                      """
-        }
-
-
         return new DynamicFinder(PersonAdvancedSearchView.class, query, "data")
     }
 
 
     def static countAllEntities2(filterData) {
-         def tempFilterData = copyFilterData(filterData)
+        def tempFilterData = copyFilterData(filterData)
         finderByAllEntityList2(tempFilterData).count(tempFilterData)
     }
 
-     def public static fetchSearchEntityList2(filterData, pagingAndSortParams) {
-         def tempFilterData = copyFilterData(filterData)
+    def public static fetchSearchEntityList2(filterData, pagingAndSortParams) {
+        def tempFilterData = copyFilterData(filterData)
         finderByAllEntityList2(tempFilterData).find(tempFilterData, pagingAndSortParams)
     }
 
-    def public static copyFilterData = { filterData->
-        def tempFilterData = [params:[:],criteria:[]]
-         tempFilterData.params = filterData.params
-         tempFilterData.criteria = filterData.criteria
-         tempFilterData.dynamicdomain = filterData.dynamicdomain
-         tempFilterData.sortColumn = filterData.sortColumn
+    def public static copyFilterData = { filterData ->
+        def tempFilterData = [params: [:], criteria: []]
+        tempFilterData.params = filterData.params
+        tempFilterData.criteria = filterData.criteria
+        tempFilterData.dynamicdomain = filterData.dynamicdomain
+        tempFilterData.sortColumn = filterData.sortColumn
         tempFilterData.includeAlternate = filterData.includeAlternate
         return tempFilterData
     }

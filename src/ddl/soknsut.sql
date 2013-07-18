@@ -27,6 +27,7 @@ AS
    -- DESCRIPTION END
    -- Variables
       search_filter       VARCHAR2(2000);
+      page_size           NUMBER;
    --
    --
    -- Procedures
@@ -49,6 +50,16 @@ FUNCTION f_get_search_filter RETURN VARCHAR2;
    * This procedure set the search filter for the advanced search component.
    */
 PROCEDURE p_set_search_filter(search_var VARCHAR2);
+--
+/**
+   * This function returns the page size of listbox for the advanced search component.
+   */
+FUNCTION f_get_page_size RETURN NUMBER;
+--
+   /**
+   * This procedure set the page size of listbox for the advanced search component.
+   */
+PROCEDURE p_set_page_size(search_var NUMBER);
 --
    /*
    * This function split the search string into tokens

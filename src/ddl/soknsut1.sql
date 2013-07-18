@@ -90,6 +90,17 @@ BEGIN
 END f_get_search_filter;
 --
 
+PROCEDURE p_set_page_size(search_var NUMBER) IS
+BEGIN
+   page_size := search_var;
+END p_set_page_size;
+--
+FUNCTION f_get_page_size RETURN NUMBER IS
+BEGIN
+     RETURN page_size;
+END f_get_page_size;
+--
+
 FUNCTION f_match_name(filter_str VARCHAR2) RETURN NUMBER IS
  LC$String  VARCHAR2(2000) := f_get_search_filter ;
  LC$Token   VARCHAR2(100) ;
