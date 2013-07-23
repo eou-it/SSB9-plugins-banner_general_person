@@ -40,7 +40,7 @@ select /*+ RULE */ SPRIDEN_SURROGATE_ID,
        SPRIDEN_CHANGE_IND,
        SPRIDEN_VERSION ,
        rownum
-from SPRIDEN where contains(SPRIDEN_ID, soknsut.f_get_search_filter)>0;;
+from SPRIDEN where contains(SPRIDEN_ID, soknsut.f_get_search_filter)>0;
 
 COMMENT ON TABLE SVQ_IDSRCH IS 'Read only view for Advanced Search Filter UI Component';
 COMMENT ON COLUMN SVQ_IDSRCH.SURROGATE_ID IS 'SURROGATE ID: Immutable unique key';
