@@ -17,6 +17,9 @@ import net.hedtech.banner.query.QueryBuilder
 import javax.persistence.*
 import net.hedtech.banner.person.dsl.NameTemplate
 import net.hedtech.banner.general.person.PersonUtility
+import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.springframework.context.ApplicationContext
+import org.springframework.context.i18n.LocaleContextHolder
 
 
 @Entity
@@ -206,16 +209,34 @@ class ExtendedWindowIdSearchView {
         if (changeIndicator != null) {
             return PersonUtility.formatName(this)
         } else {
-            return super.getFormattedName()
+            return getDisplayName()
         }
 
     }
 
     public String getBaseFormattedName() {
-        return super.getFormattedName()
+        return getDisplayName()
     }
 
+    public String getDisplayName() {
+        return NameTemplate.format {
+            lastName lastName
+            firstName firstName
+            mi middleName
+            surnamePrefix surnamePrefix
+            nameSuffix nameSuffix
+            namePrefix namePrefix
+            formatTemplate getNameFormat()
+            text
+        }
+    }
 
+    public def getNameFormat() {
+        def application = ApplicationHolder.application
+        ApplicationContext applicationContext = application.mainContext
+        def messageSource = applicationContext.getBean("messageSource")
+        messageSource.getMessage("default.name.format", null, LocaleContextHolder.getLocale())
+    }
 
     @Override
     public String toString() {
