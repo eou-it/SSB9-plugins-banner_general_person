@@ -2,15 +2,15 @@
 -- * Copyright 2013 Ellucian Company L.P. and its affiliates.                              *
 -- *****************************************************************************************
 REM
-REM sv_spriden_alt_ins_trg.sql
+REM sv_spriden_cur_i_trg.sql
 REM 
 REM AUDIT TRAIL: 9.0 
 REM 1. Horizon 
 REM Generated trigger for Horizon API support
 REM AUDIT TRAIL END 
 REM
-CREATE OR REPLACE TRIGGER spriden_alt_view_create_trg
-  INSTEAD OF INSERT ON sv_spriden_alt
+CREATE OR REPLACE TRIGGER spriden_cur_view_create_trg
+  INSTEAD OF INSERT ON sv_spriden_cur
 DECLARE
   p_id_inout_v spriden.spriden_id%TYPE;
   p_pidm_inout_v spriden.spriden_pidm%TYPE;
