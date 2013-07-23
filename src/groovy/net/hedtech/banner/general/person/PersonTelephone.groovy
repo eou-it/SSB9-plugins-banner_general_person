@@ -304,13 +304,11 @@ class PersonTelephone implements Serializable {
 
 
     public static PersonTelephone fetchByPidmSequenceNoAndAddressType(Integer pidm, Integer addressSequenceNumber, AddressType addressType) {
-        println "inside telephone " + pidm + addressSequenceNumber + addressType
         PersonTelephone.withSession { session ->
             def personTelephone = session.getNamedQuery('PersonTelephone.fetchByPidmSequenceNoAndAddressType')
                     .setInteger('pidm', pidm)
                     .setInteger('addressSequenceNumber', addressSequenceNumber)
                     .setString('addressType', addressType.code).list()[0]
-            println " the tele " + personTelephone
             return personTelephone
         }
     }
