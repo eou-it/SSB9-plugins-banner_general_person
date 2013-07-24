@@ -24,42 +24,43 @@ import javax.persistence.*
 /**
  * Telephone Table
  */
-
+@Entity
+@Table(name = "SV_SPRTELE")
 @NamedQueries(value = [
 @NamedQuery(name = "PersonTelephone.fetchByPidmTelephoneTypeAndTelephoneSequence",
-query = """FROM PersonTelephone a
+        query = """FROM PersonTelephone a
                              WHERE  pidm = :pidm
                              AND  telephoneType.code = :telephoneType
                              AND  sequenceNumber = :sequenceNumber
                     """),
 @NamedQuery(name = "PersonTelephone.fetchByPidmSequenceNoAndAddressType",
-query = """FROM PersonTelephone a
+        query = """FROM PersonTelephone a
                              WHERE  pidm = :pidm
                              AND  addressSequenceNumber = :addressSequenceNumber
                              AND  addressType.code  = :addressType
                              AND  primaryIndicator IS NOT NULL
                     """),
 @NamedQuery(name = "PersonTelephone.fetchByPidmSequenceNoAndAddressTypeWithPrimaryCheck",
-query = """FROM PersonTelephone a
+        query = """FROM PersonTelephone a
                              WHERE  pidm = :pidm
                              AND  addressSequenceNumber = :addressSequenceNumber
                              AND  addressType.code  = :addressType
                              AND  primaryIndicator = 'Y'
                     """),
 @NamedQuery(name = "PersonTelephone.fetchByPidmSequenceNoAndAddressTypeWithoutPrimaryCheck",
-query = """FROM PersonTelephone a
+        query = """FROM PersonTelephone a
                              WHERE  pidm = :pidm
                              AND  addressSequenceNumber = :addressSequenceNumber
                              AND  addressType.code  = :addressType
                              AND NVL(statusIndicator,'A') <> 'I'
                     """),
 @NamedQuery(name = "PersonTelephone.fetchMaxSequenceNumber",
-query = """select max(a.sequenceNumber)
+        query = """select max(a.sequenceNumber)
                              FROM  PersonTelephone a
 	  	                     WHERE a.pidm = :pidm
                     """),
 @NamedQuery(name = "PersonTelephone.fetchByPidmTelephoneTypeAndAddressType",
-query = """FROM PersonTelephone a
+        query = """FROM PersonTelephone a
                              WHERE  pidm = :pidm
                              AND addressType IS NOT NULL
                              AND  (telephoneType LIKE :filter
@@ -67,13 +68,6 @@ query = """FROM PersonTelephone a
                              ORDER BY DECODE(a.statusIndicator, 'I',-2) DESC
                     """)
 ])
-
-/**
- * Where clause on this entity present in forms:
- * Order by clause on this entity present in forms:
- */
-/*PROTECTED REGION END*/ @Entity
-@Table(name = "SV_SPRTELE")
 @DatabaseModifiesState
 class PersonTelephone implements Serializable {
 
@@ -303,14 +297,18 @@ class PersonTelephone implements Serializable {
     public static readonlyProperties = ['pidm', 'sequenceNumber', 'telephoneType']
 
 
-    public static PersonTelephone fetchByPidmSequenceNoAndAddressType(Integer pidm, Integer addressSequenceNumber, AddressType addressType) {
-        PersonTelephone.withSession { session ->
-            def personTelephone = session.getNamedQuery('PersonTelephone.fetchByPidmSequenceNoAndAddressType')
-                    .setInteger('pidm', pidm)
-                    .setInteger('addressSequenceNumber', addressSequenceNumber)
-                    .setString('addressType', addressType.code).list()[0]
-            return personTelephone
-        }
+    static PersonTelephone fetchByPidmSequenceNoAndAddressType(Integer pidm, Integer addressSequenceNumber, def addressType) {
+        def address
+        if (addressType instanceof AddressType) address = addressType.code
+        else address = addressType
+        def personTelephone =
+            PersonTelephone.withSession { session ->
+                session.getNamedQuery('PersonTelephone.fetchByPidmSequenceNoAndAddressType')
+                        .setInteger('pidm', pidm)
+                        .setInteger('addressSequenceNumber', addressSequenceNumber)
+                        .setString('addressType', address).uniqueResult()
+            }
+        return personTelephone
     }
 
 
@@ -368,8 +366,9 @@ class PersonTelephone implements Serializable {
         }
     }
 
-     static def fetchByPidmTelephoneTypeAndTelephoneSequence(Map map) {
-         PersonTelephone.withSession { session ->
+
+    static def fetchByPidmTelephoneTypeAndTelephoneSequence(Map map) {
+        PersonTelephone.withSession { session ->
             def personTelephone = session.getNamedQuery('PersonTelephone.fetchByPidmTelephoneTypeAndTelephoneSequence')
                     .setInteger('pidm', map.pidm)
                     .setString('telephoneType', map.telephoneType.code)
