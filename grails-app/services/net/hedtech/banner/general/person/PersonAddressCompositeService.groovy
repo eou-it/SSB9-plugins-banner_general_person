@@ -34,7 +34,7 @@ class PersonAddressCompositeService {
                 address = personAddressService.create([domainModel:domain.personAddress])
                 if ((domain?.telephoneType) || (domain?.countryPhone) || (domain?.phoneArea) || (domain?.phoneNumber) || (domain?.phoneExtension))      {
                     checkPhone(domain)
-                    personTelephoneService.create([pidm:domain.personAddress.pidm,telephoneType:domain.telephoneType,countryPhone:domain.countryPhone,phoneArea:domain.phoneArea,phoneNumber:domain.phoneNumber,extension:domain.phoneExtension,addressType:domain.personAddress.addressType,addressSequenceNumber:address.sequenceNumber])
+                    personTelephoneService.create([pidm:domain.personAddress.pidm,telephoneType:domain.telephoneType,countryPhone:domain.countryPhone,phoneArea:domain.phoneArea,phoneNumber:domain.phoneNumber,phoneExtension:domain.phoneExtension,addressType:domain.personAddress.addressType,addressSequenceNumber:address.sequenceNumber])
                 }  }
             else   {
                 checkDatesForUpdate(domain.personAddress)

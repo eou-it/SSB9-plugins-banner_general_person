@@ -29,28 +29,28 @@ import javax.persistence.*
 @NamedQuery(name = "PersonTelephone.fetchByPidmTelephoneTypeAndTelephoneSequence",
 query = """FROM PersonTelephone a
                              WHERE  pidm = :pidm
-                             AND  telephoneType = :telephoneType
+                             AND  telephoneType.code = :telephoneType
                              AND  sequenceNumber = :sequenceNumber
                     """),
 @NamedQuery(name = "PersonTelephone.fetchByPidmSequenceNoAndAddressType",
 query = """FROM PersonTelephone a
                              WHERE  pidm = :pidm
                              AND  addressSequenceNumber = :addressSequenceNumber
-                             AND  addressType  = :addressType
+                             AND  addressType.code  = :addressType
                              AND  primaryIndicator IS NOT NULL
                     """),
 @NamedQuery(name = "PersonTelephone.fetchByPidmSequenceNoAndAddressTypeWithPrimaryCheck",
 query = """FROM PersonTelephone a
                              WHERE  pidm = :pidm
                              AND  addressSequenceNumber = :addressSequenceNumber
-                             AND  addressType  = :addressType
+                             AND  addressType.code  = :addressType
                              AND  primaryIndicator = 'Y'
                     """),
 @NamedQuery(name = "PersonTelephone.fetchByPidmSequenceNoAndAddressTypeWithoutPrimaryCheck",
 query = """FROM PersonTelephone a
                              WHERE  pidm = :pidm
                              AND  addressSequenceNumber = :addressSequenceNumber
-                             AND  addressType  = :addressType
+                             AND  addressType.code  = :addressType
                              AND NVL(statusIndicator,'A') <> 'I'
                     """),
 @NamedQuery(name = "PersonTelephone.fetchMaxSequenceNumber",
