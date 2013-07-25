@@ -9,7 +9,7 @@
 --
 -- AUDIT TRAIL END
 --
-CREATE OR REPLACE PACKAGE soknsut
+CREATE OR REPLACE PACKAGE BODY soknsut
 AS
 --
 -- FILE NAME..: soknsut1.sql
