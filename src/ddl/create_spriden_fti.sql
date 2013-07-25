@@ -17,7 +17,7 @@ REM
 -- Create the stoplist for name search.
 --
 begin
-     ctx_ddl.create_stoplist('STOPLIST_NAME_SEARCH'); ;
+     ctx_ddl.create_stoplist('STOPLIST_NAMESEARCH');
 end;
 /
 
@@ -28,7 +28,7 @@ declare
   index_does_not_exist EXCEPTION;
   pragma exception_init(index_does_not_exist,-01418);
 begin
-   execute immediate 'drop index SEARCH_LAST_NAME';
+   execute immediate 'drop index SPRIDEN_INDEX_LAST_NAME';
 exception
 	when index_does_not_exist then null;
 end;
@@ -41,7 +41,7 @@ declare
   index_does_not_exist EXCEPTION;
   pragma exception_init(index_does_not_exist,-01418);
 begin
-   execute immediate 'drop index SEARCH_FIRST_NAME';
+   execute immediate 'drop index SPRIDEN_INDEX_FIRST_NAME';
 exception
 	when index_does_not_exist then null;
 end;
@@ -54,7 +54,7 @@ declare
   index_does_not_exist EXCEPTION;
   pragma exception_init(index_does_not_exist,-01418);
 begin
-   execute immediate 'drop index SEARCH_MI';
+   execute immediate 'drop index SPRIDEN_INDEX_MI';
 exception
 	when index_does_not_exist then null;
 end;
@@ -89,19 +89,19 @@ end;
 --
 -- Create the domain index on SPRIDEN_SEARCH_LAST_NAME.
 --
-CREATE INDEX SPRIDEN_SEARCH_LAST_NAME ON SPRIDEN (SPRIDEN_SEARCH_LAST_NAME) INDEXTYPE IS ctxsys.context parameters('STOPLIST STOPLIST_NAME_SEARCH');
+CREATE INDEX SPRIDEN_INDEX_LAST_NAME ON SPRIDEN (SPRIDEN_SEARCH_LAST_NAME) INDEXTYPE IS ctxsys.context parameters('STOPLIST STOPLIST_NAMESEARCH');
 /
 
 --
 -- Create the domain index on SPRIDEN_SEARCH_FIRST_NAME.
 --
-CREATE INDEX SPRIDEN_SEARCH_FIRST_NAME ON SPRIDEN (SPRIDEN_SEARCH_FIRST_NAME) INDEXTYPE IS ctxsys.context parameters('STOPLIST STOPLIST_NAME_SEARCH');
+CREATE INDEX SPRIDEN_INDEX_FIRST_NAME ON SPRIDEN (SPRIDEN_SEARCH_FIRST_NAME) INDEXTYPE IS ctxsys.context parameters('STOPLIST STOPLIST_NAMESEARCH');
 /
 
 --
 -- Create the domain index on SPRIDEN_SEARCH_MI.
 --
-CREATE INDEX SPRIDEN_SEARCH_MI ON SPRIDEN (SPRIDEN_SEARCH_MI) INDEXTYPE IS ctxsys.context parameters('STOPLIST STOPLIST_NAME_SEARCH');
+CREATE INDEX SPRIDEN_INDEX_MI ON SPRIDEN (SPRIDEN_SEARCH_MI) INDEXTYPE IS ctxsys.context parameters('STOPLIST STOPLIST_NAMESEARCH');
 /
 
 --
