@@ -49,6 +49,12 @@ there is no concept of an 'entity manager' within this project.
         <mapping class="net.hedtech.banner.general.person.PersonIdentificationNameAlternate"/>
         <mapping class="net.hedtech.banner.general.person.PersonIdentificationNameCurrent"/>
         <mapping class="net.hedtech.banner.general.person.PersonTelephone"/>
+   <mapping class="net.hedtech.banner.general.person.view.ExtendedWindowNameSearchView"/>
+     <mapping class="net.hedtech.banner.general.person.view.ExtendedWindowIdSearchView"/>
+        <mapping class="net.hedtech.banner.general.person.PersonEmergencyContact"/>
+        <mapping class="net.hedtech.banner.general.person.PersonIdentificationNameAlternate"/>
+        <mapping class="net.hedtech.banner.general.person.PersonIdentificationNameCurrent"/>
+        <mapping class="net.hedtech.banner.general.person.PersonTelephone"/>
    
     </session-factory>
 </hibernate-configuration>
