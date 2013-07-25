@@ -9,7 +9,6 @@
 --
 -- AUDIT TRAIL END
 --
-
 CREATE OR REPLACE PACKAGE BODY soknsut
 AS
 --
@@ -88,6 +87,50 @@ FUNCTION f_get_search_filter RETURN VARCHAR2 IS
 BEGIN
      RETURN search_filter;
 END f_get_search_filter;
+--
+
+PROCEDURE p_set_page_size(search_var NUMBER) IS
+BEGIN
+   page_size := search_var;
+END p_set_page_size;
+--
+FUNCTION f_get_page_size RETURN NUMBER IS
+BEGIN
+     RETURN page_size;
+END f_get_page_size;
+--
+
+PROCEDURE p_set_name1(search_var VARCHAR2) IS
+BEGIN
+   name1 := search_var;
+END p_set_name1;
+--
+FUNCTION f_get_name1 RETURN VARCHAR2 IS
+BEGIN
+     RETURN name1;
+END f_get_name1;
+--
+
+PROCEDURE p_set_name2(search_var VARCHAR2) IS
+BEGIN
+   name2 := search_var;
+END p_set_name2;
+--
+FUNCTION f_get_name2 RETURN VARCHAR2 IS
+BEGIN
+     RETURN name2;
+END f_get_name2;
+--
+
+PROCEDURE p_set_name3(search_var VARCHAR2) IS
+BEGIN
+   name3 := search_var;
+END p_set_name3;
+--
+FUNCTION f_get_name3 RETURN VARCHAR2 IS
+BEGIN
+     RETURN name3;
+END f_get_name3;
 --
 
 FUNCTION f_match_name(filter_str VARCHAR2) RETURN NUMBER IS

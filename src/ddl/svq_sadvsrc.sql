@@ -82,7 +82,7 @@ SELECT /*+ RULE */  o.rowid||n.rowid||pers.rowid,
    FROM SPBPERS pers, SPRIDEN n, SPRIDEN o
   WHERE pers.SPBPERS_PIDM(+) = o.SPRIDEN_PIDM
     AND n.spriden_pidm = o.spriden_pidm
-    AND n.spriden_change_ind IS NULL
+    AND nvl(n.spriden_change_ind,'null')='null'
     AND o.spriden_entity_ind = n.spriden_entity_ind;
   /**  ORDER BY n.spriden_search_last_name, n.spriden_search_first_name,
              n.spriden_search_mi, n.spriden_id, o.spriden_change_ind DESC;**/

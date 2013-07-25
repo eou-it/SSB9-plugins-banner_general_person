@@ -27,6 +27,10 @@ AS
    -- DESCRIPTION END
    -- Variables
       search_filter       VARCHAR2(2000);
+      page_size           NUMBER;
+      name1               VARCHAR2(2000);
+      name2               VARCHAR2(2000);
+      name3               VARCHAR2(2000);
    --
    --
    -- Procedures
@@ -50,6 +54,32 @@ FUNCTION f_get_search_filter RETURN VARCHAR2;
    */
 PROCEDURE p_set_search_filter(search_var VARCHAR2);
 --
+/**
+   * This function returns the page size of listbox for the advanced search component.
+   */
+FUNCTION f_get_page_size RETURN NUMBER;
+--
+   /**
+   * This procedure set the page size of listbox for the advanced search component.
+   */
+PROCEDURE p_set_page_size(search_var NUMBER);
+--
+FUNCTION f_get_name1 RETURN VARCHAR2;
+
+--
+FUNCTION f_get_name2 RETURN VARCHAR2;
+
+--
+
+FUNCTION f_get_name3 RETURN VARCHAR2;
+--
+PROCEDURE p_set_name1(search_var VARCHAR2);
+--
+PROCEDURE p_set_name2(search_var VARCHAR2);
+--
+PROCEDURE p_set_name3(search_var VARCHAR2);
+--
+
    /*
    * This function split the search string into tokens
    * @param chaine The search parameters separated by |

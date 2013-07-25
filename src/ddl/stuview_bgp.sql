@@ -3,10 +3,10 @@
 -- *****************************************************************************************
 REM
 REM stuview_bgp.sql
-REM 
-REM AUDIT TRAIL: 9.0 
-REM 1. Horizon 
-REM AUDIT TRAIL END 
+REM
+REM AUDIT TRAIL: 9.0
+REM 1. Horizon
+REM AUDIT TRAIL END
 REM
 start sv_spraddr
 start sv_sprhold
@@ -29,3 +29,6 @@ start svq_idsrch
 start sv_spbpers
 start gv_goradid
 start sv_spremrg
+start create_spriden_fti
+start svq_extsrch
+start svq_extnamesrch
