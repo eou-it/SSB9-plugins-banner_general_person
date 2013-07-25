@@ -13,6 +13,14 @@ REM Project: Student Registration
 REM Audit Trail: 9.1 2/13/2012
 REM 1. Added triggers for the long title and short description tables for keyword searching.
 REM
+
+--
+-- Drop the stoplist for name search.
+--
+begin
+  ctx_ddl.drop_stoplist('STOPLIST_NAMESEARCH');
+end;
+/
 --
 -- Create the stoplist for name search.
 --
@@ -90,25 +98,25 @@ end;
 -- Create the domain index on SPRIDEN_SEARCH_LAST_NAME.
 --
 CREATE INDEX SPRIDEN_INDEX_LAST_NAME ON SPRIDEN (SPRIDEN_SEARCH_LAST_NAME) INDEXTYPE IS ctxsys.context parameters('STOPLIST STOPLIST_NAMESEARCH');
-/
+
 
 --
 -- Create the domain index on SPRIDEN_SEARCH_FIRST_NAME.
 --
 CREATE INDEX SPRIDEN_INDEX_FIRST_NAME ON SPRIDEN (SPRIDEN_SEARCH_FIRST_NAME) INDEXTYPE IS ctxsys.context parameters('STOPLIST STOPLIST_NAMESEARCH');
-/
+
 
 --
 -- Create the domain index on SPRIDEN_SEARCH_MI.
 --
 CREATE INDEX SPRIDEN_INDEX_MI ON SPRIDEN (SPRIDEN_SEARCH_MI) INDEXTYPE IS ctxsys.context parameters('STOPLIST STOPLIST_NAMESEARCH');
-/
+
 
 --
 -- Create the domain index on SPRIDEN_ID.
 --
 CREATE INDEX SPRIDEN_SEARCH_ID ON SPRIDEN (SPRIDEN_ID) INDEXTYPE IS ctxsys.context;
-/
+
 --
 -- Create the function based index on SPRIDEN_CHANGE_IND.
 --
