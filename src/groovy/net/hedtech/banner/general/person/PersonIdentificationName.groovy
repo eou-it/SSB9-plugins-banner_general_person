@@ -76,7 +76,12 @@ query = """select count(a.bannerId) FROM  PersonIdentificationName a
 query = """FROM PersonIdentificationName a
                         WHERE a.bannerId = :filter
                         and a.entityIndicator = 'P'
-                        and a.changeIndicator = 'I' """)
+                        and a.changeIndicator = 'I' """),
+@NamedQuery(name = "PersonIdentificationName.fetchPersonCurrentRecord",
+query = """FROM PersonIdentificationName a
+                        WHERE a.entityIndicator = 'P'
+                        and a.changeIndicator is null
+                        and a.pidm in (select pidm from PersonIdentificationName where bannerId = :bannerId and entityIndicator = 'P') """)
 ])
 @DatabaseModifiesState
 class PersonIdentificationName implements Serializable {
@@ -530,6 +535,18 @@ class PersonIdentificationName implements Serializable {
         }
         return object
     }
+
+
+    public static PersonIdentificationName fetchPersonCurrentRecord(String bannerId) {
+        PersonIdentificationName object
+        if (bannerId) {
+            object = PersonIdentificationName.withSession { session ->
+                session.getNamedQuery('PersonIdentificationName.fetchPersonCurrentRecord').setString('bannerId', bannerId).list()[0]
+            }
+        }
+        return object
+    }
+
 
     //Used for spriden id Lookup.
     public static Map fetchAllForBannerId(filter) {
