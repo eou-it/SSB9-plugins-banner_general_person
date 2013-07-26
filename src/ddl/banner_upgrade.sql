@@ -24,11 +24,6 @@ REM
 connect dbeu_owner/&&dbeu_password
 REM
 start dbeu_ext_stu_bgp
-REM
-connect baninst1/&&baninst1_password
-REM
-start stuview_bgp
-REM
 REM index may have accidently been created with baninst1
 connect baninst1/&&baninst1_password
 start spriden_fti_teardown.sql
@@ -36,6 +31,12 @@ connect saturn/&&saturn_password
 start spriden_fti_teardown.sql
 connect saturn/&&saturn_password
 start create_spriden_fti.sql
+REM
+connect baninst1/&&baninst1_password
+REM
+start stuview_bgp
+REM
+
 
 connect baninst1/&&baninst1_password
 start studbpr_bgp
