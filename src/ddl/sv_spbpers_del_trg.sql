@@ -13,9 +13,9 @@
 CREATE OR REPLACE TRIGGER spbpers_view_delete_trg
   INSTEAD OF DELETE ON sv_spbpers
 BEGIN
-  gb_bio.p_delete(
-     p_PIDM              =>:OLD.spbpers_pidm,
-     p_ROWID             =>:OLD.spbpers_v_rowid);
+  gb_bio.p_delete
+    (p_pidm => :OLD.spbpers_pidm,
+     p_rowid => :OLD.spbpers_v_rowid);
 END;
 /
 show errors

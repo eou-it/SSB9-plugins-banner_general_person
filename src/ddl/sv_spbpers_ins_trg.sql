@@ -11,40 +11,57 @@
 --
 -- AUDIT TRAIL END
 --
-CREATE OR REPLACE TRIGGER spbpers_view_insert_trg
+CREATE OR REPLACE TRIGGER spbpers_view_create_trg
   INSTEAD OF INSERT ON sv_spbpers
 DECLARE
   p_rowid_v VARCHAR2(100);
 BEGIN
   gfksjpa.setId(:NEW.spbpers_surrogate_id);
   gfksjpa.setVersion(:NEW.spbpers_version);
-  GB_BIO.P_CREATE(p_PIDM                   =>:NEW.SPBPERS_PIDM, 
-                  p_SSN                    =>:NEW.SPBPERS_SSN,
-                  p_BIRTH_DATE             =>:NEW.SPBPERS_BIRTH_DATE,
-                  p_LGCY_CODE              =>:NEW.SPBPERS_LGCY_CODE,
-                  p_ETHN_CODE              =>:NEW.SPBPERS_ETHN_CODE,
-                  p_MRTL_CODE              =>:NEW.SPBPERS_MRTL_CODE,
-                  p_RELG_CODE              =>:NEW.SPBPERS_RELG_CODE,
-                  p_SEX                    =>:NEW.SPBPERS_SEX,
-                  p_CONFID_IND             =>:NEW.SPBPERS_CONFID_IND,
-                  p_DEAD_IND               =>:NEW.SPBPERS_DEAD_IND,
-                  p_VETC_FILE_NUMBER       =>:NEW.SPBPERS_VETC_FILE_NUMBER,
-                  p_LEGAL_NAME             =>:NEW.SPBPERS_LEGAL_NAME,
-                  p_PREF_FIRST_NAME        =>:NEW.SPBPERS_PREF_FIRST_NAME,
-                  p_NAME_PREFIX            =>:NEW.SPBPERS_NAME_PREFIX,
-                  p_NAME_SUFFIX            =>:NEW.SPBPERS_NAME_SUFFIX,
-                  p_VERA_IND               =>:NEW.SPBPERS_VERA_IND,
-                  p_DEAD_DATE              =>:NEW.SPBPERS_DEAD_DATE,
-                  p_CITZ_CODE              =>:NEW.SPBPERS_CITZ_CODE,
-                  p_ACTIVE_DUTY_SEPR_DATE  =>:NEW.SPBPERS_ACTIVE_DUTY_SEPR_DATE,
-                  p_SDVET_IND              =>:NEW.SPBPERS_SDVET_IND,
-                  p_DATA_ORIGIN            =>:NEW.SPBPERS_DATA_ORIGIN,
-                  p_USER_ID                =>:NEW.SPBPERS_USER_ID,
-                  P_ETHN_CDE               =>:NEW.SPBPERS_ETHN_CDE,
-                  P_CONFIRMED_RE_CDE       =>:NEW.SPBPERS_CONFIRMED_RE_CDE,
-                  P_CONFIRMED_RE_DATE      =>:NEW.SPBPERS_CONFIRMED_RE_DATE,
-                  p_ARMED_SERV_MED_VET_IND =>:NEW.SPBPERS_ARMED_SERV_MED_VET_IND,
-                  p_ROWID_OUT              =>p_rowid_v);
+  gb_bio.p_create
+    (p_pidm => :NEW.spbpers_pidm,
+     p_ssn => :NEW.spbpers_ssn,
+     p_birth_date => :NEW.spbpers_birth_date,
+     p_lgcy_code => :NEW.spbpers_lgcy_code,
+     p_ethn_code => :NEW.spbpers_ethn_code,
+     p_mrtl_code => :NEW.spbpers_mrtl_code,
+     p_relg_code => :NEW.spbpers_relg_code,
+     p_sex => :NEW.spbpers_sex,
+     p_confid_ind => :NEW.spbpers_confid_ind,
+     p_dead_ind => :NEW.spbpers_dead_ind,
+     p_vetc_file_number => :NEW.spbpers_vetc_file_number,
+     p_legal_name => :NEW.spbpers_legal_name,
+     p_pref_first_name => :NEW.spbpers_pref_first_name,
+     p_name_prefix => :NEW.spbpers_name_prefix,
+     p_name_suffix => :NEW.spbpers_name_suffix,
+     p_vera_ind => :NEW.spbpers_vera_ind,
+     p_citz_ind => :NEW.spbpers_citz_ind,
+     p_dead_date => :NEW.spbpers_dead_date,
+     p_citz_code => :NEW.spbpers_citz_code,
+     p_hair_code => :NEW.spbpers_hair_code,
+     p_eyes_code => :NEW.spbpers_eyes_code,
+     p_city_birth => :NEW.spbpers_city_birth,
+     p_stat_code_birth => :NEW.spbpers_stat_code_birth,
+     p_driver_license => :NEW.spbpers_driver_license,
+     p_stat_code_driver => :NEW.spbpers_stat_code_driver,
+     p_natn_code_driver => :NEW.spbpers_natn_code_driver,
+     p_uoms_code_height => :NEW.spbpers_uoms_code_height,
+     p_height => :NEW.spbpers_height,
+     p_uoms_code_weight => :NEW.spbpers_uoms_code_weight,
+     p_weight => :NEW.spbpers_weight,
+     p_sdvet_ind => :NEW.spbpers_sdvet_ind,
+     p_license_issued_date => :NEW.spbpers_license_issued_date,
+     p_license_expires_date => :NEW.spbpers_license_expires_date,
+     p_incar_ind => :NEW.spbpers_incar_ind,
+     p_itin => :NEW.spbpers_itin,
+     p_active_duty_sepr_date => :NEW.spbpers_active_duty_sepr_date,
+     p_data_origin => :NEW.spbpers_data_origin,
+     p_user_id => :NEW.spbpers_user_id,
+     p_ethn_cde => :NEW.spbpers_ethn_cde,
+     p_confirmed_re_cde => :NEW.spbpers_confirmed_re_cde,
+     p_confirmed_re_date => :NEW.spbpers_confirmed_re_date,
+     p_armed_serv_med_vet_ind => :NEW.spbpers_armed_serv_med_vet_ind,
+     p_rowid_out => p_rowid_v);
 END;
 /
 show errors
