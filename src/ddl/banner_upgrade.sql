@@ -29,9 +29,18 @@ connect baninst1/&&baninst1_password
 REM
 start stuview_bgp
 REM
+REM index may have accidently been created with baninst1
+connect baninst1/&&baninst1_password
+start spriden_fti_teardown.sql
+connect saturn/&&saturn_password
+start spriden_fti_teardown.sql
+connect saturn/&&saturn_password
+start create_spriden_fti.sql
+
 connect baninst1/&&baninst1_password
 start studbpr_bgp
 commit;
+
 REM
 REM Recompile invalid objects
 REM

@@ -29,6 +29,5 @@ start svq_idsrch
 start sv_spbpers
 start gv_goradid
 start sv_spremrg
-start create_spriden_fti
 start svq_extsrch
 start svq_extnamesrch
