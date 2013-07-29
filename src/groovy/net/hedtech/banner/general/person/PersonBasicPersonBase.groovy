@@ -5,6 +5,7 @@ package net.hedtech.banner.general.person
 
 import net.hedtech.banner.general.system.*
 import net.hedtech.banner.query.DynamicFinder
+import net.hedtech.banner.service.DatabaseModifiesState
 import org.hibernate.annotations.Type
 
 import javax.persistence.*
@@ -14,6 +15,7 @@ import javax.persistence.*
  */
 @Entity
 @Table(name = "SV_SPBPERS")
+@DatabaseModifiesState
 @NamedQueries(value = [
 @NamedQuery(name = "PersonBasicPersonBase.fetchByPidm",
 query = """FROM  PersonBasicPersonBase a
