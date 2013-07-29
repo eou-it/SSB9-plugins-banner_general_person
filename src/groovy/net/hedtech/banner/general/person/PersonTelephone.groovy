@@ -17,6 +17,7 @@ package net.hedtech.banner.general.person
 
 import net.hedtech.banner.general.system.AddressType
 import net.hedtech.banner.general.system.TelephoneType
+import net.hedtech.banner.query.DynamicFinder
 import net.hedtech.banner.service.DatabaseModifiesState
 
 import javax.persistence.*
@@ -309,6 +310,41 @@ class PersonTelephone implements Serializable {
                         .setString('addressType', address).uniqueResult()
             }
         return personTelephone
+    }
+
+
+    /**
+     * Finder for advanced filtering and sorting
+     * @param filterData , pagingAndSortParams
+     * @return filtered and sorted data
+     */
+    def static countAll(filterData) {
+        finderByAll().count(filterData)
+    }
+
+
+    def static fetchSearch(filterData, pagingAndSortParams) {
+        def personTelephones = finderByAll().find(filterData, pagingAndSortParams)
+        return personTelephones
+    }
+
+
+    def private static finderByAll = {
+        def query = """FROM PersonTelephone a WHERE a.pidm = :pidm"""
+        return new DynamicFinder(PersonTelephone.class, query, "a")
+    }
+
+
+    public static PersonTelephone fetchByPidmSequenceNoAndAddressType(Integer pidm, Integer addressSequenceNumber, AddressType addressType) {
+        println "inside telephone " + pidm + addressSequenceNumber + addressType
+        PersonTelephone.withSession { session ->
+            def personTelephone = session.getNamedQuery('PersonTelephone.fetchByPidmSequenceNoAndAddressType')
+                    .setInteger('pidm', pidm)
+                    .setInteger('addressSequenceNumber', addressSequenceNumber)
+                    .setString('addressType', addressType.code).list()[0]
+            println " the tele " + personTelephone
+            return personTelephone
+        }
     }
 
 

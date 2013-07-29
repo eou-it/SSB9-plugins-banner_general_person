@@ -21,6 +21,7 @@ import javax.persistence.*
 query = """FROM  PersonBasicPersonBase a
 	       WHERE a.pidm = :pidm """)
 ])
+@DatabaseModifiesState
 class PersonBasicPersonBase implements Serializable {
 
     /**
@@ -68,7 +69,7 @@ class PersonBasicPersonBase implements Serializable {
      * This field identifies if a person record is confidential Valid value is: Y - confidential.
      */
     @Column(name = "SPBPERS_CONFID_IND")
-    String confidIndicator
+    String confidIndicator = "N"
 
     /**
      * This field indicates if a person is deceased. Valid value is: Y - deceased.
@@ -116,7 +117,7 @@ class PersonBasicPersonBase implements Serializable {
      * Citizen Indicator.
      */
     @Column(name = "SPBPERS_CITZ_IND")
-    String citizenshiopIndicator
+    String citizenshipIndicator
 
     /**
      * Person Deceased Date.
@@ -210,7 +211,7 @@ class PersonBasicPersonBase implements Serializable {
      * RACE AND ETHNICITY CONFIRMED: This field identifies the race and ethnicity has been confirmed. Valid values are (Y)es, (N)o and Null.
      */
     @Column(name = "SPBPERS_CONFIRMED_RE_CDE")
-    String confirmedRe
+    String confirmedRe = "N"
 
     /**
      * RACE AND ETHNICITY CONFIRMED DATE: This field identifies when the race and ethnicity has been confirmed.
@@ -352,7 +353,7 @@ class PersonBasicPersonBase implements Serializable {
 					namePrefix=$namePrefix, 
 					nameSuffix=$nameSuffix, 
 					veraIndicator=$veraIndicator, 
-					citizenshiopIndicator=$citizenshiopIndicator, 
+					citizenshipIndicator=$citizenshipIndicator,
 					deadDate=$deadDate, 
 					hair=$hair, 
 					eyeColor=$eyeColor, 
@@ -404,7 +405,7 @@ class PersonBasicPersonBase implements Serializable {
         if (namePrefix != that.namePrefix) return false
         if (nameSuffix != that.nameSuffix) return false
         if (veraIndicator != that.veraIndicator) return false
-        if (citizenshiopIndicator != that.citizenshiopIndicator) return false
+        if (citizenshipIndicator != that.citizenshipIndicator) return false
         if (deadDate != that.deadDate) return false
         if (hair != that.hair) return false
         if (eyeColor != that.eyeColor) return false
@@ -455,7 +456,7 @@ class PersonBasicPersonBase implements Serializable {
         result = 31 * result + (namePrefix != null ? namePrefix.hashCode() : 0)
         result = 31 * result + (nameSuffix != null ? nameSuffix.hashCode() : 0)
         result = 31 * result + (veraIndicator != null ? veraIndicator.hashCode() : 0)
-        result = 31 * result + (citizenshiopIndicator != null ? citizenshiopIndicator.hashCode() : 0)
+        result = 31 * result + (citizenshipIndicator != null ? citizenshipIndicator.hashCode() : 0)
         result = 31 * result + (deadDate != null ? deadDate.hashCode() : 0)
         result = 31 * result + (hair != null ? hair.hashCode() : 0)
         result = 31 * result + (eyeColor != null ? eyeColor.hashCode() : 0)
@@ -503,7 +504,7 @@ class PersonBasicPersonBase implements Serializable {
         namePrefix(nullable: true, maxSize: 20)
         nameSuffix(nullable: true, maxSize: 20)
         veraIndicator(nullable: true, maxSize: 1, inList: ["V", "B", "O", "N"])
-        citizenshiopIndicator(nullable: true, maxSize: 1, inList: ["U", "Y", "S"])
+        citizenshipIndicator(nullable: true, maxSize: 1, inList: ["U", "Y", "S"])
         deadDate(nullable: true)
         hair(nullable: true, maxSize: 2)
         eyeColor(nullable: true, maxSize: 2)
@@ -540,24 +541,26 @@ class PersonBasicPersonBase implements Serializable {
     public static readonlyProperties = ['pidm']
 
     /**
-     * Finder for page data so that advanced filter and column sorting can occur
-     * @param filterData , sort parms
-     * @return data for the page
+     * Get the age of the person.
      */
-    def static countAll(filterData) {
-        finderByAll().count(filterData)
-    }
+    def calculateAge() {
+        def deadInd = deadIndicator ? deadIndicator : "N"
+        def months
 
+        if (!birthDate) return null
+        if (deadIndicator == 'Y' && (!deadDate)) return null
 
-    def static fetchSearch(filterData, pagingAndSortParams) {
-        def personBasicPersonBases = finderByAll().find(filterData, pagingAndSortParams)
-        return personBasicPersonBases
-    }
+        def fromDate = new GregorianCalendar()
+        fromDate.setTime(birthDate)
 
+        def toDate = new GregorianCalendar()
+        if (deadDate) {
+            toDate.setTime(deadDate)
+        }
 
-    def private static finderByAll = {
-        def query = """FROM  PersonBasicPersonBase a where a.pidm = :pidm """
-        return new DynamicFinder(PersonBasicPersonBase.class, query, "a")
+        months = (toDate.get(Calendar.YEAR) - fromDate.get(Calendar.YEAR)) * 12
+        months = months + (toDate.get(Calendar.MONTH) - fromDate.get(Calendar.MONTH))
+        return new Integer(Math.floor(months / 12).intValue())
     }
 
 
@@ -568,4 +571,6 @@ class PersonBasicPersonBase implements Serializable {
 
         return object
     }
+
+
 }

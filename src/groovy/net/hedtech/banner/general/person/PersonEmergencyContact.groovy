@@ -7,6 +7,7 @@ import net.hedtech.banner.general.system.AddressType
 import net.hedtech.banner.general.system.Nation
 import net.hedtech.banner.general.system.Relationship
 import net.hedtech.banner.general.system.State
+import net.hedtech.banner.query.DynamicFinder
 import net.hedtech.banner.service.DatabaseModifiesState
 
 import javax.persistence.*
@@ -328,6 +329,28 @@ class PersonEmergencyContact implements Serializable {
 
     //Read Only fields that should be protected against update
     public static readonlyProperties = ['pidm', 'priority']
+
+
+    /**
+     * Finder for advanced filtering and sorting
+     * @param filterData , pagingAndSortParams
+     * @return filtered and sorted data
+     */
+    def static countAll(filterData) {
+        finderByAll().count(filterData)
+    }
+
+
+    def static fetchSearch(filterData, pagingAndSortParams) {
+        def personEmergencyContacts = finderByAll().find(filterData, pagingAndSortParams)
+        return personEmergencyContacts
+    }
+
+
+    def private static finderByAll = {
+        def query = """FROM PersonEmergencyContact a WHERE a.pidm = :pidm"""
+        return new DynamicFinder(PersonEmergencyContact.class, query, "a")
+    }
 
 
     static List fetchByPidmOrderByPriority(Integer pidm) {

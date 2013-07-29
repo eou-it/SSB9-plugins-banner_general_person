@@ -22,7 +22,11 @@ import javax.persistence.*
 @NamedQueries(value = [
 @NamedQuery(name = "PersonIdentificationNameAlternate.fetchAllByPidm",
 query = """FROM  PersonIdentificationNameAlternate a
-	       WHERE a.pidm = :filter """)
+	       WHERE a.pidm = :pidm """),
+@NamedQuery(name = "PersonIdentificationNameAlternate.fetchAllIdChangesByBannerId",
+query = """FROM  PersonIdentificationNameAlternate a
+	       WHERE a.bannerId = :bannerId
+	         AND a.changeIndicator = 'I' """)
 ])
 @DatabaseModifiesState
 class PersonIdentificationNameAlternate implements Serializable {
@@ -341,12 +345,12 @@ class PersonIdentificationNameAlternate implements Serializable {
      * @param filterData , pagingAndSortParams
      * @return filtered and sorted data
      */
-    def static countAllAlternate(filterData) {
+    def static countAll(filterData) {
         finderByAll().count(filterData)
     }
 
 
-    def static fetchSearchAlternate(filterData, pagingAndSortParams) {
+    def static fetchSearch(filterData, pagingAndSortParams) {
         def personIdentificationNameAlternates = finderByAll().find(filterData, pagingAndSortParams)
         return personIdentificationNameAlternates
     }
@@ -363,7 +367,20 @@ class PersonIdentificationNameAlternate implements Serializable {
 
         if (pidm) {
             personIdentificationNameAlternates = PersonIdentificationNameAlternate.withSession { session ->
-                def list = session.getNamedQuery('PersonIdentificationNameAlternate.fetchAllByPidm').setInteger('filter', pidm).list()
+                def list = session.getNamedQuery('PersonIdentificationNameAlternate.fetchAllByPidm').setInteger('pidm', pidm).list()
+            }
+        }
+
+        return personIdentificationNameAlternates
+    }
+
+
+    def static fetchAllIdChangesByBannerId(String bannerId) {
+        def personIdentificationNameAlternates = []
+
+        if (bannerId) {
+            personIdentificationNameAlternates = PersonIdentificationNameAlternate.withSession { session ->
+                def list = session.getNamedQuery('PersonIdentificationNameAlternate.fetchAllIdChangesByBannerId').setString('bannerId', bannerId).list()
             }
         }
 

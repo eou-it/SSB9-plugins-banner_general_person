@@ -3,6 +3,8 @@
  ****************************************************************************** */
 package net.hedtech.banner.general.person
 
+import net.hedtech.banner.query.DynamicFinder
+
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -129,9 +131,33 @@ class PersonRace implements Serializable {
 		lastModifiedBy(nullable:true, maxSize:30)
 		dataOrigin(nullable:true, maxSize:30)
     }
-    
+
+
     //Read Only fields that should be protected against update
     public static readonlyProperties = [ 'pidm', 'race' ]
+
+
+    /**
+     * Finder for advanced filtering and sorting
+     * @param filterData , pagingAndSortParams
+     * @return filtered and sorted data
+     */
+    def static countAll(filterData) {
+        finderByAll().count(filterData)
+    }
+
+
+    def static fetchSearch(filterData, pagingAndSortParams) {
+        def personRaces = finderByAll().find(filterData, pagingAndSortParams)
+        return personRaces
+    }
+
+
+    def private static finderByAll = {
+        def query = """FROM PersonRace a WHERE a.pidm = :pidm"""
+        return new DynamicFinder(PersonRace.class, query, "a")
+    }
+
 
     static def fetchByPidm(Integer pidm) {
         if (pidm) {

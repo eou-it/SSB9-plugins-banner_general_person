@@ -16,6 +16,7 @@
 package net.hedtech.banner.general.person
 
 import net.hedtech.banner.general.system.EmailType
+import net.hedtech.banner.query.DynamicFinder
 import org.apache.log4j.Logger
 import org.hibernate.annotations.Type
 import javax.persistence.*
@@ -132,7 +133,7 @@ class PersonEmail implements Serializable {
 
 
     public String toString() {
-        """PersonEMail[
+        """PersonEmail[
 					id=$id, 
 					version=$version, 
 					pidm=$pidm, 
@@ -203,6 +204,29 @@ class PersonEmail implements Serializable {
 //    public static readonlyProperties = ['pidm', 'emailAddress', 'emailType']
 
     public static readonlyProperties = ['pidm']
+
+
+    /**
+     * Finder for advanced filtering and sorting
+     * @param filterData , pagingAndSortParams
+     * @return filtered and sorted data
+     */
+    def static countAll(filterData) {
+        finderByAll().count(filterData)
+    }
+
+
+    def static fetchSearch(filterData, pagingAndSortParams) {
+        def personEmails = finderByAll().find(filterData, pagingAndSortParams)
+        return personEmails
+    }
+
+
+    def private static finderByAll = {
+        def query = """FROM PersonEmail a WHERE a.pidm = :pidm"""
+        return new DynamicFinder(PersonEmail.class, query, "a")
+    }
+
 
     public static List fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator(Integer pidm, String statusIndicator,
                                                                               String displayWebIndicator, String preferredIndicator) {

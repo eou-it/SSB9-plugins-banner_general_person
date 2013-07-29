@@ -4,6 +4,8 @@ Copyright 2013 Ellucian Company L.P. and its affiliates.
 *******************************************************************************/
 package net.hedtech.banner.general.person
 
+import net.hedtech.banner.query.DynamicFinder
+
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -138,4 +140,26 @@ class AdditionalID implements Serializable {
 
     //Read Only fields that should be protected against update
     public static readonlyProperties = [ 'pidm', 'additionalId', 'additionalIdentificationType' ]
+
+
+    /**
+     * Finder for advanced filtering and sorting
+     * @param filterData , pagingAndSortParams
+     * @return filtered and sorted data
+     */
+    def static countAll(filterData) {
+        finderByAll().count(filterData)
+    }
+
+
+    def static fetchSearch(filterData, pagingAndSortParams) {
+        def additionalIDs = finderByAll().find(filterData, pagingAndSortParams)
+        return additionalIDs
+    }
+
+
+    def private static finderByAll = {
+        def query = """FROM AdditionalID a WHERE a.pidm = :pidm"""
+        return new DynamicFinder(AdditionalID.class, query, "a")
+    }
 }

@@ -246,6 +246,28 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+    void testCalculateAge() {
+        def df = new SimpleDateFormat("MM/dd/yyyy");
+        def birthDate = new java.sql.Date(df.parse("10/17/1966").getTime());
+        def deceasedDate = new java.sql.Date(df.parse("07/15/2013").getTime());
+
+        def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()
+        personBasicPersonBase.birthDate = birthDate
+        personBasicPersonBase.deadIndicator = "Y"
+        personBasicPersonBase.deadDate = deceasedDate
+        personBasicPersonBase.save(failOnError: true, flush: true)
+        //Test if the generated entity now has an id assigned
+        assertNotNull personBasicPersonBase.id
+        assertEquals 46, personBasicPersonBase.calculateAge()
+
+        personBasicPersonBase.birthDate = null
+        personBasicPersonBase.save(failOnError: true, flush: true)
+        //Test if the generated entity now has an id assigned
+        assertNotNull personBasicPersonBase.id
+        assertNull personBasicPersonBase.calculateAge()
+    }
+
+
     void testCreateInvalidPersonBasicPersonBase() {
         def personBasicPersonBase = newInvalidForCreatePersonBasicPersonBase()
         shouldFail(ValidationException) {
@@ -629,6 +651,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
         assertFalse "PersonBasicPersonBase should have failed validation", personBasicPersonBase.validate()
         assertErrorsFor personBasicPersonBase, 'maxSize', ['ssn', 'sex', 'confidIndicator', 'deadIndicator', 'vetcFileNumber', 'legalName', 'preferenceFirstName', 'namePrefix', 'nameSuffix', 'veraIndicator', 'citizenshiopIndicator', 'hair', 'eyeColor', 'cityBirth', 'driverLicense', 'sdvetIndicator', 'incarcerationIndicator', 'ethnic', 'confirmedRe']
     }
+
 
     void testFindByPidm() {
         def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()

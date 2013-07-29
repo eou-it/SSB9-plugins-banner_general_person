@@ -59,7 +59,7 @@ class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTes
             fail("This should have failed with @@r1:unsupported.operation")
         }
         catch (ApplicationException ae) {
-//            assertApplicationException ae, "unsupported.operation"
+            assertApplicationException ae, "unsupported.operation"
         }
     }
 

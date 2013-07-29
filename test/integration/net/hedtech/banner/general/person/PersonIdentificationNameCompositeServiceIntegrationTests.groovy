@@ -100,7 +100,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
 
         try {
             personIdentificationNameCompositeService.createOrUpdate([personIdentificationNameCurrents: personList])
-            fail "should have failed because you cannot create two person with the same banner id"
+            fail "Should have failed because you cannot create two persons with the same banner id."
         }
         catch (ApplicationException ae) {
             assertApplicationException ae, "Cannot create new identification record, since the ID provided is in use by another person/non-person."

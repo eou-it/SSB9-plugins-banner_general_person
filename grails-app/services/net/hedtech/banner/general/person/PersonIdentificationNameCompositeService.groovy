@@ -21,11 +21,9 @@ class PersonIdentificationNameCompositeService extends ServiceBase {
     def sessionFactory
     def log = Logger.getLogger(this.getClass())
 
-    def personIdentificationNameService
     def personIdentificationNameCurrentService
     def personIdentificationNameAlternateService
     def personBasicPersonBaseService
-
 
 
     public def createOrUpdate(map) {
@@ -38,13 +36,7 @@ class PersonIdentificationNameCompositeService extends ServiceBase {
         }
 
         if (map?.personIdentificationNameCurrent) {
-            def personIdentificationNameCurrents = [map?.personIdentificationNameCurrent]  // Convert to a list
-            processInsertUpdates(personIdentificationNameCurrents, personIdentificationNameCurrentService)
-        }
-
-        if (map?.personBasicPersonBase) {
-            def personBasicPersonBases = [map?.personBasicPersonBase]  // Convert to a list
-            processInsertUpdates(personBasicPersonBases, personBasicPersonBaseService)
+            processInsertUpdates([map?.personIdentificationNameCurrent], personIdentificationNameCurrentService)
         }
 
         if (map?.personIdentificationNameCurrents) {
@@ -53,6 +45,10 @@ class PersonIdentificationNameCompositeService extends ServiceBase {
 
         if (map?.personIdentificationNameAlternates) {
             processInsertUpdates(map?.personIdentificationNameAlternates, personIdentificationNameAlternateService)
+        }
+
+        if (map?.basicPerson) {
+            processInsertUpdates([map?.basicPerson], personBasicPersonBaseService)
         }
     }
 
