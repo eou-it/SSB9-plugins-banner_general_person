@@ -15,7 +15,6 @@ import javax.persistence.*
  */
 @Entity
 @Table(name = "SV_SPBPERS")
-@DatabaseModifiesState
 @NamedQueries(value = [
 @NamedQuery(name = "PersonBasicPersonBase.fetchByPidm",
 query = """FROM  PersonBasicPersonBase a

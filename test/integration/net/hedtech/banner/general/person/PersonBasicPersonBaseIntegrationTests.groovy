@@ -37,7 +37,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     def i_success_namePrefix = "TTTTT"
     def i_success_nameSuffix = "TTTTT"
     def i_success_veraIndicator = "V"
-    def i_success_citizenshiopIndicator = "U"
+    def i_success_citizenshipIndicator = "U"
     def i_success_deadDate = new Date()
     def i_success_hair = "TT"
     def i_success_eyeColor = "TT"
@@ -78,7 +78,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     def i_failure_namePrefix = "TTTTT"
     def i_failure_nameSuffix = "TTTTT"
     def i_failure_veraIndicator = "V"
-    def i_failure_citizenshiopIndicator = "U"
+    def i_failure_citizenshipIndicator = "U"
     def i_failure_deadDate = new Date()
     def i_failure_hair = "TTT"
     def i_failure_eyeColor = "TT"
@@ -121,7 +121,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     def u_success_namePrefix = "TTTTT"
     def u_success_nameSuffix = "TTTTT"
     def u_success_veraIndicator = "V"
-    def u_success_citizenshiopIndicator = "U"
+    def u_success_citizenshipIndicator = "U"
     def u_success_deadDate = new Date()
     def u_success_hair = "TT"
     def u_success_eyeColor = "TT"
@@ -162,7 +162,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     def u_failure_namePrefix = "TTTTT"
     def u_failure_nameSuffix = "TTTTT"
     def u_failure_veraIndicator = "V"
-    def u_failure_citizenshiopIndicator = "U"
+    def u_failure_citizenshipIndicator = "U"
     def u_failure_deadDate = new Date()
     def u_failure_hair = "TTT"
     def u_failure_eyeColor = "TT"
@@ -292,7 +292,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
         assertEquals i_success_namePrefix, personBasicPersonBase.namePrefix
         assertEquals i_success_nameSuffix, personBasicPersonBase.nameSuffix
         assertEquals i_success_veraIndicator, personBasicPersonBase.veraIndicator
-        assertEquals i_success_citizenshiopIndicator, personBasicPersonBase.citizenshiopIndicator
+        assertEquals i_success_citizenshipIndicator, personBasicPersonBase.citizenshipIndicator
         assertEquals i_success_deadDate, personBasicPersonBase.deadDate
         assertEquals i_success_hair, personBasicPersonBase.hair
         assertEquals i_success_eyeColor, personBasicPersonBase.eyeColor
@@ -323,7 +323,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
         personBasicPersonBase.namePrefix = u_success_namePrefix
         personBasicPersonBase.nameSuffix = u_success_nameSuffix
         personBasicPersonBase.veraIndicator = u_success_veraIndicator
-        personBasicPersonBase.citizenshiopIndicator = u_success_citizenshiopIndicator
+        personBasicPersonBase.citizenshipIndicator = u_success_citizenshipIndicator
         personBasicPersonBase.deadDate = u_success_deadDate
         personBasicPersonBase.hair = u_success_hair
         personBasicPersonBase.eyeColor = u_success_eyeColor
@@ -366,7 +366,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
         assertEquals u_success_namePrefix, personBasicPersonBase.namePrefix
         assertEquals u_success_nameSuffix, personBasicPersonBase.nameSuffix
         assertEquals u_success_veraIndicator, personBasicPersonBase.veraIndicator
-        assertEquals u_success_citizenshiopIndicator, personBasicPersonBase.citizenshiopIndicator
+        assertEquals u_success_citizenshipIndicator, personBasicPersonBase.citizenshipIndicator
         assertEquals u_success_deadDate, personBasicPersonBase.deadDate
         assertEquals u_success_hair, personBasicPersonBase.hair
         assertEquals u_success_eyeColor, personBasicPersonBase.eyeColor
@@ -413,7 +413,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
         assertEquals i_success_namePrefix, personBasicPersonBase.namePrefix
         assertEquals i_success_nameSuffix, personBasicPersonBase.nameSuffix
         assertEquals i_success_veraIndicator, personBasicPersonBase.veraIndicator
-        assertEquals i_success_citizenshiopIndicator, personBasicPersonBase.citizenshiopIndicator
+        assertEquals i_success_citizenshipIndicator, personBasicPersonBase.citizenshipIndicator
         assertEquals i_success_deadDate, personBasicPersonBase.deadDate
         assertEquals i_success_hair, personBasicPersonBase.hair
         assertEquals i_success_eyeColor, personBasicPersonBase.eyeColor
@@ -444,7 +444,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
         personBasicPersonBase.namePrefix = u_failure_namePrefix
         personBasicPersonBase.nameSuffix = u_failure_nameSuffix
         personBasicPersonBase.veraIndicator = u_failure_veraIndicator
-        personBasicPersonBase.citizenshiopIndicator = u_failure_citizenshiopIndicator
+        personBasicPersonBase.citizenshipIndicator = u_failure_citizenshipIndicator
         personBasicPersonBase.deadDate = u_failure_deadDate
         personBasicPersonBase.hair = u_failure_hair
         personBasicPersonBase.eyeColor = u_failure_eyeColor
@@ -535,7 +535,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
         personBasicPersonBase.namePrefix = u_success_namePrefix
         personBasicPersonBase.nameSuffix = u_success_nameSuffix
         personBasicPersonBase.veraIndicator = u_success_veraIndicator
-        personBasicPersonBase.citizenshiopIndicator = u_success_citizenshiopIndicator
+        personBasicPersonBase.citizenshipIndicator = u_success_citizenshipIndicator
         personBasicPersonBase.deadDate = u_success_deadDate
         personBasicPersonBase.hair = u_success_hair
         personBasicPersonBase.eyeColor = u_success_eyeColor
@@ -596,7 +596,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
                         'namePrefix',
                         'nameSuffix',
                         'veraIndicator',
-                        'citizenshiopIndicator',
+                        'citizenshipIndicator',
                         'deadDate',
                         'hair',
                         'eyeColor',
@@ -639,7 +639,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
                 namePrefix: 'XXXXXXXXXXXXXXXXXXXXXX',
                 nameSuffix: 'XXXXXXXXXXXXXXXXXXXXXX',
                 veraIndicator: 'XXX',
-                citizenshiopIndicator: 'XXX',
+                citizenshipIndicator: 'XXX',
                 hair: 'XXXX',
                 eyeColor: 'XXXX',
                 cityBirth: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
@@ -649,7 +649,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
                 ethnic: 'XXX',
                 confirmedRe: 'XXX')
         assertFalse "PersonBasicPersonBase should have failed validation", personBasicPersonBase.validate()
-        assertErrorsFor personBasicPersonBase, 'maxSize', ['ssn', 'sex', 'confidIndicator', 'deadIndicator', 'vetcFileNumber', 'legalName', 'preferenceFirstName', 'namePrefix', 'nameSuffix', 'veraIndicator', 'citizenshiopIndicator', 'hair', 'eyeColor', 'cityBirth', 'driverLicense', 'sdvetIndicator', 'incarcerationIndicator', 'ethnic', 'confirmedRe']
+        assertErrorsFor personBasicPersonBase, 'maxSize', ['ssn', 'sex', 'confidIndicator', 'deadIndicator', 'vetcFileNumber', 'legalName', 'preferenceFirstName', 'namePrefix', 'nameSuffix', 'veraIndicator', 'citizenshipIndicator', 'hair', 'eyeColor', 'cityBirth', 'driverLicense', 'sdvetIndicator', 'incarcerationIndicator', 'ethnic', 'confirmedRe']
     }
 
 
@@ -699,7 +699,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
                 namePrefix: i_success_namePrefix,
                 nameSuffix: i_success_nameSuffix,
                 veraIndicator: i_success_veraIndicator,
-                citizenshiopIndicator: i_success_citizenshiopIndicator,
+                citizenshipIndicator: i_success_citizenshipIndicator,
                 deadDate: i_success_deadDate,
                 hair: i_success_hair,
                 eyeColor: i_success_eyeColor,
@@ -767,7 +767,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
                 namePrefix: i_failure_namePrefix,
                 nameSuffix: i_failure_nameSuffix,
                 veraIndicator: i_failure_veraIndicator,
-                citizenshiopIndicator: i_failure_citizenshiopIndicator,
+                citizenshipIndicator: i_failure_citizenshipIndicator,
                 deadDate: i_failure_deadDate,
                 hair: i_failure_hair,
                 eyeColor: i_failure_eyeColor,
