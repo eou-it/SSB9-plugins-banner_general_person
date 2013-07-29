@@ -2,20 +2,15 @@
  Copyright 2013 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 
-package net.hedtech.banner.general.person.search
+package net.hedtech.banner.general.person
 
 import groovy.sql.Sql
-import net.hedtech.banner.general.person.PersonBasicPersonBase
-import net.hedtech.banner.general.person.PersonIdentificationNameCurrent
-import net.hedtech.banner.general.person.PersonRace
 import net.hedtech.banner.general.system.*
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 
 class PersonBiographicalCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
 
     def personBiographicalCompositeService
-    def personBasicPersonBaseService
-    def personRaceService
 
 
     protected void setUp() {
@@ -50,62 +45,106 @@ class PersonBiographicalCompositeServiceIntegrationTests extends BaseIntegration
 
         personBasicPersonBase = PersonBasicPersonBase.fetchByPidm(personIdentificationNameCurrent.pidm)
         assertNotNull personBasicPersonBase
-        assertEquals "TTTTT",  personBasicPersonBase.ssn
-        assertEquals "BR",  personBasicPersonBase.hair
+        assertEquals "TTTTT", personBasicPersonBase.ssn
+        assertEquals "BR", personBasicPersonBase.hair
 
         personRaces = PersonRace.fetchByPidm(personIdentificationNameCurrent.pidm)
         assertEquals 2, personRaces.size()
     }
 
-//    void testUpdateCurrentBannerId() {
-//        def origBannerId = "ID-T00001"
-//        def updateBannerId = "ID-U00001"
-//
-//        def person = setupNewPersonIdentificationNameCurrent(origBannerId)
-//
-//        // Update the person's banner id
-//        person.bannerId = updateBannerId
-//
-//        def updatedPersonList = []
-//        updatedPersonList << person
-//        personIdentificationNameCompositeService.createOrUpdate([personIdentificationNameCurrents: updatedPersonList])
-//
-//        def currentPerson = PersonIdentificationNameCurrent.fetchByBannerId(updateBannerId)
-//        assertNotNull currentPerson
-//        assertEquals person.pidm, currentPerson.pidm
-//        assertEquals updateBannerId, currentPerson.bannerId
-//        assertEquals 1L, currentPerson.version
-//
-//        def alternatePersons = PersonIdentificationNameAlternate.fetchAllByPidm(currentPerson.pidm)
-//        assertEquals 1, alternatePersons.size()
-//
-//        // Check the alternate id
-//        def alternatePerson = alternatePersons.get(0)
-//        assertEquals currentPerson.pidm, alternatePerson?.pidm
-//        assertEquals origBannerId, alternatePerson.bannerId
-//        assertEquals "I", alternatePerson.changeIndicator
-//        assertEquals 0L, alternatePerson.version
-//    }
-//
-//
-//    void testDeleteCurrent() {
-//        def person = setupNewPersonIdentificationNameCurrent("ID-T00001")
-//
-//        def deletePersonList = []
-//        deletePersonList << person
-//
-//        try {
-//            personIdentificationNameCompositeService.createOrUpdate([deletePersonIdentificationNameCurrents: deletePersonList])
-//            fail "should have failed because you cannot delete the current id"
-//        }
-//        catch (ApplicationException ae) {
-//            assertApplicationException ae, "Cannot delete current record."
-//        }
-//    }
 
-    // *************************************************************************************************************
-    //  End tests.
-    // *************************************************************************************************************
+    void testUpdateBiographical() {
+        def personIdentificationNameCurrent = setupNewPersonIdentificationNameCurrent()
+
+        def personBasicPersonBase = newPersonBasicPersonBase(personIdentificationNameCurrent)
+
+        def personRaces = []
+
+        personRaces << new PersonRace(
+                pidm: personIdentificationNameCurrent.pidm,
+                race: "MOA")
+
+        personRaces << new PersonRace(
+                pidm: personIdentificationNameCurrent.pidm,
+                race: "ASI")
+
+
+        personBiographicalCompositeService.createOrUpdate([personBasicPersonBase: personBasicPersonBase,
+                personRaces: personRaces])
+
+        personBasicPersonBase = PersonBasicPersonBase.fetchByPidm(personIdentificationNameCurrent.pidm)
+        assertNotNull personBasicPersonBase
+        assertEquals "TTTTT", personBasicPersonBase.ssn
+        assertEquals "BR", personBasicPersonBase.hair
+
+        personRaces = PersonRace.fetchByPidm(personIdentificationNameCurrent.pidm)
+        assertEquals 2, personRaces.size()
+
+        // Update values
+        personBasicPersonBase.hair = "BL"
+        personBasicPersonBase.eyeColor = "BL"
+        personBasicPersonBase.cityBirth = "Bristol"
+        personBasicPersonBase.driverLicense = "UUUUU"
+        personBasicPersonBase.height = 2
+        personBasicPersonBase.weight = 2
+
+        personRaces << new PersonRace(
+                pidm: personIdentificationNameCurrent.pidm,
+                race: "IND")
+
+        personBiographicalCompositeService.createOrUpdate([personBasicPersonBase: personBasicPersonBase,
+                personRaces: personRaces])
+
+        personBasicPersonBase = PersonBasicPersonBase.fetchByPidm(personIdentificationNameCurrent.pidm)
+        assertNotNull personBasicPersonBase
+        assertEquals "UUUUU", personBasicPersonBase.driverLicense
+        assertEquals "BL", personBasicPersonBase.hair
+        assertEquals "BL", personBasicPersonBase.eyeColor
+        assertEquals "Bristol", personBasicPersonBase.cityBirth
+        assertEquals 2, personBasicPersonBase.height
+        assertEquals 2, personBasicPersonBase.weight
+
+        personRaces = PersonRace.fetchByPidm(personIdentificationNameCurrent.pidm)
+        assertEquals 3, personRaces.size()
+    }
+
+
+    void testDeleteBiographical() {
+        def personIdentificationNameCurrent = setupNewPersonIdentificationNameCurrent()
+
+        def personBasicPersonBase = newPersonBasicPersonBase(personIdentificationNameCurrent)
+
+        def personRaces = []
+
+        personRaces << new PersonRace(
+                pidm: personIdentificationNameCurrent.pidm,
+                race: "MOA")
+
+        personRaces << new PersonRace(
+                pidm: personIdentificationNameCurrent.pidm,
+                race: "ASI")
+
+
+        personBiographicalCompositeService.createOrUpdate([personBasicPersonBase: personBasicPersonBase,
+                personRaces: personRaces])
+
+        personBasicPersonBase = PersonBasicPersonBase.fetchByPidm(personIdentificationNameCurrent.pidm)
+        assertNotNull personBasicPersonBase
+        assertEquals "TTTTT", personBasicPersonBase.ssn
+        assertEquals "BR", personBasicPersonBase.hair
+
+        personRaces = PersonRace.fetchByPidm(personIdentificationNameCurrent.pidm)
+        assertEquals 2, personRaces.size()
+
+        personBiographicalCompositeService.createOrUpdate([deletePersonBasicPersonBase: personBasicPersonBase,
+                deletePersonRaces: personRaces])
+
+        personBasicPersonBase = PersonBasicPersonBase.fetchByPidm(personIdentificationNameCurrent.pidm)
+        assertNull personBasicPersonBase
+
+        personRaces = PersonRace.fetchByPidm(personIdentificationNameCurrent.pidm)
+        assertEquals 0, personRaces.size()
+    }
 
     /**
      * Creates a new person current id record.
