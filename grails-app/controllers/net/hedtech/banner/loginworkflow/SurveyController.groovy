@@ -1,13 +1,12 @@
 package net.hedtech.banner.loginworkflow
 
-import net.hedtech.BasePostLoginFlowController
 import net.hedtech.banner.general.person.PersonBasicPersonBase
 import net.hedtech.banner.general.person.PersonRace
 import net.hedtech.banner.general.system.Race
 import net.hedtech.banner.general.system.RegulatoryRace
 import net.hedtech.banner.general.system.SdaCrosswalkConversion
 
-class SurveyController extends BasePostLoginFlowController {
+class SurveyController {
     def personRaceService
     def personBasicPersonBaseService
     static defaultAction = "index"
