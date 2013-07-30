@@ -3,6 +3,8 @@
  ****************************************************************************** */
 package net.hedtech.banner.general.person
 
+import net.hedtech.banner.exceptions.ApplicationException
+import net.hedtech.banner.general.system.SdaCrosswalkConversion
 import net.hedtech.banner.service.ServiceBase
 
 // NOTE:
@@ -14,4 +16,35 @@ import net.hedtech.banner.service.ServiceBase
 // create, update, and delete may throw grails.validation.ValidationException a runtime exception when there is a validation failure
 
 class PersonRaceService extends ServiceBase {
+
+    boolean transactional = true
+    /*def sessionFactory*/
+
+    def createOrUpdate(map) {
+        if (map?.deletePersonRaces) {
+            processDeletes(map.deletePersonRaces)
+        }
+        if (map?.createPersonRaces) {
+            processInsertUpdates(map.createPersonRaces)
+        }
+    }
+
+
+    private void processDeletes(domains) {
+        domains.each { domain ->
+            this.delete(domain)
+        }
+    }
+
+
+    private void processInsertUpdates(domains) {
+        domains.each { personRace ->
+            if (personRace.id == null) {
+                this.create([domainModel: personRace])
+            } else {
+                this.update([domainModel: personRace])
+            }
+        }
+    }
+
 }

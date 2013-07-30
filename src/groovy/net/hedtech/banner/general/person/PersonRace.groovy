@@ -25,7 +25,11 @@ import net.hedtech.banner.service.DatabaseModifiesState
 @NamedQueries(value = [
 @NamedQuery(name = "PersonRace.fetchByPidm",
         query = """ FROM PersonRace a
-                            WHERE  a.pidm = :pidm""")
+                    WHERE  a.pidm = :pidm"""),
+@NamedQuery(name = "PersonRace.fetchByPidmAndRace",
+        query = """ FROM PersonRace a
+                    WHERE  a.pidm = :pidm
+                    AND a.race = :race""")
 ])
  /**
     * Where clause on this entity present in forms:
@@ -164,6 +168,18 @@ class PersonRace implements Serializable {
             PersonRace.withSession { session ->
                 List personRaceList = session.getNamedQuery('PersonRace.fetchByPidm').setInteger('pidm', pidm).list()
                 return personRaceList
+            }
+        } else {
+            return null
+        }
+    }
+
+
+    static def fetchByPidmAndRace(Integer pidm, String race) {
+        if (pidm) {
+            PersonRace.withSession { session ->
+                def personRace = session.getNamedQuery('PersonRace.fetchByPidmAndRace').setInteger('pidm', pidm).setString('race', race).list()[0]
+                return personRace
             }
         } else {
             return null
