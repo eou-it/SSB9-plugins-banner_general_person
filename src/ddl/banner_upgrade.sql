@@ -40,6 +40,8 @@ REM
 
 connect baninst1/&&baninst1_password
 start studbpr_bgp
+start svq_nameparams
+start svq_advsrch
 commit;
 
 REM
