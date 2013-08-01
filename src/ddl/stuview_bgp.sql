@@ -7,7 +7,8 @@ REM
 REM AUDIT TRAIL: 9.0
 REM 1. Horizon
 REM AUDIT TRAIL END
-REM
+REM 
+start svq_nameparams
 start sv_spraddr
 start sv_sprhold
 start sv_spriden
