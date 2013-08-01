@@ -63,9 +63,5 @@ REM
 start sv_spremrg_ins_trg
 start sv_spremrg_upd_trg
 start sv_spremrg_del_trg
-REM
-REM Create procedures
-REM
-start soknsut
-start soknsut1
+
 REM

@@ -31,12 +31,15 @@ connect saturn/&&saturn_password
 start spriden_fti_teardown.sql
 connect saturn/&&saturn_password
 start create_spriden_fti.sql
+
+REM  Create package needed for view 
+connect baninst1/&&baninst1_password
+start studbpr_bgp_preview
 REM
 connect baninst1/&&baninst1_password
 REM
 start stuview_bgp
-REM
-
+REM 
 
 connect baninst1/&&baninst1_password
 start studbpr_bgp

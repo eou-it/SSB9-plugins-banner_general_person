@@ -111,7 +111,7 @@ class PersonAdvancedFilterView {
      */
     def private static finderByAllEntityList = {filterData ->
         def query = """FROM PersonAdvancedSearchView a
-                       where exists( from PersonAdvancedFilterView as af where af.pidm = a.pidm )
+                       where 1 = 1
                       """
 
         return new DynamicFinder(PersonAdvancedSearchView.class, query, "a")
