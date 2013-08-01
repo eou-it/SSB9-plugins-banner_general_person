@@ -1,5 +1,5 @@
 -- *****************************************************************************************
--- * Copyright 2009-2011 SunGard Higher Education. All Rights Reserved.                    *
+-- * Copyright 2009-2012 SunGard Higher Education. All Rights Reserved.                    *
 -- * This copyrighted software contains confidential and proprietary information of        *
 -- * SunGard Higher Education and its subsidiaries. Any use of this software is limited    *
 -- * solely to SunGard Higher Education licensees, and is further subject to the terms     *
@@ -9,45 +9,27 @@
 -- * Banner and Luminis are either registered trademarks or trademarks of SunGard Higher   *
 -- * Education in the U.S.A. and/or other regions and/or countries.                        *
 -- *****************************************************************************************
-REM
-REM banner_upgrade.sql
-REM
-REM AUDIT TRAIL: 9.0
-REM 1. Horizon
-REM Main common project schema maintenance script.
-REM AUDIT TRAIL END
-REM
-set scan on echo on termout on;
-REM
-spool horizon_upgrade.lis
-REM
-connect dbeu_owner/&&dbeu_password
-REM
-start dbeu_ext_stu_bgp
-REM index may have accidently been created with baninst1
-connect baninst1/&&baninst1_password
-start spriden_fti_teardown.sql
-connect saturn/&&saturn_password
-start spriden_fti_teardown.sql
-connect saturn/&&saturn_password
-start create_spriden_fti.sql
-REM
-connect baninst1/&&baninst1_password
-REM
-start stuview_bgp
-REM
+--  SVQ_NAMEPARAMS.sql
+--
+-- AUDIT TRAIL: 9.0
+-- Read only view for Advanced Search Filter UI Component - ID Search    rahulb 31-Jul-2012
+-- AUDIT TRAIL END
+--
 
+SET SCAN OFF;
+CREATE OR REPLACE FORCE VIEW SVQ_NAME_PARAMS(NAME1,NAME2,
+NAME3) as
+Select
+Soknsut.F_Get_Name1,
+Soknsut.F_Get_Name2,
+Soknsut.F_Get_Name3
+from dual;
 
-connect baninst1/&&baninst1_password
-start studbpr_bgp
-start svq_nameparams
-start svq_advsrch
-commit;
+COMMENT ON TABLE SVQ_NAME_PARAMS IS 'Read only view for Name Search';
+COMMENT ON COLUMN SVQ_NAME_PARAMS.NAME1 IS 'First word in the search text ';
+COMMENT ON COLUMN SVQ_NAME_PARAMS.NAME2 IS 'Second word in the search text ';
+COMMENT ON COLUMN SVQ_NAME_PARAMS.NAME3 IS 'Third word in the search text ';
+CREATE OR REPLACE PUBLIC SYNONYM SVQ_NAME_PARAMS FOR SVQ_NAME_PARAMS;
+SHOW ERRORS VIEW SVQ_NAME_PARAMS;
+SET SCAN ON;
 
-REM
-REM Recompile invalid objects
-REM
-conn sys/u_pick_it as sysdba
-execute utl_recomp.recomp_parallel();
-start showinv
-spool off;

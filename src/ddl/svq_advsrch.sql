@@ -40,9 +40,19 @@ select /*+ RULE */ SPRIDEN_SURROGATE_ID,
        SPRIDEN_CHANGE_IND,
        SPRIDEN_VERSION ,
        rownum
-from SPRIDEN  where (contains(SPRIDEN_SEARCH_LAST_NAME,soknsut.f_get_name1)>0 OR contains(SPRIDEN_SEARCH_FIRST_NAME,soknsut.f_get_name1)>0 OR contains(SPRIDEN_SEARCH_MI,soknsut.f_get_name1)>0) and
-(contains(SPRIDEN_SEARCH_LAST_NAME,soknsut.f_get_name2)>0 OR contains(SPRIDEN_SEARCH_FIRST_NAME,soknsut.f_get_name2)>0 OR contains(SPRIDEN_SEARCH_MI,soknsut.f_get_name2)>0) and
-(contains(SPRIDEN_SEARCH_LAST_NAME,soknsut.f_get_name3)>0 OR contains(SPRIDEN_SEARCH_FIRST_NAME,soknsut.f_get_name3)>0 OR contains(SPRIDEN_SEARCH_MI,soknsut.f_get_name3)>0);
+from SPRIDEN, SVQ_NAME_PARAMS  where
+(contains(SPRIDEN_SEARCH_LAST_NAME, NAME1)>0
+     Or contains(SPRIDEN_SEARCH_FIRST_NAME, NAME1)>0
+     Or contains(SPRIDEN_SEARCH_MI, NAME1)>0)
+And ( NAME2  = '%' or
+  (contains(SPRIDEN_SEARCH_LAST_NAME,NAME2)>0
+    Or Contains(SPRIDEN_SEARCH_FIRST_NAME,NAME2)>0
+    Or Contains(SPRIDEN_SEARCH_MI,NAME2)>0) )
+And ( name3  = '%' or
+   (Contains(SPRIDEN_SEARCH_LAST_NAME,NAME3)>0
+    Or Contains(SPRIDEN_SEARCH_FIRST_NAME,NAME3)>0
+    Or Contains(SPRIDEN_SEARCH_MI,NAME3)>0) );
+
 
 COMMENT ON TABLE SVQ_ADVSRCH IS 'Read only view for Advanced Search Filter UI Component';
 COMMENT ON COLUMN SVQ_ADVSRCH.SURROGATE_ID IS 'SURROGATE ID: Immutable unique key';
