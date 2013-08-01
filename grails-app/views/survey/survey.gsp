@@ -24,7 +24,7 @@ Copyright 2009-2012 Ellucian Company L.P. and its affiliates.
         #pagetitle {
             float: left;
             color: #646464;
-            font-size: 1.61em;
+            font-size: 27px;
             font-weight: normal;
             letter-spacing: 0.08em;
             padding: 0;
@@ -112,6 +112,9 @@ Copyright 2009-2012 Ellucian Company L.P. and its affiliates.
             }
         });
 
+        $("#ask-me-later-btn").click(function () {
+            window.location = "${createLink(controller: "survey", action: "completed")}";
+        });
 
     })
 
@@ -182,7 +185,7 @@ Copyright 2009-2012 Ellucian Company L.P. and its affiliates.
                                 </g:each>
                             </div>
                             <input type='button' value="Continue" id="save-btn" class="primary-button" />
-                            <input type='button' value="Ask me Later" id="ask-me-later-btn" class="secondary-button" onclick="askMeLater()" height="32px" />
+                            <input type='button' value="Ask me Later" id="ask-me-later-btn" class="secondary-button" />
                         </div>
                     </form>
                 </div>

@@ -3,6 +3,8 @@ package net.hedtech.banner.loginworkflow
 import net.hedtech.banner.general.person.PersonBasicPersonBase
 import net.hedtech.banner.general.system.SdaCrosswalkConversion
 import net.hedtech.banner.loginworkflow.PostLoginWorkflow
+import net.hedtech.banner.security.BannerUser
+import org.springframework.security.core.context.SecurityContextHolder
 
 /** *****************************************************************************
  © 2013 SunGard Higher Education.  All Rights Reserved.
@@ -29,6 +31,7 @@ class RaceAndEthnicityFlow implements PostLoginWorkflow {
 
 
     public static boolean showPage(request) {
+        def pidm = getPidm()
         def session = request.getSession()
         String isDone = session.getAttribute("surveydone")
         def pushSurvey = false
@@ -42,27 +45,29 @@ class RaceAndEthnicityFlow implements PostLoginWorkflow {
                 def surveyEndDate = sdaxForSurveyEndDate?.reportingDate ?: today
                 // Survey start date is not null & Today is between Survey start and end dates
                 if (surveyStartDate && (surveyStartDate <= today && today <= surveyEndDate)) {
-                    if (PersonBasicPersonBase.fetchByPidm(34525)?.confirmedRe != 'Y') {
+                    if (PersonBasicPersonBase.fetchByPidm(pidm)?.confirmedRe != 'Y') {
                         pushSurvey = true
                     }
                 }
             }
-            /*def surveyStartDateSql = """ select gtvsdax_reporting_date from gtvsdax
-                                            where gtvsdax_internal_code = ?
-                                            and gtvsdax_internal_code_seqno = ?
-                                            and gtvsdax_internal_code_group = ?
-                                            and gtvsdax_sysreq_ind = 'Y' """
-            def surveyStartDate = sql.firstRow(surveyStartDateSql, ['RESTARTDAT', 1, 'SSMREDATE'])*/
             return pushSurvey
         } else {
             // Do not show Survey page as Survey has already been taken.
             return pushSurvey
         }
-        return true
     }
 
 
     public static String getControllerUri() {
-        return "/ssb/survey"
+        return "/ssb/survey/survey"
+    }
+
+
+    public static def getPidm() {
+        def user = SecurityContextHolder?.context?.authentication?.principal
+        if (user instanceof BannerUser) {
+            return user.pidm
+        }
+        return null
     }
 }
