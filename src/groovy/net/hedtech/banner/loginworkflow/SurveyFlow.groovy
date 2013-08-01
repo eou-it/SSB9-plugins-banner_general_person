@@ -16,21 +16,9 @@ import org.springframework.security.core.context.SecurityContextHolder
  NOR USED FOR ANY PURPOSE OTHER THAN THAT WHICH IT IS SPECIFICALLY PROVIDED
  WITHOUT THE WRITTEN PERMISSION OF THE SAID COMPANY
  ****************************************************************************** */
-class RaceAndEthnicityFlow implements PostLoginWorkflow {
+class SurveyFlow implements PostLoginWorkflow {
 
-    /*public boolean showPage(request) {
-        def session = request.getSession();
-        String isDone = session.getAttribute("surveydone")
-        if(isDone == "true") {
-            return false
-        }
-        else {
-            return true
-        }
-    }*/
-
-
-    public static boolean showPage(request) {
+    public boolean showPage(request) {
         def pidm = getPidm()
         def session = request.getSession()
         String isDone = session.getAttribute("surveydone")
@@ -58,7 +46,7 @@ class RaceAndEthnicityFlow implements PostLoginWorkflow {
     }
 
 
-    public static String getControllerUri() {
+    public String getControllerUri() {
         return "/ssb/survey/survey"
     }
 

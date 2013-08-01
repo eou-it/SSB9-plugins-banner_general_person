@@ -54,40 +54,13 @@ Copyright 2009-2012 Ellucian Company L.P. and its affiliates.
             background: transparent;
             position: relative;
             top: 0px;
-            padding: 25px; /* safari fix */
+            padding: 25px;
             float: left;
             overflow: hidden;
             width: 95%;
         }
 
-        #contentBelt {
-
-        }
-
-        #contentBelt div {
-
-        }
-
-        DIV.pagebodydiv {
-            text-align: left;
-        }
-
-        DIV.infotextdiv {
-            text-align: left;
-        }
-
-        .infotextdiv {
-            background-color: #FFFFFF;
-            border: 1px solid #CCCCCC;
-        }
-
-        .infotexttable {
-            font-size: 0.98em;
-            line-height: 13pt;
-        }
-
-        .race-row {
-            /*float: left;*/
+        .content-label {
             margin-bottom: 5px;
             margin-right: 10px;
             padding-top: 4px;
@@ -95,14 +68,64 @@ Copyright 2009-2012 Ellucian Company L.P. and its affiliates.
             width: 14em;
             font-size: 12px;
             min-height: 20px;
+            vertical-align: top;
+        }
+
+        .section-header {
+            background-color: #FFFFFF;
+            border: 1px solid #CCCCCC;
+            color: black;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 13px;
+            font-style: normal;
+            text-align: left;
+            padding: 10px 0 10px 10px;
+        }
+
+        .section-header-text {
+            color: #444455;
+        }
+
+        .race-category-area {
+            display: inline-block;
+            vertical-align: top;
+        }
+
+        .race-category-header {
+            padding: 5px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        #ethnicity {
+            padding: 4px;
+        }
+
+        .races-content {
+            padding: 4px;
+        }
+
+        .button-area {
+            float: right;
+        }
+
+        #save-btn, #ask-me-later-btn {
+            cursor: pointer;
+        }
+
+        #errorMessage {
+            font-size: 13px;
+            font-weight: bold;
+            padding: 4px;
+            color: red;
         }
 
     </style>
-    %{--<r:require modules="term,registration"/>--}%
     <script>
     $(document).ready(function () {
         $("#save-btn").click(function () {
             if ($('#ethnicity input:checked').length > 1) {
+                $("#errorMessage").empty()
                 $("#errorMessage").append("You may only select one checkbox for Ethnicity")
             }
             else {
@@ -118,26 +141,6 @@ Copyright 2009-2012 Ellucian Company L.P. and its affiliates.
 
     })
 
-    /*function submitSurvey() {
-        if ($('#ethnicity input:checked').length > 1) {
-            alert("You may only select one checkbox for Ethnicity")
-        }
-        else {
-            alert('else')
-            var form = document.getElementById('surveyForm')
-            form.submit()
-        }
-    }
-
-
-    function askMeLater() {
-        alert('ask later')
-    }*/
-
-    /*function moveToController() {
-        window.location = "${createLink(controller: "survey", action: "completed")}";
-    }*/
-
     </script>
 </head>
 
@@ -145,7 +148,7 @@ Copyright 2009-2012 Ellucian Company L.P. and its affiliates.
 <div id="content">
     <div id="bodyContainer" class="ui-layout-center inner-center">
         <div id="pageheader" class="level4">
-            <div id="pagetitle">Update Ethnicity and Race</div>
+            <div id="pagetitle"><g:message code="survey.title" /></div>
         </div>
         <div id="pagebody" class="level4">
             <div id="contentHolder">
@@ -153,39 +156,40 @@ Copyright 2009-2012 Ellucian Company L.P. and its affiliates.
                 <div class="pagebodydiv" style="display: block;">
                     <div id="errorMessage"></div>
                     <form controller="survey" action="save" id='surveyForm' method='POST'>
-                    %{--<g:form action='${postUrl}' method='POST' id='surveyForm'>--}%
                         <div id="ethnicity-race-wrapper">
                             <div id="ethnicity-wrapper">
-                                <div id="ethnicity-header">What is your ethnicity?</div>
-                                %{--<g:each in="${ethnicityList}" var="ethnicity">--}%
-                                    <div id="ethnicity">
-                                        %{--<input id="rdEthn_${ethnicity}" name="ethnicity" type="checkbox" value="${ethnicity}"/>
-                                        <label class="form-row" for="ethnicity-desc_${ethnicity}">${ethnicity}</label>--}%
-                                        <input id="chkEthn_1" name="ethnicity" value="1" type="checkbox" <g:if test="${personEthnicity == '1'}">checked="true"</g:if> />
-                                        <label for="chkEthn_1" class="race-row"><g:message code="survey.ethnicity.nothispanic" /></label>
-                                        <br/>
-                                        <input id="chkEthn_2" name="ethnicity" value="2" type="checkbox" <g:if test="${personEthnicity == '2'}">checked="true"</g:if> />
-                                        <label for="chkEthn_2" class="race-row"><g:message code="survey.ethnicity.hispanic" /></label>
-                                    </div>
-                                %{--</g:each>--}%
+                                <div id="ethnicity-header" class="section-header">
+                                    <span class="section-header-text"><g:message code="survey.ethnicity.header" /></span>
+                                </div>
+                                <div id="ethnicity">
+                                    <input id="chkEthn_1" name="ethnicity" value="1" type="checkbox" <g:if test="${personEthnicity == '1'}">checked="true"</g:if> />
+                                    <label for="chkEthn_1" class="content-label"><g:message code="survey.ethnicity.nothispanic" /></label>
+                                    <br/>
+                                    <input id="chkEthn_2" name="ethnicity" value="2" type="checkbox" <g:if test="${personEthnicity == '2'}">checked="true"</g:if> />
+                                    <label for="chkEthn_2" class="content-label"><g:message code="survey.ethnicity.hispanic" /></label>
+                                </div>
                             </div>
                             <div id="race-wrapper">
-                                <div id="race-header">Select one or more races to indicate what you consider yourself to be.</div>
+                                <div id="race-header" class="section-header">
+                                    <span class="section-header-text"><g:message code="survey.race.header" /></span>
+                                </div>
                                 <g:each in="${regulatoryRaces}" var="regulatoryRace">
-                                    <div id="race-category_${regulatoryRace.code}" style="display: inline-block">
-                                        <div id="race-category-desc">${regulatoryRace.description}</div>
-                                        <div id="races_${regulatoryRace.code}">
+                                    <div id="race-category_${regulatoryRace.code}" class="race-category-area">
+                                        <div id="race-category-desc" class="race-category-header">${regulatoryRace.description}</div>
+                                        <div id="races_${regulatoryRace.code}" class="races-content">
                                             <g:each in="${raceMap[regulatoryRace.code]}" var="race">
                                                 <input id="chkRace_${race.race}" name="race" value="${race.race}" type="checkbox" <g:if test="${personRaceCodes.contains(race.race)}">checked="true"</g:if>/>
-                                                <label for="chkRace_${race.race}" class="race-row">${race.description}</label>
+                                                <label for="chkRace_${race.race}" class="content-label">${race.description}</label>
                                                 <br/>
                                             </g:each>
                                         </div>
                                     </div>
                                 </g:each>
                             </div>
-                            <input type='button' value="Continue" id="save-btn" class="primary-button" />
-                            <input type='button' value="Ask me Later" id="ask-me-later-btn" class="secondary-button" />
+                        <div class="button-area">
+                            <input type='button' value="Ask me Later" id="ask-me-later-btn" class="secondary-button"/>
+                            <input type='button' value="Continue" id="save-btn" class="primary-button"/>
+                        </div>
                         </div>
                     </form>
                 </div>
@@ -193,7 +197,5 @@ Copyright 2009-2012 Ellucian Company L.P. and its affiliates.
         </div>
     </div>
 </div>
-%{--Take Survey
-<input type="button" value="yes" onclick="moveToController()"/>--}%
 </body>
 </html>

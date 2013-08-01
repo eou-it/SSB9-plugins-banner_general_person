@@ -45,10 +45,8 @@ class SurveyService extends ServiceBase {
                 createPersonRaces << (personRace ?: new PersonRace(pidm: pidm, race: race))
             }
         }
-        println "createPersonRaces: " + createPersonRaces
         def savedPersonRaces = PersonRace.fetchByPidm(pidm)
         deletePersonRaces = savedPersonRaces - createPersonRaces
-        println "deletePersonRaces: " + deletePersonRaces
         personRaceService.createOrUpdate([createPersonRaces: createPersonRaces, deletePersonRaces: deletePersonRaces])
 
     }
