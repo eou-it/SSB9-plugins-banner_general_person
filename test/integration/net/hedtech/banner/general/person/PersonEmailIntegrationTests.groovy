@@ -167,14 +167,13 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
 
     void testNullValidationFailure() {
         def personEmail = new PersonEmail()
+        personEmail.statusIndicator = null
         assertFalse "PersonEmail should have failed validation", personEmail.validate()
         assertErrorsFor personEmail, 'nullable',
                 [
                         'pidm',
                         'emailAddress',
                         'statusIndicator',
-                        'preferredIndicator',
-                        'displayWebIndicator',
                         'emailType'
                 ]
         assertNoErrorsFor personEmail,

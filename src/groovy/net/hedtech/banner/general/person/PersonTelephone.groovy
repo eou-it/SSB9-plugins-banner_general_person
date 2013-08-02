@@ -295,7 +295,7 @@ class PersonTelephone implements Serializable {
     }
 
 
-    public static readonlyProperties = ['pidm', 'sequenceNumber', 'telephoneType']
+    public static readonlyProperties = ['pidm', 'sequenceNumber']
 
 
     static PersonTelephone fetchByPidmSequenceNoAndAddressType(Integer pidm, Integer addressSequenceNumber, def addressType) {

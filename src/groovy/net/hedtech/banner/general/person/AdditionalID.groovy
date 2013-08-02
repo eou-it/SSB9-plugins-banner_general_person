@@ -139,7 +139,7 @@ class AdditionalID implements Serializable {
     }
 
     //Read Only fields that should be protected against update
-    public static readonlyProperties = [ 'pidm', 'additionalId', 'additionalIdentificationType' ]
+    public static readonlyProperties = [ 'pidm' ]
 
 
     /**

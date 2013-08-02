@@ -81,14 +81,14 @@ class PersonEmail implements Serializable {
      * The status of the e-mail address: (A)ctive, (I)nactive
      */
     @Column(name = "GOREMAL_STATUS_IND")
-    String statusIndicator
+    String statusIndicator = "A"
 
     /**
      * This column indicates if the e-mail address is the preferred contact address.
      */
     @Type(type = "yes_no")
     @Column(name = "GOREMAL_PREFERRED_IND")
-    Boolean preferredIndicator
+    Boolean preferredIndicator = false
 
     /**
      * This is a free format comment regarding the e-mail information.
@@ -101,7 +101,7 @@ class PersonEmail implements Serializable {
      */
     @Type(type = "yes_no")
     @Column(name = "GOREMAL_DISP_WEB_IND")
-    Boolean displayWebIndicator
+    Boolean displayWebIndicator = true
 
     /**
      * The date on which the row was added or modified.
