@@ -67,6 +67,14 @@ import javax.persistence.*
                              AND  (telephoneType LIKE :filter
                              OR addressType LIKE :filter)
                              ORDER BY DECODE(a.statusIndicator, 'I',-2) DESC
+                    """),
+@NamedQuery(name = "PersonTelephone.fetchActiveTelephoneByPidmAndTelephoneType",
+        query = """FROM PersonTelephone a
+                             WHERE  pidm = :pidm
+                             AND telephoneType = :telephoneType
+                             AND primaryIndicator = 'Y'
+                             AND NVL(statusIndicator,'A') <> 'I'
+                             AND NVL(unlistIndicator,'N') <> 'Y'
                     """)
 ])
 @DatabaseModifiesState
@@ -409,6 +417,26 @@ class PersonTelephone implements Serializable {
                     .setInteger('pidm', map.pidm)
                     .setString('telephoneType', map.telephoneType.code)
                     .setInteger('sequenceNumber', map.telephoneSequenceNumber).list()[0]
+            return personTelephone
+        }
+    }
+
+
+    static PersonTelephone fetchActiveTelephoneByPidmAndTelephoneType(Integer pidm, String telephoneType){
+        PersonTelephone.withSession { session ->
+            PersonTelephone personTelephone = session.getNamedQuery('PersonTelephone.fetchActiveTelephoneByPidmAndTelephoneType')
+                    .setInteger('pidm', pidm)
+                    .setString('telephoneType', telephoneType).list()[0]
+            return personTelephone
+        }
+    }
+
+
+    public static PersonTelephone fetchActiveTelephoneByPidmAndTelephoneType(Integer pidm, TelephoneType telephoneType){
+        PersonTelephone.withSession { session ->
+            PersonTelephone personTelephone = session.getNamedQuery('PersonTelephone.fetchActiveTelephoneByPidmAndTelephoneType')
+                    .setInteger('pidm', pidm)
+                    .setString('telephoneType', telephoneType.code).list()[0]
             return personTelephone
         }
     }

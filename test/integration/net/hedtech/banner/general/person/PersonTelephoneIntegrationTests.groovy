@@ -348,6 +348,39 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+    void testFetchActiveTelephoneByPidmAndTelephoneType() {
+        def pidm = PersonUtility.getPerson("HOS00001").pidm
+        def maxSeqNo = PersonTelephone.fetchMaxSequenceNumber(pidm)
+        def personTelephone = newValidForCreatePersonTelephone()
+        def telephoneType =  TelephoneType.findByCode("PR")
+        personTelephone.pidm = pidm
+        personTelephone.sequenceNumber = maxSeqNo + 1
+        personTelephone.phoneNumber = "222222222"
+        personTelephone.telephoneType = telephoneType
+        personTelephone.primaryIndicator = "Y"
+        personTelephone.statusIndicator = null
+        personTelephone.unlistIndicator = null
+        personTelephone.save()
+        def personTelephone1 = newValidForCreatePersonTelephone()
+        personTelephone1.pidm = pidm
+        personTelephone1.sequenceNumber = maxSeqNo + 1
+        personTelephone1.phoneNumber = "333333333"
+        personTelephone1.telephoneType = telephoneType
+        personTelephone1.primaryIndicator = null
+        personTelephone1.statusIndicator = null
+        personTelephone1.unlistIndicator = null
+        personTelephone1.save()
+
+        def phone = PersonTelephone.fetchActiveTelephoneByPidmAndTelephoneType(pidm,telephoneType)
+
+        def phone1 = PersonTelephone.fetchActiveTelephoneByPidmAndTelephoneType(pidm,telephoneType.code)
+
+        assertNotNull(phone)
+        assertNotNull(phone1)
+        assertEquals(phone.phoneNumber,personTelephone.phoneNumber,phone1.phoneNumber)
+    }
+
+
     private def newValidForCreatePersonTelephone() {
         def personTelephone = new PersonTelephone(
                 pidm: i_success_pidm,
