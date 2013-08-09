@@ -4,24 +4,14 @@ import net.hedtech.banner.general.person.PersonBasicPersonBase
 import net.hedtech.banner.general.person.PersonRace
 import net.hedtech.banner.general.system.Race
 import net.hedtech.banner.general.system.RegulatoryRace
-import net.hedtech.banner.general.system.SdaCrosswalkConversion
 import net.hedtech.banner.security.BannerUser
 import org.springframework.security.core.context.SecurityContextHolder
 
 class SurveyController {
-    def personRaceService
-    def personBasicPersonBaseService
     static defaultAction = "index"
     def surveyService
 
-    /*def index() {
-        render view: "survey"
-    }*/
-
-
     def survey() {
-        /*def ethnicityList = [1, 2]*/
-        // "Not Hispanic or Latino", "Hispanic or Latino"
         def pidm = getPidm()
         def raceMap = [:]
         def regulatoryRaces = RegulatoryRace.fetchRequiredRegulatoryRaces()
@@ -49,11 +39,8 @@ class SurveyController {
     }
 
 
-    def save = {      // TODO: Remove println statements
+    def save = {
         def pidm = getPidm()
-        println params
-        def ethnicity = params.ethnicity
-
         surveyService.saveSurveyResponse(pidm, params.ethnicity, params.race)
         completed()
     }

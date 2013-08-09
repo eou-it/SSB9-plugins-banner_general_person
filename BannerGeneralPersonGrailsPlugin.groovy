@@ -1,5 +1,3 @@
-import net.hedtech.banner.loginworkflow.SurveyFlow
-
 /*********************************************************************************
  Copyright 2009-2011 SunGard Higher Education. All Rights Reserved.
  This copyrighted software contains confidential and proprietary information of
@@ -58,9 +56,6 @@ class BannerGeneralPersonGrailsPlugin {
 
 
     def doWithSpring = {
-        surveyFlow(SurveyFlow) {
-
-        }
     }
 
 

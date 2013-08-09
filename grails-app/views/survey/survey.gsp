@@ -8,140 +8,7 @@ Copyright 2009-2012 Ellucian Company L.P. and its affiliates.
 <head>
     <title>Race and Ethnicity Survey</title>
     <meta name="layout" content="bannerSelfServicePage"/>
-
-    <style type="text/css">
-
-        #bodyContainer {
-            margin: 30px;
-        }
-
-        #pageheader {
-            width: 100%;
-            margin: 25px 0;
-            padding: 0px;
-        }
-
-        #pagetitle {
-            float: left;
-            color: #646464;
-            font-size: 27px;
-            font-weight: normal;
-            letter-spacing: 0.08em;
-            padding: 0;
-            margin: 5px 0 10px 0;
-            width: 85%;
-        }
-
-        #pagebody {
-            padding: 0 0 25px 0px;
-            top: -5px;
-            background: #fff url(images/content-bg-tc-dark.png) repeat-x left top;
-            border: 1px #e5ebee solid;
-            border-top-width: 0px;
-            float: left;
-            min-width: 911px;
-            width: 100%;
-            margin: 29px 0 0;
-        }
-
-        #pagebody.level4 {
-            min-width: 100%;
-            width: auto;
-            margin: 0;
-        }
-
-        #contentHolder {
-            background: transparent;
-            position: relative;
-            top: 0px;
-            padding: 25px;
-            float: left;
-            overflow: hidden;
-            width: 95%;
-        }
-
-        .content-label {
-            margin-bottom: 5px;
-            margin-right: 10px;
-            padding-top: 4px;
-            text-align: right;
-            width: 14em;
-            font-size: 12px;
-            min-height: 20px;
-            vertical-align: top;
-        }
-
-        .section-header {
-            background-color: #FFFFFF;
-            border: 1px solid #CCCCCC;
-            color: black;
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 13px;
-            font-style: normal;
-            text-align: left;
-            padding: 10px 0 10px 10px;
-        }
-
-        .section-header-text {
-            color: #444455;
-        }
-
-        .race-category-area {
-            display: inline-block;
-            vertical-align: top;
-        }
-
-        .race-category-header {
-            padding: 5px;
-            font-size: 13px;
-            font-weight: bold;
-        }
-
-        #ethnicity {
-            padding: 4px;
-        }
-
-        .races-content {
-            padding: 4px;
-        }
-
-        .button-area {
-            float: right;
-        }
-
-        #save-btn, #ask-me-later-btn {
-            cursor: pointer;
-        }
-
-        #errorMessage {
-            font-size: 13px;
-            font-weight: bold;
-            padding: 4px;
-            color: red;
-        }
-
-    </style>
-    <script>
-    $(document).ready(function () {
-        $("#save-btn").click(function () {
-            if ($('#ethnicity input:checked').length > 1) {
-                $("#errorMessage").empty()
-                $("#errorMessage").append("You may only select one checkbox for Ethnicity")
-            }
-            else {
-                $("#errorMessage").empty()
-                var form = document.getElementById('surveyForm')
-                form.submit()
-            }
-        });
-
-        $("#ask-me-later-btn").click(function () {
-            window.location = "${createLink(controller: "survey", action: "completed")}";
-        });
-
-    })
-
-    </script>
+    <r:require modules="survey"/>
 </head>
 
 <body>
@@ -187,7 +54,7 @@ Copyright 2009-2012 Ellucian Company L.P. and its affiliates.
                                 </g:each>
                             </div>
                         <div class="button-area">
-                            <input type='button' value="Ask me Later" id="ask-me-later-btn" class="secondary-button"/>
+                            <input type='button' value="Ask me Later" id="ask-me-later-btn" class="secondary-button" data-endpoint="${createLink(controller: "survey", action: "completed")}"/>
                             <input type='button' value="Continue" id="save-btn" class="primary-button"/>
                         </div>
                         </div>
