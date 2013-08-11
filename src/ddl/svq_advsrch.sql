@@ -41,9 +41,9 @@ select /*+ RULE */ SPRIDEN_SURROGATE_ID,
        SPRIDEN_VERSION ,
        rownum
 from SPRIDEN, SVQ_NAME_PARAMS  where
-(contains(SPRIDEN_SEARCH_LAST_NAME, NAME1)>0
+(NAME1  = '%' or (contains(SPRIDEN_SEARCH_LAST_NAME, NAME1)>0
      Or contains(SPRIDEN_SEARCH_FIRST_NAME, NAME1)>0
-     Or contains(SPRIDEN_SEARCH_MI, NAME1)>0)
+     Or contains(SPRIDEN_SEARCH_MI, NAME1)>0))
 And ( NAME2  = '%' or
   (contains(SPRIDEN_SEARCH_LAST_NAME,NAME2)>0
     Or Contains(SPRIDEN_SEARCH_FIRST_NAME,NAME2)>0

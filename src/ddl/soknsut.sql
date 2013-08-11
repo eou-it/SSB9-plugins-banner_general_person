@@ -31,6 +31,7 @@ AS
       name1               VARCHAR2(2000);
       name2               VARCHAR2(2000);
       name3               VARCHAR2(2000);
+      search_id           VARCHAR2(2000);
    --
    --
    -- Procedures
@@ -73,13 +74,17 @@ FUNCTION f_get_name2 RETURN VARCHAR2;
 
 FUNCTION f_get_name3 RETURN VARCHAR2;
 --
+
+FUNCTION f_get_search_id RETURN VARCHAR2;
+--
 PROCEDURE p_set_name1(search_var VARCHAR2);
 --
 PROCEDURE p_set_name2(search_var VARCHAR2);
 --
 PROCEDURE p_set_name3(search_var VARCHAR2);
 --
-
+PROCEDURE p_set_search_id(search_var VARCHAR2);
+--
    /*
    * This function split the search string into tokens
    * @param chaine The search parameters separated by |

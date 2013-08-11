@@ -42,7 +42,7 @@ select SPRIDEN_SURROGATE_ID,
 from SPRIDEN where SPRIDEN_PIDM in (
             select a.SPBPERS_PIDM
               from SPBPERS a
-              where a.SPBPERS_SSN like soknsut.f_get_search_filter
+              where contains(a.SPBPERS_SSN,soknsut.f_get_search_filter) >0
               );
 
 COMMENT ON TABLE SVQ_ALTISRC IS 'Read only view for Advanced Search Filter UI Component';

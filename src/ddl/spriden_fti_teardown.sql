@@ -5,21 +5,30 @@
 
 
 REM
-REM create_spriden_fti.sql
+REM create_spriden_teardown.sql
 REM
-REM This script creates index on spriden for name searching
-REM
-REM Project: Student Registration
-REM Audit Trail: 9.1 2/13/2012
-REM 1. Added triggers for the long title and short description tables for keyword searching.
+REM This script removes index for idname searching
 REM
 
+
 --
--- Drop the stoplist for name search.
+-- Drop the stoplist for idname search.
 --
 whenever sqlerror continue;
 begin
-  ctx_ddl.drop_stoplist('STOPLIST_NAMESEARCH'); 
+  ctx_ddl.drop_stoplist('STOPLIST_IDNAMESEARCH');
+exception
+	when others then null;
+end;
+/
+whenever sqlerror exit rollback;
+
+--
+-- Drop the lexer for idname search.
+--
+whenever sqlerror continue;
+begin
+  ctx_ddl.drop_preference('LEXER_IDNAMESEARCH');
 exception
 	when others then null;
 end;
@@ -83,7 +92,7 @@ end;
 /
 whenever sqlerror exit rollback;
 --
--- Drop the domain index on spriden change indicator name if it already exists.
+-- Drop the function-based index on spriden change indicator name if it already exists.
 --
 whenever sqlerror continue;
 declare
@@ -91,6 +100,20 @@ declare
   pragma exception_init(index_does_not_exist,-01418);
 begin
    execute immediate 'drop index SPRIDEN_CHANGE_IND';
+exception
+	when index_does_not_exist then null;
+end;
+/
+whenever sqlerror exit rollback;
+--
+-- Drop the domain index on spbpers ssn if it already exists.
+--
+whenever sqlerror continue;
+declare
+  index_does_not_exist EXCEPTION;
+  pragma exception_init(index_does_not_exist,-01418);
+begin
+   execute immediate 'drop index SPBPERS_SSN_TEXT_INDEX';
 exception
 	when index_does_not_exist then null;
 end;

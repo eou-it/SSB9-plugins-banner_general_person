@@ -116,6 +116,12 @@ BEGIN
    name2 := search_var;
 END p_set_name2;
 --
+
+PROCEDURE p_set_search_id(search_var VARCHAR2) IS
+BEGIN
+   search_id := search_var;
+END p_set_search_id;
+--
 FUNCTION f_get_name2 RETURN VARCHAR2 IS
 BEGIN
      RETURN name2;
@@ -131,6 +137,13 @@ FUNCTION f_get_name3 RETURN VARCHAR2 IS
 BEGIN
      RETURN name3;
 END f_get_name3;
+--
+
+FUNCTION f_get_search_id RETURN VARCHAR2 IS
+BEGIN
+     RETURN search_id;
+END f_get_search_id;
+
 --
 
 FUNCTION f_match_name(filter_str VARCHAR2) RETURN NUMBER IS

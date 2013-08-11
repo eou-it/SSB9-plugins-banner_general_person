@@ -12,23 +12,20 @@
 package net.hedtech.banner.general.person
 
 import org.apache.log4j.Logger
-import net.hedtech.banner.general.person.view.PersonPersonView
 import groovy.sql.Sql
 import org.springframework.security.core.context.SecurityContextHolder
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.person.view.PersonView
-import net.hedtech.banner.general.person.view.PersonAdvancedFilterView
-import net.hedtech.banner.general.person.view.PersonAdvancedAlternateIdFilterView
-import net.hedtech.banner.person.dsl.NameTemplate
 import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
 import org.springframework.context.i18n.LocaleContextHolder as LCH
 import org.springframework.context.ApplicationContext
-import net.hedtech.banner.general.person.view.PersonAdvancedIdFilterView
 import net.hedtech.banner.general.person.view.PersonAdvancedSearchView
 import net.hedtech.banner.general.system.SdaCrosswalkConversion
 import net.hedtech.banner.security.FormContext
 import net.hedtech.banner.general.person.view.ExtendedWindowIdSearchView
 import net.hedtech.banner.general.person.view.ExtendedWindowNameSearchView
+import net.hedtech.banner.general.person.view.ExtendedWindowSsnIdSearchView
+
 
 class PersonSearchService {
 
@@ -63,16 +60,13 @@ class PersonSearchService {
     ] as Comparator
 
     def extendedWindowNameSearch(searchFilter, filterData, pagingAndSortParams) {
-        def currentList
         def list
-        //remove all special characters
         def search = Arrays.asList(searchFilter?.replaceAll('[^a-zA-Z0-9%\\s]+', '').toUpperCase().split()).join("|")
         Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
         def name1, name2, name3
         (name1, name2, name3) = formatNameSearchFilterData(searchFilter)
 
         try {
-            sql.call("{call soknsut.p_set_search_filter(${search})}")
             setFilterData(sql, name1, name2, name3)
             list = ExtendedWindowNameSearchView.findAll().each {
                 it -> it.formattedName = net.hedtech.banner.general.person.PersonUtility.formatName(it)
@@ -87,40 +81,34 @@ class PersonSearchService {
     private List formatNameSearchFilterData(searchFilter) {
         def name1, name3, name2
         (name1, name2, name3) = Arrays.asList(searchFilter?.replaceAll('[^a-zA-Z0-9%\\s]+', '').toUpperCase().split())
-        if (!name1) {
-            name1 = "%"
-        }
-        else {
-            name1 = "%" + name1 + "%"
-        }
-        if (!name2) {
-            name2 = "%"
-        }
-        else {
-            name2 = "%" + name2 + "%"
-        }
-        if (!name3) {
-            name3 = "%"
-        }
-        else {
-            name3 = "%" + name3 + "%"
-        }
+        name1 = setSearchName(name1)
+        name2 = setSearchName(name2)
+        name3 = setSearchName(name3)
         [name1, name2, name3]
     }
 
+    private String setSearchName(name) {
+        if (!name || name.count("%") == name.size()) {
+            name = "%"
+        }
+        else if (name.size() == 1 && name.count("%") == 0) {
+            name = name + "%"
+        }
+        else {
+            name = "%" + name + "%"
+        }
+        name
+    }
+
     def personNameSearch(searchFilter, filterData, pagingAndSortParams) {
-        def currentList
         def list
 
         //remove all special characters
         def search = Arrays.asList(searchFilter?.replaceAll('[^a-zA-Z0-9%\\s]+', '').toUpperCase().split()).join("|")
-
         Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
         def name1, name2, name3
         (name1, name2, name3) = formatNameSearchFilterData(searchFilter)
         try {
-            //sets the search filter per search request
-            sql.call("{call soknsut.p_set_search_filter(${search})}")
             setFilterData(sql, name1, name2, name3)
             filterData.dynamicdomain = "PersonAdvancedFilterView"
             list = PersonAdvancedSearchView.fetchSearchEntityList2(filterData, pagingAndSortParams).each {
@@ -151,10 +139,13 @@ class PersonSearchService {
         def ssnSearchEnabledIndicator = institutionalDescriptionService.findByKey().ssnSearchEnabledIndicator
         def ssn
         def pii
-
         Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
-
+        searchFilter = addEscapeCharacter(searchFilter)
         try {
+            if (searchFilter.count("%") == searchFilter.size()) {
+                String searchId = "%"
+                sql.call("{call soknsut.p_set_search_id(${searchId})}")
+            }
             searchFilter = "%" + searchFilter + "%"
             //sets the search filter per search request
             sql.call("{call soknsut.p_set_search_filter(${searchFilter})}")
@@ -183,28 +174,26 @@ class PersonSearchService {
         return searchResult
     }
 
-    private List extendedSearchComponent(ssn, filterData, pagingAndSortParams) {
-        def currentList
-        List list
+    private String addEscapeCharacter(String searchFilter) {
+        searchFilter.replaceAll('[-.\'\"_$:,;#@\\/]', {'\\' + it})
+    }
 
+
+    private List extendedSearchComponent(ssn, filterData, pagingAndSortParams) {
+        List list
         if (ssn == "YES") {
-            //search by id first
-            filterData.dynamicdomain = "PersonAdvancedIdFilterView"
-            list = PersonAdvancedSearchView.fetchSearchEntityList2(filterData, pagingAndSortParams).each {
+            list = ExtendedWindowIdSearchView.findAll().each {
                 it -> it.formattedName = net.hedtech.banner.general.person.PersonUtility.formatName(it)
             }
-
             if (list && list?.size() > 0) {
                 return list
             }
-            filterData.dynamicdomain = "PersonAdvancedAlternateIdFilterView"
-            list = PersonAdvancedSearchView.fetchSearchEntityList2(filterData, pagingAndSortParams).each {
+            list = ExtendedWindowSsnIdSearchView.findAll().each {
                 it -> it.formattedName = net.hedtech.banner.general.person.PersonUtility.formatName(it)
             }
             return list
 
         } else {
-            filterData.dynamicdomain = "PersonAdvancedIdFilterView"
             list = ExtendedWindowIdSearchView.findAll().each {
                 it -> it.formattedName = net.hedtech.banner.general.person.PersonUtility.formatName(it)
             }
@@ -219,8 +208,12 @@ class PersonSearchService {
         def pii
 
         Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
-
+        searchFilter = addEscapeCharacter(searchFilter)
         try {
+            if (searchFilter.count("%") == searchFilter.size()) {
+                String searchId = "%"
+                sql.call("{call soknsut.p_set_search_id(${searchId})}")
+            }
             searchFilter = "%" + searchFilter + "%"
             //sets the search filter per search request
             sql.call("{call soknsut.p_set_search_filter(${searchFilter})}")
@@ -321,9 +314,7 @@ class PersonSearchService {
 
 
     private List searchComponent(ssn, filterData, pagingAndSortParams) {
-        def currentList
         List list
-
         if (ssn == "YES") {
             //search by id first
             filterData.dynamicdomain = "PersonAdvancedIdFilterView"
@@ -379,6 +370,19 @@ class PersonSearchService {
         def count = 0
         try {
             sql.eachRow("select count(distinct pidm) as totalCount from SVQ_IDSRCH ") { row ->
+                count = row.totalCount
+            }
+        } finally {
+            sql?.close()
+        }
+        return count
+    }
+
+    public def personSsnIdSearchCount() {
+        Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
+        def count = 0
+        try {
+            sql.eachRow("select count(distinct pidm) as totalCount from SVQ_ALTISRC ") { row ->
                 count = row.totalCount
             }
         } finally {
