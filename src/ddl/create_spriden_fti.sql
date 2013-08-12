@@ -76,6 +76,6 @@ whenever sqlerror exit rollback;
 -- Create the domain index on SPBPERS_SSN.
 --
 whenever sqlerror continue;
-CREATE INDEX SPBPERS_SSN_TEXT_INDEX ON SPBPERS(SPBPERS_SSN) INDEXTYPE IS ctxsys.context;
+CREATE INDEX SPBPERS_SSN_TEXT_INDEX ON SPBPERS(SPBPERS_SSN) INDEXTYPE IS ctxsys.context parameters('STOPLIST STOPLIST_IDNAMESEARCH LEXER LEXER_IDNAMESEARCH');
 
 whenever sqlerror exit rollback;
