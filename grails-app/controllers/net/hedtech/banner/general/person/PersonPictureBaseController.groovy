@@ -48,7 +48,7 @@ class PersonPictureBaseController {
             // We didn't find a default either
             if (null == imageFile)
             {
-                response.sendError(403)
+                response.sendError(404)
             }
             else
             {

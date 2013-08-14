@@ -115,7 +115,7 @@ class PersonPictureBaseControllerTests {
         controller.params.bannerId = "NOTME"
         controller.picture()
 
-        assertEquals 403, controller.response.status
+        assertEquals 404, controller.response.status
     }
 
     void testHasNoAccess() {
