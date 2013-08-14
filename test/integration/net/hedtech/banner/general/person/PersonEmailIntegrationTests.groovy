@@ -301,13 +301,13 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
 
 
     def testFetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicatorWhenNoneExists() {
-        def pidm = PersonUtility.getPerson("HOSL0003").pidm
+        def pidm = PersonUtility.getPerson("HOS00003").pidm
         assertNotNull pidm
-        def results = PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator(PersonUtility.getPerson("HOSL0003").pidm, 'A', 'Y', 'Y')
+        def results = PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator(PersonUtility.getPerson("HOS00003").pidm, 'A', 'Y', 'N')
 
         assertTrue results.size() == 0
 
-        def email = PersonEmail.fetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicator(PersonUtility.getPerson("HOSL0003").pidm, 'A', 'Y', 'Y')
+        def email = PersonEmail.fetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicator(PersonUtility.getPerson("HOS00003").pidm, 'A', 'Y', 'N')
 
         assertNull email
 

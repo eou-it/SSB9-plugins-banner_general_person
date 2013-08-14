@@ -146,7 +146,7 @@ class NonPersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def filterData = [:]
         def param = [:]
-        param."searchLastName" = "%thompson e%"
+        param."searchLastName" = "%thompsone%"
 
         filterData.params = param
 
