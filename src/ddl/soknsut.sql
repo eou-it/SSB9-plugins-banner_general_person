@@ -1,3 +1,8 @@
+-- *****************************************************************************************
+-- * Copyright 2013 Ellucian Company L.P. and its affiliates.                              *
+-- *****************************************************************************************
+
+
 -- Copyright (c) SunGard Corporation 2012. All rights reserved.
 -- SunGard Higher Education
 --
