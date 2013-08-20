@@ -142,10 +142,6 @@ class PersonSearchService {
         Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
         searchFilter = addEscapeCharacter(searchFilter)
         try {
-            if (searchFilter.count("%") == searchFilter.size()) {
-                String searchId = "%"
-                sql.call("{call soknsut.p_set_search_id(${searchId})}")
-            }
             searchFilter = "%" + searchFilter + "%"
             //sets the search filter per search request
             sql.call("{call soknsut.p_set_search_filter(${searchFilter})}")
@@ -210,10 +206,6 @@ class PersonSearchService {
         Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
         searchFilter = addEscapeCharacter(searchFilter)
         try {
-            if (searchFilter.count("%") == searchFilter.size()) {
-                String searchId = "%"
-                sql.call("{call soknsut.p_set_search_id(${searchId})}")
-            }
             searchFilter = "%" + searchFilter + "%"
             //sets the search filter per search request
             sql.call("{call soknsut.p_set_search_filter(${searchFilter})}")
