@@ -171,7 +171,7 @@ class PersonSearchService {
     }
 
     private String addEscapeCharacter(String searchFilter) {
-        searchFilter.replaceAll('[-.\'\"_$:,;#@\\/]', {'\\' + it})
+        searchFilter.replaceAll('[-.\'\"_$:,;*#@\\/]', {'\\' + it})
     }
 
 
