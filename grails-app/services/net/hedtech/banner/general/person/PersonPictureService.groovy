@@ -6,14 +6,12 @@ package net.hedtech.banner.general.person
 import grails.util.Holders
 
 /**
- * User: John Quinley
- * Date: 8/12/13
- *
  * Provides access to people's pictures on the file system
  *
  * Note: This service does not extend BaseService as it doesn't access the database.
  */
 class PersonPictureService {
+    static transactional = false
 
     public static String NO_PHOTO_AVAILABLE = "no_photo_available.png"
 
