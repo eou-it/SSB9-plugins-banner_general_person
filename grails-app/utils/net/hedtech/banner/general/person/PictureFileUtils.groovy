@@ -6,9 +6,6 @@ package net.hedtech.banner.general.person
 import javax.imageio.ImageIO
 
 /**
- * User: John Quinley
- * Date: 8/12/13
- *
  * This class provides basic utilities for processing person pictures.
  */
 class PictureFileUtils {
@@ -30,6 +27,7 @@ class PictureFileUtils {
             file.exists() ? file : null
         }
     }
+
 
     /**
      * Converts a BMP file to a JPG file.

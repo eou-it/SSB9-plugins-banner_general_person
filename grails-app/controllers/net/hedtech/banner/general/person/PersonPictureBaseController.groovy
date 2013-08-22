@@ -9,9 +9,6 @@ import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes
 import org.springframework.context.ApplicationContext
 
 /**
- * User: John Quinley
- * Date: 8/12/13
- *
  * This is the base controller used to provide pictures for Banner IDs. It maps Banner ID to image files according to
  * the rules provided by PersonPictureService.
  *
@@ -33,7 +30,7 @@ class PersonPictureBaseController {
      *   -- bannerId The banner id of the user to render the image for.
      */
     def picture() {
-        if (hasAccess(params))
+        if (hasAccess())
         {
             def pictureBytes
             def contentType
@@ -80,12 +77,10 @@ class PersonPictureBaseController {
 
     /**
      * Override this method in order to provide additional security before providing access to the photo.
-     * @param params The params that are accessible to the controller.
-     *  -- bannerId The Banner ID of the user whose photo is being requrested.
      *
      * @return True if the currently logged in user has access to the user's photo
      */
-    boolean hasAccess(params)
+    boolean hasAccess()
     {
         return true
     }

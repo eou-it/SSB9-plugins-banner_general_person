@@ -129,7 +129,7 @@ class PersonPictureBaseControllerTests {
 }
 
 public class FailingController extends PersonPictureBaseController {
-    boolean hasAccess(params)
+    boolean hasAccess()
     {
         return false
     }

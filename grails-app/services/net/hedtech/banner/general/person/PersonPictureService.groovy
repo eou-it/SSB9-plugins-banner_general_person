@@ -13,7 +13,7 @@ import grails.util.Holders
 class PersonPictureService {
     static transactional = false
 
-    public static String NO_PHOTO_AVAILABLE = "no_photo_available.png"
+    public static final String NO_PHOTO_AVAILABLE = "no_photo_available.png"
 
 
     private getImgPath() {

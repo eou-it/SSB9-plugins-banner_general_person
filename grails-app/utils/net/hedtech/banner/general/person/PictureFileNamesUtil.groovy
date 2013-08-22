@@ -4,9 +4,6 @@
 package net.hedtech.banner.general.person
 
 /**
- * User: John Quinley
- * Date: 8/12/13
- *
  * This class provides a series of supported file name/extension pairs that are supported for a given banner id. It
  * provides additional support for determining information about a given picture file.
  */
@@ -30,6 +27,7 @@ class PictureFileNamesUtil {
             [ "${id}.${ext}", "I${id}.${ext}", "I${partialId}.${ext}"]
         }).flatten().collect( { it.toString() })
     }
+
 
     /**
      * Returns the extension, in lower case, for the given file name. This file name doesn't necessarily need to be
