@@ -172,6 +172,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
 
     void testUpdateBannerIdToExistingBannerId() {
         def person1 = setupNewPersonIdentificationNameCurrent("ID-T00001")
+        def person2 = setupNewPersonIdentificationNameCurrent("ID-T00002")
 
         // Update the person1 banner id to one that already exists
         person1.bannerId = "ID-T00002"
