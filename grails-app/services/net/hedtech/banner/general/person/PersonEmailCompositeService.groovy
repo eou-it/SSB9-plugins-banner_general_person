@@ -3,8 +3,6 @@
  ****************************************************************************** */
 package net.hedtech.banner.general.person
 
-import groovy.sql.Sql
-import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.service.ServiceBase
 
 class PersonEmailCompositeService {

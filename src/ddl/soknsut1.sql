@@ -1,5 +1,6 @@
--- Copyright (c) SunGard Corporation 2012. All rights reserved.
--- SunGard Higher Education
+-- /*********************************************************************************
+--  Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+--  ********************************************************************************* */
 --
 -- soknsut1.sql
 --
@@ -17,7 +18,8 @@ AS
 -- OBJECT NAME: soknsut
 -- PRODUCT....: Student
 -- USAGE......: Utility Package to support Banner ID/Name Search
--- COPYRIGHT..: Copyright (c) SunGard Corporation 2012. All rights reserved.
+-- COPYRIGHT..: Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+
 --
 -- DESCRIPTION:
 --

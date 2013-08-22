@@ -7,7 +7,7 @@
 -- AUDIT TRAIL: 9.x
 -- DBEU 07/26/2013
 --
---    Generated view for Horizon API support
+--    Generated view for Banner XE API support
 --
 -- AUDIT TRAIL END
 --

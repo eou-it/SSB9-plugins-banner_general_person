@@ -7,7 +7,7 @@
 -- AUDIT TRAIL: 8.x
 -- DBEU 06/03/2013
 --
---    Generated trigger for Horizon API support
+--    Generated trigger for Banner XE API support
 --
 -- AUDIT TRAIL END
 --

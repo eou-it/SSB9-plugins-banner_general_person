@@ -3,7 +3,6 @@
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
-import net.hedtech.banner.service.ServiceBase
 import org.apache.log4j.Logger
 
 /**

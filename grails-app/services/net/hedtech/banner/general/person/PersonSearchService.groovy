@@ -1,37 +1,22 @@
-/** *******************************************************************************
- Copyright 2009-2012 SunGard Higher Education. All Rights Reserved.
- This copyrighted software contains confidential and proprietary information of
- SunGard Higher Education and its subsidiaries. Any use of this software is limited
- solely to SunGard Higher Education licensees, and is further subject to the terms
- and conditions of one or more written license agreements between SunGard Higher
- Education and the licensee in question. SunGard is either a registered trademark or
- trademark of SunGard Data Systems in the U.S.A. and/or other regions and/or countries.
- Banner and Luminis are either registered trademarks or trademarks of SunGard Higher
- Education in the U.S.A. and/or other regions and/or countries.
+/*********************************************************************************
+ Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
-import org.apache.log4j.Logger
 import groovy.sql.Sql
-import org.springframework.security.core.context.SecurityContextHolder
 import net.hedtech.banner.exceptions.ApplicationException
-import net.hedtech.banner.general.person.view.PersonView
-import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
-import org.springframework.context.i18n.LocaleContextHolder as LCH
-import org.springframework.context.ApplicationContext
-import net.hedtech.banner.general.person.view.PersonAdvancedSearchView
+import net.hedtech.banner.general.person.view.*
 import net.hedtech.banner.general.system.SdaCrosswalkConversion
 import net.hedtech.banner.security.FormContext
-import net.hedtech.banner.general.person.view.ExtendedWindowIdSearchView
-import net.hedtech.banner.general.person.view.ExtendedWindowNameSearchView
-import net.hedtech.banner.general.person.view.ExtendedWindowSsnIdSearchView
-
+import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
+import org.springframework.context.ApplicationContext
+import org.springframework.context.i18n.LocaleContextHolder as LCH
+import org.springframework.security.core.context.SecurityContextHolder
 
 class PersonSearchService {
 
     static transactional = false
     def sessionFactory
-    private final Logger log = Logger.getLogger(getClass())
 
     def institutionalDescriptionService
 

@@ -6,7 +6,6 @@ package net.hedtech.banner.general.person
 
 import net.hedtech.banner.general.system.EmailType
 import net.hedtech.banner.testing.BaseIntegrationTestCase
-import org.junit.Ignore
 
 class PersonEmailCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
 

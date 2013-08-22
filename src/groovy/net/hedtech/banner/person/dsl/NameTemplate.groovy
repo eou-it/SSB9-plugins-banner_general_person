@@ -68,7 +68,6 @@ class NameTemplate {
 
         //removes all double spaces and empty <,,> placeholders
         def str = writable.toString().replaceAll("\\s+", " ").replaceAll(", ,",",").trim()
-        def finalStr
 
         //removes <,> from the ends of the string if they are first or last
          if (str[-1]== ','){

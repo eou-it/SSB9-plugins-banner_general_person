@@ -1,18 +1,6 @@
 /*********************************************************************************
- Copyright 2009-2011 SunGard Higher Education. All Rights Reserved.
- This copyrighted software contains confidential and proprietary information of 
- SunGard Higher Education and its subsidiaries. Any use of this software is limited 
- solely to SunGard Higher Education licensees, and is further subject to the terms 
- and conditions of one or more written license agreements between SunGard Higher 
- Education and the licensee in question. SunGard is either a registered trademark or
- trademark of SunGard Data Systems in the U.S.A. and/or other regions and/or countries.
- Banner and Luminis are either registered trademarks or trademarks of SunGard Higher 
- Education in the U.S.A. and/or other regions and/or countries.
- **********************************************************************************/
-/**
- Banner Automator Version: 1.21
- Generated: Thu Jun 16 04:44:46 EDT 2011
- */
+ Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+ ********************************************************************************* */
 package net.hedtech.banner.general.person
 
 import net.hedtech.banner.testing.BaseIntegrationTestCase
@@ -30,7 +18,6 @@ import org.junit.Ignore
 
 class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 
-	/*PROTECTED REGION ID(personaddress_domain_integration_test_data) ENABLED START*/
 	//Test data for creating new domain instance
 	//Valid test data (For success tests)
 	def i_success_addressType
@@ -154,7 +141,6 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 	def u_failure_countryPhone = "TTTT"
 	def u_failure_houseNumber = "TTTTT"
 	def u_failure_streetLine4 = "TTTTT"
-	/*PROTECTED REGION END*/
 
 	protected void setUp() {
 		formContext = ['SOAIDEN'] // Since we are not testing a controller, we need to explicitly set this (removing GEAPART because of GUOBOBS_UI_VERSION = B)
@@ -165,7 +151,6 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 	//This method is used to initialize test data for references.
 	//A method is required to execute database calls as it requires a active transaction
 	void initializeTestDataForReferences() {
-		/*PROTECTED REGION ID(personaddress_domain_integration_test_data_initialization) ENABLED START*/
 		//Valid test data (For success tests)
         u_success_pidm = i_success_pidm = PersonIdentificationName.findByBannerId("HOF00714").pidm
         u_failure_pidm = i_failure_pidm = PersonIdentificationName.findByBannerId("HOF00716").pidm
@@ -198,8 +183,6 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
     	u_failure_nation = Nation.findWhere(code:"40")
     	u_failure_addressSource = AddressSource.findWhere(code:"BRD")
 
-		//Test data for references for custom tests
-		/*PROTECTED REGION END*/
 	}
 
 	protected void tearDown() {
@@ -600,10 +583,4 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 		return personAddress
 	}
 
-   /**
-     * Please put all the custom tests in this protected section to protect the code
-     * from being overwritten on re-generation
-     */
-    /*PROTECTED REGION ID(personaddress_custom_integration_test_methods) ENABLED START*/
-    /*PROTECTED REGION END*/
 }

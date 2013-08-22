@@ -5,7 +5,7 @@ REM
 REM stuview_bgp.sql
 REM
 REM AUDIT TRAIL: 9.0
-REM 1. Horizon
+REM 1. Banner XE
 REM AUDIT TRAIL END
 REM
 start svq_nameparams

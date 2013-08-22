@@ -1,22 +1,13 @@
---
--- *****************************************************************************************
--- * Copyright 2009-2011 SunGard Higher Education. All Rights Reserved.                    *
--- * This copyrighted software contains confidential and proprietary information of        *
--- * SunGard Higher Education and its subsidiaries. Any use of this software is limited    *
--- * solely to SunGard Higher Education licensees, and is further subject to the terms     *
--- * and conditions of one or more written license agreements between SunGard Higher       *
--- * Education and the licensee in question. SunGard is either a registered trademark or   *
--- * trademark of SunGard Data Systems in the U.S.A. and/or other regions and/or countries.*
--- * Banner and Luminis are either registered trademarks or trademarks of SunGard Higher   *
--- * Education in the U.S.A. and/or other regions and/or countries.                        *
--- *****************************************************************************************
+-- /*********************************************************************************
+--  Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+--  ********************************************************************************* */
 REM
 REM sv_sprtele_upd_trg.sql
 REM 
 REM AUDIT TRAIL: 9.0 
 REM 30/06/2011
-REM 1. Horizon 
-REM Generated trigger for Horizon API support
+REM 1. Banner XE
+REM Generated trigger for Banner XE API support
 REM AUDIT TRAIL END 
 REM
 CREATE OR REPLACE TRIGGER sprtele_view_update_trg

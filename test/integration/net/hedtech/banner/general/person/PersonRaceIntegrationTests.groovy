@@ -3,12 +3,11 @@
  ****************************************************************************** */
 package net.hedtech.banner.general.person
 
+import grails.validation.ValidationException
 import groovy.sql.Sql
-import net.hedtech.banner.general.person.PersonIdentificationName
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 import org.junit.Ignore
 import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
-import grails.validation.ValidationException
 
 class PersonRaceIntegrationTests extends BaseIntegrationTestCase {
 	

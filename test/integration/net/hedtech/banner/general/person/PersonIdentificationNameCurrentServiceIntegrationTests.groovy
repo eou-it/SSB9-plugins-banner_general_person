@@ -106,7 +106,6 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
 
     void testDeletePersonIdentificationNameCurrent() {
         def personIdentificationNameCurrent = setupNewPersonIdentificationNameCurrent("P")
-        def id = personIdentificationNameCurrent.id
 
         try {
             personIdentificationNameCurrentService.delete([domainModel: personIdentificationNameCurrent])

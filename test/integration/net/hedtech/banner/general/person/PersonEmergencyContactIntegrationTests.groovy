@@ -104,7 +104,6 @@ class PersonEmergencyContactIntegrationTests extends BaseIntegrationTestCase {
     def u_failure_countryPhone = "TTTT"
     def u_failure_houseNumber = "TTTTT"
     def u_failure_streetLine4 = "TTTTT"
-    /*PROTECTED REGION END*/
 
 
     protected void setUp() {
@@ -287,7 +286,6 @@ class PersonEmergencyContactIntegrationTests extends BaseIntegrationTestCase {
 
 
     void testDates() {
-        def time = new SimpleDateFormat('HHmmss')
         def hour = new SimpleDateFormat('HH')
         def date = new SimpleDateFormat('yyyy-M-d')
         def today = new Date()

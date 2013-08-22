@@ -5,7 +5,7 @@ REM
 REM studbpr_bgp_preview.sql
 REM
 REM AUDIT TRAIL: 9.0
-REM 1. Horizon
+REM 1. Banner XE
 REM AUDIT TRAIL END
 REM
 REM

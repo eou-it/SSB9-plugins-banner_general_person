@@ -4,7 +4,6 @@
 package net.hedtech.banner.general.person
 
 import net.hedtech.banner.general.system.*
-import net.hedtech.banner.query.DynamicFinder
 import net.hedtech.banner.service.DatabaseModifiesState
 import org.hibernate.annotations.Type
 
@@ -543,7 +542,6 @@ class PersonBasicPersonBase implements Serializable {
      * Get the age of the person.
      */
     def calculateAge() {
-        def deadInd = deadIndicator ? deadIndicator : "N"
         def months
 
         if (!birthDate) return null

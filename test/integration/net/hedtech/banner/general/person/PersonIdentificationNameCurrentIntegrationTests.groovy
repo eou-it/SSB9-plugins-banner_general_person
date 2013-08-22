@@ -29,12 +29,6 @@ class PersonIdentificationNameCurrentIntegrationTests extends BaseIntegrationTes
     }
 
 
-    void testUpdatePersonIdentificationNameCurrent() {
-          // Update is not allowed for PersonIdentificationNameCurrent.
-          // Enforcement is done at the service level.
-    }
-
-
     void testDeletePersonIdentificationNameCurrent() {
         def personIdentificationNameCurrent = setupNewPersonIdentificationNameCurrent("P")
         def id = personIdentificationNameCurrent.id

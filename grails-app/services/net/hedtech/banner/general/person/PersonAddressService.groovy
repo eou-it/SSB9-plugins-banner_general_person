@@ -3,8 +3,6 @@
  ****************************************************************************** */
 package net.hedtech.banner.general.person
 
-import net.hedtech.banner.exceptions.ApplicationException
-import net.hedtech.banner.general.system.TelephoneType
 import net.hedtech.banner.service.ServiceBase
 
 // NOTE:

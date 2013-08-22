@@ -5,7 +5,7 @@ REM
 REM sv_spriden_cur.sql
 REM 
 REM AUDIT TRAIL: 9.0 
-REM 1. Horizon 
+REM 1. Banner XE
 REM    This view returns only the current spriden identification row where the
 REM    spriden_change_indicator IS null.
 REM AUDIT TRAIL END

@@ -6,9 +6,8 @@ package net.hedtech.banner.general.person
 
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.system.*
-import net.hedtech.banner.testing.BaseIntegrationTestCase
-import org.junit.Ignore
 import net.hedtech.banner.person.PersonAddressTelephone
+import net.hedtech.banner.testing.BaseIntegrationTestCase
 
 class PersonAddressCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
 

@@ -1,23 +1,15 @@
-/** *******************************************************************************
- Copyright 2009-2011 SunGard Higher Education. All Rights Reserved.
- This copyrighted software contains confidential and proprietary information of 
- SunGard Higher Education and its subsidiaries. Any use of this software is limited 
- solely to SunGard Higher Education licensees, and is further subject to the terms 
- and conditions of one or more written license agreements between SunGard Higher 
- Education and the licensee in question. SunGard is either a registered trademark or
- trademark of SunGard Data Systems in the U.S.A. and/or other regions and/or countries.
- Banner and Luminis are either registered trademarks or trademarks of SunGard Higher 
- Education in the U.S.A. and/or other regions and/or countries.
+/*********************************************************************************
+ Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
 
 import net.hedtech.banner.general.person.view.PersonPersonView
-import net.hedtech.banner.testing.BaseIntegrationTestCase
 import net.hedtech.banner.general.system.NameType
-import org.junit.Ignore
-import java.text.SimpleDateFormat
 import net.hedtech.banner.person.dsl.NameTemplate
+import net.hedtech.banner.testing.BaseIntegrationTestCase
+
+import java.text.SimpleDateFormat
 
 class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
@@ -262,7 +254,6 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
         param."searchLastName" = "duck%"
         String strDateFrom = "1975/12/15";
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
-        Date birthDate = formatter.parse(strDateFrom);
         Date t = Date.parse("yyyy-MM-dd", "1975-12-15")
         param."birthDate" = t
         filterData.params = param

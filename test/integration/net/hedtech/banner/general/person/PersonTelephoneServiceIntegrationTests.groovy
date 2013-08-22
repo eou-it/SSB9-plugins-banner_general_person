@@ -4,14 +4,10 @@ Copyright 2013 Ellucian Company L.P. and its affiliates.
 *******************************************************************************/
 package net.hedtech.banner.general.person
 
-import groovy.sql.Sql
-import net.hedtech.banner.general.system.AddressType
-import net.hedtech.banner.testing.BaseIntegrationTestCase
 import net.hedtech.banner.exceptions.ApplicationException
-import net.hedtech.banner.general.system.TelephoneType
 import net.hedtech.banner.general.system.AddressType
-
-
+import net.hedtech.banner.general.system.TelephoneType
+import net.hedtech.banner.testing.BaseIntegrationTestCase
 
 class PersonTelephoneServiceIntegrationTests extends BaseIntegrationTestCase {
 

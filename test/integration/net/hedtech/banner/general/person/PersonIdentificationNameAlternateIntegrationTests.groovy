@@ -5,7 +5,6 @@
 package net.hedtech.banner.general.person
 
 import groovy.sql.Sql
-import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.system.NameType
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 
@@ -54,12 +53,6 @@ class PersonIdentificationNameAlternateIntegrationTests extends BaseIntegrationT
         assertEquals personIdentificationNameCurrent.middleName, personIdentificationNameAlternate.middleName
         assertEquals personIdentificationNameCurrent.entityIndicator, personIdentificationNameAlternate.entityIndicator
         assertEquals personIdentificationNameCurrent.nameType?.code, personIdentificationNameAlternate.nameType?.code
-    }
-
-
-    void testUpdatePersonIdentificationNameAlternate() {
-        // Update is not allowed for PersonIdentificationNameAlternate.
-        // Enforcement is done at the service level.
     }
 
 

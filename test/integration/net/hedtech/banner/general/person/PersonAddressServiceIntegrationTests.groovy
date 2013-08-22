@@ -4,16 +4,9 @@ Copyright 2013 Ellucian Company L.P. and its affiliates.
 *******************************************************************************/
 package net.hedtech.banner.general.person
 
-import net.hedtech.banner.general.system.AddressSource
-import net.hedtech.banner.general.system.AddressType
-import net.hedtech.banner.general.system.County
-import net.hedtech.banner.general.system.Nation
-import net.hedtech.banner.general.system.State
-import net.hedtech.banner.testing.BaseIntegrationTestCase
 import net.hedtech.banner.exceptions.ApplicationException
-import org.junit.Ignore
-
-
+import net.hedtech.banner.general.system.*
+import net.hedtech.banner.testing.BaseIntegrationTestCase
 
 class PersonAddressServiceIntegrationTests extends BaseIntegrationTestCase {
 

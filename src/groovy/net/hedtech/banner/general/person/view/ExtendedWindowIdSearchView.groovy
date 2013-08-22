@@ -1,26 +1,15 @@
-/** *******************************************************************************
- Copyright 2009-2012 SunGard Higher Education. All Rights Reserved.
- This copyrighted software contains confidential and proprietary information of
- SunGard Higher Education and its subsidiaries. Any use of this software is limited
- solely to SunGard Higher Education licensees, and is further subject to the terms
- and conditions of one or more written license agreements between SunGard Higher
- Education and the licensee in question. SunGard is either a registered trademark or
- trademark of SunGard Data Systems in the U.S.A. and/or other regions and/or countries.
- Banner and Luminis are either registered trademarks or trademarks of SunGard Higher
- Education in the U.S.A. and/or other regions and/or countries.
+/*********************************************************************************
+ Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person.view
 
-import net.hedtech.banner.query.DynamicFinder
-import net.hedtech.banner.query.QueryBuilder
-
-import javax.persistence.*
-import net.hedtech.banner.person.dsl.NameTemplate
 import net.hedtech.banner.general.person.PersonUtility
+import net.hedtech.banner.person.dsl.NameTemplate
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.springframework.context.ApplicationContext
 import org.springframework.context.i18n.LocaleContextHolder
 
+import javax.persistence.*
 
 @Entity
 @Table(name = "SVQ_EXTSRCH")
