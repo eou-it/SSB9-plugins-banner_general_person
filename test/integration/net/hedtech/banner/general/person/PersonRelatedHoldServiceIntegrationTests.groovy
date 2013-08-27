@@ -1,5 +1,5 @@
 /*********************************************************************************
- Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+  Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
@@ -17,7 +17,7 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
 
 
     protected void setUp() {
-        formContext = ['SOAIDEN'] // (removing SOAHOLD because of GUOBOBS_UI_VERSION = B)
+        formContext = ['GUAGMNU'] // (removing SOAHOLD because of GUOBOBS_UI_VERSION = B)
         super.setUp()
     }
 

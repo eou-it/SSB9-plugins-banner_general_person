@@ -1,4 +1,7 @@
 /*********************************************************************************
+Copyright 2012 Ellucian Company L.P. and its affiliates.
+**********************************************************************************/
+/*********************************************************************************
  Copyright 2013 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 
@@ -14,7 +17,7 @@ class PersonIdentificationNameAlternateIntegrationTests extends BaseIntegrationT
 
 
     protected void setUp() {
-        formContext = ['SOAIDEN'] // Since we are not testing a controller, we need to explicitly set this
+        formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this
         super.setUp()
     }
 

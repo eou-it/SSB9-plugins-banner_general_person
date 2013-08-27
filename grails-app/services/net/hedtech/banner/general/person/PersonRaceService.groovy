@@ -1,7 +1,7 @@
-/*******************************************************************************
- Copyright 2013 Ellucian Company L.P. and its affiliates.
- ****************************************************************************** */
-package net.hedtech.banner.general.person
+/*********************************************************************************
+Copyright 2012 Ellucian Company L.P. and its affiliates.
+**********************************************************************************/
+ package net.hedtech.banner.general.person
 
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.system.SdaCrosswalkConversion

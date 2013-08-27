@@ -1,3 +1,6 @@
+/*********************************************************************************
+Copyright 2012 Ellucian Company L.P. and its affiliates.
+**********************************************************************************/
 /*******************************************************************************
  Copyright 2013 Ellucian Company L.P. and its affiliates.
  ****************************************************************************** */
@@ -14,7 +17,7 @@ class PersonEmailCompositeServiceIntegrationTests extends BaseIntegrationTestCas
 
 
     protected void setUp() {
-        formContext = ['SOAIDEN']
+        formContext = ['GUAGMNU']
         super.setUp()
     }
 

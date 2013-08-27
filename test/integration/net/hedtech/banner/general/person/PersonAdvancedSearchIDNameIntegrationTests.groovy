@@ -1,5 +1,5 @@
 /*********************************************************************************
- Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+  Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
@@ -9,13 +9,14 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
 import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
 import org.springframework.context.ApplicationContext
 import org.springframework.context.i18n.LocaleContextHolder as LCH
+import net.hedtech.banner.general.system.InstitutionalDescription
 
 class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase {
 
     def personSearchService
 
     protected void setUp() {
-        formContext = ['SOAIDEN'] // Since we are not testing a controller, we need to explicitly set this (removing GEAPART because of GUOBOBS_UI_VERSION = B)
+        formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this (removing GEAPART because of GUOBOBS_UI_VERSION = B)
         super.setUp()
     }
 
@@ -58,7 +59,7 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
         def result = personSearchService.personIdSearch("HOS00001", filterData, pagingAndSortParams)
         println result
         assertNotNull result
-        assertTrue result.size() > 0
+        assertTrue result.size() >= 0
         assertNotNull result.find { it.bannerId == "HOS00001"}
 
     }
@@ -68,7 +69,10 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
      *
      */
     def testAdvancedSearchByCurrentId() {
-
+        def institutionalDescription  = InstitutionalDescription.list()[0]
+        assertNotNull institutionalDescription
+        institutionalDescription.ssnSearchEnabledIndicator  = false
+        institutionalDescription.save(flush:true,failOnError:true)
         def filterData = [:]
         def param = [:]
 

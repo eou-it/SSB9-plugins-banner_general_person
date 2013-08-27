@@ -280,7 +280,7 @@ class PersonRelatedHold implements Serializable {
         personRelatedHolds = fetchByPidmAndDateCompare(pidm, compareDate)
         if (!registrationHoldsExist) {
             personRelatedHolds.each {
-                registrationHoldType = HoldType.findWhere(registrationHoldIndicator: "Y", code: it.holdType.code)
+                registrationHoldType = HoldType.findByCodeAndRegistrationHoldIndicator(  it.holdType.code, true)
                 if (registrationHoldType != null)
                     registrationHoldsExist = true
             }

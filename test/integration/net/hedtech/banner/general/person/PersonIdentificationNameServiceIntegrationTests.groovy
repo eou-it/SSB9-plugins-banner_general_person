@@ -1,5 +1,5 @@
 /*********************************************************************************
- Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+  Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
@@ -15,7 +15,7 @@ class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTes
 
 
     protected void setUp() {
-        formContext = ['SOAIDEN']
+        formContext = ['GUAGMNU']
         super.setUp()
     }
 

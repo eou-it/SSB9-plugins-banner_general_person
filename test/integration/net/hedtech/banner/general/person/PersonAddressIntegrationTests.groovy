@@ -1,6 +1,7 @@
 /*********************************************************************************
- Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+  Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
+
 package net.hedtech.banner.general.person
 
 import net.hedtech.banner.testing.BaseIntegrationTestCase
@@ -143,7 +144,7 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 	def u_failure_streetLine4 = "TTTTT"
 
 	protected void setUp() {
-		formContext = ['SOAIDEN'] // Since we are not testing a controller, we need to explicitly set this (removing GEAPART because of GUOBOBS_UI_VERSION = B)
+		formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this (removing GEAPART because of GUOBOBS_UI_VERSION = B)
 		super.setUp()
 		initializeTestDataForReferences()
 	}

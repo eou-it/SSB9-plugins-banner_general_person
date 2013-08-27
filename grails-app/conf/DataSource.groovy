@@ -2,6 +2,7 @@
  Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 
+
 // Support Hibernate annotations
 import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsAnnotationConfiguration
 

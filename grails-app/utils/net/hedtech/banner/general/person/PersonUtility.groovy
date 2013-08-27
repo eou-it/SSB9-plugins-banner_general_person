@@ -3,11 +3,10 @@
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
-import org.codehaus.groovy.grails.web.context.ServletContextHolder as SCH
-import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes as GA
-
 import groovy.sql.Sql
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.codehaus.groovy.grails.web.context.ServletContextHolder as SCH
+import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes as GA
 import org.springframework.context.ApplicationContext
 import org.springframework.context.i18n.LocaleContextHolder
 
@@ -23,26 +22,28 @@ class PersonUtility {
     public static Boolean isPersonValid(String bannerId) {
         if (!PersonIdentificationName.fetchBannerPerson(bannerId)) {
             return false
-        }
-        else return true
+        } else return true
     }
+
 
     public static Object getPerson(String bannerId) {
         def person = getAltPerson(bannerId)
         if (person) {
             return getPerson(person.pidm)
-        }
-        else return PersonIdentificationName.fetchBannerPerson(bannerId)
+        } else return PersonIdentificationName.fetchBannerPerson(bannerId)
     }
+
 
     public static Object getAltPerson(String bannerId) {
         return PersonIdentificationName.fetchPersonByAlternativeBannerId(bannerId)
     }
 
+
     public static Object getPerson(Integer pidm) {
         return PersonIdentificationName.fetchBannerPerson(pidm)
 
     }
+
 
     public static Boolean isPersonDeceased(Integer pidm) {
 
@@ -57,6 +58,7 @@ class PersonUtility {
         return bio?.dead == 'Y'
     }
 
+
     public static Boolean isPersonConfidential(Integer pidm) {
         def confSql = """ select nvl(spbpers_confid_ind, 'N') confidential
                       from spbpers where spbpers_pidm = ? """
@@ -68,6 +70,7 @@ class PersonUtility {
         return conf?.confidential == 'Y'
     }
 
+
     public static Map isPersonConfidentialOrDeceased(Integer pidm) {
         def sqlQuery = """ select nvl(spbpers_confid_ind, 'N') confidential,  nvl (spbpers_dead_ind,  'N') dead
                       from spbpers where spbpers_pidm = ? """
@@ -78,6 +81,7 @@ class PersonUtility {
         def conf = sql.firstRow(sqlQuery, [pidm])
         return [confidential: conf?.confidential == 'Y', deceased: conf?.dead == 'Y']
     }
+
 
     public static String getEmailId(Integer pidm) {
         def emailQuery = """ select goremal_email_address email from goremal
@@ -97,9 +101,9 @@ class PersonUtility {
         def nameFormat = getNameFormat()
         def displayName = nameFormat
         if (nameFormat.contains("\$lastName")) displayName = displayName.replace("\$lastName", person?.lastName)
-        if (nameFormat.contains("\$firstName")) displayName =  displayName.replace("\$firstName", person?.firstName?:'')
-        if (nameFormat.contains("\$mi"))  displayName =  displayName.replace("\$mi", person?.middleName?:'')
-        if (nameFormat.contains("\$surnamePrefix"))  displayName =  displayName.replace("\$surnamePrefix", person?.surnamePrefix?:'')
+        if (nameFormat.contains("\$firstName")) displayName = displayName.replace("\$firstName", person?.firstName ?: '')
+        if (nameFormat.contains("\$mi")) displayName = displayName.replace("\$mi", person?.middleName ?: '')
+        if (nameFormat.contains("\$surnamePrefix")) displayName = displayName.replace("\$surnamePrefix", person?.surnamePrefix ?: '')
         displayName = displayName.trim()
         return displayName
     }

@@ -1,8 +1,7 @@
-
-/*******************************************************************************
-Copyright 2013 Ellucian Company L.P. and its affiliates.
-*******************************************************************************/
-package net.hedtech.banner.general.person
+/*********************************************************************************
+Copyright 2012 Ellucian Company L.P. and its affiliates.
+**********************************************************************************/
+ package net.hedtech.banner.general.person
 import net.hedtech.banner.service.ServiceBase
 // NOTE:
 // This service is injected with create, update, and delete methods that may throw runtime exceptions (listed below).
