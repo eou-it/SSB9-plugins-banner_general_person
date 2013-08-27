@@ -6,7 +6,6 @@ import net.hedtech.banner.general.system.Race
 import net.hedtech.banner.general.system.RegulatoryRace
 import net.hedtech.banner.security.BannerUser
 import org.springframework.security.core.context.SecurityContextHolder
-import net.hedtech.banner.general.InformationTextUtility
 
 class SurveyController {
     static defaultAction = "index"
@@ -35,9 +34,7 @@ class SurveyController {
         def personEthnicity = personBasicPersonBase?.ethnic
         session.setAttribute("raceMap", raceMap)
         session.setAttribute("regulatoryRaces", regulatoryRaces)
-
-        def infoTexts = ["ethnicity.header": InformationTextUtility.getMessage("RNE_SURVEY","ethnicity.header"), "race.header": InformationTextUtility.getMessage("RNE_SURVEY","race.header")]
-        def model = [raceMap: raceMap, regulatoryRaces: regulatoryRaces, personRaceCodes: personRaceCodes, personEthnicity: personEthnicity, postUrl: "${request.contextPath}/survey/save", infoTexts: infoTexts]
+        def model = [raceMap: raceMap, regulatoryRaces: regulatoryRaces, personRaceCodes: personRaceCodes, personEthnicity: personEthnicity, postUrl: "${request.contextPath}/survey/save"]
         render view: "survey", model: model
     }
 
