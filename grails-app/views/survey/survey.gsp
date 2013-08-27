@@ -26,7 +26,7 @@ Copyright 2009-2012 Ellucian Company L.P. and its affiliates.
                         <div id="ethnicity-race-wrapper">
                             <div id="ethnicity-wrapper">
                                 <div id="ethnicity-header" class="section-header">
-                                    <span class="section-header-text">${infoTexts."ethnicity.header"}%{--<g:message code="survey.ethnicity.header" />--}%</span>
+                                    <span class="section-header-text"><g:message code="survey.ethnicity.header" /></span>
                                 </div>
                                 <div id="ethnicity">
                                     <input id="chkEthn_1" name="ethnicity" value="1" type="checkbox" <g:if test="${personEthnicity == '1'}">checked="true"</g:if> />
@@ -38,7 +38,7 @@ Copyright 2009-2012 Ellucian Company L.P. and its affiliates.
                             </div>
                             <div id="race-wrapper">
                                 <div id="race-header" class="section-header">
-                                    <span class="section-header-text">${infoTexts."race.header"}%{--<g:message code="survey.race.header" />--}%</span>
+                                    <span class="section-header-text"><g:message code="survey.race.header" /></span>
                                 </div>
                                 <g:each in="${regulatoryRaces}" var="regulatoryRace">
                                     <div id="race-category_${regulatoryRace.code}" class="race-category-area">
