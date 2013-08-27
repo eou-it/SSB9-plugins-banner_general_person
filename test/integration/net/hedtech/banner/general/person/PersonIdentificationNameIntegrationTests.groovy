@@ -1,13 +1,7 @@
-<<<<<<< Updated upstream
 /*********************************************************************************
  Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
-=======
-/*********************************************************************************
-Copyright 2012 Ellucian Company L.P. and its affiliates.
-**********************************************************************************/
 
->>>>>>> Stashed changes
 package net.hedtech.banner.general.person
 
 import net.hedtech.banner.general.system.NameType

@@ -1,18 +1,12 @@
-<<<<<<< Updated upstream
 /*********************************************************************************
  Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
-=======
-/*********************************************************************************
-Copyright 2012 Ellucian Company L.P. and its affiliates.
-**********************************************************************************/
->>>>>>> Stashed changes
 package net.hedtech.banner.general.person
 
+import groovy.sql.Sql
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.system.MedicalCondition
 import net.hedtech.banner.service.ServiceBase
-import groovy.sql.Sql
 
 class MedicalInformationCompositeService {
 
@@ -42,12 +36,11 @@ class MedicalInformationCompositeService {
 
 
         processInsertUpdates(map?.medicalInformations,
-                medicalInformationService,
-                map?.keyBlock)
+                             medicalInformationService,
+                             map?.keyBlock)
 
 
     }
-
 
     /**
      *    Insert all new records
@@ -68,18 +61,15 @@ class MedicalInformationCompositeService {
                     service.delete(delMap)
                     def newMap = [keyBlock: keyBlock, domainModel: newMed]
                     service.create(newMap)
-                }
-                else {
+                } else {
                     service.update(map)
                 }
 
-            }
-            else {
+            } else {
                 test = service.create(map)
             }
         }
     }
-
 
     /**
      * find out if the medical condition has been changed
@@ -100,8 +90,7 @@ class MedicalInformationCompositeService {
             if (!(diff == changedNames))
                 return domainObject.getPersistentValue('medicalCondition')
             else return null
-        }
-        else return null
+        } else return null
     }
 
     /**

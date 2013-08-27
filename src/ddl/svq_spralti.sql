@@ -61,7 +61,7 @@ SELECT  SPRIDEN_SURROGATE_ID,
 COMMENT ON TABLE SVQ_SPRALTI IS 'View On SPRIDEN Alternate ID';
 COMMENT ON COLUMN SVQ_SPRALTI.SURROGATE_ID IS 'SURROGATE ID: Immutable unique key';
 COMMENT ON COLUMN SVQ_SPRALTI.VERSION IS 'VERSION: Optimistic lock token.';
-COMMENT ON COLUMN SVQ_SPRIDEN.ACTIVITY_DATE IS 'ACTIVITY_DATE:Date information was last created or modified.';
+COMMENT ON COLUMN SVQ_SPRALTI.ACTIVITY_DATE IS 'ACTIVITY_DATE:Date information was last created or modified.';
 COMMENT ON COLUMN SVQ_SPRALTI.USER_ID IS 'USER ID: The user ID of the person who inserted or last updated this record.';
 COMMENT ON COLUMN SVQ_SPRALTI.DATA_ORIGIN IS 'DATA ORIGIN: Source system that created or updated the data.';
 COMMENT ON COLUMN SVQ_SPRALTI.SSN IS 'SSN:Internal identification number of the person in SPBPERS.';
