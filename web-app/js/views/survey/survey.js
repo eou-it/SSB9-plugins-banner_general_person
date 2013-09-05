@@ -22,8 +22,10 @@ $(document).ready(function () {
     });
 
     $("#save-btn").click(function () {
-        var form = document.getElementById('surveyForm');
-        form.submit();
+        if (notificationMessages && notificationMessages.length <= 0) {
+            var form = document.getElementById('surveyForm');
+            form.submit();
+        }
     });
 
 
