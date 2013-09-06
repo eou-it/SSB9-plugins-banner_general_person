@@ -1,4 +1,25 @@
 $(document).ready(function () {
+    function fixBreadcrumbs() {
+        function rebindBreadCrumb() {
+            $('.breadcrumbButton').each(function(idx, ele) {
+                var elementId = $(ele).attr('id').replace(/([ #;&,.+*~\':"!^$[\]()=>|\/])/g, '\\$1');
+                $('#'+elementId).unbind('click');
+            });
+        }
+        function repeatUntil(func, delay, count) {
+            if (!func()) {
+                count = count == null ? 10 : count;
+                delay = delay || 100;
+                _.delay(function () {
+                    repeatUntil(func, delay, --count);
+                }, delay);
+            }
+        }
+
+        repeatUntil(rebindBreadCrumb, 100, 10);
+    }
+    fixBreadcrumbs();
+
     var notificationMessages = new Array();
     var error = $.i18n.prop("survey.ethinicity.multiple.selection.invalid");
 
@@ -30,7 +51,6 @@ $(document).ready(function () {
 
 
     $("#ask-me-later-btn").click(function () {
-        /*window.location = "${createLink(controller: "survey", action: "completed")}"*/
         var href = $(this).attr("data-endpoint");
         window.location = href;
     });
