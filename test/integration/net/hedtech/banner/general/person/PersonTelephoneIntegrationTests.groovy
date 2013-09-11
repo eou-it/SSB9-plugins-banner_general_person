@@ -6,11 +6,16 @@ package net.hedtech.banner.general.person
 
 import groovy.sql.Sql
 import net.hedtech.banner.exceptions.ApplicationException
+import net.hedtech.banner.general.system.AddressSource
 import net.hedtech.banner.general.system.AddressType
+import net.hedtech.banner.general.system.County
+import net.hedtech.banner.general.system.Nation
+import net.hedtech.banner.general.system.State
 import net.hedtech.banner.general.system.TelephoneType
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 import org.junit.Ignore
 import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
+
 
 class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
 
@@ -18,6 +23,11 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
     //Valid test data (For success tests)
     def i_success_telephoneType
     def i_success_addressType
+
+    def i_success_state
+    def i_success_county
+    def i_success_nation
+    def i_success_source
 
     def i_success_pidm = 999
     def i_success_sequenceNumber = 1
@@ -83,11 +93,15 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
     def u_failure_internationalAccess = "TTTTT"
     def u_failure_countryPhone = "WWWWWW"
 
+    def addressTypes = [:]
+
 
     protected void setUp() {
         formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this (removing GEAPART because of GUOBOBS_UI_VERSION = B)
         super.setUp()
         initializeTestDataForReferences()
+        initializeAddressTypes()
+        initializeCodes()
     }
 
     //This method is used to initialize test data for references.
@@ -106,6 +120,22 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
         u_failure_telephoneType = TelephoneType.findByCode("GR")
 
         //Test data for references for custom tests
+    }
+
+    void initializeAddressTypes() {
+        addressTypes["Z1"] = createAddressTypeWith("Z1")
+        addressTypes["Z2"] = createAddressTypeWith("Z2")
+        addressTypes["Z3"] = createAddressTypeWith("Z3")
+    }
+
+    AddressType createAddressTypeWith(def code) {
+        AddressType type = new AddressType()
+        type.lastModified = new Date()
+        type.lastModifiedBy = "test"
+        type.dataOrigin = "test"
+        type.code = code
+        type.description = "Test " + code
+        type.save(failOnError: true, flush: true)
     }
 
 
@@ -368,6 +398,145 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+    void testFetchActiveTelephoneByPidmAndAddressType() {
+        def pidm = PersonUtility.getPerson("HOS00001").pidm
+        def maxSeqNo = PersonTelephone.fetchMaxSequenceNumber(pidm)
+        def telephoneType =  TelephoneType.findByCode("PR")
+
+        def sanity = PersonTelephone.findAllByPidm(pidm).size()
+
+        createAddressFor(pidm, "Z1")
+
+        // 4 telephone numbers for Z1
+        // 1. Active, primary, listed
+        // 2. Active, not-primary, listed
+        // 3. Inactive, not-primary, listed
+        // 5. Inacrtive, not-primary, unlisted
+        // Should get back 1
+        def personTelephone = newValidForCreatePersonTelephone()
+        personTelephone.pidm = pidm
+        personTelephone.sequenceNumber = maxSeqNo + 1
+        personTelephone.phoneNumber = "1111111"
+        personTelephone.telephoneType = telephoneType
+        personTelephone.primaryIndicator = "Y"
+        personTelephone.statusIndicator = null
+        personTelephone.unlistIndicator = null
+        personTelephone.addressType = addressTypes["Z1"]
+        personTelephone.addressSequenceNumber = 1
+        personTelephone.save(failOnError: true, flush: true)
+
+        personTelephone = newValidForCreatePersonTelephone()
+        personTelephone.pidm = pidm
+        personTelephone.sequenceNumber = maxSeqNo + 2
+        personTelephone.phoneNumber = "2222222"
+        personTelephone.telephoneType = telephoneType
+        personTelephone.primaryIndicator = null
+        personTelephone.statusIndicator = null
+        personTelephone.unlistIndicator = null
+        personTelephone.addressType = addressTypes["Z1"]
+        personTelephone.addressSequenceNumber = 1
+        personTelephone.save(failOnError: true, flush: true)
+
+        personTelephone = newValidForCreatePersonTelephone()
+        personTelephone.pidm = pidm
+        personTelephone.sequenceNumber = maxSeqNo + 3
+        personTelephone.phoneNumber = "333333"
+        personTelephone.telephoneType = telephoneType
+        personTelephone.primaryIndicator = null
+        personTelephone.statusIndicator = "I"
+        personTelephone.unlistIndicator = null
+        personTelephone.addressType = addressTypes["Z1"]
+        personTelephone.addressSequenceNumber = 1
+        personTelephone.save(failOnError: true, flush: true)
+
+        personTelephone = newValidForCreatePersonTelephone()
+        personTelephone.pidm = pidm
+        personTelephone.sequenceNumber = maxSeqNo + 4
+        personTelephone.phoneNumber = "4444444"
+        personTelephone.telephoneType = telephoneType
+        personTelephone.primaryIndicator = null
+        personTelephone.statusIndicator = "I"
+        personTelephone.unlistIndicator = "Y"
+        personTelephone.addressType = addressTypes["Z1"]
+        personTelephone.addressSequenceNumber = 1
+        personTelephone.save(failOnError: true, flush: true)
+
+        assertEquals sanity+4, PersonTelephone.findAllByPidm(pidm).size()
+
+        def telephoneNumbers = PersonTelephone.fetchActiveTelephoneByPidmAndAddressType(pidm, addressTypes["Z1"])
+        assertEquals 1, telephoneNumbers.size()
+        assertEquals "Y", telephoneNumbers[0].primaryIndicator
+
+        createAddressFor(pidm, "Z2")
+
+        // Add in the following for Z2
+        // 1. Primary, Active, Unlisted
+        // 2. Non-Primary, Active, Listed
+        personTelephone = newValidForCreatePersonTelephone()
+        personTelephone.pidm = pidm
+        personTelephone.sequenceNumber = maxSeqNo + 5
+        personTelephone.phoneNumber = "1111111"
+        personTelephone.telephoneType = telephoneType
+        personTelephone.primaryIndicator = "Y"
+        personTelephone.statusIndicator = null
+        personTelephone.unlistIndicator = "Y"
+        personTelephone.addressType = addressTypes["Z2"]
+        personTelephone.addressSequenceNumber = 1
+        personTelephone.save(failOnError: true, flush: true)
+
+        personTelephone = newValidForCreatePersonTelephone()
+        personTelephone.pidm = pidm
+        personTelephone.sequenceNumber = maxSeqNo + 6
+        personTelephone.phoneNumber = "1111111"
+        personTelephone.telephoneType = telephoneType
+        personTelephone.primaryIndicator = null
+        personTelephone.statusIndicator = null
+        personTelephone.unlistIndicator = null
+        personTelephone.addressType = addressTypes["Z2"]
+        personTelephone.addressSequenceNumber = 1
+        personTelephone.save(failOnError: true, flush: true)
+
+        assertEquals sanity+6, PersonTelephone.findAllByPidm(pidm).size()
+
+        telephoneNumbers = PersonTelephone.fetchActiveTelephoneByPidmAndAddressType(pidm, addressTypes["Z2"])
+        assertEquals 0, telephoneNumbers.size()
+
+        createAddressFor(pidm, "Z3")
+
+        // Add in the following for Z3
+        // 1. Primary, Inactive, listed
+        // 2. Non-Primary, Active, Listed
+        personTelephone = newValidForCreatePersonTelephone()
+        personTelephone.pidm = pidm
+        personTelephone.sequenceNumber = maxSeqNo + 7
+        personTelephone.phoneNumber = "1111111"
+        personTelephone.telephoneType = telephoneType
+        personTelephone.primaryIndicator = "Y"
+        personTelephone.statusIndicator = "I"
+        personTelephone.unlistIndicator = null
+        personTelephone.addressType = addressTypes["Z3"]
+        personTelephone.addressSequenceNumber = 1
+        personTelephone.save(failOnError: true, flush: true)
+
+        personTelephone = newValidForCreatePersonTelephone()
+        personTelephone.pidm = pidm
+        personTelephone.sequenceNumber = maxSeqNo + 8
+        personTelephone.phoneNumber = "1111111"
+        personTelephone.telephoneType = telephoneType
+        personTelephone.primaryIndicator = null
+        personTelephone.statusIndicator = null
+        personTelephone.unlistIndicator = null
+        personTelephone.addressType = addressTypes["Z3"]
+        personTelephone.addressSequenceNumber = 1
+        personTelephone.save(failOnError: true, flush: true)
+
+        assertEquals sanity+8, PersonTelephone.findAllByPidm(pidm).size()
+
+        telephoneNumbers = PersonTelephone.fetchActiveTelephoneByPidmAndAddressType(pidm, addressTypes["Z3"])
+        assertEquals 0, telephoneNumbers.size()
+    }
+
+
     private def newValidForCreatePersonTelephone() {
         def personTelephone = new PersonTelephone(
                 pidm: i_success_pidm,
@@ -413,5 +582,48 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
                 dataOrigin: "Banner"
         )
         return personTelephone
+    }
+
+
+    private def createAddressFor(Integer studentPidm, String addressTypeCode) {
+        def personAddress = new PersonAddress(
+                pidm: studentPidm,
+                //sequenceNumber: //i_success_sequenceNumber,
+                fromDate: new Date(),
+                toDate: new Date(),
+                streetLine1: "i_success_streetLine1",
+                streetLine2: "i_success_streetLine2",
+                streetLine3: "i_success_streetLine3",
+                city: "TTTTTT",
+                zip: "TTTTTT",
+                phoneArea: "TTTTTT",
+                phoneNumber: "TTTTTT",
+                phoneExtension: "TTTTTT",
+                statusIndicator: "I",
+                userData: "",
+                deliveryPoint: 1,
+                correctionDigit: 1,
+                carrierRoute: "TTTT",
+                goodsAndServiceTaxTaxId: "TTTTT",
+                reviewedIndicator: "Y",
+                reviewedUser: "TTTTT",
+                countryPhone: "TTTT",
+                houseNumber: "TTTTT",
+                streetLine4: "TTTTT",
+                addressType: addressTypes[addressTypeCode],
+                state: i_success_state,
+                county: i_success_county,
+                nation: i_success_nation,
+                addressSource: i_success_source
+        )
+        personAddress.save(failOnError: true, flush: true)
+    }
+
+
+    private def initializeCodes() {
+        i_success_state = State.findByCode("MER")
+        i_success_county = County.findByCode("044")
+        i_success_nation = Nation.findByCode("157")
+        i_success_source = AddressSource.findByCode("BRD")
     }
 }
