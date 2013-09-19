@@ -121,6 +121,44 @@ class PersonRaceServiceIntegrationTests extends BaseIntegrationTestCase {
         }
     }
 
+    void testCreateOrUpdateValid() {
+        PersonRace personRace = newValidForCreatePersonRace()
+        Map map = [createPersonRaces: personRace]
+        personRaceService.createOrUpdate(map)
+        PersonRace quiredPersonRace =PersonRace.fetchByPidmAndRace(personRace.pidm,personRace.race)
+        assertNotNull quiredPersonRace
+        assertNotNull "PersonRace ID is null in PersonRace Service Tests Create", quiredPersonRace.id
+        assertNotNull quiredPersonRace.version
+        assertNotNull quiredPersonRace.dataOrigin
+        assertNotNull quiredPersonRace.lastModifiedBy
+        assertNotNull quiredPersonRace.lastModified
+
+        map = [deletePersonRaces: personRace]
+        personRaceService.createOrUpdate(map)
+        quiredPersonRace =PersonRace.fetchByPidmAndRace(personRace.pidm,personRace.race)
+        assertNull quiredPersonRace
+
+
+
+    }
+
+    void testCreateOrUpdateInValid() {
+        def personRace = newInvalidForCreatePersonRace()
+        def map = [createPersonRaces: personRace]
+        shouldFail(ApplicationException) {
+            personRace = personRaceService.createOrUpdate(map)
+        }
+    }
+
+    void testDeletePersonRacesForInValid() {
+           def personRace = newInvalidForCreatePersonRace()
+           def map = [deletePersonRaces: personRace]
+           shouldFail(ApplicationException) {
+               personRace = personRaceService.createOrUpdate(map)
+           }
+       }
+
+
 
     private def newValidForCreatePersonRace() {
         def personRace = new PersonRace(
