@@ -185,7 +185,6 @@ class PersonAlternateIdView extends PersonView {
             ssnCriteria = "%" + ssn.toUpperCase() + "%"
         }
 
-        println ssnCriteria
 
         def persons = PersonAlternateIdView.withSession {session ->
 
