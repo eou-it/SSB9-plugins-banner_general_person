@@ -123,6 +123,7 @@ class PersonRaceServiceIntegrationTests extends BaseIntegrationTestCase {
 
     void testCreateOrUpdateValid() {
         PersonRace personRace = newValidForCreatePersonRace()
+
         Map map = [createPersonRaces: personRace]
         personRaceService.createOrUpdate(map)
         PersonRace quiredPersonRace =PersonRace.fetchByPidmAndRace(personRace.pidm,personRace.race)
@@ -133,7 +134,7 @@ class PersonRaceServiceIntegrationTests extends BaseIntegrationTestCase {
         assertNotNull quiredPersonRace.lastModifiedBy
         assertNotNull quiredPersonRace.lastModified
 
-        map = [deletePersonRaces: personRace]
+        map = [deletePersonRaces: quiredPersonRace]
         personRaceService.createOrUpdate(map)
         quiredPersonRace =PersonRace.fetchByPidmAndRace(personRace.pidm,personRace.race)
         assertNull quiredPersonRace
@@ -143,8 +144,8 @@ class PersonRaceServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
     void testCreateOrUpdateInValid() {
-        def personRace = newInvalidForCreatePersonRace()
-        def map = [createPersonRaces: personRace]
+        PersonRace personRace = newInvalidForCreatePersonRace()
+        Map map = [createPersonRaces: personRace]
         shouldFail(ApplicationException) {
             personRace = personRaceService.createOrUpdate(map)
         }
