@@ -37,64 +37,96 @@ import javax.persistence.Version
 @Table(name = "SV_SPRIDEN")
 @NamedQueries(value = [
 @NamedQuery(name = "PersonIdentificationName.fetchByBannerId",
-query = """FROM  PersonIdentificationName a
+        query = """FROM  PersonIdentificationName a
 	  	                WHERE a.bannerId like :filter
 	  	                and a.entityIndicator = 'P'
 	  	                and a.changeIndicator is null
 	  	                ORDER by a.lastName, a.firstName, a.middleName, a.bannerId  """),
 @NamedQuery(name = "PersonIdentificationName.fetchByName",
-query = """FROM  PersonIdentificationName a
+        query = """FROM  PersonIdentificationName a
 	  	                WHERE  ( a.lastName like :filter
 	  	                OR a.searchLastName like :filter)
 	  	                and a.entityIndicator = 'P'
 	  	                and a.changeIndicator is null
 	  	                 ORDER by a.lastName, a.firstName, a.middleName, a.bannerId  """),
 @NamedQuery(name = "PersonIdentificationName.fetchPersonByBannerId",
-query = """FROM  PersonIdentificationName a
+        query = """FROM  PersonIdentificationName a
 	  	                WHERE a.bannerId = :filter
 	  	                and a.entityIndicator = 'P'
 	  	                and a.changeIndicator is null    """),
 @NamedQuery(name = "PersonIdentificationName.fetchPersonByPidm",
-query = """FROM  PersonIdentificationName a
+        query = """FROM  PersonIdentificationName a
 	  	                WHERE a.pidm = :filter
 	  	                and a.entityIndicator = 'P'
 	  	                and a.changeIndicator is null    """),
 @NamedQuery(name = "PersonIdentificationName.fetchPersonOrNonPersonByPidm",
-query = """FROM  PersonIdentificationName a
+        query = """FROM  PersonIdentificationName a
 	  	                WHERE a.pidm = :filter
 	  	                and a.changeIndicator is null    """),
 @NamedQuery(name = "PersonIdentificationName.fetchPersonOrNonPersonByBannerId",
-query = """FROM  PersonIdentificationName a
+        query = """FROM  PersonIdentificationName a
                         WHERE (a.pidm in (SELECT Y.pidm FROM PersonIdentificationName Y WHERE Y.bannerId =  :filter  AND Y.changeIndicator = 'I')
                         or a.pidm in (SELECT Z.pidm FROM PersonIdentificationName Z WHERE Z.bannerId = :filter AND Z.changeIndicator is NULL))
                        and a.changeIndicator is null
 	  	               ORDER by a.lastName, a.firstName, a.middleName, a.bannerId """),
 @NamedQuery(name = "PersonIdentificationName.fetchAllPersonByNameOrBannerId",
-query = """FROM  PersonIdentificationName a
+        query = """FROM  PersonIdentificationName a
 	  	                WHERE (a.bannerId like :filter
 	  	                or a.searchFirstName like :filter
 	  	                or a.searchMiddleName like :filter
 	  	                or a.searchLastName like :filter)
 	  	                and a.entityIndicator = 'P' order by lastName, firstName, middleName, bannerId  """),
+@NamedQuery(name = "PersonIdentificationName.fetchAllPersonByBannerId",
+        query = """FROM  PersonIdentificationName a
+	  	                WHERE a.bannerId like :filter
+	  	                and a.entityIndicator = 'P' order by lastName, firstName, middleName, bannerId  """),
+@NamedQuery(name = "PersonIdentificationName.fetchAllPersonByLastName",
+        query = """FROM  PersonIdentificationName a
+	  	                WHERE a.searchLastName like :filter
+	  	                and a.entityIndicator = 'P' order by lastName, firstName, middleName, bannerId  """),
 @NamedQuery(name = "PersonIdentificationName.fetchCountPersonByNameOrBannerId",
-query = """select count(a.bannerId) FROM  PersonIdentificationName a
+        query = """select count(a.bannerId) FROM  PersonIdentificationName a
 	  	                WHERE (a.bannerId like :filter
 	  	                or a.searchFirstName like :filter
 	  	                or a.searchMiddleName like :filter
 	  	                or a.searchLastName like :filter)
 	  	                and a.entityIndicator = 'P' """),
+@NamedQuery(name = "PersonIdentificationName.fetchCountPersonByBannerId",
+        query = """select count(a.bannerId) FROM  PersonIdentificationName a
+	  	                WHERE a.bannerId like :filter
+	  	                and a.entityIndicator = 'P' """),
+@NamedQuery(name = "PersonIdentificationName.fetchCountPersonByLastName",
+        query = """select count(a.bannerId) FROM  PersonIdentificationName a
+	  	                WHERE a.searchLastName like :filter
+	  	                and a.entityIndicator = 'P' """),
 @NamedQuery(name = "PersonIdentificationName.fetchAllNonPersonByNameOrBannerId",
-query = """FROM  PersonIdentificationName a
+        query = """FROM  PersonIdentificationName a
 	  	                WHERE (a.bannerId like :filter
 	  	                or a.searchLastName like :filter)
 	  	                and a.entityIndicator = 'C' order by lastName, bannerId  """),
+@NamedQuery(name = "PersonIdentificationName.fetchAllNonPersonByBannerId",
+        query = """FROM  PersonIdentificationName a
+	  	                WHERE a.bannerId like :filter
+	  	                and a.entityIndicator = 'C' order by lastName, bannerId  """),
+@NamedQuery(name = "PersonIdentificationName.fetchAllNonPersonByLastName",
+        query = """FROM  PersonIdentificationName a
+	  	                WHERE a.searchLastName like :filter
+	  	                and a.entityIndicator = 'C' order by lastName, bannerId  """),
 @NamedQuery(name = "PersonIdentificationName.fetchCountNonPersonByNameOrBannerId",
-query = """select count(a.bannerId) FROM  PersonIdentificationName a
+        query = """select count(a.bannerId) FROM  PersonIdentificationName a
 	  	                WHERE (a.bannerId like :filter
 	  	                or a.searchLastName like :filter)
 	  	                and a.entityIndicator = 'C' """),
+@NamedQuery(name = "PersonIdentificationName.fetchCountNonPersonByBannerId",
+        query = """select count(a.bannerId) FROM  PersonIdentificationName a
+	  	                WHERE a.bannerId like :filter
+	  	                and a.entityIndicator = 'C' """),
+@NamedQuery(name = "PersonIdentificationName.fetchCountNonPersonByLastName",
+        query = """select count(a.bannerId) FROM  PersonIdentificationName a
+	  	                WHERE a.searchLastName like :filter
+	  	                and a.entityIndicator = 'C' """),
 @NamedQuery(name = "PersonIdentificationName.fetchPersonByAlternativeBannerId",
-query = """FROM PersonIdentificationName a
+        query = """FROM PersonIdentificationName a
                         WHERE a.bannerId = :filter
                         and a.entityIndicator = 'P'
                         and a.changeIndicator = 'I' """)
@@ -516,6 +548,34 @@ class PersonIdentificationName implements Serializable {
     }
 
 
+    public static List fetchAllPersonByBannerId(filter, pagingAndSortParams) {
+        def queryCriteria
+        if (!filter) return []
+        queryCriteria = filter.toUpperCase() + "%"
+        def persons = PersonIdentificationName.withSession {session ->
+            org.hibernate.Query query = session.getNamedQuery('PersonIdentificationName.fetchAllPersonByBannerId').setString('filter', queryCriteria)
+            query.setMaxResults(pagingAndSortParams.max)
+            query.setFirstResult(pagingAndSortParams.offset)
+            query.list()
+        }
+        return persons
+    }
+
+
+    public static List fetchAllPersonByLastName(filter, pagingAndSortParams) {
+        def queryCriteria
+        if (!filter) return []
+        queryCriteria = filter.toUpperCase() + "%"
+        def persons = PersonIdentificationName.withSession {session ->
+            org.hibernate.Query query = session.getNamedQuery('PersonIdentificationName.fetchAllPersonByLastName').setString('filter', queryCriteria)
+            query.setMaxResults(pagingAndSortParams.max)
+            query.setFirstResult(pagingAndSortParams.offset)
+            query.list()
+        }
+        return persons
+    }
+
+
 
     public static int fetchCountPersonByNameOrBannerId(filter) {
         def queryCriteria
@@ -523,6 +583,30 @@ class PersonIdentificationName implements Serializable {
         queryCriteria = filter.toUpperCase() + "%"
         def count = PersonIdentificationName.withSession {session ->
             org.hibernate.Query query = session.getNamedQuery('PersonIdentificationName.fetchCountPersonByNameOrBannerId').setString('filter', queryCriteria)
+            query.list().get(0)
+        }
+        return count
+    }
+
+
+    public static int fetchCountPersonByBannerId(filter) {
+        def queryCriteria
+        if (!filter) return 0
+        queryCriteria = filter.toUpperCase() + "%"
+        def count = PersonIdentificationName.withSession {session ->
+            org.hibernate.Query query = session.getNamedQuery('PersonIdentificationName.fetchCountPersonByBannerId').setString('filter', queryCriteria)
+            query.list().get(0)
+        }
+        return count
+    }
+
+
+    public static int fetchCountPersonByLastName(filter) {
+        def queryCriteria
+        if (!filter) return 0
+        queryCriteria = filter.toUpperCase() + "%"
+        def count = PersonIdentificationName.withSession {session ->
+            org.hibernate.Query query = session.getNamedQuery('PersonIdentificationName.fetchCountPersonByLastName').setString('filter', queryCriteria)
             query.list().get(0)
         }
         return count
@@ -544,6 +628,34 @@ class PersonIdentificationName implements Serializable {
     }
 
 
+    public static List fetchAllNonPersonByBannerId(filter, pagingAndSortParams) {
+        def queryCriteria
+        if (!filter) return []
+        queryCriteria = filter.toUpperCase() + "%"
+        def nonPersons = PersonIdentificationName.withSession {session ->
+            org.hibernate.Query query = session.getNamedQuery('PersonIdentificationName.fetchAllNonPersonByBannerId').setString('filter', queryCriteria)
+            query.setMaxResults(pagingAndSortParams.max);
+            query.setFirstResult(pagingAndSortParams.offset);
+            query.list()
+        }
+        return nonPersons
+    }
+
+
+    public static List fetchAllNonPersonByLastName(filter, pagingAndSortParams) {
+        def queryCriteria
+        if (!filter) return []
+        queryCriteria = filter.toUpperCase() + "%"
+        def nonPersons = PersonIdentificationName.withSession {session ->
+            org.hibernate.Query query = session.getNamedQuery('PersonIdentificationName.fetchAllNonPersonByLastName').setString('filter', queryCriteria)
+            query.setMaxResults(pagingAndSortParams.max);
+            query.setFirstResult(pagingAndSortParams.offset);
+            query.list()
+        }
+        return nonPersons
+    }
+
+
 
     public static int fetchCountNonPersonByNameOrBannerId(filter) {
         def queryCriteria
@@ -551,6 +663,30 @@ class PersonIdentificationName implements Serializable {
         queryCriteria = filter.toUpperCase() + "%"
         def count = PersonIdentificationName.withSession {session ->
             org.hibernate.Query query = session.getNamedQuery('PersonIdentificationName.fetchCountNonPersonByNameOrBannerId').setString('filter', queryCriteria)
+            query.list().get(0)
+        }
+        return count
+    }
+
+
+    public static int fetchCountNonPersonByBannerId(filter) {
+        def queryCriteria
+        if (!filter) return 0
+        queryCriteria = filter.toUpperCase() + "%"
+        def count = PersonIdentificationName.withSession {session ->
+            org.hibernate.Query query = session.getNamedQuery('PersonIdentificationName.fetchCountNonPersonByBannerId').setString('filter', queryCriteria)
+            query.list().get(0)
+        }
+        return count
+    }
+
+
+    public static int fetchCountNonPersonByLastName(filter) {
+        def queryCriteria
+        if (!filter) return 0
+        queryCriteria = filter.toUpperCase() + "%"
+        def count = PersonIdentificationName.withSession {session ->
+            org.hibernate.Query query = session.getNamedQuery('PersonIdentificationName.fetchCountNonPersonByLastName').setString('filter', queryCriteria)
             query.list().get(0)
         }
         return count
@@ -579,22 +715,54 @@ class PersonIdentificationName implements Serializable {
         return [list: PersonIdentificationName.fetchAllPersonByNameOrBannerId(filter, pagingAndSortParams), totalCount: PersonIdentificationName.fetchCountPersonByNameOrBannerId(filter)]
     }
 
+
+    public static Map fetchPersonByBannerId(filter = null, pagingAndSortParams) {
+        if(filter)
+            return [list: PersonIdentificationName.fetchAllPersonByBannerId(filter, pagingAndSortParams), totalCount: PersonIdentificationName.fetchCountPersonByBannerId(filter)]
+        return [list:[]]
+    }
+
+
+    public static Map fetchPersonByLastName(filter = null, pagingAndSortParams) {
+        if(filter)
+            return [list: PersonIdentificationName.fetchAllPersonByLastName(filter, pagingAndSortParams), totalCount: PersonIdentificationName.fetchCountPersonByLastName(filter)]
+        return [list:[]]
+    }
+
+
     //Used for spriden id Lookup.
     public static Map fetchPersonByNameOrBannerId(pagingAndSortParams) {
         //Reason is person lookup will have performance issues when filter is unavailable
         return [list: []]
     }
 
+
     //Used for spriden id Lookup.
     public static Map fetchNonPersonByNameOrBannerId(filter, pagingAndSortParams) {
         return [list: PersonIdentificationName.fetchAllNonPersonByNameOrBannerId(filter, pagingAndSortParams), totalCount: PersonIdentificationName.fetchCountNonPersonByNameOrBannerId(filter)]
     }
+
+
+    public static Map fetchNonPersonByBannerId(filter = null, pagingAndSortParams) {
+        if(filter)
+            return [list: PersonIdentificationName.fetchAllNonPersonByBannerId(filter, pagingAndSortParams), totalCount: PersonIdentificationName.fetchCountNonPersonByBannerId(filter)]
+        return [list:[]]
+    }
+
+
+    public static Map fetchNonPersonByLastName(filter = null, pagingAndSortParams) {
+        if(filter)
+            return [list: PersonIdentificationName.fetchAllNonPersonByLastName(filter, pagingAndSortParams), totalCount: PersonIdentificationName.fetchCountNonPersonByLastName(filter)]
+        return [list:[]]
+    }
+
 
     //Used for spriden id Lookup.
     public static Map fetchNonPersonByNameOrBannerId(pagingAndSortParams) {
         //Reason is person lookup will have performance issues when filter is unavailable
         return [list: []]
     }
+
 
     /*PROTECTED REGION END*/
 }
