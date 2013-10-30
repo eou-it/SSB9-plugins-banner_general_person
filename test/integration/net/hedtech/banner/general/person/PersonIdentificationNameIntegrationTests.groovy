@@ -22,7 +22,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
 
 
     protected void setUp() {
-        formContext = ['SOAIDEN'] // Since we are not testing a controller, we need to explicitly set this
+        formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this
         super.setUp()
     }
 
@@ -200,6 +200,80 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
         assertTrue PersonIdentificationName.fetchAllPersonByNameOrBannerId(invalidSearchString, pagingAndSortParams)?.isEmpty()
     }
 
+
+    void testFetchAllPersonByBannerId() {
+        def personIdentificationName1 = newPersonIdentificationName()
+        personIdentificationName1.firstName = "One"
+        personIdentificationName1.middleName = null
+        personIdentificationName1.lastName = "UnitTest"
+        personIdentificationName1.bannerId = "UNITTEST1"
+        save personIdentificationName1
+        //This is required to compute grails derived columns
+        personIdentificationName1.refresh()
+        //Test if the generated entity now has an id assigned
+        assertNotNull personIdentificationName1.id
+        assertEquals personIdentificationName1.firstName + " " + personIdentificationName1.lastName, personIdentificationName1.fullName
+        def personIdentificationName2 = newPersonIdentificationName()
+        personIdentificationName2.firstName = "Second"
+        personIdentificationName2.middleName = "MI"
+        personIdentificationName2.lastName = "UnitTest"
+        personIdentificationName2.bannerId = "UNITTEST2"
+        save personIdentificationName2
+        //This is required to compute grails derived columns
+        personIdentificationName2.refresh()
+        //Test if the generated entity now has an id assigned
+        assertNotNull personIdentificationName2.id
+        assertEquals personIdentificationName2.firstName + " " + personIdentificationName2.middleName + " " + personIdentificationName2.lastName, personIdentificationName2.fullName
+        def searchString = "unittest"
+        def invalidSearchString = "T!!!@@@"
+        def pagingAndSortParams = [max: 10, offset: 0]
+        def results = PersonIdentificationName.fetchAllPersonByBannerId(searchString, pagingAndSortParams)
+        assertNotNull results
+		assertTrue results.size() >= 2
+        assertTrue results.contains(personIdentificationName1)
+        assertTrue results.contains(personIdentificationName2)
+        assertTrue PersonIdentificationName.fetchAllPersonByBannerId(invalidSearchString, pagingAndSortParams)?.isEmpty()
+        invalidSearchString = null
+        assertTrue PersonIdentificationName.fetchAllPersonByBannerId(invalidSearchString, pagingAndSortParams)?.isEmpty()
+    }
+
+
+    void testFetchAllPersonByLastName() {
+        def personIdentificationName1 = newPersonIdentificationName()
+        personIdentificationName1.firstName = "One"
+        personIdentificationName1.middleName = null
+        personIdentificationName1.lastName = "UnitTest"
+        personIdentificationName1.bannerId = "UNITTEST1"
+        save personIdentificationName1
+        //This is required to compute grails derived columns
+        personIdentificationName1.refresh()
+        //Test if the generated entity now has an id assigned
+        assertNotNull personIdentificationName1.id
+        assertEquals personIdentificationName1.firstName + " " + personIdentificationName1.lastName, personIdentificationName1.fullName
+        def personIdentificationName2 = newPersonIdentificationName()
+        personIdentificationName2.firstName = "Second"
+        personIdentificationName2.middleName = "MI"
+        personIdentificationName2.lastName = "UnitTest"
+        personIdentificationName2.bannerId = "UNITTEST2"
+        save personIdentificationName2
+        //This is required to compute grails derived columns
+        personIdentificationName2.refresh()
+        //Test if the generated entity now has an id assigned
+        assertNotNull personIdentificationName2.id
+        assertEquals personIdentificationName2.firstName + " " + personIdentificationName2.middleName + " " + personIdentificationName2.lastName, personIdentificationName2.fullName
+        def searchString = "unittest"
+        def invalidSearchString = "T!!!@@@"
+        def pagingAndSortParams = [max: 10, offset: 0]
+        def results = PersonIdentificationName.fetchAllPersonByLastName(searchString, pagingAndSortParams)
+        assertNotNull results
+		assertTrue results.size() >= 2
+        assertTrue results.contains(personIdentificationName1)
+        assertTrue results.contains(personIdentificationName2)
+        assertTrue PersonIdentificationName.fetchAllPersonByLastName(invalidSearchString, pagingAndSortParams)?.isEmpty()
+        invalidSearchString = null
+        assertTrue PersonIdentificationName.fetchAllPersonByLastName(invalidSearchString, pagingAndSortParams)?.isEmpty()
+    }
+
     void testFetchAllNonPersonByNameOrBannerId() {
         def personIdentificationName1 = newNonPersonIdentificationName("FIRSTCOMPANY")
         personIdentificationName1.bannerId = "UNITTEST1"
@@ -233,6 +307,289 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
 
         assertTrue PersonIdentificationName.fetchAllNonPersonByNameOrBannerId(invalidSearchString, pagingAndSortParams)?.isEmpty()
     }
+
+
+    void testFetchAllNonPersonByBannerId() {
+        def personIdentificationName1 = newNonPersonIdentificationName("FIRSTCOMPANY")
+        personIdentificationName1.bannerId = "UNITTEST1"
+        save personIdentificationName1
+        //This is required to compute grails derived columns
+        personIdentificationName1.refresh()
+        //Test if the generated entity now has an id assigned
+        assertNotNull personIdentificationName1.id
+        assertEquals "FIRSTCOMPANY", personIdentificationName1.fullName
+        def personIdentificationName2 = newNonPersonIdentificationName("SECONDCOMPANY")
+        personIdentificationName2.bannerId = "UNITTEST2"
+        save personIdentificationName2
+        //This is required to compute grails derived columns
+        personIdentificationName2.refresh()
+        //Test if the generated entity now has an id assigned
+        assertNotNull personIdentificationName2.id
+        assertEquals "SECONDCOMPANY", personIdentificationName2.fullName
+        def searchString = "unittest"
+        def invalidSearchString = "T!!!@@@"
+        def pagingAndSortParams = [max: 10, offset: 0]
+        def results = PersonIdentificationName.fetchAllNonPersonByBannerId(searchString, pagingAndSortParams)
+        assertNotNull results
+		assertTrue results.size() >= 2
+        assertTrue results.contains(personIdentificationName1)
+        assertTrue results.contains(personIdentificationName2)
+
+        assertTrue PersonIdentificationName.fetchAllNonPersonByBannerId(invalidSearchString, pagingAndSortParams)?.isEmpty()
+        invalidSearchString = null
+        assertTrue PersonIdentificationName.fetchAllNonPersonByBannerId(invalidSearchString, pagingAndSortParams)?.isEmpty()
+    }
+
+
+    void testFetchAllNonPersonByLastName() {
+        def personIdentificationName1 = newNonPersonIdentificationName("FIRSTCOMPANY")
+        personIdentificationName1.bannerId = "UNITTEST1"
+        save personIdentificationName1
+        //This is required to compute grails derived columns
+        personIdentificationName1.refresh()
+        //Test if the generated entity now has an id assigned
+        assertNotNull personIdentificationName1.id
+        assertEquals "FIRSTCOMPANY", personIdentificationName1.fullName
+        def personIdentificationName2 = newNonPersonIdentificationName("SECONDCOMPANY")
+        personIdentificationName2.bannerId = "UNITTEST2"
+        save personIdentificationName2
+        //This is required to compute grails derived columns
+        personIdentificationName2.refresh()
+        //Test if the generated entity now has an id assigned
+        assertNotNull personIdentificationName2.id
+        assertEquals "SECONDCOMPANY", personIdentificationName2.fullName
+        def searchString = "SECOND"
+        def invalidSearchString = "T!!!@@@"
+        def pagingAndSortParams = [max: 10, offset: 0]
+        def results = PersonIdentificationName.fetchAllNonPersonByLastName(searchString, pagingAndSortParams)
+        assertNotNull results
+		assertTrue results.size() >= 1
+        assertTrue results.contains(personIdentificationName2)
+
+        assertTrue PersonIdentificationName.fetchAllNonPersonByLastName(invalidSearchString, pagingAndSortParams)?.isEmpty()
+        invalidSearchString = null
+        assertTrue PersonIdentificationName.fetchAllNonPersonByLastName(invalidSearchString, pagingAndSortParams)?.isEmpty()
+    }
+
+
+    void testFetchCountPersonByNameOrBannerId() {
+        def personIdentificationName1 = newPersonIdentificationName()
+        personIdentificationName1.firstName = "One"
+        personIdentificationName1.middleName = null
+        personIdentificationName1.lastName = "UnitTest"
+        personIdentificationName1.bannerId = "UNITTEST1"
+        save personIdentificationName1
+        //This is required to compute grails derived columns
+        personIdentificationName1.refresh()
+        //Test if the generated entity now has an id assigned
+        assertNotNull personIdentificationName1.id
+        assertEquals personIdentificationName1.firstName + " " + personIdentificationName1.lastName, personIdentificationName1.fullName
+        def personIdentificationName2 = newPersonIdentificationName()
+        personIdentificationName2.firstName = "Second"
+        personIdentificationName2.middleName = "MI"
+        personIdentificationName2.lastName = "UnitTest"
+        personIdentificationName2.bannerId = "UNITTEST2"
+        save personIdentificationName2
+        //This is required to compute grails derived columns
+        personIdentificationName2.refresh()
+        //Test if the generated entity now has an id assigned
+        assertNotNull personIdentificationName2.id
+        assertEquals personIdentificationName2.firstName + " " + personIdentificationName2.middleName + " " + personIdentificationName2.lastName, personIdentificationName2.fullName
+        def searchString = "unittest"
+        def invalidSearchString = "T!!!@@@"
+
+        def personCount = PersonIdentificationName.fetchCountPersonByNameOrBannerId(searchString)
+        assertNotNull personCount
+        assertTrue personCount > 0
+
+        personCount = PersonIdentificationName.fetchCountPersonByNameOrBannerId(invalidSearchString)
+        assertFalse personCount > 0
+		
+		invalidSearchString = null
+		personCount = PersonIdentificationName.fetchCountPersonByNameOrBannerId(invalidSearchString)
+        assertFalse personCount > 0
+
+    }
+
+
+    void testFetchCountPersonByBannerId() {
+        def personIdentificationName1 = newPersonIdentificationName()
+        personIdentificationName1.firstName = "One"
+        personIdentificationName1.middleName = null
+        personIdentificationName1.lastName = "UnitTest"
+        personIdentificationName1.bannerId = "UNITTEST1"
+        save personIdentificationName1
+        //This is required to compute grails derived columns
+        personIdentificationName1.refresh()
+        //Test if the generated entity now has an id assigned
+        assertNotNull personIdentificationName1.id
+        assertEquals personIdentificationName1.firstName + " " + personIdentificationName1.lastName, personIdentificationName1.fullName
+        def personIdentificationName2 = newPersonIdentificationName()
+        personIdentificationName2.firstName = "Second"
+        personIdentificationName2.middleName = "MI"
+        personIdentificationName2.lastName = "UnitTest"
+        personIdentificationName2.bannerId = "UNITTEST2"
+        save personIdentificationName2
+        //This is required to compute grails derived columns
+        personIdentificationName2.refresh()
+        //Test if the generated entity now has an id assigned
+        assertNotNull personIdentificationName2.id
+        assertEquals personIdentificationName2.firstName + " " + personIdentificationName2.middleName + " " + personIdentificationName2.lastName, personIdentificationName2.fullName
+        def searchString = "unittest"
+        def invalidSearchString = "T!!!@@@"
+
+        def personCount = PersonIdentificationName.fetchCountPersonByBannerId(searchString)
+        assertNotNull personCount
+        assertTrue personCount > 0
+
+        personCount = PersonIdentificationName.fetchCountPersonByBannerId(invalidSearchString)
+        assertFalse personCount > 0
+
+        invalidSearchString = null
+        personCount = PersonIdentificationName.fetchCountPersonByNameOrBannerId(invalidSearchString)
+        assertFalse personCount > 0
+    }
+
+
+    void testFetchCountPersonByLastName() {
+        def personIdentificationName1 = newPersonIdentificationName()
+        personIdentificationName1.firstName = "One"
+        personIdentificationName1.middleName = null
+        personIdentificationName1.lastName = "UnitTest"
+        personIdentificationName1.bannerId = "UNITTEST1"
+        save personIdentificationName1
+        //This is required to compute grails derived columns
+        personIdentificationName1.refresh()
+        //Test if the generated entity now has an id assigned
+        assertNotNull personIdentificationName1.id
+        assertEquals personIdentificationName1.firstName + " " + personIdentificationName1.lastName, personIdentificationName1.fullName
+        def personIdentificationName2 = newPersonIdentificationName()
+        personIdentificationName2.firstName = "Second"
+        personIdentificationName2.middleName = "MI"
+        personIdentificationName2.lastName = "UnitTest"
+        personIdentificationName2.bannerId = "UNITTEST2"
+        save personIdentificationName2
+        //This is required to compute grails derived columns
+        personIdentificationName2.refresh()
+        //Test if the generated entity now has an id assigned
+        assertNotNull personIdentificationName2.id
+        assertEquals personIdentificationName2.firstName + " " + personIdentificationName2.middleName + " " + personIdentificationName2.lastName, personIdentificationName2.fullName
+        def searchString = "unittest"
+        def invalidSearchString = "T!!!@@@"
+
+        def personCount = PersonIdentificationName.fetchCountPersonByLastName(searchString)
+        assertNotNull personCount
+        assertTrue personCount > 0
+
+        personCount = PersonIdentificationName.fetchCountPersonByLastName(invalidSearchString)
+        assertFalse personCount > 0
+
+        invalidSearchString = null
+        personCount = PersonIdentificationName.fetchCountPersonByLastName(invalidSearchString)
+        assertFalse personCount > 0
+    }
+
+
+    void testFetchCountNonPersonByNameOrBannerId() {
+        def personIdentificationName1 = newNonPersonIdentificationName("FIRSTCOMPANY")
+        personIdentificationName1.bannerId = "UNITTEST1"
+        save personIdentificationName1
+        //This is required to compute grails derived columns
+        personIdentificationName1.refresh()
+        //Test if the generated entity now has an id assigned
+        assertNotNull personIdentificationName1.id
+        assertEquals "FIRSTCOMPANY", personIdentificationName1.fullName
+        def personIdentificationName2 = newNonPersonIdentificationName("SECONDCOMPANY")
+        personIdentificationName2.bannerId = "UNITTEST2"
+        save personIdentificationName2
+        //This is required to compute grails derived columns
+        personIdentificationName2.refresh()
+        //Test if the generated entity now has an id assigned
+        assertNotNull personIdentificationName2.id
+        assertEquals "SECONDCOMPANY", personIdentificationName2.fullName
+        def searchString = "unittest"
+        def invalidSearchString = "T!!!@@@"
+
+        def nonPersonCount = PersonIdentificationName.fetchCountNonPersonByNameOrBannerId(searchString)
+        assertNotNull nonPersonCount
+        assertTrue nonPersonCount > 0
+
+        nonPersonCount = PersonIdentificationName.fetchCountNonPersonByNameOrBannerId(invalidSearchString)
+        assertFalse nonPersonCount > 0
+		
+		invalidSearchString = null
+		nonPersonCount = PersonIdentificationName.fetchCountNonPersonByNameOrBannerId(invalidSearchString)
+        assertFalse nonPersonCount > 0
+
+    }
+
+
+    void testFetchCountNonPersonByBannerId() {
+        def personIdentificationName1 = newNonPersonIdentificationName("FIRSTCOMPANY")
+        personIdentificationName1.bannerId = "UNITTEST1"
+        save personIdentificationName1
+        //This is required to compute grails derived columns
+        personIdentificationName1.refresh()
+        //Test if the generated entity now has an id assigned
+        assertNotNull personIdentificationName1.id
+        assertEquals "FIRSTCOMPANY", personIdentificationName1.fullName
+        def personIdentificationName2 = newNonPersonIdentificationName("SECONDCOMPANY")
+        personIdentificationName2.bannerId = "UNITTEST2"
+        save personIdentificationName2
+        //This is required to compute grails derived columns
+        personIdentificationName2.refresh()
+        //Test if the generated entity now has an id assigned
+        assertNotNull personIdentificationName2.id
+        assertEquals "SECONDCOMPANY", personIdentificationName2.fullName
+        def searchString = "unittest"
+        def invalidSearchString = "T!!!@@@"
+
+        def nonPersonCount = PersonIdentificationName.fetchCountNonPersonByBannerId(searchString)
+        assertNotNull nonPersonCount
+        assertTrue nonPersonCount > 0
+
+        nonPersonCount = PersonIdentificationName.fetchCountNonPersonByBannerId(invalidSearchString)
+        assertFalse nonPersonCount > 0
+
+        invalidSearchString = null
+        nonPersonCount = PersonIdentificationName.fetchCountNonPersonByBannerId(invalidSearchString)
+        assertFalse nonPersonCount > 0
+
+    }
+
+
+    void testFetchCountNonPersonByLastName() {
+        def personIdentificationName1 = newNonPersonIdentificationName("FIRSTCOMPANY")
+        personIdentificationName1.bannerId = "UNITTEST1"
+        save personIdentificationName1
+        //This is required to compute grails derived columns
+        personIdentificationName1.refresh()
+        //Test if the generated entity now has an id assigned
+        assertNotNull personIdentificationName1.id
+        assertEquals "FIRSTCOMPANY", personIdentificationName1.fullName
+        def personIdentificationName2 = newNonPersonIdentificationName("SECONDCOMPANY")
+        personIdentificationName2.bannerId = "UNITTEST2"
+        save personIdentificationName2
+        //This is required to compute grails derived columns
+        personIdentificationName2.refresh()
+        //Test if the generated entity now has an id assigned
+        assertNotNull personIdentificationName2.id
+        assertEquals "SECONDCOMPANY", personIdentificationName2.fullName
+        def searchString = "SECOND"
+        def invalidSearchString = "T!!!@@@"
+
+        def nonPersonCount = PersonIdentificationName.fetchCountNonPersonByLastName(searchString)
+        assertNotNull nonPersonCount
+        assertTrue nonPersonCount > 0
+
+        nonPersonCount = PersonIdentificationName.fetchCountNonPersonByLastName(invalidSearchString)
+        assertFalse nonPersonCount > 0
+
+        invalidSearchString = null
+        nonPersonCount = PersonIdentificationName.fetchCountNonPersonByLastName(invalidSearchString)
+        assertFalse nonPersonCount > 0
+    }
+
 
     void testFetchBannerPersonOrNonPerson() {
         def personIdentificationName1 = newNonPersonIdentificationName("FIRSTCOMPANY")
