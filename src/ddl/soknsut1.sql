@@ -72,8 +72,10 @@ OPEN regex_cursor;
 FETCH regex_cursor INTO hold_var;
 --
   IF regex_cursor%FOUND THEN
+    close regex_cursor;
     RETURN 1;
   ELSE
+    close regex_cursor;
     RETURN 2;
   END IF;
 --
