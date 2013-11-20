@@ -83,7 +83,7 @@ query = """ FROM PersonAddress a
 query = """ FROM PersonAddress a
                             WHERE  a.pidm = :pidm
                             AND NVL(a.statusIndicator,'Y') <> 'I'
-                            AND a.addressType.code LIKE :filter
+                            AND upper(a.addressType.code) LIKE upper(:filter)
                             AND  SYSDATE BETWEEN
                             NVL(SPRADDR_FROM_DATE,sysdate-1) AND
                             NVL(SPRADDR_TO_DATE,sysdate+1)
