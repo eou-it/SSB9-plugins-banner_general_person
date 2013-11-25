@@ -1,20 +1,13 @@
--- *****************************************************************************************
--- * Copyright 2009-2012 SunGard Higher Education. All Rights Reserved.                    *
--- * This copyrighted software contains confidential and proprietary information of        *
--- * SunGard Higher Education and its subsidiaries. Any use of this software is limited    *
--- * solely to SunGard Higher Education licensees, and is further subject to the terms     *
--- * and conditions of one or more written license agreements between SunGard Higher       *
--- * Education and the licensee in question. SunGard is either a registered trademark or   *
--- * trademark of SunGard Data Systems in the U.S.A. and/or other regions and/or countries.*
--- * Banner and Luminis are either registered trademarks or trademarks of SunGard Higher   *
--- * Education in the U.S.A. and/or other regions and/or countries.                        *
--- *****************************************************************************************
---  svq_spriden.sql
---
--- AUDIT TRAIL: 9.0
--- Read only view over SPRIDEN table           mhitrik 28-FEB-2012
--- AUDIT TRAIL END
---
+REM *****************************************************************************************
+REM * Copyright 2012-2013 Ellucian Company L.P. and its affiliates.                         *
+REM *****************************************************************************************
+REM svq_spriden.sql
+REM
+REM AUDIT TRAIL: 9.0
+REM mhitrik 28-FEB-2012
+REM 1. Read only view over SPRIDEN table
+REM AUDIT TRAIL END
+REM
 
 SET SCAN OFF;
 
