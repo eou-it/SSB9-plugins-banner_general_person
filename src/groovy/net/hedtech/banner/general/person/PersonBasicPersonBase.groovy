@@ -17,7 +17,10 @@ import javax.persistence.*
 @NamedQueries(value = [
 @NamedQuery(name = "PersonBasicPersonBase.fetchByPidm",
 query = """FROM  PersonBasicPersonBase a
-	       WHERE a.pidm = :pidm """)
+	       WHERE a.pidm = :pidm """),
+@NamedQuery(name = "PersonBasicPersonBase.fetchBySsn",
+query = """FROM  PersonBasicPersonBase a
+	       WHERE a.ssn = :ssn """)
 ])
 @DatabaseModifiesState
 class PersonBasicPersonBase implements Serializable {
@@ -569,5 +572,17 @@ class PersonBasicPersonBase implements Serializable {
         return object
     }
 
+
+    def static fetchBySsn(String ssn) {
+        def bioList
+
+        if (ssn) {
+            bioList = PersonBasicPersonBase.withSession { session ->
+                def result = session.getNamedQuery('PersonBasicPersonBase.fetchBySsn').setString('ssn', ssn).list()
+            }
+        }
+
+        return bioList
+    }
 
 }

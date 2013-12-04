@@ -471,6 +471,20 @@ class PersonBasicPersonBaseServiceIntegrationTests extends BaseIntegrationTestCa
     }
 
 
+    void testSsnTooLong() {
+        def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()
+        personBasicPersonBase.ssn = "TTTTTTTTTTTTTTTTTTTT"
+
+        try {
+            personBasicPersonBaseService.create([domainModel: personBasicPersonBase])
+            fail("This should have failed with @@r1:ssnMaximumLengthExceeded")
+        }
+        catch (ApplicationException ae) {
+            assertApplicationException ae, "ssnMaximumLengthExceeded"
+        }
+    }
+
+
     private def newValidForCreatePersonBasicPersonBase() {
         def sql = new Sql(sessionFactory.getCurrentSession().connection())
         String idSql = """select gb_common.f_generate_id bannerId, gb_common.f_generate_pidm pidm from dual """

@@ -1,6 +1,6 @@
 /*********************************************************************************
-Copyright 2012 Ellucian Company L.P. and its affiliates.
-**********************************************************************************/
+ Copyright 2012 Ellucian Company L.P. and its affiliates.
+ ********************************************************************************* */
 /*********************************************************************************
  Copyright 2013 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
@@ -16,9 +16,11 @@ class PersonIdentificationNameAlternateServiceIntegrationTests extends BaseInteg
 
     def personIdentificationNameAlternateService
 
+    final def GENERATED = "GENERATED"
+
 
     protected void setUp() {
-        formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this
+        formContext = ['GUAGMNU']
         super.setUp()
     }
 
@@ -27,106 +29,86 @@ class PersonIdentificationNameAlternateServiceIntegrationTests extends BaseInteg
         super.tearDown()
     }
 
+    // *************************************************************************************************************
+    //  Perform person alternate ID tests first.  Non-person alternate ID tests follow these tests.
+    // *************************************************************************************************************
 
-    void testCreatePersonIdentificationNameAlternateBannerIdChange() {
-        def personIdentificationNameCurrent = setupNewPersonIdentificationNameCurrent()
-        def personIdentificationNameAlternate = newAlternateBannerId(personIdentificationNameCurrent, "ID-A00001")
-        personIdentificationNameAlternate = personIdentificationNameAlternateService.create([domainModel: personIdentificationNameAlternate])
+    void testCreatePersonIdentificationNameAlternateId() {
+        def person = setupNewPersonIdentificationNameCurrent()
+        def origBannerId = person.bannerId
 
-        def personIdentificationNameAlternates = PersonIdentificationNameAlternate.fetchAllByPidm(personIdentificationNameAlternate.pidm)
-        assertEquals 1, personIdentificationNameAlternates?.size()
+        def alternatePerson = newPersonIdentificationNameAlternate(person)
+        alternatePerson.bannerId = "ID-ALT001"
+        alternatePerson.changeIndicator = "I"
+        personIdentificationNameAlternateService.create([domainModel: alternatePerson])
 
-        personIdentificationNameAlternate = personIdentificationNameAlternates[0]
-        assertNotNull personIdentificationNameAlternate?.id
-        assertNotNull personIdentificationNameAlternate.pidm
-        assertEquals "ID-A00001", personIdentificationNameAlternate.bannerId
-        assertEquals "Adams", personIdentificationNameAlternate.lastName
-        assertEquals "Troy", personIdentificationNameAlternate.firstName
-        assertEquals "W", personIdentificationNameAlternate.middleName
-        assertEquals "P", personIdentificationNameAlternate.entityIndicator
-        assertEquals "I", personIdentificationNameAlternate.changeIndicator
-        assertEquals "BRTH", personIdentificationNameAlternate.nameType.code
-        assertEquals 0L, personIdentificationNameAlternate.version
+        // Check the current id
+        def currentPerson = PersonIdentificationNameCurrent.get(person.id)
+        assertNotNull currentPerson
+        assertNull currentPerson.changeIndicator
+        assertEquals origBannerId, currentPerson.bannerId
+        assertEquals 0L, currentPerson.version
+
+        // Check the alternate id
+        def alternatePersons = PersonIdentificationNameAlternate.fetchAllByPidm(currentPerson.pidm)
+        assertEquals 1, alternatePersons.size()
+
+        alternatePerson = alternatePersons.get(0)
+        assertNotNull alternatePerson.pidm
+        assertEquals "ID-ALT001", alternatePerson.bannerId
+        assertEquals "I", alternatePerson.changeIndicator
+        assertEquals "BRTH", alternatePerson.nameType?.code
+        assertEquals 0L, alternatePerson.version
     }
 
 
-    void testCreatePersonIdentificationNameAlternateNameChange() {
-        def personIdentificationNameCurrent = setupNewPersonIdentificationNameCurrent()
-        def personIdentificationNameAlternate = newAlternateName(personIdentificationNameCurrent, [lastName: "Higgins", firstName: "Walter"])
-        personIdentificationNameAlternate = personIdentificationNameAlternateService.create([domainModel: personIdentificationNameAlternate])
-        def bannerId = personIdentificationNameAlternate.bannerId
+    void testCreatePersonIdentificationNameAlternateName() {
+        def person = setupNewPersonIdentificationNameCurrent()
+        def origBannerId = person.bannerId
 
-        def personIdentificationNameAlternates = PersonIdentificationNameAlternate.fetchAllByPidm(personIdentificationNameAlternate.pidm)
-        assertEquals 1, personIdentificationNameAlternates?.size()
+        def altLastName = "ALTERNATE_LAST_NAME"
+        def altFirstName = "ALTERNATE_FIRST_NAME"
+        def altMiddleName = "ALTERNATE_MIDDLE_NAME"
 
-        personIdentificationNameAlternate = personIdentificationNameAlternates[0]
-        assertNotNull personIdentificationNameAlternate?.id
-        assertNotNull personIdentificationNameAlternate.pidm
-        assertEquals bannerId, personIdentificationNameAlternate.bannerId
-        assertEquals "Higgins", personIdentificationNameAlternate.lastName
-        assertEquals "Walter", personIdentificationNameAlternate.firstName
-        assertNull personIdentificationNameAlternate.middleName
-        assertEquals "P", personIdentificationNameAlternate.entityIndicator
-        assertEquals "N", personIdentificationNameAlternate.changeIndicator
-        assertEquals "BRTH", personIdentificationNameAlternate.nameType.code
-        assertEquals 0L, personIdentificationNameAlternate.version
+        def alternatePerson = newPersonIdentificationNameAlternate(person)
+        alternatePerson.lastName = altLastName
+        alternatePerson.firstName = altFirstName
+        alternatePerson.middleName = altMiddleName
+        alternatePerson.changeIndicator = "N"
+        personIdentificationNameAlternateService.create([domainModel: alternatePerson])
+
+        // Check the current id
+        def currentPerson = PersonIdentificationNameCurrent.get(person.id)
+        assertNotNull currentPerson
+        assertEquals origBannerId, currentPerson.bannerId
+        assertEquals "Adams", currentPerson.lastName
+        assertEquals 0L, currentPerson.version
+
+        // Check the alternate id
+        def alternatePersons = PersonIdentificationNameAlternate.fetchAllByPidm(currentPerson.pidm)
+        assertEquals 1, alternatePersons.size()
+
+        alternatePerson = alternatePersons.get(0)
+        assertNotNull alternatePerson?.pidm
+        assertEquals "N", alternatePerson.changeIndicator
+        assertEquals origBannerId, alternatePerson.bannerId
+        assertEquals altLastName, alternatePerson.lastName
+        assertEquals altFirstName, alternatePerson.firstName
+        assertEquals altMiddleName, alternatePerson.middleName
+        assertEquals 0L, alternatePerson.version
     }
 
 
-    void testCreateNonPersonIdentificationNameAlternateBannerIdChange() {
-        def personIdentificationNameCurrent = setupNewNonPersonIdentificationNameCurrent()
-        def personIdentificationNameAlternate = newAlternateBannerId(personIdentificationNameCurrent, "ID-A00001")
-        personIdentificationNameAlternate = personIdentificationNameAlternateService.create([domainModel: personIdentificationNameAlternate])
+    void testCreateAlternatePersonIdentificationNameWithNullChangeIndicator() {
+        def person = setupNewPersonIdentificationNameCurrent()
 
-        def personIdentificationNameAlternates = PersonIdentificationNameAlternate.fetchAllByPidm(personIdentificationNameAlternate.pidm)
-        assertEquals 1, personIdentificationNameAlternates?.size()
-
-        personIdentificationNameAlternate = personIdentificationNameAlternates[0]
-
-        assertNotNull personIdentificationNameAlternate?.id
-        assertNotNull personIdentificationNameAlternate.pidm
-        assertEquals "ID-A00001", personIdentificationNameAlternate.bannerId
-        assertEquals "Acme Rockets and Anvils", personIdentificationNameAlternate.lastName
-        assertNull personIdentificationNameAlternate.firstName
-        assertNull personIdentificationNameAlternate.middleName
-        assertEquals "C", personIdentificationNameAlternate.entityIndicator
-        assertEquals "I",  personIdentificationNameAlternate.changeIndicator
-        assertEquals "CORP", personIdentificationNameAlternate.nameType.code
-        assertEquals 0L, personIdentificationNameAlternate.version
-    }
-
-
-    void testCreateNonPersonIdentificationNameAlternateNameChange() {
-        def personIdentificationNameCurrent = setupNewNonPersonIdentificationNameCurrent()
-        def personIdentificationNameAlternate = newAlternateName(personIdentificationNameCurrent, [lastName: "Ellucian"])
-        personIdentificationNameAlternate = personIdentificationNameAlternateService.create([domainModel: personIdentificationNameAlternate])
-        def bannerId = personIdentificationNameAlternate.bannerId
-
-        def personIdentificationNameAlternates = PersonIdentificationNameAlternate.fetchAllByPidm(personIdentificationNameAlternate.pidm)
-        assertEquals 1, personIdentificationNameAlternates?.size()
-
-        personIdentificationNameAlternate = personIdentificationNameAlternates[0]
-        assertNotNull personIdentificationNameAlternate?.id
-        assertNotNull personIdentificationNameAlternate.pidm
-        assertEquals bannerId, personIdentificationNameAlternate.bannerId
-        assertEquals "Ellucian", personIdentificationNameAlternate.lastName
-        assertNull personIdentificationNameAlternate.firstName
-        assertNull personIdentificationNameAlternate.middleName
-        assertEquals "C", personIdentificationNameAlternate.entityIndicator
-        assertEquals "N", personIdentificationNameAlternate.changeIndicator
-        assertEquals "CORP", personIdentificationNameAlternate.nameType.code
-        assertEquals 0L, personIdentificationNameAlternate.version
-    }
-
-
-    void testCreateWithInvalidChangeIndicator() {
-        def personIdentificationNameCurrent = setupNewPersonIdentificationNameCurrent()
-        def personIdentificationNameAlternate = newAlternateBannerId(personIdentificationNameCurrent, "ID-A00001")
-        personIdentificationNameAlternate.changeIndicator = null
+        def alternatePerson = newPersonIdentificationNameAlternate(person)
+        alternatePerson.bannerId = 'ID-ALT001'
+        alternatePerson.changeIndicator = null
 
         try {
-            personIdentificationNameAlternate = personIdentificationNameAlternateService.create([domainModel: personIdentificationNameAlternate]) fail "Should have failed because change indicator must be null."
-            fail "Should have failed because you cannot create an alternate identification record with a null change indicator."
+            personIdentificationNameAlternateService.create([domainModel: alternatePerson])
+            fail "Should have failed because change indicator must be null."
         }
         catch (ApplicationException ae) {
             assertApplicationException ae, "changeIndicatorCannotBeNull"
@@ -134,51 +116,123 @@ class PersonIdentificationNameAlternateServiceIntegrationTests extends BaseInteg
     }
 
 
-    void testUpdatePersonIdentificationNameAlternate() {
-        def personIdentificationNameCurrent = setupNewPersonIdentificationNameCurrent()
-        def personIdentificationNameAlternate = newAlternateBannerId(personIdentificationNameCurrent, "ID-A00001")
-        personIdentificationNameAlternate = personIdentificationNameAlternateService.create([domainModel: personIdentificationNameAlternate])
+    void testUpdateAlternateNameType() {
+        def altId = "ID-ALT001"
+        def person = setupNewPersonIdentificationNameCurrent()
 
-        personIdentificationNameAlternate.bannerId = "ID-U00001"
+        // Create id change
+        def alternatePerson = setupNewPersonIdentificationNameAlternateId(person, altId)
+        assertNotNull alternatePerson
+        def alternatePersonId = alternatePerson.id
+
+        alternatePerson.nameType = NameType.findByCode("PROF")
+        alternatePerson = personIdentificationNameAlternateService.update([domainModel: alternatePerson])
+
+        alternatePerson = PersonIdentificationNameAlternate.get(alternatePersonId)
+        assertNotNull alternatePerson
+        assertEquals "PROF", alternatePerson.nameType.code
+    }
+
+
+    void testUpdateAlternateOtherThanNameType() {
+        def person = setupNewPersonIdentificationNameCurrent()
+
+        // Create id change
+        def alternatePerson = setupNewPersonIdentificationNameAlternateId(person, "ID-ALT001")
+        assertNotNull alternatePerson
+        def alternatePersonId = alternatePerson.id
+
+        alternatePerson.lastName = "Update Name"
 
         try {
-            personIdentificationNameAlternateService.update([domainModel: personIdentificationNameAlternate])
-            fail("This should have failed with @@r1:unsupported.operation")
+            personIdentificationNameAlternateService.update([domainModel: alternatePerson])
+            fail "should have failed because you can only update name type on alternate id records"
         }
         catch (ApplicationException ae) {
-            assertApplicationException ae, "unsupported.operation"
+            assertApplicationException ae, "The only change to history records allowed is Name Type."
         }
     }
 
 
-    void testDeletePersonIdentificationNameAlternate() {
-        def personIdentificationNameCurrent = setupNewPersonIdentificationNameCurrent()
-        def personIdentificationNameAlternate = newAlternateBannerId(personIdentificationNameCurrent, "ID-A00001")
-        personIdentificationNameAlternate = personIdentificationNameAlternateService.create([domainModel: personIdentificationNameAlternate])
-        assertNotNull personIdentificationNameAlternate?.id
-        def id = personIdentificationNameAlternate.id
+    void testDeleteAlternatePersonIdentificationName() {
+        def person = setupNewPersonIdentificationNameCurrent()
 
-        personIdentificationNameAlternate = personIdentificationNameAlternate.get(id)
-        assertNotNull personIdentificationNameAlternate?.id
+        def altBannerId = "ID-A00001"
+        def altLastName = "ALTERNATE_LAST_NAME"
+        def altFirstName = "ALTERNATE_FIRST_NAME"
 
-        personIdentificationNameAlternateService.delete([domainModel: personIdentificationNameAlternate])
-        assertNull "Alternate identification should have been deleted", PersonIdentificationNameAlternate.get(id)
+        // Create some alternate id records
+        def alternatePerson1 = setupNewPersonIdentificationNameAlternateId(person, altBannerId)
+        def alternatePerson2 = setupNewPersonIdentificationNameAlternateName(person, [lastName: altLastName, firstName: altFirstName])
+
+        def personList = PersonIdentificationNameAlternate.fetchAllByPidm(person.pidm)
+        assertEquals 2, personList.size()
+
+        personIdentificationNameAlternateService.delete([domainModel: alternatePerson1])
+        personIdentificationNameAlternateService.delete([domainModel: alternatePerson2])
+
+        personList = PersonIdentificationNameAlternate.fetchAllByPidm(person.pidm)
+        assertEquals 0, personList.size()
+    }
+
+    // *************************************************************************************************************
+    //  End tests.
+    // *************************************************************************************************************
+    /**
+     * Setup a new PersonIdentificationNameCurrent for testing.
+     */
+    private def setupNewPersonIdentificationNameCurrent() {
+        def personIdentificationNameCurrent = newPersonIdentificationNameCurrent(generateBannerId(), generatePidm())
+
+        save personIdentificationNameCurrent
+        assertNotNull personIdentificationNameCurrent.id
+        assertNotNull personIdentificationNameCurrent.bannerId
+        assertNotNull personIdentificationNameCurrent.pidm
+        assertEquals 0L, personIdentificationNameCurrent.version
+        return personIdentificationNameCurrent
     }
 
     /**
-     * Creates a new person current id record.
+     * Creates a new alternate id record with a banner id change.
      */
-    private def setupNewPersonIdentificationNameCurrent() {
-        // Generate the banner id and pidm
-        def sql = new Sql(sessionFactory.getCurrentSession().connection())
-        String idSql = """select gb_common.f_generate_id bannerId, gb_common.f_generate_pidm pidm from dual """
-        def bannerValues = sql.firstRow(idSql)
-        def bannerId = bannerValues.bannerId
-        def pidm = bannerValues.pidm
+    private def setupNewPersonIdentificationNameAlternateId(currentPerson, altBannerId) {
+        def alternatePerson = newPersonIdentificationNameAlternate(currentPerson)
+        alternatePerson.bannerId = altBannerId
+        alternatePerson.changeIndicator = "I"
 
+        alternatePerson = personIdentificationNameAlternateService.create([domainModel: alternatePerson])
+        assertNotNull alternatePerson
+        assertNotNull alternatePerson.id
+        assertEquals altBannerId, alternatePerson.bannerId
+        assertEquals 0L, alternatePerson.version
+
+        alternatePerson
+    }
+
+    /**
+     * Creates a new alternate id record with a name change.
+     */
+    private def setupNewPersonIdentificationNameAlternateName(currentPerson, names) {
+
+        def alternatePerson = newPersonIdentificationNameAlternate(currentPerson)
+        alternatePerson.changeIndicator = "N"
+        alternatePerson.lastName = names["lastName"]
+        alternatePerson.firstName = names["firstName"]
+        alternatePerson.middleName = names["middleName"]
+
+        alternatePerson = personIdentificationNameAlternateService.create([domainModel: alternatePerson])
+        assertNotNull alternatePerson?.id
+        assertEquals names["lastName"], alternatePerson.lastName
+        assertEquals 0L, alternatePerson.version
+
+        alternatePerson
+    }
+
+
+    private def newPersonIdentificationNameCurrent(bannerId, pidm) {
         def personIdentificationNameCurrent = new PersonIdentificationNameCurrent(
-                pidm: pidm,
                 bannerId: bannerId,
+                pidm: pidm,
                 lastName: "Adams",
                 firstName: "Troy",
                 middleName: "W",
@@ -187,72 +241,41 @@ class PersonIdentificationNameAlternateServiceIntegrationTests extends BaseInteg
                 nameType: NameType.findByCode("BRTH")
         )
 
-        personIdentificationNameCurrent.save(failOnError: true, flush: true)
-        assertNotNull personIdentificationNameCurrent?.id
-
         return personIdentificationNameCurrent
     }
 
-    /**
-     * Creates a new non-person current id record.
-     */
-    private def setupNewNonPersonIdentificationNameCurrent() {
-        // Generate the banner id and pidm
-        def sql = new Sql(sessionFactory.getCurrentSession().connection())
-        String idSql = """select gb_common.f_generate_id bannerId, gb_common.f_generate_pidm pidm from dual """
-        def bannerValues = sql.firstRow(idSql)
-        def bannerId = bannerValues.bannerId
-        def pidm = bannerValues.pidm
 
-        def personIdentificationNameCurrent = new PersonIdentificationNameCurrent(
-                pidm: pidm,
-                bannerId: bannerId,
-                lastName: "Acme Rockets and Anvils",
-                changeIndicator: null,
-                entityIndicator: "C",
-                nameType: NameType.findByCode("CORP")
-        )
-
-        personIdentificationNameCurrent.save(failOnError: true, flush: true)
-        assertNotNull personIdentificationNameCurrent?.id
-        assertNotNull personIdentificationNameCurrent?.pidm
-
-        return personIdentificationNameCurrent
-    }
-
-    /**
-     * Creates a new alternate id record with a banner id change.
-     */
-    private def newAlternateBannerId(currentPerson, String newBannerId) {
-        def alternatePerson = new PersonIdentificationNameAlternate(
-                pidm: currentPerson.pidm,
-                bannerId: newBannerId,
-                lastName: currentPerson.lastName,
-                firstName: currentPerson.firstName,
-                middleName: currentPerson.middleName,
-                changeIndicator: "I",
-                entityIndicator: currentPerson.entityIndicator,
-                nameType: currentPerson.nameType
-        )
-
-        return alternatePerson
-    }
-
-    /**
-     * Creates a new alternate id record with a name change.
-     */
-    private def newAlternateName(currentPerson, names) {
+    private def newPersonIdentificationNameAlternate(currentPerson) {
         def alternatePerson = new PersonIdentificationNameAlternate(
                 pidm: currentPerson.pidm,
                 bannerId: currentPerson.bannerId,
-                lastName: names["lastName"],
-                firstName: names["firstName"],
-                middleName: names["middleName"],
-                changeIndicator: "N",
+                lastName: currentPerson.lastName,
+                firstName: currentPerson.firstName,
+                middleName: currentPerson.middleName,
+                changeIndicator: currentPerson.changeIndicator,
                 entityIndicator: currentPerson.entityIndicator,
                 nameType: currentPerson.nameType
         )
 
         return alternatePerson
     }
+
+
+    private def generateBannerId() {
+        def sql = new Sql(sessionFactory.getCurrentSession().connection())
+        String idSql = """select gb_common.f_generate_id bannerId from dual """
+        def bannerValues = sql.firstRow(idSql)
+
+        return bannerValues.bannerId
+    }
+
+
+    private def generatePidm() {
+        def sql = new Sql(sessionFactory.getCurrentSession().connection())
+        String idSql = """select gb_common.f_generate_pidm pidm from dual """
+        def bannerValues = sql.firstRow(idSql)
+
+        return bannerValues.pidm
+    }
+
 }

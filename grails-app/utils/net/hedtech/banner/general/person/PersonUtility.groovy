@@ -4,11 +4,14 @@
 package net.hedtech.banner.general.person
 
 import groovy.sql.Sql
+import net.hedtech.banner.service.ServiceBase
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.codehaus.groovy.grails.web.context.ServletContextHolder as SCH
 import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes as GA
 import org.springframework.context.ApplicationContext
 import org.springframework.context.i18n.LocaleContextHolder
+
+import java.sql.CallableStatement
 
 /**
  * This is a helper class that is used to help common validation and other processing for
@@ -121,5 +124,67 @@ class PersonUtility {
             message = "\$lastName, \$firstName"
         }
 
+    }
+
+
+    private static def boolean isDirtyProperty(domainClass, domainObject, String property) {
+        def content = ServiceBase.extractParams(domainClass, domainObject)
+        def oldDomainObject = domainClass.get(content?.id)
+        oldDomainObject.properties = content
+
+        return (property in oldDomainObject.dirtyPropertyNames)
+    }
+
+
+    public static boolean isPiiActive() {
+        def connection
+        CallableStatement sqlCall
+        def piiActive = "N"
+        def sessionFactory = SCH.servletContext.getAttribute(GA.APPLICATION_CONTEXT)?.sessionFactory
+
+        try {
+            connection = sessionFactory.currentSession.connection()
+            sqlCall = connection.prepareCall("{ ? = call gokfgac.f_spriden_pii_active }")
+            sqlCall.registerOutParameter(1, java.sql.Types.VARCHAR)
+            sqlCall.executeUpdate()
+            piiActive = sqlCall.getString(1)
+        }
+        finally {
+            sqlCall?.close()
+        }
+
+        return (piiActive == "Y")
+    }
+
+
+    public static turnFgacOff() {
+        def connection
+        CallableStatement sqlCall
+        def sessionFactory = SCH.servletContext.getAttribute(GA.APPLICATION_CONTEXT)?.sessionFactory
+
+        try {
+            connection = sessionFactory.currentSession.connection()
+            sqlCall = connection.prepareCall("{ call gokfgac.p_turn_fgac_off }")
+            sqlCall.executeUpdate()
+        }
+        finally {
+            sqlCall?.close()
+        }
+    }
+
+
+    public static turnFgacOn() {
+        def connection
+        CallableStatement sqlCall
+        def sessionFactory = SCH.servletContext.getAttribute(GA.APPLICATION_CONTEXT)?.sessionFactory
+
+        try {
+            connection = sessionFactory.currentSession.connection()
+            sqlCall = connection.prepareCall("{ call gokfgac.p_turn_fgac_on }")
+            sqlCall.executeUpdate()
+        }
+        finally {
+            sqlCall?.close()
+        }
     }
 }

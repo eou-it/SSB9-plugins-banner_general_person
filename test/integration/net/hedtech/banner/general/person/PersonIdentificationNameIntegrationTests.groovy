@@ -295,6 +295,73 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+    void testFetchPersonBySoundexName() {
+        def personIdentificationName1 = newPersonIdentificationName()
+        personIdentificationName1.firstName = "One"
+        personIdentificationName1.lastName = "UnitTest"
+        save personIdentificationName1
+        //This is required to compute grails derived columns
+        personIdentificationName1.refresh()
+        //Test if the generated entity now has an id assigned
+        assertNotNull personIdentificationName1.id
+
+        def personIdentificationName2 = newPersonIdentificationName()
+        personIdentificationName2.firstName = "One"
+        personIdentificationName2.lastName = "UnitTest2"
+        save personIdentificationName2
+        //This is required to compute grails derived columns
+        personIdentificationName2.refresh()
+        //Test if the generated entity now has an id assigned
+        assertNotNull personIdentificationName2.id
+
+        def results = PersonIdentificationName.fetchPersonBySoundexName("UnitTest", "One")
+        assertNotNull results
+        assertEquals results?.size(), 2
+    }
+
+    void testFetchNonPersonBySoundexName() {
+        def personIdentificationName1 = newPersonIdentificationName()
+        personIdentificationName1.firstName = null
+        personIdentificationName1.lastName = "UnitTest"
+        personIdentificationName1.entityIndicator = "C"
+        save personIdentificationName1
+        //This is required to compute grails derived columns
+        personIdentificationName1.refresh()
+        //Test if the generated entity now has an id assigned
+        assertNotNull personIdentificationName1.id
+
+        def personIdentificationName2 = newPersonIdentificationName()
+        personIdentificationName2.firstName = null
+        personIdentificationName2.lastName = "UnitTest2"
+        personIdentificationName2.entityIndicator = "C"
+        save personIdentificationName2
+        //This is required to compute grails derived columns
+        personIdentificationName2.refresh()
+        //Test if the generated entity now has an id assigned
+        assertNotNull personIdentificationName2.id
+
+        def results = PersonIdentificationName.fetchNonPersonBySoundexName("UnitTest")
+        assertNotNull results
+        assertEquals results?.size(), 2
+    }
+
+
+    void testBannerIdOrNameExists() {
+        def person = newPersonIdentificationName()
+        person.save(flush: true, failOnError: true)
+
+        assertTrue PersonIdentificationName.bannerIdOrNameExists(
+                person.pidm, person.bannerId,
+                person.lastName, person.firstName, person.middleName,
+                person.nameType.code, person.surnamePrefix)
+
+        assertFalse PersonIdentificationName.bannerIdOrNameExists(
+                person.pidm, person.bannerId,
+                person.lastName, person.firstName, person.middleName,
+                person.nameType.code, "X")
+    }
+
+
     void testFetchPersonCurrentRecord() {
         // you cannot update the spriden ID or name using the sv_spriden
         def sql = new Sql(sessionFactory.getCurrentSession().connection())

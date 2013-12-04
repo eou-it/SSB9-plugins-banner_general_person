@@ -1,8 +1,10 @@
 /*********************************************************************************
-Copyright 2012 Ellucian Company L.P. and its affiliates.
-**********************************************************************************/
- package net.hedtech.banner.general.person
+ Copyright 2012 Ellucian Company L.P. and its affiliates.
+ ********************************************************************************* */
+package net.hedtech.banner.general.person
 
+import net.hedtech.banner.exceptions.ApplicationException
+import net.hedtech.banner.general.system.InstitutionalDescription
 import net.hedtech.banner.service.ServiceBase
 
 // NOTE:
@@ -16,5 +18,32 @@ import net.hedtech.banner.service.ServiceBase
 class PersonBasicPersonBaseService extends ServiceBase {
 
     boolean transactional = true
+
+
+    def preCreate(map) {
+        if (map?.domainModel) {
+            validateSsn(map.domainModel)
+        }
+    }
+
+
+    def preUpdate(map) {
+        if (map?.domainModel) {
+            if (PersonUtility.isDirtyProperty(PersonBasicPersonBase, map.domainModel, "ssn")) {
+                validateSsn(map.domainModel)
+            }
+        }
+    }
+
+
+    private def validateSsn(domain) {
+        def institutionalDescription = InstitutionalDescription.fetchByKey()
+
+        if (domain.ssn && institutionalDescription.ssnMaximumLength) {
+            if (domain.ssn.length() > institutionalDescription.ssnMaximumLength) {
+                throw new ApplicationException(PersonBasicPersonBase, "@@r1:ssnMaximumLengthExceeded:${institutionalDescription.ssnMaximumLength}@@")
+            }
+        }
+    }
 
 }

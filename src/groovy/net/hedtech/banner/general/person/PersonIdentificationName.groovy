@@ -77,11 +77,29 @@ query = """FROM PersonIdentificationName a
                         WHERE a.bannerId = :filter
                         and a.entityIndicator = 'P'
                         and a.changeIndicator = 'I' """),
+@NamedQuery(name = "PersonIdentificationName.fetchPersonBySoundexName",
+query = """FROM PersonIdentificationName a
+                        WHERE (:lastName is null OR a.soundexLastName = SOUNDEX(:lastName))
+                        and (:firstName is null OR a.soundexFirstName = SOUNDEX(:firstName))
+                        and a.entityIndicator = 'P' """),
+@NamedQuery(name = "PersonIdentificationName.fetchNonPersonBySoundexName",
+query = """FROM PersonIdentificationName a
+                        WHERE (:lastName is null OR a.soundexLastName = SOUNDEX(:lastName))
+                        and a.entityIndicator = 'C' """),
 @NamedQuery(name = "PersonIdentificationName.fetchPersonCurrentRecord",
 query = """FROM PersonIdentificationName a
                         WHERE a.entityIndicator = 'P'
                         and a.changeIndicator is null
-                        and a.pidm in (select pidm from PersonIdentificationName where bannerId = :bannerId and entityIndicator = 'P') """)
+                        and a.pidm in (select pidm from PersonIdentificationName where bannerId = :bannerId and entityIndicator = 'P') """),
+@NamedQuery(name = "PersonIdentificationName.fetchByPidmAndBannerIdAndName",
+query = """FROM  PersonIdentificationName a
+	       WHERE a.pidm = :pidm
+	         AND a.bannerId = :bannerId
+	         AND a.lastName = :lastName
+	         AND COALESCE(a.firstName, '@') = COALESCE(:firstName, '@')
+	         AND COALESCE(a.middleName, '@') = COALESCE(:middleName, '@')
+	         AND COALESCE(a.nameType.code, '@') = COALESCE(:nameTypeCode, '@')
+	         AND COALESCE(a.surnamePrefix, '@') = COALESCE(:surnamePrefix, '@') """)
 ])
 @DatabaseModifiesState
 class PersonIdentificationName implements Serializable {
@@ -578,6 +596,32 @@ class PersonIdentificationName implements Serializable {
     public static Map fetchNonPersonByNameOrBannerId(pagingAndSortParams) {
         //Reason is person lookup will have performance issues when filter is unavailable
         return [list: []]
+    }
+
+    public static List fetchPersonBySoundexName(String lastName, String firstName) {
+        def persons = PersonIdentificationName.withSession {session ->
+            session.getNamedQuery('PersonIdentificationName.fetchPersonBySoundexName').setString('lastName', lastName).setString('firstName', firstName).list()
+        }
+        return persons
+    }
+
+    public static List fetchNonPersonBySoundexName(String lastName) {
+        def nonPersons = PersonIdentificationName.withSession {session ->
+            session.getNamedQuery('PersonIdentificationName.fetchNonPersonBySoundexName').setString('lastName', lastName).list()
+        }
+        return nonPersons
+    }
+
+    // During a banner id or name change, this checks for existence of a record with the same attributes.
+    public static boolean bannerIdOrNameExists(Integer pidm, String bannerId, String lastName, String firstName, String middleName,
+                                                   String nameTypeCode, String surnamePrefix) {
+        def personIdentificationNames = []
+
+        personIdentificationNames = PersonIdentificationName.withSession { session ->
+            def list = session.getNamedQuery('PersonIdentificationName.fetchByPidmAndBannerIdAndName').setInteger('pidm', pidm).setString('bannerId', bannerId).setString('lastName', lastName).setString('firstName', firstName).setString('middleName', middleName).setString('nameTypeCode', nameTypeCode).setString('surnamePrefix', surnamePrefix).list()
+        }
+
+        return !personIdentificationNames?.isEmpty()
     }
 
 }

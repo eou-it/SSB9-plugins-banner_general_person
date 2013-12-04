@@ -359,7 +359,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
         alternateList << alternatePerson
 
         try {
-            personIdentificationNameCompositeService.createOrUpdate([personIdentificationNameCurrents: alternateList])
+            personIdentificationNameCompositeService.createOrUpdate([personIdentificationNameAlternates: alternateList])
             fail "This should have failed with @@r1:readonlyFieldsCannotBeModified"
         }
         catch (ApplicationException ae) {
@@ -561,7 +561,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
         person.bannerId = updateBannerId
         def updatedPersonList = []
         updatedPersonList << person
-        personIdentificationNameCompositeService.createOrUpdate([personIdentificationNameAlternates: updatedPersonList])
+        personIdentificationNameCompositeService.createOrUpdate([personIdentificationNameCurrents: updatedPersonList])
 
         // We should have 3 alternate id records
         def updatedPersons = PersonIdentificationNameAlternate.fetchAllByPidm(person.pidm)

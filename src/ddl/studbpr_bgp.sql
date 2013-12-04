@@ -30,11 +30,11 @@ REM   SV_SPRIDEN SHOULD NOT HAVE AN "INSTEAD OF UPDATE" TRIGGER
 REM
 start sv_spriden_cur_d_trg
 start sv_spriden_cur_i_trg
-REM   SV_SPRIDEN_CUR SHOULD NOT HAVE AN "INSTEAD OF UPDATE" TRIGGER
+start sv_spriden_cur_u_trg
 REM
 start sv_spriden_alt_d_trg
 start sv_spriden_alt_i_trg
-REM   SV_SPRIDEN_ALT SHOULD NOT HAVE AN "INSTEAD OF UPDATE" TRIGGER
+start sv_spriden_alt_u_trg
 REM
 start sv_sprmedi_del_trg
 start sv_sprmedi_ins_trg

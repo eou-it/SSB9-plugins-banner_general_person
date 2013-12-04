@@ -25,7 +25,7 @@ query = """FROM  PersonIdentificationNameCurrent a
 	       WHERE a.bannerId = :bannerId """),
 @NamedQuery(name = "PersonIdentificationNameCurrent.fetchByPidm",
 query = """FROM  PersonIdentificationNameCurrent a
-	       WHERE a.pidm = :pidm """),
+	       WHERE a.pidm = :pidm """)
 ])
 @DatabaseModifiesState
 class PersonIdentificationNameCurrent implements Serializable {
@@ -391,6 +391,5 @@ class PersonIdentificationNameCurrent implements Serializable {
 
         return personIdentificationNameCurrent
     }
-
 
 }

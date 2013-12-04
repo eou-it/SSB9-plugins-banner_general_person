@@ -666,6 +666,20 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
         assertNotNull newPersonBasicPersonBase.id
     }
 
+    void testFetchBySsn() {
+        def personBasicPersonBase1 = newValidForCreatePersonBasicPersonBase()
+        personBasicPersonBase1.save(failOnError: true, flush: true)
+        assertNotNull personBasicPersonBase1.id
+
+        def personBasicPersonBase2 = newValidForCreatePersonBasicPersonBase()
+        personBasicPersonBase2.save(failOnError: true, flush: true)
+        assertNotNull personBasicPersonBase2.id
+
+        def bioList = PersonBasicPersonBase.fetchBySsn(personBasicPersonBase1.ssn)
+
+        assertEquals 2, bioList.size()
+    }
+
 
     private def newValidForCreatePersonBasicPersonBase() {
         def sql = new Sql(sessionFactory.getCurrentSession().connection())
@@ -686,8 +700,11 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
         person.save(flush: true, failOnError: true)
         assert person.id
 
-        def unitOfMeasure = newUnitOfMeasure()
-        unitOfMeasure.save(failOnError: true, flush: true)
+        def unitOfMeasure = UnitOfMeasure.findByCode("LB")
+        if (!unitOfMeasure?.id) {
+            unitOfMeasure = newUnitOfMeasure()
+            unitOfMeasure.save(failOnError: true, flush: true)
+        }
 
         def personBasicPersonBase = new PersonBasicPersonBase(
                 pidm: ipidm,
