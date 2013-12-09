@@ -20,31 +20,38 @@ class PersonIdentificationNameAlternateService extends ServiceBase {
     def sessionFactory
 
 
-    def preCreate(map) {
-        if (map?.domainModel) {
-            if (!map.domainModel.changeIndicator) {
-                throw new ApplicationException(PersonIdentificationNameCurrent, "@@r1:changeIndicatorCannotBeNull@@")
-            }
+    def preCreate(domainModelOrMap) {
+        def domain = domainModelOrMap instanceof Map ? domainModelOrMap?.domainModel : domainModelOrMap
 
-            checkBannerIdOrNameExists(map.domainModel)
+        if (domain) {
+            validateChangeIndicator(domain.changeIndicator)
+            checkBannerIdOrNameExists(domain)
         }
     }
 
 
-    def preDelete(map) {
-        if (!map?.domainModel?.changeIndicator) {
-            throw new ApplicationException(PersonIdentificationNameCurrent, "@@r1:changeIndicatorCannotBeNull@@")
+    def preDelete(domainModelOrMap) {
+        def domain = domainModelOrMap instanceof Map ? domainModelOrMap?.domainModel : domainModelOrMap
+
+        if (domain) {
+            validateChangeIndicator(domain.changeIndicator)
         }
     }
 
 
-    def preUpdate(map) {
-        if (map?.domainModel) {
-            if (!map?.domainModel?.changeIndicator) {
-                throw new ApplicationException(PersonIdentificationNameCurrent, "@@r1:changeIndicatorCannotBeNull@@")
-            }
+    def preUpdate(domainModelOrMap) {
+        def domain = domainModelOrMap instanceof Map ? domainModelOrMap?.domainModel : domainModelOrMap
 
-            checkBannerIdOrNameExists(map.domainModel)
+        if (domain) {
+            validateChangeIndicator(domain.changeIndicator)
+            checkBannerIdOrNameExists(domain)
+        }
+    }
+
+
+    private def validateChangeIndicator(changeIndicator) {
+        if (!changeIndicator) {
+            throw new ApplicationException(PersonIdentificationNameAlternate, "@@r1:changeIndicatorCannotBeNull@@")
         }
     }
 

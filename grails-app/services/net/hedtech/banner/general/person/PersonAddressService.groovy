@@ -18,14 +18,17 @@ class PersonAddressService extends ServiceBase {
     boolean transactional = true
 
 
-    void preUpdate(map) {
-        def dirtyProperties = map.domainModel.getDirtyPropertyNames()
-        def changes = dirtyProperties.findAll { it == 'addressType' }
-        if (changes.size() > 0) {
-            log.warn "Attempt to modify ${map.domainModel.class} primary key ${changes}"
-            throw new RuntimeException("@@r1:primaryKeyFieldsCannotBeModified@@")
+    void preUpdate(domainModelOrMap) {
+        def domain = domainModelOrMap instanceof Map ? domainModelOrMap?.domainModel : domainModelOrMap
+
+        if (domain) {
+            def dirtyProperties = domain.getDirtyPropertyNames()
+            def changes = dirtyProperties.findAll { it == 'addressType' }
+            if (changes.size() > 0) {
+                log.warn "Attempt to modify ${domain.class} primary key ${changes}"
+                throw new RuntimeException("@@r1:primaryKeyFieldsCannotBeModified@@")
+            }
         }
     }
-
 
 }

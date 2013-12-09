@@ -20,17 +20,21 @@ class PersonBasicPersonBaseService extends ServiceBase {
     boolean transactional = true
 
 
-    def preCreate(map) {
-        if (map?.domainModel) {
-            validateSsn(map.domainModel)
+    def preCreate(domainModelOrMap) {
+        def domain = domainModelOrMap instanceof Map ? domainModelOrMap?.domainModel : domainModelOrMap
+
+        if (domain) {
+            validateSsn(domain)
         }
     }
 
 
-    def preUpdate(map) {
-        if (map?.domainModel) {
-            if (PersonUtility.isDirtyProperty(PersonBasicPersonBase, map.domainModel, "ssn")) {
-                validateSsn(map.domainModel)
+    def preUpdate(domainModelOrMap) {
+        def domain = domainModelOrMap instanceof Map ? domainModelOrMap?.domainModel : domainModelOrMap
+
+        if (domain) {
+            if (PersonUtility.isDirtyProperty(PersonBasicPersonBase, domain, "ssn")) {
+                validateSsn(domain)
             }
         }
     }

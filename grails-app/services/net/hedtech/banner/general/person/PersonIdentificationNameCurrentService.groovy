@@ -23,33 +23,41 @@ class PersonIdentificationNameCurrentService extends ServiceBase {
     def sessionFactory
 
 
-    def preCreate(map) {
-        if (map?.domainModel) {
-            if (map.domainModel.changeIndicator) {
-                throw new ApplicationException(PersonIdentificationNameCurrent, "@@r1:changeIndicatorMustBeNull@@")
-            }
+    def preCreate(domainModelOrMap) {
+        def domain = domainModelOrMap instanceof Map ? domainModelOrMap?.domainModel : domainModelOrMap
 
-            validateId(map.domainModel)
+        if (domain) {
+            validateChangeIndicator(domain.changeIndicator)
+            validateId(domain)
         }
     }
 
 
-    def preDelete(map) {
-        if (map?.domainModel?.changeIndicator) {
+    def preDelete(domainModelOrMap) {
+        def domain = domainModelOrMap instanceof Map ? domainModelOrMap?.domainModel : domainModelOrMap
+
+        if (domain) {
+            validateChangeIndicator(domain.changeIndicator)
+        }
+    }
+
+
+    def preUpdate(domainModelOrMap) {
+        def domain = domainModelOrMap instanceof Map ? domainModelOrMap?.domainModel : domainModelOrMap
+
+        if (domain) {
+            validateChangeIndicator(domain.changeIndicator)
+
+            if (PersonUtility.isDirtyProperty(PersonIdentificationNameCurrent, domain, "bannerId")) {
+                validateId(domain)
+            }
+        }
+    }
+
+
+    private def validateChangeIndicator(changeIndicator) {
+        if (changeIndicator) {
             throw new ApplicationException(PersonIdentificationNameCurrent, "@@r1:changeIndicatorMustBeNull@@")
-        }
-    }
-
-
-    def preUpdate(map) {
-        if (map?.domainModel) {
-            if (map.domainModel.changeIndicator) {
-                throw new ApplicationException(PersonIdentificationNameCurrent, "@@r1:changeIndicatorMustBeNull@@")
-            }
-
-            if (PersonUtility.isDirtyProperty(PersonIdentificationNameCurrent, map.domainModel, "bannerId")) {
-                validateId(map.domainModel)
-            }
         }
     }
 

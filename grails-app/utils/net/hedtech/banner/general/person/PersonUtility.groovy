@@ -127,7 +127,7 @@ class PersonUtility {
     }
 
 
-    private static def boolean isDirtyProperty(domainClass, domainObject, String property) {
+    public static def boolean isDirtyProperty(domainClass, domainObject, String property) {
         def content = ServiceBase.extractParams(domainClass, domainObject)
         def oldDomainObject = domainClass.get(content?.id)
         oldDomainObject.properties = content
