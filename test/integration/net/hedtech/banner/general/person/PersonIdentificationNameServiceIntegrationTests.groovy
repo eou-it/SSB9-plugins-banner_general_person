@@ -27,20 +27,20 @@ class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTes
 
     void testCreatePersonIdentificationName() {
         def personIdentificationName = newPersonIdentificationName()
-        personIdentificationName = personIdentificationNameService.create([domainModel: personIdentificationName])
-        assertNotNull "PersonIdentificationName ID is null in PersonIdentificationName Service Tests Create", personIdentificationName.id
-        assertNotNull personIdentificationName.dataOrigin
-        assertNotNull personIdentificationName.lastModified
-        assertNotNull "PersonIdentificationName nameType is null in PersonIdentificationName Service Tests", personIdentificationName.nameType
-        assertNotNull "PersonIdentificationName pidm is null in PersonIdentificationName Service Tests", personIdentificationName.pidm
-        assertNotNull "PersonIdentificationName banner id is null in PersonIdentificationName Service Tests", personIdentificationName.bannerId
 
-    }
+        try {
+            personIdentificationName = personIdentificationNameService.create([domainModel: personIdentificationName])
+            fail("This should have failed with @@r1:unsupported.operation")
+        }
+        catch (ApplicationException ae) {
+            assertApplicationException ae, "unsupported.operation"
+        }
+     }
 
 
     void testUpdatePersonIdentificationName() {
         def personIdentificationName = newPersonIdentificationName()
-        personIdentificationName = personIdentificationNameService.create([domainModel: personIdentificationName])
+        personIdentificationName.save(failOnError: true, flush: true)
         //Test if the generated entity now has an id assigned
         assertNotNull personIdentificationName.id
 
@@ -56,49 +56,18 @@ class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTes
     }
 
 
-    void testPersonIdentificationNameDeleteWithNullChangeIndicator() {
+    void testDeletePersonIdentificationName() {
         def personIdentificationName = newPersonIdentificationName()
-        personIdentificationName = personIdentificationNameService.create([domainModel: personIdentificationName])
-        // cannot delete an ID
+        personIdentificationName.save(failOnError: true, flush: true)
         def id = personIdentificationName.id
+
         try {
             personIdentificationNameService.delete(id)
-            fail "should have failed because you cannot delete banner spriden"
+            fail("This should have failed with @@r1:unsupported.operation")
         }
         catch (ApplicationException ae) {
-            assertApplicationException ae, "Cannot delete current record."
+            assertApplicationException ae, "unsupported.operation"
         }
-
-    }
-
-
-    void testPersonIdentificationNameDelete() {
-        def personIdentificationName = newPersonIdentificationName()
-        personIdentificationName = personIdentificationNameService.create([domainModel: personIdentificationName])
-        assertNotNull personIdentificationName.id
-
-        def newPersonIdentificationName = new PersonIdentificationName(personIdentificationName.properties)
-        newPersonIdentificationName.changeIndicator = "N"
-        newPersonIdentificationName.lastName = 'YYYYY'
-        newPersonIdentificationName = personIdentificationNameService.create([domainModel: newPersonIdentificationName])
-        assertNotNull newPersonIdentificationName.id
-
-        def id = newPersonIdentificationName.id
-        personIdentificationNameService.delete(id)
-        // make sure it was deleted
-        assertNull PersonIdentificationName.get(id)
-    }
-
-
-    void testPersonIdentificationEntityCheck() {
-        def personIdentificationName = newPersonIdentificationName()
-        personIdentificationName = personIdentificationNameService.create([domainModel: personIdentificationName])
-        assertNotNull personIdentificationName.id
-        assertEquals('P', personIdentificationNameService.fetchEntityOfPerson(personIdentificationName.pidm))
-        def companyIdentificationName = newCompanyIdentificationName()
-        companyIdentificationName = personIdentificationNameService.create(companyIdentificationName)
-        assertNotNull companyIdentificationName.id
-        assertEquals('C', personIdentificationNameService.fetchEntityOfPerson(companyIdentificationName.pidm))
     }
 
 
@@ -137,97 +106,20 @@ class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTes
     }
 
 
-    void testLengthFullNameWithSureNamePrefix() {
-        def updateSql = """update  gordmsk set gordmsk_display_ind = 'Y' where  gordmsk_objs_code   = '**SSB_MASKING'
-               And Gordmsk_Block_Name  = 'F_FORMAT_NAME'
-               And Gordmsk_Column_Name = 'SPRIDEN_SURNAME_PREFIX' """
-        def sql = new Sql(sessionFactory.getCurrentSession().connection())
-        sql.executeUpdate(updateSql)
-        def ssbsql = "select gb_displaymask.f_ssb_format_name display from dual"
-        def ssbPrefix = sql.firstRow(ssbsql)
-        assertEquals "Y", ssbPrefix.display
-        def personIdentificationName2 = newPersonIdentificationName()
-        // max lengths: first 60, mi 60, last 60, surname 60
-        personIdentificationName2.firstName = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-        personIdentificationName2.middleName = "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
-        personIdentificationName2.lastName = "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL"
-        personIdentificationName2.surnamePrefix = "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS"
-        personIdentificationName2 = personIdentificationNameService.create([domainModel: personIdentificationName2])
-        assertNotNull personIdentificationName2.id
-        assertEquals "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL", personIdentificationName2.lastName
-        assertEquals "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", personIdentificationName2.firstName
-        assertEquals "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM", personIdentificationName2.middleName
-        assertEquals "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS", personIdentificationName2.surnamePrefix
-        assertEquals 60, personIdentificationName2.lastName.length()
-        assertEquals 60, personIdentificationName2.firstName.length()
-        assertEquals 60, personIdentificationName2.middleName.length()
-        assertEquals 60, personIdentificationName2.surnamePrefix.length()
-
-        def personFullName = PersonIdentificationName.findByPidm(personIdentificationName2.pidm)
-        assertTrue personFullName?.fullName?.length() <= 182
-        assertEquals "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL", personFullName.fullName
-
-    }
-
-
-    void testLengthFullNameWithOutSureNamePrefixDisplayed() {
-        def updateSql = """update  gordmsk set gordmsk_display_ind = 'N' where  gordmsk_objs_code   = '**SSB_MASKING'
-                  And Gordmsk_Block_Name  = 'F_FORMAT_NAME'
-                  And Gordmsk_Column_Name = 'SPRIDEN_SURNAME_PREFIX' """
-        def sql = new Sql(sessionFactory.getCurrentSession().connection())
-        sql.executeUpdate(updateSql)
-        def ssbsql = "select gb_displaymask.f_ssb_format_name display from dual"
-        def ssbPrefix = sql.firstRow(ssbsql)
-        assertEquals "N", ssbPrefix.display
-        def personIdentificationName2 = newPersonIdentificationName()
-        // max lengths: first 60, mi 60, last 60, surname 60
-        personIdentificationName2.firstName = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-        personIdentificationName2.middleName = "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
-        personIdentificationName2.lastName = "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL"
-        personIdentificationName2.surnamePrefix = "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS"
-        personIdentificationName2 = personIdentificationNameService.create([domainModel: personIdentificationName2])
-        assertNotNull personIdentificationName2.id
-        assertEquals "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL", personIdentificationName2.lastName
-        assertEquals "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", personIdentificationName2.firstName
-        assertEquals "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM", personIdentificationName2.middleName
-        assertEquals "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS", personIdentificationName2.surnamePrefix
-        assertEquals 60, personIdentificationName2.lastName.length()
-        assertEquals 60, personIdentificationName2.firstName.length()
-        assertEquals 60, personIdentificationName2.middleName.length()
-        assertEquals 60, personIdentificationName2.surnamePrefix.length()
-
-        def personFullName = PersonIdentificationName.findByPidm(personIdentificationName2.pidm)
-        assertTrue personFullName?.fullName?.length() <= 182
-        assertEquals "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL", personFullName.fullName
-
-    }
-
-
-    void testLengthFullNameForContract() {
-        def personIdentificationName2 = newCompanyIdentificationName()
-        // max lengths: first 60, mi 60, last 60, surname 60
-        personIdentificationName2.lastName = "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL"
-        personIdentificationName2 = personIdentificationNameService.create([domainModel: personIdentificationName2])
-        assertNotNull personIdentificationName2.id
-        assertEquals "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL", personIdentificationName2.lastName
-        assertNull personIdentificationName2.firstName
-        assertNull personIdentificationName2.middleName
-        assertEquals 60, personIdentificationName2.lastName.length()
-
-        def personFullName = PersonIdentificationName.findByPidm(personIdentificationName2.pidm)
-        assertTrue personFullName?.fullName?.length() == 60
-        assertEquals "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL", personFullName.fullName
-
-    }
-
-
     private def newPersonIdentificationName() {
         def inameType = NameType.findWhere(code: "PROF")
+
+        def sql = new Sql(sessionFactory.getCurrentSession().connection())
+        String idSql = """select gb_common.f_generate_id bannerId, gb_common.f_generate_pidm pidm from dual """
+        def bannerValues = sql.firstRow(idSql)
+        def ibannerId = bannerValues.bannerId
+        def ipidm = bannerValues.pidm
+
         // leave the pidm null to get a generated on, and the ID equal to GENERATED to get a newly
         // generated ID
         def personIdentificationName = new PersonIdentificationName(
-                pidm: null,
-                bannerId: 'GENERATED',
+                pidm: ipidm,
+                bannerId: ibannerId,
                 lastName: "TTTTT",
                 firstName: "TTTTT",
                 middleName: "TTTTT",

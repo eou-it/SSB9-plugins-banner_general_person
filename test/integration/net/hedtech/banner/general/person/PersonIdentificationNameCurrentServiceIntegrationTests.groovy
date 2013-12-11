@@ -300,6 +300,76 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
             assertApplicationException ae, "Cannot delete current record."
         }
     }
+
+
+    void testLengthFullNameWithSurnamePrefix() {
+        def updateSql = """update  gordmsk set gordmsk_display_ind = 'Y' where  gordmsk_objs_code   = '**SSB_MASKING'
+               And Gordmsk_Block_Name  = 'F_FORMAT_NAME'
+               And Gordmsk_Column_Name = 'SPRIDEN_SURNAME_PREFIX' """
+        def sql = new Sql(sessionFactory.getCurrentSession().connection())
+        sql.executeUpdate(updateSql)
+        def ssbsql = "select gb_displaymask.f_ssb_format_name display from dual"
+        def ssbPrefix = sql.firstRow(ssbsql)
+        assertEquals "Y", ssbPrefix.display
+
+        def bannerId = generateBannerId()
+        def person = newPersonIdentificationNameCurrent(bannerId, null)
+        // max lengths: first 60, mi 60, last 60, surname 60
+        person.firstName = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+        person.middleName = "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
+        person.lastName = "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL"
+        person.surnamePrefix = "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS"
+        person = personIdentificationNameCurrentService.create([domainModel: person])
+        assertNotNull person.id
+        assertEquals "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL", person.lastName
+        assertEquals "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", person.firstName
+        assertEquals "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM", person.middleName
+        assertEquals "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS", person.surnamePrefix
+        assertEquals 60, person.lastName.length()
+        assertEquals 60, person.firstName.length()
+        assertEquals 60, person.middleName.length()
+        assertEquals 60, person.surnamePrefix.length()
+
+        def person2 = PersonIdentificationNameCurrent.findByPidm(person.pidm)
+        assertTrue person2?.fullName?.length() <= 182
+        assertEquals "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL", person2.fullName
+
+    }
+
+
+    void testLengthFullNameWithOutSureNamePrefixDisplayed() {
+        def updateSql = """update  gordmsk set gordmsk_display_ind = 'N' where  gordmsk_objs_code   = '**SSB_MASKING'
+                  And Gordmsk_Block_Name  = 'F_FORMAT_NAME'
+                  And Gordmsk_Column_Name = 'SPRIDEN_SURNAME_PREFIX' """
+        def sql = new Sql(sessionFactory.getCurrentSession().connection())
+        sql.executeUpdate(updateSql)
+        def ssbsql = "select gb_displaymask.f_ssb_format_name display from dual"
+        def ssbPrefix = sql.firstRow(ssbsql)
+        assertEquals "N", ssbPrefix.display
+
+        def bannerId = generateBannerId()
+        def person = newPersonIdentificationNameCurrent(bannerId, null)
+        // max lengths: first 60, mi 60, last 60, surname 60
+        person.firstName = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+        person.middleName = "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
+        person.lastName = "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL"
+        person.surnamePrefix = "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS"
+        person = personIdentificationNameCurrentService.create([domainModel: person])
+        assertNotNull person.id
+        assertEquals "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL", person.lastName
+        assertEquals "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", person.firstName
+        assertEquals "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM", person.middleName
+        assertEquals "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS", person.surnamePrefix
+        assertEquals 60, person.lastName.length()
+        assertEquals 60, person.firstName.length()
+        assertEquals 60, person.middleName.length()
+        assertEquals 60, person.surnamePrefix.length()
+
+        def person2 = PersonIdentificationNameCurrent.findByPidm(person.pidm)
+        assertTrue person2?.fullName?.length() <= 182
+        assertEquals "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL", person2.fullName
+    }
+
     // *************************************************************************************************************
     //  Start non-person tests.
     // *************************************************************************************************************
@@ -378,6 +448,23 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
     }
 
 
+    void testLengthFullNameForContract() {
+        def bannerId = generateBannerId()
+        def nonPerson = newNonPersonIdentificationNameCurrent(bannerId, null)
+        nonPerson.lastName = "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL"
+        nonPerson = personIdentificationNameCurrentService.create([domainModel: nonPerson])
+        assertNotNull nonPerson.id
+        assertEquals "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL", nonPerson.lastName
+        assertNull nonPerson.firstName
+        assertNull nonPerson.middleName
+        assertEquals 60, nonPerson.lastName.length()
+
+        def nonPerson2 = PersonIdentificationNameCurrent.findByPidm(nonPerson.pidm)
+        assertTrue nonPerson2?.fullName?.length() == 60
+        assertEquals "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL", nonPerson2.fullName
+    }
+
+
     // *************************************************************************************************************
     //  End tests.
     // *************************************************************************************************************
@@ -432,7 +519,6 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
                 bannerId: bannerId,
                 pidm: pidm,
                 lastName: "Acme Rocket and Anvils",
-                middleName: "W",
                 changeIndicator: null,
                 entityIndicator: "C",
                 nameType: NameType.findByCode("CORP")

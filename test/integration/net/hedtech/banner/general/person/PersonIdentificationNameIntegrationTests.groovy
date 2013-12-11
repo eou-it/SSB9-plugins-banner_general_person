@@ -444,8 +444,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
                 middleName: "TTTTT",
                 changeIndicator: null,
                 entityIndicator: "P",
-                nameType: inameType,
-                lastModifiedBy: "grails"
+                nameType: inameType
         )
         return personIdentificationName
     }
