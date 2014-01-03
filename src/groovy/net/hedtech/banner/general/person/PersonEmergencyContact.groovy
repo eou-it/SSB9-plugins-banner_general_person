@@ -24,7 +24,8 @@ query = """ FROM PersonEmergencyContact a
 /**
  * Where clause on this entity present in forms:
  * Order by clause on this entity present in forms:
- */ @Entity
+ */
+@Entity
 @Table(name = "SV_SPREMRG")
 @DatabaseModifiesState
 class PersonEmergencyContact implements Serializable {
