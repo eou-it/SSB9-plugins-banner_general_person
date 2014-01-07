@@ -1,12 +1,13 @@
--- /*********************************************************************************
---  Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
---  ********************************************************************************* */
---  svq_spriden.sql
---
--- AUDIT TRAIL: 9.0
--- Read only view over SPRIDEN table           mhitrik 28-FEB-2012
--- AUDIT TRAIL END
---
+REM *****************************************************************************************
+REM * Copyright 2012-2013 Ellucian Company L.P. and its affiliates.                         *
+REM *****************************************************************************************
+REM svq_spriden.sql
+REM
+REM AUDIT TRAIL: 9.0
+REM mhitrik 28-FEB-2012
+REM 1. Read only view over SPRIDEN table
+REM AUDIT TRAIL END
+REM
 
 SET SCAN OFF;
 
