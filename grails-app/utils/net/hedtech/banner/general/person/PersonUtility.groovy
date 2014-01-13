@@ -101,6 +101,7 @@ class PersonUtility {
 
     //Public method for formatting a person's name based on the LinkedHashMap passed in.
     public static String formatName(person) {
+        if (!person) return null
         def nameFormat = getNameFormat()
         def displayName = nameFormat
         if (nameFormat.contains("\$lastName")) displayName = displayName.replace("\$lastName", person?.lastName)

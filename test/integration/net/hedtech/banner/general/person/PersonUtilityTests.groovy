@@ -1,5 +1,5 @@
 /*********************************************************************************
-  Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
@@ -7,7 +7,6 @@ package net.hedtech.banner.general.person
 import net.hedtech.banner.person.dsl.NameTemplate
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.junit.Ignore
 import org.springframework.context.ApplicationContext
 import org.springframework.context.i18n.LocaleContextHolder
 
@@ -79,6 +78,15 @@ class PersonUtilityTests extends BaseIntegrationTestCase {
             text
         }
         assertEquals displayName, formattedName
+    }
+
+
+    void testNullPersonFormatName() {
+        def formatName = PersonUtility.formatName([])
+        assertNull formatName
+
+        formatName = PersonUtility.formatName()
+        assertNull formatName
     }
 
 
