@@ -90,7 +90,6 @@ class PersonUtilityTests extends BaseIntegrationTestCase {
     }
 
 
-    @Ignore //TODO: need to enable this once its determined how seed data is to be incorporated - Amrit
     void testIsPersonConfidential() {
         def pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("EVT00023", null).pidm
         assertNotNull pidm
@@ -99,7 +98,6 @@ class PersonUtilityTests extends BaseIntegrationTestCase {
     }
 
 
-    @Ignore //TODO: need to enable this once its determined how seed data is to be incorporated - Amrit
     void testIsPersonConfidentialOrDeceased() {
         def pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("EVT00023", null).pidm
         assertNotNull pidm
@@ -115,12 +113,11 @@ class PersonUtilityTests extends BaseIntegrationTestCase {
     }
 
 
-    @Ignore //TODO: need to enable this once its determined how seed data is to be incorporated - Manjunath
     void testGetEmailId() {
-        def pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("CMOORE", null).pidm
+        def pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("HOF00714", null).pidm
         assertNotNull pidm
         def emailId = PersonUtility.getEmailId(pidm)
         assertNotNull emailId
-        assertEquals emailId, "Cindy@comcast.net"
+        assertEquals emailId, "Marita.Herwig@sungarduniv.edu"
     }
 }
