@@ -4,9 +4,9 @@
 
 package net.hedtech.banner.general.person
 
+import groovy.sql.Sql
 import net.hedtech.banner.general.system.NameType
 import net.hedtech.banner.testing.BaseIntegrationTestCase
-import groovy.sql.Sql
 
 class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
 
@@ -57,28 +57,28 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
         def personIdentificationName = new PersonIdentificationName()
         assertFalse "PersonIdentificationName should have failed validation", personIdentificationName.validate()
         assertErrorsFor personIdentificationName, 'nullable',
-                [
-                        'lastName'
-                ]
+                        [
+                                'lastName'
+                        ]
         assertNoErrorsFor personIdentificationName,
-                [
-                        'firstName',
-                        'middleName',
-                        'changeIndicator',
-                        'entityIndicator',
-                        'userData',
-                        'origin',
-                        'searchLastName',
-                        'searchFirstName',
-                        'searchMiddleName',
-                        'soundexLastName',
-                        'soundexFirstName',
-                        'createUser',
-                        'createDate',
-                        'surnamePrefix',
-                        'nameType',
-                        'cohortReasonEFineGrainedAccessControlDomain'
-                ]
+                          [
+                                  'firstName',
+                                  'middleName',
+                                  'changeIndicator',
+                                  'entityIndicator',
+                                  'userData',
+                                  'origin',
+                                  'searchLastName',
+                                  'searchFirstName',
+                                  'searchMiddleName',
+                                  'soundexLastName',
+                                  'soundexFirstName',
+                                  'createUser',
+                                  'createDate',
+                                  'surnamePrefix',
+                                  'nameType',
+                                  'cohortReasonEFineGrainedAccessControlDomain'
+                          ]
     }
 
 
@@ -129,6 +129,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
         assertTrue PersonIdentificationName.fetchByBannerId(invalidSearchString)?.isEmpty()
     }
 
+
     void testFetchBySomeBannerId() {
         def invalidSearchString = "XXX"
         def results = PersonIdentificationName.fetchBySomeBannerId(invalidSearchString)
@@ -145,6 +146,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
         assertEquals results?.size(), 1
         assertNull results?.list[0]
     }
+
 
     void testFetchBySomeName() {
         def limitSearchString1 = "%"
@@ -221,7 +223,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
         def pagingAndSortParams = [max: 10, offset: 0]
         def results = PersonIdentificationName.fetchAllPersonByBannerId(searchString, pagingAndSortParams)
         assertNotNull results
-		assertTrue results.size() >= 2
+        assertTrue results.size() >= 2
         assertTrue results.contains(personIdentificationName1)
         assertTrue results.contains(personIdentificationName2)
         assertTrue PersonIdentificationName.fetchAllPersonByBannerId(invalidSearchString, pagingAndSortParams)?.isEmpty()
@@ -258,13 +260,14 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
         def pagingAndSortParams = [max: 10, offset: 0]
         def results = PersonIdentificationName.fetchAllPersonByLastName(searchString, pagingAndSortParams)
         assertNotNull results
-		assertTrue results.size() >= 2
+        assertTrue results.size() >= 2
         assertTrue results.contains(personIdentificationName1)
         assertTrue results.contains(personIdentificationName2)
         assertTrue PersonIdentificationName.fetchAllPersonByLastName(invalidSearchString, pagingAndSortParams)?.isEmpty()
         invalidSearchString = null
         assertTrue PersonIdentificationName.fetchAllPersonByLastName(invalidSearchString, pagingAndSortParams)?.isEmpty()
     }
+
 
     void testFetchAllNonPersonByNameOrBannerId() {
         def personIdentificationName1 = newNonPersonIdentificationName("FIRSTCOMPANY")
@@ -323,7 +326,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
         def pagingAndSortParams = [max: 10, offset: 0]
         def results = PersonIdentificationName.fetchAllNonPersonByBannerId(searchString, pagingAndSortParams)
         assertNotNull results
-		assertTrue results.size() >= 2
+        assertTrue results.size() >= 2
         assertTrue results.contains(personIdentificationName1)
         assertTrue results.contains(personIdentificationName2)
 
@@ -355,7 +358,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
         def pagingAndSortParams = [max: 10, offset: 0]
         def results = PersonIdentificationName.fetchAllNonPersonByLastName(searchString, pagingAndSortParams)
         assertNotNull results
-		assertTrue results.size() >= 1
+        assertTrue results.size() >= 1
         assertTrue results.contains(personIdentificationName2)
 
         assertTrue PersonIdentificationName.fetchAllNonPersonByLastName(invalidSearchString, pagingAndSortParams)?.isEmpty()
@@ -396,9 +399,9 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
 
         personCount = PersonIdentificationName.fetchCountPersonByNameOrBannerId(invalidSearchString)
         assertFalse personCount > 0
-		
-		invalidSearchString = null
-		personCount = PersonIdentificationName.fetchCountPersonByNameOrBannerId(invalidSearchString)
+
+        invalidSearchString = null
+        personCount = PersonIdentificationName.fetchCountPersonByNameOrBannerId(invalidSearchString)
         assertFalse personCount > 0
 
     }
@@ -508,9 +511,9 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
 
         nonPersonCount = PersonIdentificationName.fetchCountNonPersonByNameOrBannerId(invalidSearchString)
         assertFalse nonPersonCount > 0
-		
-		invalidSearchString = null
-		nonPersonCount = PersonIdentificationName.fetchCountNonPersonByNameOrBannerId(invalidSearchString)
+
+        invalidSearchString = null
+        nonPersonCount = PersonIdentificationName.fetchCountNonPersonByNameOrBannerId(invalidSearchString)
         assertFalse nonPersonCount > 0
 
     }
@@ -676,6 +679,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
         assertEquals results?.size(), 2
     }
 
+
     void testFetchNonPersonBySoundexName() {
         def personIdentificationName1 = newPersonIdentificationName()
         personIdentificationName1.firstName = null
@@ -773,7 +777,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
 
         ${Sql.VARCHAR} := test_pidm ;
          end ;
-         """) { output_info -> bannerPidm = output_info }
+         """) {output_info -> bannerPidm = output_info}
 
         def currentPerson = PersonIdentificationName.fetchPersonCurrentRecord(firstBannerId)
         assertNotNull currentPerson
@@ -830,6 +834,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
         return personIdentificationName
     }
 
+
     void testAltId() {
         // you cannot update the spriden ID or name using the sv_spriden
         // you need to use the API. The reason is the sv_spriden trigger sets the surrogate ID
@@ -884,7 +889,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
 
         ${Sql.VARCHAR} := test_pidm ;
          end ;
-         """) { output_info -> bannerPidm = output_info }
+         """) {output_info -> bannerPidm = output_info}
 
         def persons = PersonIdentificationName.findAllByPidm(bannerPidm)
         assertEquals 2, persons.size()
@@ -898,4 +903,33 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
         assertEquals "TTT001", currentPerson.bannerId
 
     }
+
+
+    void testFetchBannerPerson() {
+        def person = newPersonIdentificationName()
+        person.firstName = "test"
+        person.lastName = "testLast"
+        save person
+        person.refresh()
+        def result = PersonIdentificationName.fetchBannerPerson(person.pidm)
+
+        assertNotNull result
+        assertTrue result instanceof PersonIdentificationName
+    }
+
+
+    void testFetchBannerPersonList() {
+        def personIdentificationNameList = []
+        (0..5).each {
+            def person = newPersonIdentificationName()
+            person.save(failOnError: true, flush: true)
+            personIdentificationNameList.add(person)
+        }
+        def persons = PersonIdentificationName.fetchBannerPersonList(personIdentificationNameList.pidm)
+
+        assertFalse persons.empty
+        assertTrue persons.size() > 1
+        assertTrue persons[0] instanceof PersonIdentificationName
+    }
+
 }

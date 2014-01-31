@@ -210,6 +210,23 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
         assertNotNull(holdList)
     }
 
+    void testFetchByPidmListAndDateCompare() {
+        def holdList = [newPersonRelatedHold()]
+        def personRelatedHold = newPersonRelatedHold()
+        personRelatedHold.pidm  = PersonIdentificationName.findByBannerIdAndChangeIndicatorIsNull("HOS00002").pidm
+        holdList.add(personRelatedHold)
+        holdList.each{it.save()}
+
+        def df1 = new SimpleDateFormat("yyyy-MM-dd")
+        def holdDate = df1.parse("2010-08-01")
+
+        def result = PersonRelatedHold.fetchByPidmListAndDateCompare(holdList.pidm, holdDate)
+        assertNotNull(result)
+        assertTrue result.size() > 1
+        assertTrue result.pidm.size() > 1
+        assertTrue result[0] instanceof PersonRelatedHold
+    }
+
 
     void testFetchRegistrationHoldsExist() {
         def personRelatedHold = newPersonRelatedHold()

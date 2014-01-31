@@ -20,7 +20,10 @@ query = """FROM  PersonBasicPersonBase a
 	       WHERE a.pidm = :pidm """),
 @NamedQuery(name = "PersonBasicPersonBase.fetchBySsn",
 query = """FROM  PersonBasicPersonBase a
-	       WHERE a.ssn = :ssn """)
+	       WHERE a.ssn = :ssn """),
+@NamedQuery(name = "PersonBasicPersonBase.fetchByPidmList",
+        query = """FROM  PersonBasicPersonBase a
+	       WHERE a.pidm IN :pidm """)
 ])
 @DatabaseModifiesState
 class PersonBasicPersonBase implements Serializable {
@@ -567,6 +570,15 @@ class PersonBasicPersonBase implements Serializable {
     def static fetchByPidm(Integer pidm) {
         PersonBasicPersonBase object = PersonBasicPersonBase.withSession { session ->
             def list = session.getNamedQuery('PersonBasicPersonBase.fetchByPidm').setInteger('pidm', pidm).list()[0]
+        }
+
+        return object
+    }
+
+
+    def static List fetchByPidmList(List pidm) {
+        List object = PersonBasicPersonBase.withSession { session ->
+            def list = session.getNamedQuery('PersonBasicPersonBase.fetchByPidmList').setParameterList('pidm', pidm).list()
         }
 
         return object

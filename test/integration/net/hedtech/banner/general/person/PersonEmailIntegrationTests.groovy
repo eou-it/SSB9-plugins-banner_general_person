@@ -323,4 +323,12 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
 
     }
 
+
+    def testFetchListByPidmAndStatusAndWebDisplayAndPreferredIndicator() {
+        def pidmList = [PersonUtility.getPerson("966049236").pidm, PersonUtility.getPerson("HOS00003").pidm]
+        def results = PersonEmail.fetchListByPidmAndStatusAndWebDisplayAndPreferredIndicator(pidmList, 'A', 'Y', 'Y')
+
+        assertTrue results.size() > 1
+        assertTrue results[0] instanceof PersonEmail
+    }
 }

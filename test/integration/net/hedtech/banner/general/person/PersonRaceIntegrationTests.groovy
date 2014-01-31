@@ -211,4 +211,16 @@ class PersonRaceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+    void testFetchByPidmList() {
+        def people = [newValidForCreatePersonRace()]
+        i_success_race = "IND"
+        i_success_pidm = PersonIdentificationName.findByBannerId("HOF00716").pidm
+        people.add(newValidForCreatePersonRace())
+        people.each{it.save(failOnError: true, flush: true)}
+
+        def results = PersonRace.fetchByPidmList(people.pidm)
+
+        assertTrue results.size() > 1
+        assertTrue results[1] instanceof PersonRace
+    }
 }

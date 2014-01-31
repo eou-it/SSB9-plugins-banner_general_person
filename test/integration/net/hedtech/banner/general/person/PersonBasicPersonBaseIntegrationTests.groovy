@@ -666,6 +666,22 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
         assertNotNull newPersonBasicPersonBase.id
     }
 
+
+    void testFetchByPidmList() {
+        def personList = []
+        (0..5).each {
+            def person = newValidForCreatePersonBasicPersonBase()
+            person.save(failOnError: true, flush: true)
+            personList.add(person)
+        }
+        def result = PersonBasicPersonBase.fetchByPidmList(personList.pidm)
+
+        assertFalse result.empty
+        assertTrue result.size() > 1
+        assertTrue result[0] instanceof PersonBasicPersonBase
+    }
+
+
     void testFetchBySsn() {
         def personBasicPersonBase1 = newValidForCreatePersonBasicPersonBase()
         personBasicPersonBase1.save(failOnError: true, flush: true)

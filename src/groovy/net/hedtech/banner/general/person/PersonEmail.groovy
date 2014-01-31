@@ -32,6 +32,12 @@ query = """SELECT a.emailAddress
     WHERE a.pidm = :pidm
     AND a.statusIndicator = :statusIndicator
     AND a.preferredIndicator = :preferredIndicator
+    AND a.displayWebIndicator = :displayWebIndicator"""),
+@NamedQuery(name = "PersonEmail.fetchListByPidmAndStatusAndWebDisplayAndPreferredIndicator",
+query = """FROM PersonEmail a
+    WHERE a.pidm IN :pidm
+    AND a.statusIndicator = :statusIndicator
+    AND a.preferredIndicator = :preferredIndicator
     AND a.displayWebIndicator = :displayWebIndicator""")
 ])
 class PersonEmail implements Serializable {
@@ -250,4 +256,14 @@ class PersonEmail implements Serializable {
         return email
     }
 
+
+    public static List fetchListByPidmAndStatusAndWebDisplayAndPreferredIndicator(List pidm, String statusIndicator, String displayWebIndicator, String preferredIndicator) {
+        def emails = PersonEmail.withSession {session ->
+            session.getNamedQuery('PersonEmail.fetchListByPidmAndStatusAndWebDisplayAndPreferredIndicator').setParameterList('pidm', pidm).setString('statusIndicator', statusIndicator).setString('displayWebIndicator', displayWebIndicator).setString('preferredIndicator', preferredIndicator).list()
+        }
+
+        log.debug "Executing fetchListByPidmAndStatusAndWebDisplayAndPreferredIndiator  with pidms = ${pidm} and status = ${statusIndicator} and displayWebIndicator = ${displayWebIndicator} and preferredIndicator = {$preferredIndicator}"
+        log.debug "Fetched number of emails ${emails.size()} }"
+        return emails
+    }
 }

@@ -34,8 +34,13 @@ import javax.persistence.*
 	  	                and a.entityIndicator = 'P'
 	  	                and a.changeIndicator is null    """),
 @NamedQuery(name = "PersonIdentificationName.fetchPersonByPidm",
-        query = """FROM  PersonIdentificationName a
+query = """FROM  PersonIdentificationName a
 	  	                WHERE a.pidm = :filter
+	  	                and a.entityIndicator = 'P'
+	  	                and a.changeIndicator is null    """),
+@NamedQuery(name = "PersonIdentificationName.fetchPersonByPidmList",
+        query = """FROM  PersonIdentificationName a
+	  	                WHERE a.pidm IN :filter
 	  	                and a.entityIndicator = 'P'
 	  	                and a.changeIndicator is null    """),
 @NamedQuery(name = "PersonIdentificationName.fetchPersonOrNonPersonByPidm",
@@ -508,9 +513,18 @@ class PersonIdentificationName implements Serializable {
         return object
     }
 
+
     public static PersonIdentificationName fetchBannerPerson(Integer pidm) {
         PersonIdentificationName object = PersonIdentificationName.withSession { session ->
             session.getNamedQuery('PersonIdentificationName.fetchPersonByPidm').setInteger('filter', pidm).list()[0]
+        }
+        return object
+    }
+
+
+    public static List fetchBannerPersonList(List pidm) {
+        def object = PersonIdentificationName.withSession { session ->
+            session.getNamedQuery('PersonIdentificationName.fetchPersonByPidmList').setParameterList('filter', pidm).list()
         }
         return object
     }
