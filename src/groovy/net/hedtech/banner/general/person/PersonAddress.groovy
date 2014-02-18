@@ -636,4 +636,15 @@ class PersonAddress implements Serializable {
             return null
         }
     }
+
+    static def fetchActiveAddressByPidmAndAddressType(Integer pidm, String addressType) {
+        if (pidm && addressType) {
+            PersonAddress.withSession { session ->
+                List personAddressList = session.getNamedQuery('PersonAddress.fetchActiveAddressByPidmAndAddressType').setInteger('pidm', pidm).setString('addressType', addressType).list()
+                return personAddressList[0]
+            }
+        } else {
+            return null
+        }
+    }
 }
