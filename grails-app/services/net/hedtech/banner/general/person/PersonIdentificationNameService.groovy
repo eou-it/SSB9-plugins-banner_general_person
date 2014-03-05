@@ -34,10 +34,16 @@ class PersonIdentificationNameService extends ServiceBase {
     def fetchEntityOfPerson(pidm) {
         def sql
         def entity
-        sql = new Sql(sessionFactory.getCurrentSession().connection())
-        sql.call("{? = call gb_identification.f_get_entity(?)}",
-                [Sql.VARCHAR, pidm]) { result -> entity = result }
-        sql?.close()
+        sql = null
+        try {
+            sql = new Sql(sessionFactory.getCurrentSession().connection())
+
+            sql.call("{? = call gb_identification.f_get_entity(?)}",
+                    [Sql.VARCHAR, pidm]) { result -> entity = result }
+        }
+        finally {
+            sql?.close()
+        }
         return entity
     }
 
@@ -45,10 +51,14 @@ class PersonIdentificationNameService extends ServiceBase {
     def getSystemGeneratedIdPrefix() {
         def sql
         def idPrefix
-        sql = new Sql(sessionFactory.getCurrentSession().connection())
-        sql.call("{? = call sokfunc.f_get_idprefix(?)}",
-                [Sql.VARCHAR, 'ID']) { result -> idPrefix = result }
-        sql?.close()
+        try {
+            sql = new Sql(sessionFactory.getCurrentSession().connection())
+            sql.call("{? = call sokfunc.f_get_idprefix(?)}",
+                    [Sql.VARCHAR, 'ID']) { result -> idPrefix = result }
+        }
+        finally {
+            sql?.close()
+        }
         return idPrefix
     }
 
@@ -56,10 +66,14 @@ class PersonIdentificationNameService extends ServiceBase {
      def getPrefixDisplayIndicatorForSelfService() {
         def sql
         def prefixInd
-        sql = new Sql(sessionFactory.getCurrentSession().connection())
-        sql.call("{? = call gb_displaymask.f_ssb_format_name()}",
+        try {
+            sql = new Sql(sessionFactory.getCurrentSession().connection())
+            sql.call("{? = call gb_displaymask.f_ssb_format_name()}",
                 [Sql.VARCHAR]) { result -> prefixInd = result }
-        sql?.close()
+        }
+        finally {
+            sql?.close()
+        }
         return prefixInd
     }
 
@@ -86,10 +100,14 @@ class PersonIdentificationNameService extends ServiceBase {
     def getFormattedName(pidm, fmt) {
         def sql
         def formattedName
-        sql = new Sql(sessionFactory.getCurrentSession().connection())
-        sql.call("{? = call f_format_name(?,?)}",
-                [Sql.VARCHAR, pidm, fmt]) { result -> formattedName = result }
-        sql?.close()
+        try {
+            sql = new Sql(sessionFactory.getCurrentSession().connection())
+            sql.call("{? = call f_format_name(?,?)}",
+                    [Sql.VARCHAR, pidm, fmt]) { result -> formattedName = result }
+        }
+        finally {
+            sql?.close()
+        }
         return formattedName
     }
 
