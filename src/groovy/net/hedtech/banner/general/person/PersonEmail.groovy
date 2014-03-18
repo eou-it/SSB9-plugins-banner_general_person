@@ -33,11 +33,10 @@ query = """SELECT a.emailAddress
     AND a.statusIndicator = :statusIndicator
     AND a.preferredIndicator = :preferredIndicator
     AND a.displayWebIndicator = :displayWebIndicator"""),
-@NamedQuery(name = "PersonEmail.fetchListByPidmAndStatusAndWebDisplayAndPreferredIndicator",
+@NamedQuery(name = "PersonEmail.fetchListByPidmAndStatusAndWebDisplay",
 query = """FROM PersonEmail a
     WHERE a.pidm IN :pidm
     AND a.statusIndicator = :statusIndicator
-    AND a.preferredIndicator = :preferredIndicator
     AND a.displayWebIndicator = :displayWebIndicator""")
 ])
 class PersonEmail implements Serializable {
@@ -257,12 +256,12 @@ class PersonEmail implements Serializable {
     }
 
 
-    public static List fetchListByPidmAndStatusAndWebDisplayAndPreferredIndicator(List pidm, String statusIndicator, String displayWebIndicator, String preferredIndicator) {
+    public static List fetchListByPidmAndStatusAndWebDisplay(List pidm, String statusIndicator, String displayWebIndicator) {
         def emails = PersonEmail.withSession {session ->
-            session.getNamedQuery('PersonEmail.fetchListByPidmAndStatusAndWebDisplayAndPreferredIndicator').setParameterList('pidm', pidm).setString('statusIndicator', statusIndicator).setString('displayWebIndicator', displayWebIndicator).setString('preferredIndicator', preferredIndicator).list()
+            session.getNamedQuery('PersonEmail.fetchListByPidmAndStatusAndWebDisplay').setParameterList('pidm', pidm).setString('statusIndicator', statusIndicator).setString('displayWebIndicator', displayWebIndicator).list()
         }
 
-        log.debug "Executing fetchListByPidmAndStatusAndWebDisplayAndPreferredIndiator  with pidms = ${pidm} and status = ${statusIndicator} and displayWebIndicator = ${displayWebIndicator} and preferredIndicator = {$preferredIndicator}"
+        log.debug "Executing fetchListByPidmAndStatusAndWebDisplay  with pidms = ${pidm} and status = ${statusIndicator} and displayWebIndicator = ${displayWebIndicator}"
         log.debug "Fetched number of emails ${emails.size()} }"
         return emails
     }

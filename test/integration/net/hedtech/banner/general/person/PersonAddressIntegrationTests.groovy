@@ -513,6 +513,15 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	def testFetchListActiveAddressByPidmAndAddressType() {
+		def pidmList = [PersonUtility.getPerson("HOF00714").pidm, PersonUtility.getPerson("HOF00716").pidm]
+		def results = PersonAddress.fetchListActiveAddressByPidmAndAddressType(pidmList, [AddressType.findByCode("MA"), AddressType.findByCode("PO")])
+
+		assertTrue results.size() > 1
+		assertTrue results[0] instanceof PersonAddress
+	}
+	
+
 
 
 	private def newValidForCreatePersonAddress() {

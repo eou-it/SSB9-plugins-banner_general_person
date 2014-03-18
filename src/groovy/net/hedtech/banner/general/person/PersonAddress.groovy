@@ -71,6 +71,15 @@ query = """ FROM PersonAddress a
                             NVL(SPRADDR_FROM_DATE,sysdate-1) AND
                             NVL(SPRADDR_TO_DATE,sysdate+1)
                 """),
+@NamedQuery(name = "PersonAddress.fetchListActiveAddressByPidmAndAddressType",
+query = """ FROM PersonAddress a
+                            WHERE  a.pidm IN :pidm
+                            AND  a.addressType IN :addressType
+                            AND NVL(a.statusIndicator,'Y') <> 'I'
+                            AND  SYSDATE BETWEEN
+                            NVL(SPRADDR_FROM_DATE,sysdate-1) AND
+                            NVL(SPRADDR_TO_DATE,sysdate+1)
+                """),
 @NamedQuery(name = "PersonAddress.fetchActiveAddressesByPidm",
 query = """ FROM PersonAddress a
                             WHERE  a.pidm = :pidm
@@ -530,6 +539,17 @@ class PersonAddress implements Serializable {
         }
     }
 
+
+	static def fetchListActiveAddressByPidmAndAddressType(List pidm, List addressType) {
+		if (pidm.isEmpty() || addressType.isEmpty()) return []
+		PersonAddress.withSession { session ->
+			List personAddressList = session.getNamedQuery('PersonAddress.fetchListActiveAddressByPidmAndAddressType')
+				.setParameterList('pidm', pidm)
+				.setParameterList('addressType', addressType).list()
+			return personAddressList
+		}
+	}
+	
 
     static def fetchActiveAddressesByPidm(map)  {
          if (map.pidm) {
