@@ -1,8 +1,5 @@
-/*********************************************************************************
-Copyright 2012 Ellucian Company L.P. and its affiliates.
-**********************************************************************************/
 /*******************************************************************************
- Copyright 2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2012-2014 Ellucian Company L.P. and its affiliates.
  ****************************************************************************** */
 package net.hedtech.banner.general.person
 
@@ -767,6 +764,14 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
         return personBasicPersonBase
     }
 
+    void testFetchSurveyConfirmedFlagByPidm() {
+        def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()
+        personBasicPersonBase.save(failOnError: true, flush: true)
+        assertNotNull personBasicPersonBase.id
+
+        String confirmedFlag = PersonBasicPersonBase.fetchSurveyConfirmedFlagByPidm(personBasicPersonBase.pidm)
+        assertNotNull confirmedFlag
+    }
 
     private def newInvalidForCreatePersonBasicPersonBase() {
         def sql = new Sql(sessionFactory.getCurrentSession().connection())
