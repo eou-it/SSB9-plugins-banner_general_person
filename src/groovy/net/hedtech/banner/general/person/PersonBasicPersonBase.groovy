@@ -1,5 +1,5 @@
 /*******************************************************************************
- Copyright 2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2013-2014 Ellucian Company L.P. and its affiliates.
  ****************************************************************************** */
 package net.hedtech.banner.general.person
 
@@ -17,7 +17,12 @@ import javax.persistence.*
 @NamedQueries(value = [
 @NamedQuery(name = "PersonBasicPersonBase.fetchByPidm",
 query = """FROM  PersonBasicPersonBase a
-	       WHERE a.pidm = :pidm """)
+	       WHERE a.pidm = :pidm """),
+@NamedQuery(name = "PersonBasicPersonBase.fetchConfirmedReByPidm",
+query = """SELECT a.confirmedRe
+    FROM PersonBasicPersonBase a
+    WHERE a.pidm = :pidm
+    """)
 ])
 @DatabaseModifiesState
 class PersonBasicPersonBase implements Serializable {
@@ -567,6 +572,13 @@ class PersonBasicPersonBase implements Serializable {
         }
 
         return object
+    }
+
+    public static String fetchSurveyConfirmedFlagByPidm(Integer pidm) {
+        String surveyConfirmedFlag = PersonBasicPersonBase.withSession {session ->
+            session.getNamedQuery('PersonBasicPersonBase.fetchConfirmedReByPidm').setInteger('pidm', pidm).list()[0]
+        }
+        return surveyConfirmedFlag
     }
 
 
