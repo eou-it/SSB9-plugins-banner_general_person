@@ -33,8 +33,6 @@ query = """SELECT a.confirmedRe
 @DatabaseModifiesState
 class PersonBasicPersonBase implements Serializable {
 
-    protected static final String PIDM = 'pidm'
-
     /**
      * Surrogate ID for SPBPERS
      */
@@ -576,7 +574,7 @@ class PersonBasicPersonBase implements Serializable {
 
     def static fetchByPidm(Integer pidm) {
         PersonBasicPersonBase object = PersonBasicPersonBase.withSession { session ->
-            def list = session.getNamedQuery('PersonBasicPersonBase.fetchByPidm').setInteger(PIDM, pidm).list()[0]
+            def list = session.getNamedQuery('PersonBasicPersonBase.fetchByPidm').setInteger('pidm', pidm).list()[0]
         }
 
         return object
@@ -584,7 +582,7 @@ class PersonBasicPersonBase implements Serializable {
 
     public static String fetchSurveyConfirmedFlagByPidm(Integer pidm) {
         String surveyConfirmedFlag = PersonBasicPersonBase.withSession {session ->
-            session.getNamedQuery('PersonBasicPersonBase.fetchConfirmedReByPidm').setInteger(PIDM, pidm).list()[0]
+            session.getNamedQuery('PersonBasicPersonBase.fetchConfirmedReByPidm').setInteger('pidm', pidm).list()[0]
         }
         return surveyConfirmedFlag
     }
