@@ -1,9 +1,7 @@
 /*********************************************************************************
-Copyright 2012 Ellucian Company L.P. and its affiliates.
+Copyright 2012-2014 Ellucian Company L.P. and its affiliates.
 **********************************************************************************/
-/*******************************************************************************
- Copyright 2013 Ellucian Company L.P. and its affiliates.
- ****************************************************************************** */
+
 package net.hedtech.banner.general.person
 
 import net.hedtech.banner.exceptions.ApplicationException
@@ -17,23 +15,19 @@ class AdditionalIDServiceIntegrationTests extends BaseIntegrationTestCase {
     //Test data for creating new domain instance
     //Valid test data (For success tests)
     def i_success_additionalIdentificationType
-    def i_success_pidm = 1
     def i_success_additionalId = "TTTTT"
 
     //Invalid test data (For failure tests)
     def i_failure_additionalIdentificationType
-    def i_failure_pidm = 1
     def i_failure_additionalId = "TTTTT"
 
     //Test data for creating updating domain instance
     //Valid test data (For success tests)
     def u_success_additionalIdentificationType
-    def u_success_pidm = 1
     def u_success_additionalId = "TTTTTs"
 
     //Valid test data (For failure tests)
     def u_failure_additionalIdentificationType
-    def u_failure_pidm = 1
     def u_failure_additionalId = "TTTTT"
 
 
@@ -43,8 +37,8 @@ class AdditionalIDServiceIntegrationTests extends BaseIntegrationTestCase {
         initializeTestDataForReferences()
     }
 
+
     //This method is used to initialize test data for references.
-    //A method is required to execute database calls as it requires a active transaction
     void initializeTestDataForReferences() {
         //Valid test data (For success tests)
         i_success_additionalIdentificationType = AdditionalIdentificationType.findByCode("PROD")
@@ -57,9 +51,6 @@ class AdditionalIDServiceIntegrationTests extends BaseIntegrationTestCase {
 
         //Valid test data (For failure tests)
         u_failure_additionalIdentificationType = AdditionalIdentificationType.findByCode("x")
-
-        //Test data for references for custom tests
-
     }
 
 
@@ -136,9 +127,11 @@ class AdditionalIDServiceIntegrationTests extends BaseIntegrationTestCase {
         additionalID = additionalIDService.create(map)
         assertNotNull "AdditionalID ID is null in AdditionalID Service Tests Create", additionalID.id
         def id = additionalID.id
-        map = [domainModel: additionalID]
+
+        def deleteAdditionalID = AdditionalID.get(id)
+        map = [domainModel: deleteAdditionalID]
         additionalIDService.delete(map)
-        assertNull "AdditionalID should have been deleted", additionalID.get(id)
+        assertNull "AdditionalID should have been deleted", AdditionalID.get(id)
     }
 
 
@@ -178,4 +171,5 @@ class AdditionalIDServiceIntegrationTests extends BaseIntegrationTestCase {
         )
         return additionalID
     }
+
 }
