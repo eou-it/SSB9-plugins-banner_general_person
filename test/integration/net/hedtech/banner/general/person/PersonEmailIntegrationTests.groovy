@@ -1,7 +1,7 @@
 /*********************************************************************************
-  Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
- package net.hedtech.banner.general.person
+package net.hedtech.banner.general.person
 
 import grails.validation.ValidationException
 import groovy.sql.Sql
@@ -52,7 +52,7 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     def u_failure_displayWebIndicator = true
 
 
-    protected void setUp() {
+    protected void setUp( ) {
         formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this (removing GEAPART because of GUOBOBS_UI_VERSION = B)
         super.setUp()
         initializeTestDataForReferences()
@@ -60,36 +60,36 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
 
     //This method is used to initialize test data for references.
     //A method is required to execute database calls as it requires a active transaction
-    void initializeTestDataForReferences() {
+    void initializeTestDataForReferences( ) {
         //Valid test data (For success tests)
-        i_success_emailType = EmailType.findByCode("CAMP")
+        i_success_emailType = EmailType.findByCode( "CAMP" )
     }
 
 
-    protected void tearDown() {
+    protected void tearDown( ) {
         super.tearDown()
     }
 
 
-    void testCreateValidPersonEmail() {
+    void testCreateValidPersonEmail( ) {
         def personEmail = newValidForCreatePersonEmail()
-        personEmail.save(failOnError: true, flush: true)
+        personEmail.save( failOnError: true, flush: true )
         //Test if the generated entity now has an id assigned
         assertNotNull personEmail.id
     }
 
 
-    void testCreateInvalidPersonEmail() {
+    void testCreateInvalidPersonEmail( ) {
         def personEmail = newInvalidForCreatePersonEmail()
-        shouldFail(ValidationException) {
-            personEmail.save(failOnError: true, flush: true)
+        shouldFail( ValidationException ) {
+            personEmail.save( failOnError: true, flush: true )
         }
     }
 
 
-    void testUpdateValidPersonEmail() {
+    void testUpdateValidPersonEmail( ) {
         def personEmail = newValidForCreatePersonEmail()
-        personEmail.save(failOnError: true, flush: true)
+        personEmail.save( failOnError: true, flush: true )
         assertNotNull personEmail.id
         assertEquals 0L, personEmail.version
         assertEquals i_success_emailAddress, personEmail.emailAddress
@@ -102,9 +102,9 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
         personEmail.preferredIndicator = u_success_preferredIndicator
         personEmail.commentData = u_success_commentData
         personEmail.displayWebIndicator = u_success_displayWebIndicator
-        personEmail.save(failOnError: true, flush: true)
+        personEmail.save( failOnError: true, flush: true )
         //Assert for sucessful update
-        personEmail = PersonEmail.get(personEmail.id)
+        personEmail = PersonEmail.get( personEmail.id )
         assertEquals 1L, personEmail?.version
         assertEquals u_success_statusIndicator, personEmail.statusIndicator
         assertEquals u_success_preferredIndicator, personEmail.preferredIndicator
@@ -113,9 +113,9 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-    void testUpdateInvalidPersonEmail() {
+    void testUpdateInvalidPersonEmail( ) {
         def personEmail = newValidForCreatePersonEmail()
-        personEmail.save(failOnError: true, flush: true)
+        personEmail.save( failOnError: true, flush: true )
         assertNotNull personEmail.id
         assertEquals 0L, personEmail.version
         assertEquals i_success_emailAddress, personEmail.emailAddress
@@ -129,29 +129,29 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
         personEmail.commentData = u_failure_commentData
         personEmail.displayWebIndicator = u_failure_displayWebIndicator
 
-        shouldFail(ValidationException) {
-            personEmail.save(failOnError: true, flush: true)
+        shouldFail( ValidationException ) {
+            personEmail.save( failOnError: true, flush: true )
         }
     }
 
 
-    void testDeletePersonEmail() {
+    void testDeletePersonEmail( ) {
         def personEmail = newValidForCreatePersonEmail()
-        personEmail.save(failOnError: true, flush: true)
+        personEmail.save( failOnError: true, flush: true )
         def id = personEmail.id
         assertNotNull id
         personEmail.delete()
-        assertNull PersonEmail.get(id)
+        assertNull PersonEmail.get( id )
     }
 
 
-    void testValidation() {
+    void testValidation( ) {
         def personEmail = newInvalidForCreatePersonEmail()
         assertFalse "PersonEmail could not be validated as expected due to ${personEmail.errors}", personEmail.validate()
     }
 
 
-    void testNullValidationFailure() {
+    void testNullValidationFailure( ) {
         def personEmail = new PersonEmail()
         personEmail.statusIndicator = null
         assertFalse "PersonEmail should have failed validation", personEmail.validate()
@@ -169,22 +169,22 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-    void testMaxSizeValidationFailures() {
+    void testMaxSizeValidationFailures( ) {
         def personEmail = new PersonEmail(
-                commentData: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
+                commentData: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX' )
         assertFalse "PersonEmail should have failed validation", personEmail.validate()
         assertErrorsFor personEmail, 'maxSize', ['commentData']
     }
 
 
-    void testOptimisticLock() {
+    void testOptimisticLock( ) {
         def personEmail = newValidForCreatePersonEmail()
-        personEmail.save(failOnError: true, flush: true)
+        personEmail.save( failOnError: true, flush: true )
 
         def sql
         try {
-            sql = new Sql(sessionFactory.getCurrentSession().connection())
-            sql.executeUpdate("update GOREMAL set GOREMAL_VERSION = 999 where GOREMAL_SURROGATE_ID = ?", [personEmail.id])
+            sql = new Sql( sessionFactory.getCurrentSession().connection() )
+            sql.executeUpdate( "update GOREMAL set GOREMAL_VERSION = 999 where GOREMAL_SURROGATE_ID = ?", [personEmail.id] )
         } finally {
             sql?.close() // note that the test will close the connection, since it's our current session's connection
         }
@@ -193,16 +193,16 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
         personEmail.preferredIndicator = u_success_preferredIndicator
         personEmail.commentData = u_success_commentData
         personEmail.displayWebIndicator = u_success_displayWebIndicator
-        shouldFail(HibernateOptimisticLockingFailureException) {
-            personEmail.save(failOnError: true, flush: true)
+        shouldFail( HibernateOptimisticLockingFailureException ) {
+            personEmail.save( failOnError: true, flush: true )
         }
     }
 
 
-    private def newValidForCreatePersonEmail() {
-        def sql = new Sql(sessionFactory.getCurrentSession().connection())
+    private def newValidForCreatePersonEmail( ) {
+        def sql = new Sql( sessionFactory.getCurrentSession().connection() )
         String idSql = """select gb_common.f_generate_id bannerId, gb_common.f_generate_pidm pidm from dual """
-        def bannerValues = sql.firstRow(idSql)
+        def bannerValues = sql.firstRow( idSql )
         def ibannerId = bannerValues.bannerId
         def ipidm = bannerValues.pidm
         def person = new PersonIdentificationName(
@@ -214,7 +214,7 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
                 changeIndicator: null,
                 entityIndicator: "P"
         )
-        person.save(flush: true, failOnError: true)
+        person.save( flush: true, failOnError: true )
         assert person.id
 
         def personEmail = new PersonEmail(
@@ -230,10 +230,10 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-    private def newInvalidForCreatePersonEmail() {
-        def sql = new Sql(sessionFactory.getCurrentSession().connection())
+    private def newInvalidForCreatePersonEmail( ) {
+        def sql = new Sql( sessionFactory.getCurrentSession().connection() )
         String idSql = """select gb_common.f_generate_id bannerId, gb_common.f_generate_pidm pidm from dual """
-        def bannerValues = sql.firstRow(idSql)
+        def bannerValues = sql.firstRow( idSql )
         def ibannerId = bannerValues.bannerId
         def ipidm = bannerValues.pidm
         def person = new PersonIdentificationName(
@@ -245,7 +245,7 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
                 changeIndicator: null,
                 entityIndicator: "P"
         )
-        person.save(flush: true, failOnError: true)
+        person.save( flush: true, failOnError: true )
         assert person.id
 
         def personEmail = new PersonEmail(
@@ -262,12 +262,12 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-    def testFetchByPidmAndStatusAndWebDisplayAndPreferredIndicator() {
-        def results = PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator(PersonUtility.getPerson("966049236").pidm, 'A', 'Y', 'Y')
+    def testFetchByPidmAndStatusAndWebDisplayAndPreferredIndicator( ) {
+        def results = PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator( PersonUtility.getPerson( "966049236" ).pidm, 'A', 'Y', 'Y' )
 
         assertTrue results.size() == 1
 
-        def res = results.get(0)
+        def res = results.get( 0 )
 
 
         assertEquals res.version, 0
@@ -282,53 +282,78 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-    def testFetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicator() {
-        def results = PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator(PersonUtility.getPerson("966049236").pidm, 'A', 'Y', 'Y')
+    def testFetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicator( ) {
+        def results = PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator( PersonUtility.getPerson( "966049236" ).pidm, 'A', 'Y', 'Y' )
 
         assertTrue results.size() == 1
 
-        def res = results.get(0)
+        def res = results.get( 0 )
 
-        def email = PersonEmail.fetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicator(PersonUtility.getPerson("966049236").pidm, 'A', 'Y', 'Y')
+        def email = PersonEmail.fetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicator( PersonUtility.getPerson( "966049236" ).pidm, 'A', 'Y', 'Y' )
 
         assertEquals res.emailAddress, email
 
     }
 
 
-    def testFetchFirstByPidmAndStatus() {
-        def emails = PersonEmail.findAllByPidm(PersonUtility.getPerson("HOS00003").pidm)
+    def testFetchFirstByPidmAndStatus( ) {
+        def emails = PersonEmail.findAllByPidm( PersonUtility.getPerson( "HOS00003" ).pidm )
         assertEquals 2, emails.size()
         emails.each {
             assertTrue it.statusIndicator == "A"
         }
         assertNotNull emails.find { it.displayWebIndicator }
         assertNotNull emails.find { !it.displayWebIndicator }
-        def results = PersonEmail.fetchByPidmAndStatus(PersonUtility.getPerson("HOS00003").pidm, 'A')
+        def results = PersonEmail.fetchByPidmAndStatus( PersonUtility.getPerson( "HOS00003" ).pidm, 'A' )
 
         assertEquals 2, results.size()
     }
 
 
-    def testFetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicatorWhenNoneExists() {
-        def pidm = PersonUtility.getPerson("HOSL0003").pidm
+    def testFetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicatorWhenNoneExists( ) {
+        def pidm = PersonUtility.getPerson( "HOSL0003" ).pidm
         assertNotNull pidm
-        def results = PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator(PersonUtility.getPerson("HOSL0003").pidm, 'A', 'Y', 'Y')
+        def results = PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator( PersonUtility.getPerson( "HOSL0003" ).pidm, 'A', 'Y', 'Y' )
 
         assertTrue results.size() == 0
 
-        def email = PersonEmail.fetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicator(PersonUtility.getPerson("HOSL0003").pidm, 'A', 'Y', 'Y')
+        def email = PersonEmail.fetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicator( PersonUtility.getPerson( "HOSL0003" ).pidm, 'A', 'Y', 'Y' )
 
         assertNull email
 
     }
 
 
-    def testFetchListByPidmAndStatusAndWebDisplay() {
-        def pidmList = [PersonUtility.getPerson("966049236").pidm, PersonUtility.getPerson("HOS00003").pidm]
-        def results = PersonEmail.fetchListByPidmAndStatusAndWebDisplay(pidmList, 'A', 'Y')
+    def testFetchListByPidmAndStatusAndWebDisplay( ) {
+        def pidmList = [PersonUtility.getPerson( "966049236" ).pidm, PersonUtility.getPerson( "HOS00003" ).pidm]
+        def results = PersonEmail.fetchListByPidmAndStatusAndWebDisplay( pidmList, 'A', 'Y' )
 
         assertTrue results.size() > 1
         assertTrue results[0] instanceof PersonEmail
+    }
+
+
+    def testFetchByEmailAddressAndActiveStatus_ActivePreferred( ) {
+        PersonEmail result = PersonEmail.fetchByEmailAddressAndActiveStatus( "Ben29322@Ellucian.edu" )
+        assertTrue result instanceof PersonEmail
+        assertEquals(29322, result.pidm)
+    }
+
+
+    def testFetchByEmailAddressAndActiveStatus_ActiveNotPreferred( ) {
+        def result = PersonEmail.fetchByEmailAddressAndActiveStatus( "Neil29311@Ellucian.edu" )
+        assertEquals(29311, result.pidm)
+    }
+
+
+    def testFetchByEmailAddressAndActiveStatus_NoSuchAddress( ) {
+        def result = PersonEmail.fetchByEmailAddressAndActiveStatus( "jksdhfiwjencvwe@Ellucian.edu" )
+        assertNull(result)
+    }
+
+
+    def testFetchByEmailAddressAndActiveStatus_Inactive( ) {
+        def result = PersonEmail.fetchByEmailAddressAndActiveStatus( "Stuart29321@Ellucian.edu" )
+        assertNull(result)
     }
 }
