@@ -40,7 +40,7 @@ query = """FROM PersonEmail a
     AND a.displayWebIndicator = :displayWebIndicator"""),
 @NamedQuery(name = "PersonEmail.fetchByEmailAddressAndActiveStatus",
 query = """FROM PersonEmail a
-    WHERE a.emailAddress = :emailAddress
+    WHERE upper(a.emailAddress) = upper(:emailAddress)
     AND a.statusIndicator = :statusIndicator""")
 ])
 class PersonEmail implements Serializable {

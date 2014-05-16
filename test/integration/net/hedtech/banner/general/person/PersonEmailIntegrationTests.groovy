@@ -335,14 +335,20 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
 
     def testFetchByEmailAddressAndActiveStatus_ActivePreferred( ) {
         PersonEmail result = PersonEmail.fetchByEmailAddressAndActiveStatus( "Ben29322@Ellucian.edu" )
-        assertTrue result instanceof PersonEmail
-        assertEquals(29322, result.pidm)
+        assertEquals( 29322, result.pidm )
+    }
+
+
+    def testFetchByEmailAddressCaseInsensitive( ) {
+        PersonEmail result = PersonEmail.fetchByEmailAddressAndActiveStatus( "beN29322@Ellucian.edu" )
+        assertEquals( 29322, result.pidm )
     }
 
 
     def testFetchByEmailAddressAndActiveStatus_ActiveNotPreferred( ) {
         def result = PersonEmail.fetchByEmailAddressAndActiveStatus( "Neil29311@Ellucian.edu" )
-        assertEquals(29311, result.pidm)
+        assertTrue result instanceof PersonEmail
+        assertEquals( 29311, result.pidm )
     }
 
 
