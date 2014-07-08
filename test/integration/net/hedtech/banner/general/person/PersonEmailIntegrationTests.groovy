@@ -328,8 +328,52 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
         def pidmList = [PersonUtility.getPerson( "966049236" ).pidm, PersonUtility.getPerson( "HOS00003" ).pidm]
         def results = PersonEmail.fetchListByPidmAndStatusAndWebDisplay( pidmList, 'A', 'Y' )
 
-        assertTrue results.size() > 1
+        assertEquals 2, results.size()
         assertTrue results[0] instanceof PersonEmail
+        assertTrue results[1] instanceof PersonEmail
+        
+        def foundCount = 0
+        results.each {
+            if (it.emailType.code == "PERS") {
+                foundCount++
+                assertEquals "einstein2be@verizon.net", it.emailAddress
+                assertTrue it.displayWebIndicator
+            } else if (it.emailType.code == "MA") {
+                foundCount++
+                assertEquals "pamix@charter.net", it.emailAddress
+                assertTrue it.displayWebIndicator
+            }
+        }
+        assertEquals 2, foundCount
+    }
+
+
+    def testFetchListByPidmAndStatus() {
+        def pidmList = [PersonUtility.getPerson("966049236").pidm, PersonUtility.getPerson("HOS00003").pidm]
+        def results = PersonEmail.fetchListByPidmAndStatus(pidmList, 'A')
+
+        assertEquals 3, results.size()
+        assertTrue results[0] instanceof PersonEmail
+        assertTrue results[1] instanceof PersonEmail
+        assertTrue results[2] instanceof PersonEmail
+        
+        def foundCount = 0
+        results.each {
+            if (it.emailType.code == "PERS") {
+                foundCount++
+                assertEquals "einstein2be@verizon.net", it.emailAddress
+                assertTrue it.displayWebIndicator
+            } else if (it.emailType.code == "MA") {
+                foundCount++
+                assertEquals "pamix@charter.net", it.emailAddress
+                assertTrue it.displayWebIndicator
+            } else if (it.emailType.code == "CAMP") {
+                foundCount++
+                assertEquals "pauline.amyx@charter.net", it.emailAddress
+                assertFalse it.displayWebIndicator
+            }
+        }
+        assertEquals 3, foundCount
     }
 
 
