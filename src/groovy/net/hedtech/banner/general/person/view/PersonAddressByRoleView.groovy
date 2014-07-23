@@ -15,7 +15,11 @@ import javax.persistence.*
 @NamedQueries(value = [
 @NamedQuery(name = "PersonAddressByRoleView.fetchAddressesByPidmAndRole",
             query = """FROM  PersonAddressByRoleView a
-                       WHERE UPPER(a.pidm) = :pidm and a.userRole = :role order by addressTypeDescription """)
+                       WHERE a.pidm = :pidm and a.userRole = :role order by a.addressTypeDescription """),
+@NamedQuery(name = "PersonAddressByRoleView.fetchAddressesByPidmAndRoles",
+        query = """FROM PersonAddressByRoleView a
+           WHERE   a.pidm  = :pidm
+           AND a.userRole in :roles """)
 ])
 class PersonAddressByRoleView {
 
@@ -170,6 +174,20 @@ class PersonAddressByRoleView {
             }
         return personAddressList
     }
+
+
+    public static def fetchAddressesByPidmAndRoles(Map params) {
+
+        def result = []
+        if (params.roles?.size()) {
+            result = PersonAddressByRoleView.withSession { session ->
+                session.getNamedQuery('PersonAddressByRoleView.fetchAddressesByPidmAndRoles').setInteger('pidm', params?.pidm)
+                        .setParameterList('roles', params.roles).list()
+            }
+        }
+        return result
+    }
+
 
 
 }
