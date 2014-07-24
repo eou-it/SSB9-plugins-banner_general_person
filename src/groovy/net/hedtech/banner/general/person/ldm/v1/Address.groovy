@@ -1,7 +1,7 @@
 /*******************************************************************************
  Copyright 2014 Ellucian Company L.P. and its affiliates.
  *******************************************************************************/
-package net.hedtech.banner.ldm.person
+package net.hedtech.banner.general.person.ldm.v1
 
 import net.hedtech.banner.general.person.PersonAddress
 
@@ -9,16 +9,15 @@ import net.hedtech.banner.general.person.PersonAddress
 /**
  * LDM decorator for person resource address.
  */
-class AddressV1 {
+class Address {
 
     @Delegate private final PersonAddress address
+    String guid
+    String addressType
 
-    def AddressV1( PersonAddress address ) {
+    def Address( PersonAddress address ) {
         this.address = address
-    }
-
-    def getAddressType() {
-        this.address?.addressType?.description
+        this.addressType = null
     }
 
     def getState() {
@@ -27,6 +26,14 @@ class AddressV1 {
 
     def getNation() {
         this.address?.nation?.nation
+    }
+
+    def getAddressType() {
+        this.addressType
+    }
+
+    def setAddressType(String addressType) {
+        this.addressType = addressType
     }
 
 }

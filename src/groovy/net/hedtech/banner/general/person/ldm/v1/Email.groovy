@@ -1,23 +1,28 @@
 /*******************************************************************************
  Copyright 2014 Ellucian Company L.P. and its affiliates.
  *******************************************************************************/
-package net.hedtech.banner.ldm.person
+package net.hedtech.banner.general.person.ldm.v1
 
 import net.hedtech.banner.general.person.PersonEmail
 
 /**
  * LDM Decorator for person resource emails.
  */
-class EmailV1 {
+class Email {
     @Delegate private final PersonEmail email
+    String guid
+    String emailType
 
-    def EmailV1(PersonEmail email) {
+    def Email(PersonEmail email) {
         this.email = email
     }
 
     def getEmailType() {
-        // TODO: Filter and decode/map enumerations.
-        this.email?.emailType?.description
+        this.emailType
+    }
+
+    def setEmailType(String emailType) {
+        this.emailType = emailType
     }
 
 }

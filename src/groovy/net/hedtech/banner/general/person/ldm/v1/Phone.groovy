@@ -1,21 +1,26 @@
 /*******************************************************************************
  Copyright 2014 Ellucian Company L.P. and its affiliates.
  *******************************************************************************/
-package net.hedtech.banner.ldm.person
+package net.hedtech.banner.general.person.ldm.v1
 
 import net.hedtech.banner.general.person.PersonTelephone
 
 /**
  * LDM Decorator for person resource phones.
  */
-class PhoneV1 {
+class Phone {
     @Delegate private final PersonTelephone phone
+    String phoneType
 
-    def PhoneV1( PersonTelephone phone ) {
+    def Phone( PersonTelephone phone ) {
         this.phone = phone
     }
 
     def getTelephoneType() {
-        phone?.telephoneType?.description
+        this.phoneType
+    }
+
+    def setTelephoneType(String phoneType) {
+        this.phoneType = phoneType
     }
 }
