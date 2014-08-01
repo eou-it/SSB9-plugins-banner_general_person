@@ -56,7 +56,7 @@ class PersonCompositeService extends LdmService {
 
     @Transactional(readOnly = true)
     def get(id) {
-        def entity = globalUniqueIdentifierService.fetchByLdmNameAndGuid(ldmName, id)
+        def entity = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(ldmName, id)
         if( !entity ) {
             throw new ApplicationException("Person","@@r1:not.found.message:BusinessLogicValidationException@@")
         }
@@ -94,7 +94,7 @@ class PersonCompositeService extends LdmService {
             updateGuidValue(newPersonIdentificationName.id, person.guid)
         }
         else {
-            def entity = globalUniqueIdentifierService.fetchByLdmNameAndDomainId('person', newPersonIdentificationName.id)
+            def entity = GlobalUniqueIdentifier.fetchByLdmNameAndDomainId(ldmName, newPersonIdentificationName.id)
             person.put('guid', entity)
         }
 
@@ -136,7 +136,7 @@ class PersonCompositeService extends LdmService {
     // TODO: validate guid format.
     private void updateGuidValue(def id, def guid) {
         // Update the GUID to the one we received.
-        GlobalUniqueIdentifier newEntity = GlobalUniqueIdentifier.fetchByLdmNameAndDomainId('persons', id)
+        GlobalUniqueIdentifier newEntity = GlobalUniqueIdentifier.findByLdmNameAndDomainId(ldmName, id)
         if( !newEntity ) {
             throw new ApplicationException("Person","@@r1:guid.record.not.found.message:Person@@")
         }
@@ -282,10 +282,13 @@ class PersonCompositeService extends LdmService {
     @Transactional(readOnly = true)
     def buildLdmPersonObjects(def pidms) {
         def persons = [:]
+        if( pidms.size() < 1 ) {
+            return persons
+        }
         List<PersonBasicPersonBase> personBaseList = PersonBasicPersonBase.findAllByPidmInList(pidms)
         List<PersonIdentificationNameCurrent> personIdentificationList = PersonIdentificationNameCurrent.findAllByPidmInList(pidms)
-        List<PersonAddress> personAddressList = PersonAddress.fetchActiveAddressesByPidmInList(pidms)
-        List<PersonTelephone> personTelephoneList = PersonTelephone.fetchActiveTelephoneByPidmInList(pidms)
+        def personAddressList = PersonAddress.fetchActiveAddressesByPidmInList(pidms)
+        def personTelephoneList = PersonTelephone.fetchActiveTelephoneByPidmInList(pidms)
         List<PersonEmail> personEmailList = PersonEmail.findAllByStatusIndicatorAndPidmInList('A', pidms)
         personBaseList.each { personBase ->
             Person currentRecord = new Person(personBase)

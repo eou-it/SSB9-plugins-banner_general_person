@@ -570,10 +570,11 @@ class PersonAddress implements Serializable {
         }
     }
 
-    static def fetchActiveAddressesByPidmInList(List<Integer> pidms)  {
-            PersonAddress.withSession { session ->
-                session.getNamedQuery('PersonAddress.fetchActiveAddressesByPidmInList').setParameterList('pidms', pidms).list()
-            }
+    static List<PersonAddress> fetchActiveAddressesByPidmInList(List<Integer> pidms)  {
+        if( pidms.isEmpty() ) { return [] }
+        PersonAddress.withSession { session ->
+            session.getNamedQuery('PersonAddress.fetchActiveAddressesByPidmInList').setParameterList('pidms', pidms).list()
+        }
     }
 
 

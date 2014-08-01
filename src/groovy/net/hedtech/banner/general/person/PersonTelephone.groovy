@@ -483,7 +483,8 @@ class PersonTelephone implements Serializable {
         }
     }
 
-    static def fetchActiveTelephoneByPidmInList(List<Integer> pidms){
+    static List<PersonTelephone> fetchActiveTelephoneByPidmInList(List<Integer> pidms){
+        if( pidms.isEmpty() ) { return [] }
         PersonTelephone.withSession { session ->
             session.getNamedQuery('PersonTelephone.fetchActiveTelephoneByPidmInList')
                     .setParameterList('pidms', pidms).list()
