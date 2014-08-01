@@ -36,8 +36,11 @@ class Person {
 
     }
 
+    def Person(PersonBasicPersonBase person) {
+        this.person = person ?: new PersonBasicPersonBase() // PersonBasicPersonBase is optional, create blank object if none exists.
+    }
+
     def getMaritalStatus() {
-        // TODO: support enumeration
         this.maritalStatus
     }
 

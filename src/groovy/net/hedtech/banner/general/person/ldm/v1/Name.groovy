@@ -17,7 +17,7 @@ public class Name {
     String pedigree
     String preferredName
 
-    def Name(PersonIdentificationNameCurrent personName, PersonBasicPersonBase person ) {
+    def Name(PersonIdentificationNameCurrent personName, def person ) {
         this.personName = personName
         this.title = person?.namePrefix
         this.pedigree = person?.nameSuffix

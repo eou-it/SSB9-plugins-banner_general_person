@@ -34,39 +34,34 @@ class PersonCompositeService extends LdmService {
     def personAddressService
     def personTelephoneService
     def personEmailService
+    def globalUniqueIdentifierService
+    def static ldmName = 'persons'
+
+    @Transactional(readOnly = true)
+    def list(params) {
+        def pidms = []
+            // This'll be populated by the pidm(s) returned from common matching, or the list we query from matching results.
+
+
+        def persons = buildLdmPersonObjects(pidms)
+        def resultList
+        try {  // Avoid restful-api plugin dependencies.
+            resultList = this.class.classLoader.loadClass('net.hedtech.restfulapi.PagedResultArrayList').newInstance(persons.values(), persons.values()?.size())
+        }
+        catch (ClassNotFoundException e) {
+            resultList = persons.values()
+        }
+        resultList
+    }
 
     @Transactional(readOnly = true)
     def get(id) {
-        def entity = GlobalUniqueIdentifier.findByGuid(id)
+        def entity = globalUniqueIdentifierService.fetchByLdmNameAndGuid(ldmName, id)
         if( !entity ) {
             throw new ApplicationException("Person","@@r1:not.found.message:BusinessLogicValidationException@@")
         }
-        PersonIdentificationNameCurrent personIdentificationName = PersonIdentificationNameCurrent.get(entity.domainId)
-        if( !personIdentificationName ) {
-            throw new ApplicationException("Person","@@r1:not.found.message:BusinessLogicValidationException@@")
-        }
-        PersonBasicPersonBase personBase = PersonBasicPersonBase.findByPidm(personIdentificationName.pidm)
-        // Store the primary name
-        def names = []
-        def name = new Name(personIdentificationName, personBase)
-        name.setNameType("Primary")
-        names << name
-        // TODO: Look for and display birth name?
-        //Store the credential we already have
-        def credentials = []
-        credentials << new Credential("Person ID",
-                personIdentificationName.bannerId,
-                null,
-                null)
-        // TODO: Add other credentials?  (Not PIDM!)
-        def addresses = listAddresses(personIdentificationName.pidm)
-        def phones = listPhones(personIdentificationName.pidm)
-        def emails = listEmails(personIdentificationName.pidm)
-        // Create decorated object to return.
-        def person = new Person( personBase, entity.guid,
-                credentials, addresses, phones, emails, names)
-        person.setMaritalStatus(getLdmMaritalStatus(personBase?.maritalStatus?.code))
-        person
+        def resultList = buildLdmPersonObjects([entity.domainKey?.toInteger()])
+        resultList.get(entity.domainKey?.toInteger())
     }
 
     // TODO: Break into more functions.
@@ -99,8 +94,8 @@ class PersonCompositeService extends LdmService {
             updateGuidValue(newPersonIdentificationName.id, person.guid)
         }
         else {
-            def entity = GlobalUniqueIdentifier.findByLdmNameAndDomainId('person', newPersonIdentificationName.id)
-            person.put('guid', entity?.guid)
+            def entity = globalUniqueIdentifierService.fetchByLdmNameAndDomainId('person', newPersonIdentificationName.id)
+            person.put('guid', entity)
         }
 
         //Copy personBase attributes into person map from Primary names object.
@@ -149,32 +144,7 @@ class PersonCompositeService extends LdmService {
             throw new ApplicationException("Person","@@r1:guid.not.found.message:Person:BusinessLogicValidationException@@")
         }
         newEntity.guid = guid
-        newEntity.save(failOnError: true)
-    }
-
-    //TODO: Order address query by preference
-    @Transactional( readOnly = true )
-    def listAddresses (Integer pidm) {
-        def addresses = []
-        def addressRules = rules.grep {
-            it.settingName?.equals('person.addresses.addressType')
-        }
-        PersonCompositeService.log.debug "Address mapping rules: ${addressRules.toString()}"
-        if( addressRules.size() > 0 ) {
-            PersonAddress.fetchActiveAddressesByPidm([pidm: pidm]).list?.each { activeAddress ->
-
-                addressRules?.each { rule ->
-                    if (rule.value == activeAddress.addressType?.code &&
-                            !addresses.contains { it.addressType == rule.translationValue }) {
-                        def address = new Address(activeAddress)
-                        address.addressType = rule.translationValue
-                        addresses << address
-                    }
-
-                }
-            }
-        }
-        addresses
+        globalUniqueIdentifierService.update(newEntity)
     }
 
     def createAddresses (def pidm, List newAddresses) {
@@ -205,27 +175,6 @@ class PersonCompositeService extends LdmService {
         addresses
     }
 
-    // TODO: Order phone query by preference.
-    @Transactional( readOnly = true )
-    def listPhones(def pidm ) {
-        def phones = []
-        def phoneRules = rules.grep {
-            it.settingName?.equals('person.phones.phoneType')
-        }
-        PersonCompositeService.log.debug "Phone mapping rules: ${phoneRules.toString()}"
-        PersonTelephone.fetchActiveTelephoneByPidm(pidm).each { activePhone ->
-            phoneRules?.each { rule ->
-                if (rule.value == activePhone?.telephoneType?.code &&
-                        !(phones.contains { it.phoneType == rule.translationValue })) {
-                    def phone = new Phone(activePhone)
-                    phone.phoneType = rule.translationValue
-                    phones << phone
-                }
-            }
-        }
-        phones
-    }
-
     def createPhones(def pidm, List newPhones) {
         def phones = []
         def phoneRules = rules.grep {
@@ -248,27 +197,6 @@ class PersonCompositeService extends LdmService {
             }
         }
         phones
-    }
-
-    // TODO: Need to know priority here.
-    @Transactional( readOnly = true )
-    def listEmails(Integer pidm) {
-        def emails = []
-        def emailRules = rules.grep {
-            it.settingName?.equals('person.emails.emailType')
-        }
-        PersonCompositeService.log.debug "Email mapping rules: ${emailRules.toString()}"
-        PersonEmail.findAllByPidmAndStatusIndicator(pidm, "A").each { PersonEmail activeEmail ->
-            emailRules?.each { rule ->
-                if (rule.value == activeEmail?.emailType?.code &&
-                        !emails.contains { it.emailType == rule.translationValue }) {
-                    def email = new Email(activeEmail)
-                    email.emailType = rule.translationValue
-                    emails << email
-                }
-            }
-        }
-        emails
     }
 
     def createEmails(def pidm, List newEmails) {
@@ -351,5 +279,86 @@ class PersonCompositeService extends LdmService {
         return null
     }
 
-}
+    @Transactional(readOnly = true)
+    def buildLdmPersonObjects(def pidms) {
+        def persons = [:]
+        List<PersonBasicPersonBase> personBaseList = PersonBasicPersonBase.findAllByPidmInList(pidms)
+        List<PersonIdentificationNameCurrent> personIdentificationList = PersonIdentificationNameCurrent.findAllByPidmInList(pidms)
+        List<PersonAddress> personAddressList = PersonAddress.fetchActiveAddressesByPidmInList(pidms)
+        List<PersonTelephone> personTelephoneList = PersonTelephone.fetchActiveTelephoneByPidmInList(pidms)
+        List<PersonEmail> personEmailList = PersonEmail.findAllByStatusIndicatorAndPidmInList('A', pidms)
+        personBaseList.each { personBase ->
+            Person currentRecord = new Person(personBase)
+            currentRecord.setMaritalStatus(getLdmMaritalStatus(personBase?.maritalStatus?.code))
+            persons.put(currentRecord.pidm, currentRecord)
+        }
+        def domainIds = []
+        personIdentificationList.each { identification ->
+            Person currentRecord = persons.get(identification.pidm) ?: new Person(null)
+            def name = new Name(identification, currentRecord)
+            name.setNameType("Primary")
+            domainIds << identification.id
+            currentRecord.names << name
+            currentRecord.credentials << new Credential("Person ID",
+                    identification.bannerId,
+                    null,
+                    null)
+            persons.put(identification.pidm, currentRecord)
+        }
+        GlobalUniqueIdentifier.findAllByLdmNameAndDomainIdInList(ldmName, domainIds).each { guid ->
+            Person currentRecord = persons.get(guid.domainKey.toInteger())
+            currentRecord.guid = guid.guid
+            persons.put(guid.domainKey.toInteger(), currentRecord)
+        }
+        def addressRules = rules.grep {
+            it.settingName?.equals('person.addresses.addressType')
+        }
+        PersonCompositeService.log.debug "Address mapping rules: ${addressRules.toString()}"
+        personAddressList.each { activeAddress ->
+            Person currentRecord = persons.get(activeAddress.pidm)
+            addressRules?.each { rule ->
+                if (rule.value == activeAddress.addressType?.code &&
+                        !currentRecord.addresses.contains { it.addressType == rule.translationValue }) {
+                    def address = new Address(activeAddress)
+                    address.addressType = rule.translationValue
+                    currentRecord.addresses << address
+                }
 
+            }
+        }
+        def phoneRules = rules.grep {
+            it.settingName?.equals('person.phones.phoneType')
+        }
+        PersonCompositeService.log.debug "Phone mapping rules: ${phoneRules.toString()}"
+        personTelephoneList.each { activePhone ->
+            Person currentRecord = persons.get(activePhone.pidm)
+            phoneRules?.each { rule ->
+                if (rule.value == activePhone?.telephoneType?.code &&
+                        !(currentRecord.phones.contains { it.phoneType == rule.translationValue })) {
+                    def phone = new Phone(activePhone)
+                    phone.phoneType = rule.translationValue
+                    currentRecord.phones << phone
+                }
+            }
+            persons.put(activePhone.pidm, currentRecord)
+        }
+
+        def emailRules = rules.grep {
+            it.settingName?.equals('person.emails.emailType')
+        }
+        PersonCompositeService.log.debug "Email mapping rules: ${emailRules.toString()}"
+        personEmailList.each { PersonEmail activeEmail ->
+            Person currentRecord = persons.get(activeEmail.pidm)
+            emailRules?.each { rule ->
+                if (rule.value == activeEmail?.emailType?.code &&
+                        !currentRecord.emails.contains { it.emailType == rule.translationValue }) {
+                    def email = new Email(activeEmail)
+                    email.emailType = rule.translationValue
+                    currentRecord.emails << email
+                }
+            }
+            persons.put(activeEmail.pidm, currentRecord)
+        }
+        persons // Map of person objects with pidm as index.
+    }
+}

@@ -85,6 +85,12 @@ import javax.persistence.*
                              WHERE  pidm = :pidm
                              AND NVL(statusIndicator,'A') <> 'I'
                              AND NVL(unlistIndicator,'N') <> 'Y'
+                    """),
+@NamedQuery(name = "PersonTelephone.fetchActiveTelephoneByPidmInList",
+                query = """FROM PersonTelephone a
+                             WHERE  pidm IN :pidms
+                             AND NVL(statusIndicator,'A') <> 'I'
+                             AND NVL(unlistIndicator,'N') <> 'Y'
                     """)
 ])
 @DatabaseModifiesState
@@ -474,6 +480,13 @@ class PersonTelephone implements Serializable {
         PersonTelephone.withSession { session ->
             session.getNamedQuery('PersonTelephone.fetchActiveTelephoneByPidm')
                     .setInteger('pidm', pidm).list()
+        }
+    }
+
+    static def fetchActiveTelephoneByPidmInList(List<Integer> pidms){
+        PersonTelephone.withSession { session ->
+            session.getNamedQuery('PersonTelephone.fetchActiveTelephoneByPidmInList')
+                    .setParameterList('pidms', pidms).list()
         }
     }
 }
