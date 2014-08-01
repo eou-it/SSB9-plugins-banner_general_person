@@ -1,5 +1,5 @@
 /*******************************************************************************
- Copyright 2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2013-2014 Ellucian Company L.P. and its affiliates.
  ****************************************************************************** */
 package net.hedtech.banner.general.person
 
@@ -20,7 +20,15 @@ query = """FROM  PersonBasicPersonBase a
 	       WHERE a.pidm = :pidm """),
 @NamedQuery(name = "PersonBasicPersonBase.fetchBySsn",
 query = """FROM  PersonBasicPersonBase a
-	       WHERE a.ssn = :ssn """)
+	       WHERE a.ssn = :ssn """),
+@NamedQuery(name = "PersonBasicPersonBase.fetchByPidmList",
+        query = """FROM  PersonBasicPersonBase a
+	       WHERE a.pidm IN :pidm """),
+@NamedQuery(name = "PersonBasicPersonBase.fetchConfirmedReByPidm",
+query = """SELECT a.confirmedRe
+    FROM PersonBasicPersonBase a
+    WHERE a.pidm = :pidm
+    """)
 ])
 @DatabaseModifiesState
 class PersonBasicPersonBase implements Serializable {
@@ -567,6 +575,22 @@ class PersonBasicPersonBase implements Serializable {
     def static fetchByPidm(Integer pidm) {
         PersonBasicPersonBase object = PersonBasicPersonBase.withSession { session ->
             def list = session.getNamedQuery('PersonBasicPersonBase.fetchByPidm').setInteger('pidm', pidm).list()[0]
+        }
+
+        return object
+    }
+
+    public static String fetchSurveyConfirmedFlagByPidm(Integer pidm) {
+        String surveyConfirmedFlag = PersonBasicPersonBase.withSession {session ->
+            session.getNamedQuery('PersonBasicPersonBase.fetchConfirmedReByPidm').setInteger('pidm', pidm).list()[0]
+        }
+        return surveyConfirmedFlag
+    }
+
+
+    def static List fetchByPidmList(List pidm) {
+        List object = PersonBasicPersonBase.withSession { session ->
+            def list = session.getNamedQuery('PersonBasicPersonBase.fetchByPidmList').setParameterList('pidm', pidm).list()
         }
 
         return object

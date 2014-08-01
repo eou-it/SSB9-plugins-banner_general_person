@@ -35,7 +35,14 @@ query = """FROM  PersonRelatedHold a
 	  	   WHERE a.pidm = :pidm
 	  	     AND ( TRUNC(:compareDate) >= TRUNC(a.fromDate)
 	  	           AND TRUNC(:compareDate) < TRUNC(a.toDate) )
-	  	ORDER BY a.fromDate desc, a.toDate desc """)])
+	  	ORDER BY a.fromDate desc, a.toDate desc """),
+@NamedQuery(name = "PersonRelatedHold.fetchByPidmListAndDateCompare",
+query = """FROM  PersonRelatedHold a
+	  	   WHERE a.pidm IN :pidm
+	  	     AND ( TRUNC(:compareDate) >= TRUNC(a.fromDate)
+	  	           AND TRUNC(:compareDate) < TRUNC(a.toDate) )
+	  	ORDER BY a.fromDate desc, a.toDate desc """)
+])
 
 @Entity
 @Table(name = "SV_SPRHOLD")
@@ -266,6 +273,21 @@ class PersonRelatedHold implements Serializable {
 
         return personRelatedHolds
     }
+
+
+    /**
+     * Retrieve person related hold records where the date sent in is greater
+     * than or equal to the hold from date and less than the hold to date, for a list of pidms.
+     */
+
+    public static List fetchByPidmListAndDateCompare(List pidm, Date compareDate) {
+        def personRelatedHolds = PersonRelatedHold.withSession {session ->
+            session.getNamedQuery('PersonRelatedHold.fetchByPidmListAndDateCompare').setParameterList('pidm', pidm).setDate('compareDate', compareDate).list()
+        }
+
+        return personRelatedHolds
+    }
+
 
     /**
      * Check for the existence of a person related registration hold record where the date sent in is greater

@@ -1,8 +1,5 @@
-/*********************************************************************************
-Copyright 2012 Ellucian Company L.P. and its affiliates.
-**********************************************************************************/
 /*******************************************************************************
- Copyright 2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2012-2014 Ellucian Company L.P. and its affiliates.
  ****************************************************************************** */
 package net.hedtech.banner.general.person
 
@@ -666,6 +663,22 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
         assertNotNull newPersonBasicPersonBase.id
     }
 
+
+    void testFetchByPidmList() {
+        def personList = []
+        (0..5).each {
+            def person = newValidForCreatePersonBasicPersonBase()
+            person.save(failOnError: true, flush: true)
+            personList.add(person)
+        }
+        def result = PersonBasicPersonBase.fetchByPidmList(personList.pidm)
+
+        assertFalse result.empty
+        assertTrue result.size() > 1
+        assertTrue result[0] instanceof PersonBasicPersonBase
+    }
+
+
     void testFetchBySsn() {
         def personBasicPersonBase1 = newValidForCreatePersonBasicPersonBase()
         personBasicPersonBase1.save(failOnError: true, flush: true)
@@ -751,6 +764,14 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
         return personBasicPersonBase
     }
 
+    void testFetchSurveyConfirmedFlagByPidm() {
+        def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()
+        personBasicPersonBase.save(failOnError: true, flush: true)
+        assertNotNull personBasicPersonBase.id
+
+        String confirmedFlag = PersonBasicPersonBase.fetchSurveyConfirmedFlagByPidm(personBasicPersonBase.pidm)
+        assertNotNull confirmedFlag
+    }
 
     private def newInvalidForCreatePersonBasicPersonBase() {
         def sql = new Sql(sessionFactory.getCurrentSession().connection())
