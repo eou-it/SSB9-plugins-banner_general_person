@@ -176,6 +176,7 @@ class PersonAddressByRoleView {
     }
 
 
+    //currently not selecting unique address
     public static def fetchAddressesByPidmAndRoles(Map params) {
 
         def result = []
