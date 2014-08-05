@@ -39,6 +39,9 @@ class PersonAddressByRoleView {
     @Column(name = "STVATYP_DESC")
     String addressTypeDescription
 
+    @Column(name = "SPRADDR_ATYP_CODE")
+    String addressType
+
     @Column(name = "SPRADDR_HOUSE_NUMBER")
     String houseNumber
 
@@ -94,6 +97,7 @@ class PersonAddressByRoleView {
 					pidm=$pidm,
 					fromDate=$fromDate,
 					toDate=$toDate,
+                    addressType=$addressType,
 					streetLine1=$streetLine1,
 					streetLine2=$streetLine2,
 					streetLine3=$streetLine3,
@@ -120,6 +124,7 @@ class PersonAddressByRoleView {
 
         if (city != that.city) return false
         if (addressTypeDescription != that.addressTypeDescription) return false
+        if (addressType != that.addressType) return false
         if (fromDate != that.fromDate) return false
         if (houseNumber != that.houseNumber) return false
         if (id != that.id) return false
@@ -147,6 +152,7 @@ class PersonAddressByRoleView {
         result = 31 * result + (id != null ? id.hashCode() : 0)
         result = 31 * result + (version != null ? version.hashCode() : 0)
         result = 31 * result + (pidm != null ? pidm.hashCode() : 0)
+        result = 31 * result + (addressType != null ? addressType.hashCode() : 0)
         result = 31 * result + (addressTypeDescription != null ? addressTypeDescription.hashCode() : 0)
         result = 31 * result + (houseNumber != null ? houseNumber.hashCode() : 0)
         result = 31 * result + (streetLine1 != null ? streetLine1.hashCode() : 0)

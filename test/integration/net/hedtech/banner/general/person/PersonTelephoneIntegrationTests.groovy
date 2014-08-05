@@ -544,6 +544,13 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
 		assertTrue results.size() > 1
 		assertTrue results[0] instanceof PersonTelephone
 	}
+
+
+    def testFetchActiveTelphonesByPidmAndAddressType() {
+        def pidm = PersonUtility.getPerson('HOS000JIM').pidm
+        def results = PersonTelephone.fetchActiveTelephonesByPidmAndAddressTypes([pidm:pidm,addressTypes:['MA']])
+        assertTrue results.size() == 1
+    }
 	
 
     private def newValidForCreatePersonTelephone() {
