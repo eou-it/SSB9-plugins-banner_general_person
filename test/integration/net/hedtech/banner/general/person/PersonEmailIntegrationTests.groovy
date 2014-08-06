@@ -377,4 +377,18 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
         assertNull(result)
     }
 
+    def testFetchByPidmAndEmailTypeAndStatusAndWebDisplay() {
+        def emails = PersonEmail.fetchByPidmAndStatusAndWebDisplay(PersonUtility.getPerson("966049236").pidm, 'A','Y')
+        def res = emails[0]
+        assertEquals res.version, 0
+        assertEquals res.pidm, 33784
+        assertEquals res.emailAddress, "einstein2be@verizon.net"
+        assertEquals res.statusIndicator, "A"
+        assertEquals res.preferredIndicator, true
+        assertEquals res.commentData, null
+        assertEquals res.displayWebIndicator, true
+        assertEquals res.dataOrigin, "Banner"
+
+    }
+
 }
