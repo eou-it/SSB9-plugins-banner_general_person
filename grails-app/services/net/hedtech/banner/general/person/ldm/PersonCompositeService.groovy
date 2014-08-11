@@ -24,6 +24,7 @@ import net.hedtech.banner.general.system.MaritalStatus
 import net.hedtech.banner.general.system.Nation
 import net.hedtech.banner.general.system.State
 import net.hedtech.banner.general.system.TelephoneType
+import net.hedtech.banner.general.system.ldm.v1.MaritalStatusParentCategory
 import org.springframework.transaction.annotation.Transactional
 
 @Transactional
@@ -228,17 +229,17 @@ class PersonCompositeService extends LdmService {
         if( maritalStatus != null  ) {
             switch (maritalStatus) {
                 case "S":
-                    return "Single"
+                    return MaritalStatusParentCategory.SINGLE.value
                 case "M":
-                    return "Married"
+                    return MaritalStatusParentCategory.MARRIED.value
                 case "D":
-                    return "Divorced"
+                    return MaritalStatusParentCategory.DIVORCED.value
                 case "W":
-                    return "Widowed"
+                    return MaritalStatusParentCategory.WIDOWED.value
                 case "P":
-                    return "Separated"
+                    return MaritalStatusParentCategory.SEPARATED.value
                 case "R":
-                    return "Married"
+                    return MaritalStatusParentCategory.MARRIED.value
                 default:
                     PersonCompositeService.log.warn "Banner marital status code ${maritalStatus} not found."
             }
@@ -251,19 +252,19 @@ class PersonCompositeService extends LdmService {
         if( maritalStatus != null ) {
             def validationRecord
             switch (maritalStatus) {
-                case "Single":
+                case MaritalStatusParentCategory.SINGLE.value:
                     validationRecord = MaritalStatus.findByCode("S")
                     break
-                case "Married":
+                case MaritalStatusParentCategory.MARRIED.value:
                     validationRecord = MaritalStatus.findByCode("M")
                     break
-                case "Divorced":
+                case MaritalStatusParentCategory.DIVORCED.value:
                     validationRecord = MaritalStatus.findByCode("D")
                     break
-                case "Widowed":
+                case MaritalStatusParentCategory.WIDOWED.value:
                     validationRecord = MaritalStatus.findByCode("W")
                     break
-                case "Separated":
+                case MaritalStatusParentCategory.SEPARATED.value:
                     validationRecord = MaritalStatus.findByCode("P")
                     break
                 default:
