@@ -4,6 +4,7 @@
 package net.hedtech.banner.general.person.ldm
 
 import net.hedtech.banner.exceptions.ApplicationException
+import net.hedtech.banner.general.overall.IntegrationConfiguration
 import net.hedtech.banner.general.person.PersonAddress
 import net.hedtech.banner.general.person.PersonBasicPersonBase
 import net.hedtech.banner.general.person.PersonEmail
@@ -37,6 +38,11 @@ class PersonCompositeService extends LdmService {
     def personEmailService
     def globalUniqueIdentifierService
     def static ldmName = 'persons'
+    static final String PERSON_ADDRESS_TYPE = "person.addresses.addressType"
+    static final String PERSON_PHONE_TYPE = "person.phones.phoneType"
+    static final String PERSON_EMAIL_TYPE ="person.emails.emailType"
+    static final String PROCESS_CODE ="LDM"
+
 
     @Transactional(readOnly = true)
     def list(params) {
@@ -150,75 +156,55 @@ class PersonCompositeService extends LdmService {
 
     def createAddresses (def pidm, List newAddresses) {
         def addresses = []
-        def addressRules = rules.grep {
-            it.settingName?.equals('person.addresses.addressType')
-        }
-        PersonCompositeService.log.debug "Address mapping rules: ${addressRules.toString()}"
-        if( addressRules.size() > 0 ) {
-            newAddresses?.each { activeAddress ->
-                addressRules?.each { rule ->
-                    if (rule.translationValue == activeAddress.addressType &&
-                            !addresses.contains { activeAddress.addressType == rule.value }) {
-                        activeAddress.addressType = AddressType.findByCode(rule.value)
-                        activeAddress.state = State.findByDescription(activeAddress.state) // TODO: This may change
-                        activeAddress.nation = Nation.findByNation(activeAddress.nation) // TODO: This has changed.
-                        activeAddress.county = County.findByDescription(activeAddress.county)
-                        activeAddress.put('pidm', pidm)
-                        def address = personAddressService.create(activeAddress)
-                        def addressDecorator = new Address(address)
-                        addressDecorator.addressType = rule.translationValue
-                        addresses << addressDecorator
-                    }
-
-                }
+        newAddresses?.each { activeAddress ->
+            IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_ADDRESS_TYPE,activeAddress.addressType)
+            if (rule.translationValue == activeAddress.addressType && !addresses.contains { activeAddress.addressType == rule.value }) {
+                activeAddress.addressType = AddressType.findByCode(rule.value)
+                activeAddress.state = State.findByDescription(activeAddress.state) // TODO: This may change
+                activeAddress.nation = Nation.findByNation(activeAddress.nation) // TODO: This has changed.
+                activeAddress.county = County.findByDescription(activeAddress.county)
+                activeAddress.put('pidm', pidm)
+                def address = personAddressService.create(activeAddress)
+                def addressDecorator = new Address(address)
+                addressDecorator.addressType = rule.translationValue
+                addresses << addressDecorator
             }
+
         }
         addresses
     }
 
     def createPhones(def pidm, List newPhones) {
         def phones = []
-        def phoneRules = rules.grep {
-            it.settingName?.equals('person.phones.phoneType')
-        }
-        PersonCompositeService.log.debug "Phone mapping rules: ${phoneRules.toString()}"
-        if( phoneRules.size() > 0 ) {
-            newPhones?.each { activePhone ->
-                phoneRules?.each { rule ->
-                    if (rule.translationValue == activePhone.phoneType &&
-                            !phones.contains { activePhone.phoneType == rule.value }) {
-                        activePhone.put('telephoneType', TelephoneType.findByCode(rule.value) )
-                        activePhone.put('pidm', pidm)
-                        def phone = personTelephoneService.create(activePhone)
-                        def phoneDecorator = new Phone(phone)
-                        phoneDecorator.phoneType = rule.translationValue
-                        phones << phoneDecorator
-                    }
-                }
+        newPhones?.each { activePhone ->
+            IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_ADDRESS_TYPE, activePhone.phoneType)
+            if (rule.translationValue == activePhone.phoneType &&
+                    !phones.contains { activePhone.phoneType == rule.value }) {
+                activePhone.put('telephoneType', TelephoneType.findByCode(rule.value) )
+                activePhone.put('pidm', pidm)
+                def phone = personTelephoneService.create(activePhone)
+                def phoneDecorator = new Phone(phone)
+                phoneDecorator.phoneType = rule.translationValue
+                phones << phoneDecorator
             }
+
         }
         phones
     }
 
     def createEmails(def pidm, List newEmails) {
         def emails = []
-        def emailRules = rules.grep {
-            it.settingName?.equals('person.emails.emailType')
-        }
-        PersonCompositeService.log.debug "Email mapping rules: ${emailRules.toString()}"
-        if( emailRules.size() > 0 ) {
-            newEmails?.each { activeEmail ->
-                emailRules?.each { rule ->
-                    if (rule.translationValue == activeEmail.emailType &&
-                            !emails.contains { activeEmail.emailType == rule.value }) {
-                        activeEmail.emailType = EmailType.findByCode(rule.value)
-                        activeEmail.put('pidm', pidm)
-                        def email = personEmailService.create(activeEmail)
-                        def emailDecorator = new Email(email)
-                        emailDecorator.emailType = rule.translationValue
-                        emails << emailDecorator
-                    }
-                }
+
+        newEmails?.each { activeEmail ->
+            IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_EMAIL_TYPE, activeEmail.emailType)
+            if (rule?.translationValue == activeEmail.emailType &&
+                    !emails.contains { activeEmail.emailType == rule?.value }) {
+                activeEmail.emailType = EmailType.findByCode(rule.value)
+                activeEmail.put('pidm', pidm)
+                def email = personEmailService.create(activeEmail)
+                def emailDecorator = new Email(email)
+                emailDecorator.emailType = rule.translationValue
+                emails << emailDecorator
             }
         }
         emails
@@ -314,13 +300,9 @@ class PersonCompositeService extends LdmService {
             currentRecord.guid = guid.guid
             persons.put(guid.domainKey.toInteger(), currentRecord)
         }
-        def addressRules = rules.grep {
-            it.settingName?.equals('person.addresses.addressType')
-        }
-        PersonCompositeService.log.debug "Address mapping rules: ${addressRules.toString()}"
         personAddressList.each { activeAddress ->
             Person currentRecord = persons.get(activeAddress.pidm)
-            addressRules?.each { rule ->
+            IntegrationConfiguration rule = findAllByProcessCodeAndSettingNameAndValue(PROCESS_CODE, PERSON_ADDRESS_TYPE,activeAddress.addressType.code)
                 if (rule.value == activeAddress.addressType?.code &&
                         !currentRecord.addresses.contains { it.addressType == rule.translationValue }) {
                     def address = new Address(activeAddress)
@@ -328,39 +310,32 @@ class PersonCompositeService extends LdmService {
                     currentRecord.addresses << address
                 }
 
-            }
+
         }
-        def phoneRules = rules.grep {
-            it.settingName?.equals('person.phones.phoneType')
-        }
-        PersonCompositeService.log.debug "Phone mapping rules: ${phoneRules.toString()}"
+
         personTelephoneList.each { activePhone ->
             Person currentRecord = persons.get(activePhone.pidm)
-            phoneRules?.each { rule ->
+            IntegrationConfiguration rule = findAllByProcessCodeAndSettingNameAndValue(PROCESS_CODE, PERSON_PHONE_TYPE,activePhone?.telephoneType.code)
                 if (rule.value == activePhone?.telephoneType?.code &&
                         !(currentRecord.phones.contains { it.phoneType == rule.translationValue })) {
                     def phone = new Phone(activePhone)
                     phone.phoneType = rule.translationValue
                     currentRecord.phones << phone
                 }
-            }
+
             persons.put(activePhone.pidm, currentRecord)
         }
 
-        def emailRules = rules.grep {
-            it.settingName?.equals('person.emails.emailType')
-        }
-        PersonCompositeService.log.debug "Email mapping rules: ${emailRules.toString()}"
         personEmailList.each { PersonEmail activeEmail ->
             Person currentRecord = persons.get(activeEmail.pidm)
-            emailRules?.each { rule ->
+            IntegrationConfiguration rule = findAllByProcessCodeAndSettingNameAndValue(PROCESS_CODE, PERSON_EMAIL_TYPE,activeEmail?.emailType.code)
                 if (rule.value == activeEmail?.emailType?.code &&
                         !currentRecord.emails.contains { it.emailType == rule.translationValue }) {
                     def email = new Email(activeEmail)
                     email.emailType = rule.translationValue
                     currentRecord.emails << email
                 }
-            }
+
             persons.put(activeEmail.pidm, currentRecord)
         }
         persons // Map of person objects with pidm as index.
