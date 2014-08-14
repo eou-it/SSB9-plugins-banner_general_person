@@ -5,14 +5,15 @@ package net.hedtech.banner.general.person.ldm.v1
 
 import net.hedtech.banner.general.person.PersonBasicPersonBase
 import net.hedtech.banner.general.person.PersonIdentificationNameCurrent
+import net.hedtech.banner.general.system.ldm.MaritalStatusCompositeService
 
 /**
  * LDM Decorator for person resource.
  */
 class Person {
     @Delegate private final PersonBasicPersonBase person
+    def maritalStatusDetail
     String guid
-    String maritalStatus
     List credentials = []
     List addresses = []
     List phones = []
@@ -25,7 +26,8 @@ class Person {
              def addresses,
              def phones,
              def emails,
-             def names) {
+             def names,
+             def maritalStatus) {
         this.person = person ?: new PersonBasicPersonBase() // PersonBasicPersonBase is optional, create blank object if none exists.
         this.guid = guid instanceof String ? guid : ""
         this.credentials = credentials instanceof List ? credentials : null
@@ -33,19 +35,12 @@ class Person {
         this.phones = phones instanceof List ? phones : null
         this.emails = emails instanceof List ? emails : null
         this.names = names instanceof List ? names : null
+        this.maritalStatusDetail = maritalStatus
 
     }
 
     def Person(PersonBasicPersonBase person) {
         this.person = person ?: new PersonBasicPersonBase() // PersonBasicPersonBase is optional, create blank object if none exists.
-    }
-
-    def getMaritalStatus() {
-        this.maritalStatus
-    }
-
-    def setMaritalStatus(String maritalStatus) {
-        this.maritalStatus = maritalStatus
     }
 
     def getSex() {

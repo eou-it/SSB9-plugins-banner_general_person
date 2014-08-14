@@ -14,10 +14,12 @@ class Address {
     @Delegate private final PersonAddress address
     String guid
     String addressType
+    def country
 
     def Address( PersonAddress address ) {
         this.address = address
         this.addressType = null
+        this.country = address.nation
     }
 
     def getState() {
