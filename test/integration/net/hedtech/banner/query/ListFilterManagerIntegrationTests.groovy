@@ -5,6 +5,8 @@ package net.hedtech.banner.query
 
 import net.hedtech.banner.exceptions.ApplicationException
 import org.hibernate.Criteria
+import org.hibernate.criterion.Criterion
+import org.hibernate.Session
 import net.hedtech.banner.general.person.view.PersonPersonView
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 
@@ -54,7 +56,11 @@ class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
 
         def lfm = new ListFilterManager(PersonPersonView, filterDefinition)
         lfm.saveFilter(lastNameFilter)
-        Criteria cr = lfm.getCriterionObject(sessionFactory.getCurrentSession())
+        Session session = sessionFactory.getCurrentSession()
+        Criterion cro = lfm.getCriterionObject(session)
+        Criteria cr = session.createCriteria(PersonPersonView, "cr1")
+        cr.add(cro)
+
 
         def results = cr.list()
         assertTrue results.size() > 0
@@ -77,7 +83,10 @@ class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
 
         def lfm = new ListFilterManager(PersonPersonView, filterDefinition)
         lfm.saveFilter(lastNameFilter)
-        Criteria cr = lfm.getCriterionObject(sessionFactory.getCurrentSession())
+        Session session = sessionFactory.getCurrentSession()
+        Criterion cro = lfm.getCriterionObject(sessionFactory.getCurrentSession())
+        Criteria cr = session.createCriteria(PersonPersonView, "cr1")
+        cr.add(cro)
 
         def results = cr.list()
         assertTrue results.size() > 0
@@ -105,7 +114,10 @@ class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
 
         def lfm = new ListFilterManager(PersonPersonView, filterDefinition)
         lfm.saveFilter(lastNameFilter)
-        Criteria cr = lfm.getCriterionObject(sessionFactory.getCurrentSession())
+        Session session = sessionFactory.getCurrentSession()
+        Criterion cro = lfm.getCriterionObject(sessionFactory.getCurrentSession())
+        Criteria cr = session.createCriteria(PersonPersonView, "cr1")
+        cr.add(cro)
 
         def results = cr.list()
         assertTrue results.size() > 0
@@ -134,7 +146,10 @@ class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
 
         def lfm = new ListFilterManager(PersonPersonView, filterDefinition)
         lfm.saveFilter(lastNameFilter)
-        Criteria cr = lfm.getCriterionObject(sessionFactory.getCurrentSession())
+        Session session = sessionFactory.getCurrentSession()
+        Criterion cro = lfm.getCriterionObject(sessionFactory.getCurrentSession())
+        Criteria cr = session.createCriteria(PersonPersonView, "cr1")
+        cr.add(cro)
 
         def results = cr.list()
         assertTrue results.size() > 0

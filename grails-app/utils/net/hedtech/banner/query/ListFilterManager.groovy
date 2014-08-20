@@ -4,7 +4,7 @@
 package net.hedtech.banner.query
 
 import net.hedtech.banner.exceptions.ApplicationException
-import org.hibernate.Criteria
+import org.hibernate.criterion.Criterion
 import org.hibernate.criterion.Conjunction
 import org.hibernate.Session
 import org.hibernate.criterion.Restrictions
@@ -37,8 +37,8 @@ class ListFilterManager {
         filter = filterToSave
     }
 
-    Criteria getCriterionObject(Session session) {
-        Criteria cr = session.createCriteria(viewToFilter, "cr1")
+    Criterion getCriterionObject(Session session) {
+        Criterion cr
         def restrictionsList = []
         filter.each { it ->
                 restrictionsList << getRestriction(it)
@@ -46,16 +46,14 @@ class ListFilterManager {
 
         if (restrictionsList.size() > 0) {
             if (restrictionsList.size() == 1) {
-                cr.add(restrictionsList[0])
+                cr = restrictionsList[0]
             }
             else {
                 // AND them all together
-                Conjunction criterion = Restrictions.conjunction()
+                cr = Restrictions.conjunction()
                 restrictionsList.each{ it ->
-                    criterion.add(it)
+                    cr.add(it)
                 }
-                cr.add(criterion)
-
             }
         }
         return cr
