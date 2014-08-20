@@ -57,7 +57,7 @@ class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
         def lfm = new ListFilterManager(PersonPersonView, filterDefinition)
         lfm.saveFilter(lastNameFilter)
         Session session = sessionFactory.getCurrentSession()
-        Criterion cro = lfm.getCriterionObject(session)
+        Criterion cro = lfm.getCriterionObject()
         Criteria cr = session.createCriteria(PersonPersonView, "cr1")
         cr.add(cro)
 
@@ -84,7 +84,7 @@ class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
         def lfm = new ListFilterManager(PersonPersonView, filterDefinition)
         lfm.saveFilter(lastNameFilter)
         Session session = sessionFactory.getCurrentSession()
-        Criterion cro = lfm.getCriterionObject(sessionFactory.getCurrentSession())
+        Criterion cro = lfm.getCriterionObject()
         Criteria cr = session.createCriteria(PersonPersonView, "cr1")
         cr.add(cro)
 
@@ -115,7 +115,7 @@ class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
         def lfm = new ListFilterManager(PersonPersonView, filterDefinition)
         lfm.saveFilter(lastNameFilter)
         Session session = sessionFactory.getCurrentSession()
-        Criterion cro = lfm.getCriterionObject(sessionFactory.getCurrentSession())
+        Criterion cro = lfm.getCriterionObject()
         Criteria cr = session.createCriteria(PersonPersonView, "cr1")
         cr.add(cro)
 
@@ -147,7 +147,7 @@ class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
         def lfm = new ListFilterManager(PersonPersonView, filterDefinition)
         lfm.saveFilter(lastNameFilter)
         Session session = sessionFactory.getCurrentSession()
-        Criterion cro = lfm.getCriterionObject(sessionFactory.getCurrentSession())
+        Criterion cro = lfm.getCriterionObject()
         Criteria cr = session.createCriteria(PersonPersonView, "cr1")
         cr.add(cro)
 

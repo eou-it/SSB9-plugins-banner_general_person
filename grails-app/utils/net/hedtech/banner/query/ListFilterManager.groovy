@@ -37,7 +37,7 @@ class ListFilterManager {
         filter = filterToSave
     }
 
-    Criterion getCriterionObject(Session session) {
+    Criterion getCriterionObject() {
         Criterion cr
         def restrictionsList = []
         filter.each { it ->
