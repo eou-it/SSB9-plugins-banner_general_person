@@ -295,4 +295,169 @@ class PersonCompositeService extends LdmService {
         }
         persons // Map of person objects with pidm as index.
     }
+
+    // @Transactional(readOnly = false, propagation = Propagation.SUPPORTS)
+    /**
+     * Updates the Person Information like PersonIdentificationNameCurrent, PersonBasicPersonBase, Address
+     * Telephones and Emails
+     * @param person - Map containing the changes person details
+     * @return erson
+     */
+    def update(Map person) {
+
+        def changedPersonIdentification
+        person?.names?.each { it ->
+            if (it.nameType == 'Primary') {
+                changedPersonIdentification = it
+            }
+        }
+        def entity = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(ldmName, person.guid)
+        if (!entity) {
+            throw new ApplicationException("Person", "@@r1:guid.record.not.found.message:Person@@")
+        }
+
+        List<PersonIdentificationNameCurrent> personIdentificationList = PersonIdentificationNameCurrent.findAllByPidmInList([entity.domainKey?.toInteger()])
+
+        def personIdentification
+        personIdentificationList.each { identification ->
+            if (identification.changeIndicator == null) {
+                personIdentification = identification
+            }
+        }
+        //update PersonIdentificationNameCurrent
+
+        personIdentification.firstName = changedPersonIdentification.firstName
+        personIdentification.lastName = changedPersonIdentification.lastName
+        personIdentification.middleName = changedPersonIdentification.middleName
+        PersonIdentificationNameCurrent newPersonIdentificationName =personIdentificationNameCurrentService.update(personIdentification)
+
+        //update PersonBasicPersonBase
+        PersonBasicPersonBase newPersonBase = updatePersonBasicPersonBase(entity, person, changedPersonIdentification)
+        def names = []
+        def name = new Name(newPersonIdentificationName, newPersonBase)
+        name.setNameType("Primary")
+        names << name
+        //Store the credential we already have
+        def credentials = person?.credentials
+
+
+        //update Address
+        def addresses = updateAddresses(entity.domainKey?.toInteger(), person.addresses instanceof List ? person.addresses : [])
+
+        //update Telephones
+        def phones = updatePhones(entity.domainKey?.toInteger(), person.phones instanceof List ? person.phones : [])
+
+        //update Emails
+        def emails =  updateEmails(entity.domainKey?.toInteger(), person.emails instanceof List ? person.emails : [])
+        //Build decorator to return LDM response.
+        def newPerson = new Person(newPersonBase, person.guid, credentials, addresses, phones, emails, names, newPersonBase.maritalStatus)
+        newPerson
+
+
+    }
+
+    private PersonBasicPersonBase updatePersonBasicPersonBase(entity, person, changedPersonIdentification) {
+        List<PersonBasicPersonBase> personBaseList = PersonBasicPersonBase.findAllByPidmInList([entity.domainKey?.toInteger()])
+        PersonBasicPersonBase newPersonBase
+        personBaseList.each { personBase ->
+            //Copy personBase attributes into person map from Primary names object.
+            person?.credentials?.each { it ->
+                if (it.credentialType == 'Social Security Number') {
+                    personBase.ssn = it?.credentialId
+                }
+            }
+            personBase.namePrefix = changedPersonIdentification.get('namePrefix')
+            personBase.nameSuffix = changedPersonIdentification.get('nameSuffix')
+            personBase.preferenceFirstName = changedPersonIdentification.get('preferenceFirstName')
+            //Translate enumerations and defaults
+            personBase.sex = person?.sex == 'Male' ? 'M' : (person?.sex == 'Female' ? 'F' : 'N')
+            def maritalStatus = person.maritalStatus?.guid ? maritalStatusCompositeService.get(person.maritalStatus?.guid) : null
+            personBase.maritalStatus = maritalStatus ? MaritalStatus.findByCode(maritalStatus?.code) : null
+            personBase.ethnic = person.ethnic == "Non-Hispanic" ? '1' : (person.ethnic == "Hispanic" ? '2' : null)
+            personBase.deadIndicator = person.get('dateDeceased') != null ? 'Y' : null
+            personBase.armedServiceMedalVetIndicator = false
+            newPersonBase = personBasicPersonBaseService.update(personBase)
+
+        }
+        return newPersonBase
+    }
+
+
+    private  updateAddresses(def pidm, List<Map> newAddresses) {
+        def addresses = []
+        newAddresses?.each { activeAddress ->
+            IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_ADDRESS_TYPE, activeAddress.addressType)
+            if (rule.translationValue == activeAddress.addressType && !addresses.contains {
+                activeAddress.addressType == rule.value
+            }) {
+                def currAddress = PersonAddress.fetchListActiveAddressByPidmAndAddressType([pidm], [AddressType.findByCode(rule.value)]).get(0)
+                currAddress.state = State.findByDescription(activeAddress.state)
+                if (activeAddress?.country?.code) {
+                    currAddress.nation = Nation.findByNation(activeAddress?.country?.code)
+                    if (!currAddress.nation) {
+                        log.warn "Nation not found for code: ${activeAddress?.country?.code}"
+                    }
+                }
+                if (activeAddress.county) {
+                    currAddress.county = County.findByDescription(activeAddress.county)
+                    if (!currAddress.county) {
+                        log.warn "County not found for code: ${activeAddress.county}"
+                    }
+                }
+                def address = personAddressService.update(currAddress)
+                def addressDecorator = new Address(address)
+                addressDecorator.addressType = rule.translationValue
+                addresses << addressDecorator
+            }
+        }
+        addresses
+
+    }
+
+    private  updatePhones(def pidm, List newPhones) {
+        def phones = []
+        newPhones?.each { activePhone ->
+            IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_ADDRESS_TYPE, activePhone.phoneType)
+            if (rule.translationValue == activePhone.phoneType &&
+                    !phones.contains { activePhone.phoneType == rule.value }) {
+                def telephoneType =  TelephoneType.findByCode(rule.value)
+                def personTelephoneList = PersonTelephone.fetchActiveTelephoneByPidmInList([pidm])
+                personTelephoneList.each { curPhones ->
+                    if(curPhones.telephoneType.code ==rule.value){
+                        // curPhones.phoneArea
+                        curPhones.phoneExtension = activePhone.phoneExtension
+                        curPhones.phoneNumber = activePhone.phoneNumber
+                        def phone = personTelephoneService.update(curPhones)
+                        def phoneDecorator = new Phone(phone)
+                        phoneDecorator.phoneType = rule.translationValue
+                        phones << phoneDecorator
+                    }
+                }
+            }
+        }
+        phones
+
+    }
+
+
+    private updateEmails(def pidm, List newEmails) {
+        def emails = []
+        newEmails?.each { activeEmail ->
+            IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_EMAIL_TYPE, activeEmail.emailType)
+            if (rule?.translationValue == activeEmail.emailType &&
+                    !emails.contains { activeEmail.emailType == rule?.value }) {
+                def emailList =  PersonEmail.findAllByStatusIndicatorAndPidmInList('A', [pidm])
+                emailList.each { curEmails ->
+                    if(curEmails.emailType.code ==rule.value){
+                        curEmails.emailAddress = activeEmail.emailAddress
+                        def email = personEmailService.update(curEmails)
+                        def emailDecorator = new Email(email)
+                        emailDecorator.emailType = rule.translationValue
+                        emails << emailDecorator
+                    }
+                }
+            }
+        }
+        emails
+    }
 }
