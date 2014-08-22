@@ -6,6 +6,7 @@ package net.hedtech.banner.query
 import net.hedtech.banner.exceptions.ApplicationException
 import org.hibernate.Criteria
 import org.hibernate.criterion.Criterion
+import org.hibernate.criterion.Restrictions
 import org.hibernate.Session
 import net.hedtech.banner.general.person.view.PersonPersonView
 import net.hedtech.banner.testing.BaseIntegrationTestCase
@@ -21,7 +22,8 @@ class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
         super.setUp()
         filterDefinition = [ [field: "searchLastName", preProcessor: ListFilterManager.capitalize],
             [field: "searchFirstName", preProcessor: ListFilterManager.capitalize],
-            [field: "searchMiddleName", preProcessor: ListFilterManager.capitalize]]
+            [field: "searchMiddleName", preProcessor: ListFilterManager.capitalize],
+            [field: "specialLastName", specialProcessor: ListFilterManagerIntegrationTests.specialProcessor]]
     }
 
 
@@ -160,4 +162,37 @@ class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
             assertTrue it.middleName.indexOf("Lynn") == -1
         }
     }
+
+
+    void testUseSpecialGenerator() {
+        // Setup a filter for lastName = "Smith"
+        def lastNameFilter =
+            ["filter[0][field]" : "specialLastName",
+                    "filter[0][value]" : "Smith",
+                    "filter[0][operator]" : "eq"
+            ]
+
+        def lfm = new ListFilterManager(PersonPersonView, filterDefinition)
+        lfm.saveFilter(lastNameFilter)
+        Session session = sessionFactory.getCurrentSession()
+        Criterion cro = lfm.getCriterionObject()
+        Criteria cr = session.createCriteria(PersonPersonView, "cr1")
+        cr.add(cro)
+
+        def results = cr.list()
+        assertTrue results.size() > 0
+
+        results.each { it ->
+            assertTrue "Smith" != it.lastName
+        }
+    }
+
+
+    static def specialProcessor = { it ->
+        // We get the whole map, which includes field, operator
+        // For our test, return a restriction.ne regardless of the operator
+        return Restrictions.ne("lastName", it.value)
+
+    }
+
 }
