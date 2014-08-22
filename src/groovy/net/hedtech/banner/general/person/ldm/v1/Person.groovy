@@ -13,6 +13,7 @@ import net.hedtech.banner.general.system.ldm.MaritalStatusCompositeService
 class Person {
     @Delegate private final PersonBasicPersonBase person
     def maritalStatusDetail
+    def ethnicityDetail
     String guid
     List credentials = []
     List addresses = []
@@ -27,7 +28,8 @@ class Person {
              def phones,
              def emails,
              def names,
-             def maritalStatus) {
+             def maritalStatus,
+             def ethnicity) {
         this.person = person ?: new PersonBasicPersonBase() // PersonBasicPersonBase is optional, create blank object if none exists.
         this.guid = guid instanceof String ? guid : ""
         this.credentials = credentials instanceof List ? credentials : null
@@ -36,6 +38,7 @@ class Person {
         this.emails = emails instanceof List ? emails : null
         this.names = names instanceof List ? names : null
         this.maritalStatusDetail = maritalStatus
+        this.ethnicityDetail = ethnicity
 
     }
 
@@ -45,9 +48,5 @@ class Person {
 
     def getSex() {
         this.person?.sex == 'M' ? "Male":(this.person?.sex == 'F' ? "Female" : "Unknown")
-    }
-
-    def getEthnicity() {
-        this.person?.ethnic == '1' ? "Non-Hispanic" :(this.person?.ethnic == '2' ? "Hispanic" : null)
     }
 }

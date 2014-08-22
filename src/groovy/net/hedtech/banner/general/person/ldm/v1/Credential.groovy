@@ -8,14 +8,14 @@ package net.hedtech.banner.general.person.ldm.v1
  */
 class Credential {
     String credentialType
-    String credentialID
+    String credentialId
     Date effectiveStartDate
     Date effectiveEndDate
 
     def Credential( String credentialType, String credentialId,
                     Date effectiveStartDate, Date effectiveEndDate) {
         this.credentialType = credentialType
-        this.credentialID = credentialId
+        this.credentialId = credentialId
         this.effectiveStartDate = effectiveStartDate
         this.effectiveEndDate = effectiveEndDate
     }

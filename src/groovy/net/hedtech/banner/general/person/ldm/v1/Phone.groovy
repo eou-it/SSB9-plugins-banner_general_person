@@ -11,9 +11,11 @@ import net.hedtech.banner.general.person.PersonTelephone
 class Phone {
     @Delegate private final PersonTelephone phone
     String phoneType
+    String phoneNumberDetail
 
     def Phone( PersonTelephone phone ) {
         this.phone = phone
+        this.phoneNumberDetail = phone.internationalAccess ?: phone.phoneArea + phone.phoneNumber
     }
 
     def getTelephoneType() {
