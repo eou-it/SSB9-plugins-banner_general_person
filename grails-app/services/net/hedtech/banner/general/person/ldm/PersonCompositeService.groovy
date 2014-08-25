@@ -371,20 +371,20 @@ class PersonCompositeService extends LdmService {
      * @param person - Map containing the changes person details
      * @return erson
      */
-    def update(Map person) {
+    def update(Map content) {
 
-        def changedPersonIdentification
-        person?.names?.each { it ->
+        def primaryName
+        content?.names?.each { it ->
             if (it.nameType == 'Primary') {
-                changedPersonIdentification = it
+                primaryName = it
             }
         }
-        def entity = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(ldmName, person.guid)
+        def entity = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(ldmName, content.guid)
         if (!entity) {
             throw new ApplicationException("Person", "@@r1:guid.record.not.found.message:Person@@")
         }
-
-        List<PersonIdentificationNameCurrent> personIdentificationList = PersonIdentificationNameCurrent.findAllByPidmInList([entity.domainKey?.toInteger()])
+        def pidmToUpdate = entity.domainKey?.toInteger()
+        List<PersonIdentificationNameCurrent> personIdentificationList = PersonIdentificationNameCurrent.findAllByPidmInList([pidmToUpdate])
 
         def personIdentification
         personIdentificationList.each { identification ->
@@ -393,39 +393,54 @@ class PersonCompositeService extends LdmService {
             }
         }
         //update PersonIdentificationNameCurrent
+        if(primaryName) {
+            personIdentification.firstName = primaryName.firstName
+            personIdentification.lastName = primaryName.lastName
+            personIdentification.middleName = primaryName.middleName
 
-        personIdentification.firstName = changedPersonIdentification.firstName
-        personIdentification.lastName = changedPersonIdentification.lastName
-        personIdentification.middleName = changedPersonIdentification.middleName
-        PersonIdentificationNameCurrent newPersonIdentificationName =personIdentificationNameCurrentService.update(personIdentification)
+        }
+
+        def credentials = content?.credentials
+        def  credentialType = content?.credentials?.credentialType[0]
+        if(content?.credentials?.credentialType[0]){
+            personIdentification.bannerId = credentialType
+
+        }
+        PersonIdentificationNameCurrent newPersonIdentificationName = personIdentificationNameCurrentService.update(personIdentification)
 
         //update PersonBasicPersonBase
-        PersonBasicPersonBase newPersonBase = updatePersonBasicPersonBase(entity, person, changedPersonIdentification)
+        PersonBasicPersonBase newPersonBase = updatePersonBasicPersonBase(pidmToUpdate, content, primaryName)
         def names = []
         def name = new Name(newPersonIdentificationName, newPersonBase)
         name.setNameType("Primary")
         names << name
-        //Store the credential we already have
-        def credentials = person?.credentials
 
+
+	    def ethnicity
 
         //update Address
-        def addresses = updateAddresses(entity.domainKey?.toInteger(), person.addresses instanceof List ? person.addresses : [])
+         def addresses
+        if( content.addresses instanceof List && content.addresses.size > 0)
+            addresses = updateAddresses(pidmToUpdate, content.addresses instanceof List ? content.addresses : [])
 
         //update Telephones
-        def phones = updatePhones(entity.domainKey?.toInteger(), person.phones instanceof List ? person.phones : [])
+        def phones
+        if(content.phones instanceof List && content.phones.size > 0 )
+            phones = updatePhones(pidmToUpdate, content.phones instanceof List ? content.phones : [])
 
         //update Emails
-        def emails =  updateEmails(entity.domainKey?.toInteger(), person.emails instanceof List ? person.emails : [])
+        def emails
+        if(content.emails instanceof List && content.emails.size > 0 )
+            emails = updateEmails(pidmToUpdate, content.emails instanceof List ? content.emails : [])
         //Build decorator to return LDM response.
-        def newPerson = new Person(newPersonBase, person.guid, credentials, addresses, phones, emails, names, newPersonBase.maritalStatus)
+        def newPerson = new Person(newPersonBase, content.guid, credentials, addresses, phones, emails, names, newPersonBase?.maritalStatus,ethnicity)
         newPerson
 
 
     }
 
-    private PersonBasicPersonBase updatePersonBasicPersonBase(entity, person, changedPersonIdentification) {
-        List<PersonBasicPersonBase> personBaseList = PersonBasicPersonBase.findAllByPidmInList([entity.domainKey?.toInteger()])
+    private PersonBasicPersonBase updatePersonBasicPersonBase(pidmToUpdate, person, changedPersonIdentification) {
+        List<PersonBasicPersonBase> personBaseList = PersonBasicPersonBase.findAllByPidmInList([pidmToUpdate])
         PersonBasicPersonBase newPersonBase
         personBaseList.each { personBase ->
             //Copy personBase attributes into person map from Primary names object.
@@ -434,13 +449,23 @@ class PersonCompositeService extends LdmService {
                     personBase.ssn = it?.credentialId
                 }
             }
-            personBase.namePrefix = changedPersonIdentification.get('namePrefix')
-            personBase.nameSuffix = changedPersonIdentification.get('nameSuffix')
-            personBase.preferenceFirstName = changedPersonIdentification.get('preferenceFirstName')
+
+            if(changedPersonIdentification.containsKey('namePrefix')) {
+                personBase.namePrefix = changedPersonIdentification.get('namePrefix')
+            }
+            if(changedPersonIdentification.containsKey('nameSuffix')) {
+                personBase.nameSuffix = changedPersonIdentification.get('nameSuffix')
+            }
+            if(changedPersonIdentification.containsKey('preferenceFirstName')) {
+                personBase.preferenceFirstName = changedPersonIdentification.get('preferenceFirstName')
+            }
+
             //Translate enumerations and defaults
             personBase.sex = person?.sex == 'Male' ? 'M' : (person?.sex == 'Female' ? 'F' : 'N')
             def maritalStatus = person.maritalStatus?.guid ? maritalStatusCompositeService.get(person.maritalStatus?.guid) : null
             personBase.maritalStatus = maritalStatus ? MaritalStatus.findByCode(maritalStatus?.code) : null
+            def ethnicity = person.ethnicity?.guid ? ethnicityCompositeService.get(person.ethnicity?.guid) : null
+            personBase.ethnicity = ethnicity ? Ethnicity.findByCode(ethnicity?.code) : null
             personBase.ethnic = person.ethnic == "Non-Hispanic" ? '1' : (person.ethnic == "Hispanic" ? '2' : null)
             personBase.deadIndicator = person.get('dateDeceased') != null ? 'Y' : null
             personBase.armedServiceMedalVetIndicator = false
@@ -461,14 +486,20 @@ class PersonCompositeService extends LdmService {
                 def currAddress = PersonAddress.fetchListActiveAddressByPidmAndAddressType([pidm], [AddressType.findByCode(rule.value)]).get(0)
                 currAddress.state = State.findByDescription(activeAddress.state)
                 if (activeAddress?.country?.code) {
-                    currAddress.nation = Nation.findByNation(activeAddress?.country?.code)
-                    if (!currAddress.nation) {
+                    def nation = Nation.findByNation(activeAddress?.country?.code)
+                    if(nation){
+                        currAddress.nation = nation
+                    }
+                    if (!nation) {
                         log.error "Nation not found for code: ${activeAddress?.country?.code}"
                     }
                 }
                 if (activeAddress.county) {
-                    currAddress.county = County.findByDescription(activeAddress.county)
-                    if (!currAddress.county) {
+                    def country =  County.findByDescription(activeAddress.county)
+                    if(country){
+                        currAddress.county =country
+                    }
+                    if (!country) {
                         log.warn "County not found for code: ${activeAddress.county}"
                     }
                 }
