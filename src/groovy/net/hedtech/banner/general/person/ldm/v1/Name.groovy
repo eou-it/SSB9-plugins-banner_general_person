@@ -3,7 +3,6 @@
  *******************************************************************************/
 package net.hedtech.banner.general.person.ldm.v1
 
-import net.hedtech.banner.general.person.PersonBasicPersonBase
 import net.hedtech.banner.general.person.PersonIdentificationNameCurrent
 
 /**
