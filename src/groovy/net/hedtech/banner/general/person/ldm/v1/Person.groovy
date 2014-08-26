@@ -20,6 +20,7 @@ class Person {
     List phones = []
     List emails = []
     List names = []
+    List races = []
 
     def Person(PersonBasicPersonBase person,
              def guid,
@@ -29,7 +30,8 @@ class Person {
              def emails,
              def names,
              def maritalStatus,
-             def ethnicity) {
+             def ethnicity,
+             def races) {
         // PersonBasicPersonBase is optional, create blank object if none exists.
         this.person = person ?: new PersonBasicPersonBase()
         this.guid = guid instanceof String ? guid : ""
@@ -38,9 +40,10 @@ class Person {
         this.phones = phones instanceof List ? phones : null
         this.emails = emails instanceof List ? emails : null
         this.names = names instanceof List ? names : null
+        this.races = races instanceof List ? races : null
         this.maritalStatusDetail = maritalStatus
         this.ethnicityDetail = ethnicity
-        this.metadata = null
+        this.metadata = new Metadata (this.person.dataOrigin)
 
     }
 

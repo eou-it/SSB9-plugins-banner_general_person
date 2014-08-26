@@ -6,11 +6,14 @@ package net.hedtech.banner.general.person.ldm
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.i18n.phonenumbers.Phonenumber
 import net.hedtech.banner.exceptions.ApplicationException
+import net.hedtech.banner.exceptions.NotFoundException
 import net.hedtech.banner.general.overall.IntegrationConfiguration
+import net.hedtech.banner.general.overall.ldm.GlobalUniqueIdentifierService
 import net.hedtech.banner.general.person.PersonAddress
 import net.hedtech.banner.general.person.PersonBasicPersonBase
 import net.hedtech.banner.general.person.PersonEmail
 import net.hedtech.banner.general.person.PersonIdentificationNameCurrent
+import net.hedtech.banner.general.person.PersonRace
 import net.hedtech.banner.general.person.PersonTelephone
 import net.hedtech.banner.general.person.ldm.v1.Address
 import net.hedtech.banner.general.person.ldm.v1.Credential
@@ -30,6 +33,7 @@ import net.hedtech.banner.general.system.Nation
 import net.hedtech.banner.general.system.State
 import net.hedtech.banner.general.system.TelephoneType
 import net.hedtech.banner.general.system.ldm.v1.Metadata
+import net.hedtech.banner.general.system.ldm.v1.RaceDetail
 import net.hedtech.banner.restfulapi.RestfulApiValidationException
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -45,12 +49,14 @@ class PersonCompositeService extends LdmService {
     def globalUniqueIdentifierService
     def maritalStatusCompositeService
     def ethnicityCompositeService
+    def raceCompositeService
+    def personRaceService
+
     def static ldmName = 'persons'
     static final String PERSON_ADDRESS_TYPE = "person.addresses.addressType"
     static final String PERSON_PHONE_TYPE = "person.phones.phoneType"
     static final String PERSON_EMAIL_TYPE = "person.emails.emailType"
     static final String PROCESS_CODE = "LDM"
-    static final String PERSON_ADDRESS_NATION = "person.addresses.country.code"
 
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
@@ -74,13 +80,12 @@ class PersonCompositeService extends LdmService {
     def get(id) {
         def entity = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(ldmName, id)
         if( !entity ) {
-            throw new ApplicationException("Person","@@r1:not.found.message:BusinessLogicValidationException@@")
+            throw new ApplicationException(GlobalUniqueIdentifierService.API, new NotFoundException(id: Person.class.simpleName))
         }
         def resultList = buildLdmPersonObjects([entity.domainKey?.toInteger()])
         resultList.get(entity.domainKey?.toInteger())
     }
 
-    // TODO: Break into more functions.
     def create(Map person) {
         Map<Integer,Person> persons = [:]
         def newPersonIdentification
@@ -92,6 +97,7 @@ class PersonCompositeService extends LdmService {
         newPersonIdentification.put('bannerId','GENERATED')
         newPersonIdentification.put('entityIndicator', 'P')
         newPersonIdentification.put('changeIndicator', null)
+        newPersonIdentification.put('dataOrigin', person?.metadata?.dataOrigin)
         newPersonIdentification.remove('nameType') // ID won't generate if this is set.
         //Create the new PersonIdentification record
         PersonIdentificationNameCurrent newPersonIdentificationName =
@@ -116,7 +122,7 @@ class PersonCompositeService extends LdmService {
             }
         }
         //Copy personBase attributes into person map from Primary names object.
-        log.error person.birthDate
+        person.put('dataOrigin', person?.metadata?.dataOrigin)
         person.put('namePrefix', newPersonIdentification.get('namePrefix'))
         person.put('nameSuffix', newPersonIdentification.get('nameSuffix'))
         person.put('preferenceFirstName', newPersonIdentification.get('preferenceFirstName'))
@@ -127,7 +133,7 @@ class PersonCompositeService extends LdmService {
         def ethnicity = person.ethnicityDetail?.guid ? ethnicityCompositeService.get(person.ethnicityDetail?.guid) : null
         person.put('ethnicity', ethnicity ? Ethnicity.findByCode(ethnicity?.code) : null)
         person.put('ethnic', ethnicity ? ethnicity.ethnic : null)
-        person.put('deadIndicator', person.get('dateDeceased') != null ? 'Y' : null)
+        person.put('deadIndicator', person.get('deadDate') ? 'Y' : null)
         person.put('pidm', newPersonIdentificationName?.pidm)
         person.put('armedServiceMedalVetIndicator', false)
         PersonBasicPersonBase newPersonBase = personBasicPersonBaseService.create(person)
@@ -138,7 +144,6 @@ class PersonCompositeService extends LdmService {
         def name = new Name(newPersonIdentificationName, newPersonBase)
         name.setNameType("Primary")
         currentRecord.names << name
-
         //Store the credential we already have
         currentRecord.credentials = []
         currentRecord.credentials << new Credential("Banner ID", newPersonIdentificationName.bannerId, null, null)
@@ -158,6 +163,9 @@ class PersonCompositeService extends LdmService {
         def emails = createEmails(newPersonIdentificationName.pidm,
                 person.emails instanceof List ? person.emails : [])
         persons = buildPersonEmails(emails, persons)
+        def races = createRaces(newPersonIdentificationName.pidm,
+                person.races instanceof List ? person.races : [] )
+        persons = buildPersonRaces(races, persons)
         persons.get(newPersonIdentificationName.pidm)
     }
 
@@ -165,10 +173,10 @@ class PersonCompositeService extends LdmService {
         // Update the GUID to the one we received.
         GlobalUniqueIdentifier newEntity = GlobalUniqueIdentifier.findByLdmNameAndDomainId(ldmName, id)
         if( !newEntity ) {
-            throw new ApplicationException("Person","@@r1:guid.record.not.found.message:Person@@") // TODO: 404 this.
+            throw new ApplicationException(GlobalUniqueIdentifierService.API, new NotFoundException(id: Person.class.simpleName))
         }
         if( !newEntity ) {
-            throw new ApplicationException("Person","@@r1:guid.not.found.message:Person:BusinessLogicValidationException@@")
+            throw new ApplicationException(GlobalUniqueIdentifierService.API, new NotFoundException(id: Person.class.simpleName))
         }
         newEntity.guid = guid
         globalUniqueIdentifierService.update(newEntity)
@@ -178,10 +186,10 @@ class PersonCompositeService extends LdmService {
         def addresses = []
         newAddresses?.each { activeAddress ->
             IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_ADDRESS_TYPE, activeAddress.addressType)
-            if (rule.translationValue == activeAddress.addressType && !addresses.contains {
-                activeAddress.addressType == rule.value
+            if (rule?.translationValue == activeAddress.addressType && !addresses.contains {
+                activeAddress.addressType == rule?.value
             }) {
-                activeAddress.put('addressType', AddressType.findByCode(rule.value))
+                activeAddress.put('addressType', AddressType.findByCode(rule?.value))
                 activeAddress.put('state', State.findByDescription(activeAddress.state))
                if (activeAddress?.nation?.containsKey('code')) {
                     Nation nation= Nation.findByScodIso(activeAddress?.nation?.code)
@@ -218,13 +226,37 @@ class PersonCompositeService extends LdmService {
         if( !address.zip ) { throw new RestfulApiValidationException('PersonCompositeService.postalCode.invalid')}
     }
 
+    List<PersonRace> createRaces (def pidm, List<Map> newRaces) {
+        def races = []
+        newRaces?.each { activeRace ->
+            if( activeRace?.guid ) {
+                def race = raceCompositeService.get(activeRace?.guid)
+                if (!race) {
+                    throw new ApplicationException(PersonCompositeService, "@@r1:race.invalid:BusinessLogicValidationException@@")
+                }
+                def newRace = new PersonRace()
+                newRace.pidm = pidm
+                newRace.race = race.race
+                newRace.dataOrigin = ""
+                races << personRaceService.create(newRace)
+            }
+            else {
+                throw new ApplicationException(PersonCompositeService, "@@r1:race.invalid:BusinessLogicValidationException@@")
+            }
+        }
+        races
+    }
+
+
+
     def createPhones(def pidm, List<Map> newPhones) {
         def phones = []
         newPhones?.each { activePhone ->
-            IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_ADDRESS_TYPE, activePhone.phoneType)
-            if (rule.translationValue == activePhone.phoneType &&
-                    !phones.contains { activePhone.phoneType == rule.value }) {
-                activePhone.put('telephoneType', TelephoneType.findByCode(rule.value) )
+            IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_PHONE_TYPE, activePhone.phoneType)
+            if( !rule) { log.error activePhone.toString() }
+            if (rule?.translationValue == activePhone.phoneType &&
+                    !phones.contains { activePhone.phoneType == rule?.value }) {
+                activePhone.put('telephoneType', TelephoneType.findByCode(rule?.value) )
                 activePhone.put('pidm', pidm)
                 validatePhoneRequiredFields(activePhone)
                 Map phoneNumber = parsePhoneNumber(activePhone.phoneNumber)
@@ -250,7 +282,7 @@ class PersonCompositeService extends LdmService {
             IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_EMAIL_TYPE, activeEmail.emailType)
             if (rule?.translationValue == activeEmail.emailType &&
                     !emails.contains { activeEmail.emailType == rule?.value }) {
-                activeEmail.emailType = EmailType.findByCode(rule.value)
+                activeEmail.emailType = EmailType.findByCode(rule?.value)
                 activeEmail.put('pidm', pidm)
                 validateEmailRequiredFields(activeEmail)
                 emails << personEmailService.create(activeEmail)
@@ -278,6 +310,7 @@ class PersonCompositeService extends LdmService {
         List<PersonAddress> personAddressList = PersonAddress.fetchActiveAddressesByPidmInList(pidms)
         List<PersonTelephone> personTelephoneList = PersonTelephone.fetchActiveTelephoneByPidmInList(pidms)
         List<PersonEmail> personEmailList = PersonEmail.findAllByStatusIndicatorAndPidmInList('A', pidms)
+        List<PersonRace> personRaceList = PersonRace.findAllByPidmInList(pidms)
         personBaseList.each { personBase ->
             Person currentRecord = new Person(personBase)
             currentRecord.maritalStatusDetail = maritalStatusCompositeService.fetchByMaritalStatusCode(personBase.maritalStatus?.code)
@@ -306,6 +339,7 @@ class PersonCompositeService extends LdmService {
         persons = buildPersonAddresses(personAddressList, persons)
         persons = buildPersonTelephones(personTelephoneList, persons)
         persons = buildPersonEmails(personEmailList, persons)
+        persons = buildPersonRaces(personRaceList,persons)
         persons // Map of person objects with pidm as index.
     }
 
@@ -314,10 +348,10 @@ class PersonCompositeService extends LdmService {
         personEmailList.each { PersonEmail activeEmail ->
             Person currentRecord = persons.get(activeEmail.pidm)
             IntegrationConfiguration rule = findAllByProcessCodeAndSettingNameAndValue(PROCESS_CODE, PERSON_EMAIL_TYPE,activeEmail?.emailType.code)
-            if (rule.value == activeEmail?.emailType?.code &&
-                    !currentRecord.emails.contains { it.emailType == rule.translationValue }) {
+            if (rule?.value == activeEmail?.emailType?.code &&
+                    !currentRecord.emails.contains { it.emailType == rule?.translationValue }) {
                 def email = new Email(activeEmail)
-                email.emailType = rule.translationValue
+                email.emailType = rule?.translationValue
                 currentRecord.emails << email
             }
 
@@ -331,10 +365,10 @@ class PersonCompositeService extends LdmService {
         personTelephoneList.each { activePhone ->
             Person currentRecord = persons.get(activePhone.pidm)
             IntegrationConfiguration rule = findAllByProcessCodeAndSettingNameAndValue(PROCESS_CODE, PERSON_PHONE_TYPE, activePhone?.telephoneType.code)
-            if (rule.value == activePhone?.telephoneType?.code &&
-                    !(currentRecord.phones.contains { it.phoneType == rule.translationValue })) {
+            if (rule?.value == activePhone?.telephoneType?.code &&
+                    !(currentRecord.phones.contains { it.phoneType == rule?.translationValue })) {
                 def phone = new Phone(activePhone)
-                phone.phoneType = rule.translationValue
+                phone.phoneType = rule?.translationValue
                 currentRecord.phones << phone
             }
             persons.put(activePhone.pidm, currentRecord)
@@ -347,10 +381,10 @@ class PersonCompositeService extends LdmService {
         personAddressList.each { activeAddress ->
             Person currentRecord = persons.get(activeAddress.pidm)
             IntegrationConfiguration rule = findAllByProcessCodeAndSettingNameAndValue(PROCESS_CODE, PERSON_ADDRESS_TYPE, activeAddress.addressType.code)
-            if (rule.value == activeAddress.addressType?.code &&
-                    !currentRecord.addresses.contains { it.addressType == rule.translationValue }) {
+            if (rule?.value == activeAddress.addressType?.code &&
+                    !currentRecord.addresses.contains { it.addressType == rule?.translationValue }) {
                 def address = new Address(activeAddress)
-                address.addressType = rule.translationValue
+                address.addressType = rule?.translationValue
                 currentRecord.addresses << address
             }
             persons.put(activeAddress.pidm, currentRecord)
@@ -368,6 +402,17 @@ class PersonCompositeService extends LdmService {
         persons
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    def buildPersonRaces( List<PersonRace> personRacesList, persons) {
+        personRacesList.each { activeRace ->
+            Person currentRecord = persons.get(activeRace.pidm)
+            def race = raceCompositeService.fetchByRaceCode(activeRace.race)
+            race.dataOrigin = activeRace.dataOrigin
+            currentRecord.races << race
+            persons.put(activeRace.pidm, currentRecord)
+        }
+        persons
+    }
 
     // @Transactional(readOnly = false, propagation = Propagation.SUPPORTS)
     /**
@@ -489,8 +534,8 @@ class PersonCompositeService extends LdmService {
         def addresses = []
         newAddresses?.each { activeAddress ->
             IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_ADDRESS_TYPE, activeAddress.addressType)
-            if (rule.translationValue == activeAddress.addressType && !addresses.contains {
-                activeAddress.addressType == rule.value
+            if (rule?.translationValue == activeAddress.addressType && !addresses.contains {
+                activeAddress.addressType == rule?.value
             }) {
                 def currAddress = PersonAddress.fetchListActiveAddressByPidmAndAddressType([pidm], [AddressType.findByCode(rule.value)])
                 def address
@@ -523,7 +568,7 @@ class PersonCompositeService extends LdmService {
                 }
 
                 def addressDecorator = new Address(address)
-                addressDecorator.addressType = rule.translationValue
+                addressDecorator.addressType = rule?.translationValue
                 addresses << addressDecorator
             }
         }
@@ -535,9 +580,9 @@ class PersonCompositeService extends LdmService {
         def phones = []
         newPhones?.each { activePhone ->
             IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_ADDRESS_TYPE, activePhone.phoneType)
-            if (rule.translationValue == activePhone.phoneType &&
-                    !phones.contains { activePhone.phoneType == rule.value }) {
-                def telephoneType =  TelephoneType.findByCode(rule.value)
+            if (rule?.translationValue == activePhone.phoneType &&
+                    !phones.contains { activePhone.phoneType == rule?.value }) {
+                def telephoneType =  TelephoneType.findByCode(rule?.value)
                 def personTelephoneList = PersonTelephone.fetchActiveTelephoneByPidmInList([pidm])
                 def phone
                 if(personTelephoneList){
@@ -599,14 +644,13 @@ class PersonCompositeService extends LdmService {
         Map parsedNumber = [:]
         List<InstitutionalDescription> institutions = InstitutionalDescription.list()
         def institution = institutions.size() > 0 ? institutions[0]: null
-        IntegrationConfiguration countryLdmCode
+        Nation countryLdmCode
         if( institution?.natnCode ) {
-            countryLdmCode =
-                    IntegrationConfiguration.fetchByProcessCodeAndSettingNameAndValue(PROCESS_CODE, PERSON_ADDRESS_NATION, institution.natnCode)
+            countryLdmCode = Nation.findByCode(institution.natnCode)
         }
         PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance()
-        Phonenumber.PhoneNumber parsedResult = phoneUtil.parse(phoneNumber, countryLdmCode?.translationValue ?: 'US')
-        if ( phoneUtil.isNANPACountry(countryLdmCode?.translationValue ?: 'US') ) {
+        Phonenumber.PhoneNumber parsedResult = phoneUtil.parse(phoneNumber, countryLdmCode?.scodIso ?: 'US')
+        if ( phoneUtil.isNANPACountry(countryLdmCode?.scodIso ?: 'US') ) {
             String nationalNumber = parsedResult.getNationalNumber()
             if( nationalNumber.length() == 10 ) {
                 parsedNumber.put('phoneArea', nationalNumber[0..2])

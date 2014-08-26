@@ -26,8 +26,8 @@ class Address {
         this.address?.state?.description
     }
 
-    def getNation() {
-        this.address?.nation?.nation
+    def getCounty() {
+        this.address?.county?.description
     }
 
     def getAddressType() {
