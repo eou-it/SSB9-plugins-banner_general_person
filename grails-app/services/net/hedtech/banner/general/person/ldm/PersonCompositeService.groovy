@@ -393,51 +393,50 @@ class PersonCompositeService extends LdmService {
             }
         }
         //update PersonIdentificationNameCurrent
+        PersonIdentificationNameCurrent newPersonIdentificationName
         if(primaryName) {
             personIdentification.firstName = primaryName.firstName
             personIdentification.lastName = primaryName.lastName
             personIdentification.middleName = primaryName.middleName
+            newPersonIdentificationName = personIdentificationNameCurrentService.update(personIdentification)
 
         }
-
-        def credentials = content?.credentials
-        def  credentialType = content?.credentials?.credentialType[0]
-        if(content?.credentials?.credentialType[0]){
-            personIdentification.bannerId = credentialType
-
+        def credentials
+        if(content.containsKey('credentials') &&  content?.credentials?.credentialType[0]) {
+            credentials = content?.credentials
+            personIdentification.bannerId = content?.credentials?.credentialType[0]
+            newPersonIdentificationName = personIdentificationNameCurrentService.update(personIdentification)
         }
-        PersonIdentificationNameCurrent newPersonIdentificationName = personIdentificationNameCurrentService.update(personIdentification)
 
         //update PersonBasicPersonBase
         PersonBasicPersonBase newPersonBase = updatePersonBasicPersonBase(pidmToUpdate, content, primaryName)
         def names = []
         def name = new Name(newPersonIdentificationName, newPersonBase)
-        name.setNameType("Primary")
+        if(primaryName)
+            name.setNameType("Primary")
         names << name
 
 
-	    def ethnicity
+        def ethnicity = content.ethnicity?.guid ? ethnicityCompositeService.get(content.ethnicity?.guid) : null
 
         //update Address
          def addresses
-        if( content.addresses instanceof List && content.addresses.size > 0)
-            addresses = updateAddresses(pidmToUpdate, content.addresses instanceof List ? content.addresses : [])
+
+        if(content.containsKey('addresses') && content.addresses instanceof List && content.addresses.size > 0)
+                addresses = updateAddresses(pidmToUpdate,content.addresses)
 
         //update Telephones
         def phones
-        if(content.phones instanceof List && content.phones.size > 0 )
-            phones = updatePhones(pidmToUpdate, content.phones instanceof List ? content.phones : [])
+        if(content.containsKey('phones') && content.phones instanceof List && content.phones.size > 0 )
+            phones = updatePhones(pidmToUpdate, content.phones)
 
         //update Emails
         def emails
-        if(content.emails instanceof List && content.emails.size > 0 )
-            emails = updateEmails(pidmToUpdate, content.emails instanceof List ? content.emails : [])
+        if(content.containsKey('emails') && content.emails instanceof List && content.emails.size > 0 )
+            emails = updateEmails(pidmToUpdate,content.emails)
         //Build decorator to return LDM response.
-        def newPerson = new Person(newPersonBase, content.guid, credentials, addresses, phones, emails, names, newPersonBase?.maritalStatus,ethnicity)
-        newPerson
-
-
-    }
+        new Person(newPersonBase, content.guid, credentials, addresses, phones, emails, names, newPersonBase?.maritalStatus,ethnicity)
+   }
 
     private PersonBasicPersonBase updatePersonBasicPersonBase(pidmToUpdate, person, changedPersonIdentification) {
         List<PersonBasicPersonBase> personBaseList = PersonBasicPersonBase.findAllByPidmInList([pidmToUpdate])
@@ -464,11 +463,15 @@ class PersonCompositeService extends LdmService {
             personBase.sex = person?.sex == 'Male' ? 'M' : (person?.sex == 'Female' ? 'F' : 'N')
             def maritalStatus = person.maritalStatus?.guid ? maritalStatusCompositeService.get(person.maritalStatus?.guid) : null
             personBase.maritalStatus = maritalStatus ? MaritalStatus.findByCode(maritalStatus?.code) : null
-            def ethnicity = person.ethnicity?.guid ? ethnicityCompositeService.get(person.ethnicity?.guid) : null
-            personBase.ethnicity = ethnicity ? Ethnicity.findByCode(ethnicity?.code) : null
-            personBase.ethnic = person.ethnic == "Non-Hispanic" ? '1' : (person.ethnic == "Hispanic" ? '2' : null)
-            personBase.deadIndicator = person.get('dateDeceased') != null ? 'Y' : null
-            personBase.armedServiceMedalVetIndicator = false
+            if(person.containsKey('ethnicity')){
+                def ethnicity = person.ethnicity?.guid ? ethnicityCompositeService.get(person.ethnicity?.guid) : null
+                personBase.ethnicity = ethnicity ? Ethnicity.findByCode(ethnicity?.code) : null
+                personBase.ethnic = person.ethnic == "Non-Hispanic" ? '1' : (person.ethnic == "Hispanic" ? '2' : null)
+            }
+
+            if(person.containsKey('dateDeceased'))
+                personBase.deadIndicator = person.get('dateDeceased') != null ? 'Y' : null
+
             newPersonBase = personBasicPersonBaseService.update(personBase)
 
         }
@@ -484,22 +487,23 @@ class PersonCompositeService extends LdmService {
                 activeAddress.addressType == rule.value
             }) {
                 def currAddress = PersonAddress.fetchListActiveAddressByPidmAndAddressType([pidm], [AddressType.findByCode(rule.value)]).get(0)
-                currAddress.state = State.findByDescription(activeAddress.state)
-                if (activeAddress?.country?.code) {
+
+                if(activeAddress.state)
+                    currAddress.state = State.findByDescription(activeAddress.state)
+                if (activeAddress?.nation?.containsKey('code')) {
                     def nation = Nation.findByNation(activeAddress?.country?.code)
                     if(nation){
                         currAddress.nation = nation
-                    }
-                    if (!nation) {
+                    }else{
                         log.error "Nation not found for code: ${activeAddress?.country?.code}"
                     }
                 }
-                if (activeAddress.county) {
+                if (activeAddress.containsKey('county')) {
                     def country =  County.findByDescription(activeAddress.county)
                     if(country){
                         currAddress.county =country
                     }
-                    if (!country) {
+                    else {
                         log.warn "County not found for code: ${activeAddress.county}"
                     }
                 }
