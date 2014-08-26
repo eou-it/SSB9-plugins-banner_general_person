@@ -183,16 +183,21 @@ class PersonCompositeService extends LdmService {
             }) {
                 activeAddress.put('addressType', AddressType.findByCode(rule.value))
                 activeAddress.put('state', State.findByDescription(activeAddress.state))
-                if (activeAddress?.nation?.containsKey('code')) {
-                    activeAddress.put('nation', Nation.findByScodIso(activeAddress?.nation?.code))
-                    if (!activeAddress.nation) {
+               if (activeAddress?.nation?.containsKey('code')) {
+                    Nation nation= Nation.findByScodIso(activeAddress?.nation?.code)
+                   if(nation) {
+                       activeAddress.put('nation', nation)
+                   }
+                   else {
                         log.error "Nation not found for code: ${activeAddress?.nation?.code}"
                         throw new RestfulApiValidationException('PersonCompositeService.country.invalid')
                     }
                 }
                 if (activeAddress.containsKey('county')) {
-                    activeAddress.put('county', County.findByDescription(activeAddress.county))
-                    if (!activeAddress.county) {
+                    County country = County.findByDescription(activeAddress.county)
+                    if(country){
+                        activeAddress.put('county', country)
+                    }else{
                         log.error "County not found for code: ${activeAddress.county}"
                         throw new RestfulApiValidationException('PersonCompositeService.county.invalid')
                     }
@@ -436,7 +441,8 @@ class PersonCompositeService extends LdmService {
             emails = updateEmails(pidmToUpdate,content.emails)
         //Build decorator to return LDM response.
         new Person(newPersonBase, content.guid, credentials, addresses, phones, emails, names, newPersonBase?.maritalStatus,ethnicity)
-   }
+
+    }
 
     private PersonBasicPersonBase updatePersonBasicPersonBase(pidmToUpdate, person, changedPersonIdentification) {
         List<PersonBasicPersonBase> personBaseList = PersonBasicPersonBase.findAllByPidmInList([pidmToUpdate])
@@ -486,28 +492,36 @@ class PersonCompositeService extends LdmService {
             if (rule.translationValue == activeAddress.addressType && !addresses.contains {
                 activeAddress.addressType == rule.value
             }) {
-                def currAddress = PersonAddress.fetchListActiveAddressByPidmAndAddressType([pidm], [AddressType.findByCode(rule.value)]).get(0)
+                def currAddress = PersonAddress.fetchListActiveAddressByPidmAndAddressType([pidm], [AddressType.findByCode(rule.value)])
+                def address
+                //address exists in DB
+                if(currAddress){
+                    if(activeAddress.state)
+                        currAddress.state = State.findByDescription(activeAddress.state)
+                    if (activeAddress?.nation?.containsKey('code')) {
+                        def nation = Nation.findByNation(activeAddress?.country?.code)
+                        if(nation){
+                            currAddress.nation = nation
+                        }else{
+                            log.error "Nation not found for code: ${activeAddress?.country?.code}"
+                        }
+                    }
+                    if (activeAddress.containsKey('county')) {
+                        def country =  County.findByDescription(activeAddress.county)
+                        if(country){
+                            currAddress.county =country
+                        }
+                        else {
+                            log.warn "County not found for code: ${activeAddress.county}"
+                        }
+                    }
+                    address = personAddressService.update(currAddress)
 
-                if(activeAddress.state)
-                    currAddress.state = State.findByDescription(activeAddress.state)
-                if (activeAddress?.nation?.containsKey('code')) {
-                    def nation = Nation.findByNation(activeAddress?.country?.code)
-                    if(nation){
-                        currAddress.nation = nation
-                    }else{
-                        log.error "Nation not found for code: ${activeAddress?.country?.code}"
-                    }
+                }else{
+
+                    address = createAddresses(pidm,[activeAddress]).get(0)
                 }
-                if (activeAddress.containsKey('county')) {
-                    def country =  County.findByDescription(activeAddress.county)
-                    if(country){
-                        currAddress.county =country
-                    }
-                    else {
-                        log.warn "County not found for code: ${activeAddress.county}"
-                    }
-                }
-                def address = personAddressService.update(currAddress)
+
                 def addressDecorator = new Address(address)
                 addressDecorator.addressType = rule.translationValue
                 addresses << addressDecorator
@@ -525,17 +539,26 @@ class PersonCompositeService extends LdmService {
                     !phones.contains { activePhone.phoneType == rule.value }) {
                 def telephoneType =  TelephoneType.findByCode(rule.value)
                 def personTelephoneList = PersonTelephone.fetchActiveTelephoneByPidmInList([pidm])
-                personTelephoneList.each { curPhones ->
-                    if(curPhones.telephoneType.code ==rule.value){
-                        // curPhones.phoneArea
-                        curPhones.phoneExtension = activePhone.phoneExtension
-                        curPhones.phoneNumber = activePhone.phoneNumber
-                        def phone = personTelephoneService.update(curPhones)
-                        def phoneDecorator = new Phone(phone)
-                        phoneDecorator.phoneType = rule.translationValue
-                        phones << phoneDecorator
+                def phone
+                if(personTelephoneList){
+                    personTelephoneList.each { curPhones ->
+                        if(curPhones.telephoneType.code ==rule.value){
+                            // curPhones.phoneArea
+                            curPhones.phoneExtension = activePhone.phoneExtension
+                            curPhones.phoneNumber = activePhone.phoneNumber
+                            phone = personTelephoneService.update(curPhones)
+
+                        }
                     }
+
+                }else{
+                    //Create New Telephones if it dosen't exists
+                    phone = createPhones(pidm,[activePhone]).get(0)
                 }
+                def phoneDecorator = new Phone(phone)
+                phoneDecorator.phoneType = rule.translationValue
+                phones << phoneDecorator
+
             }
         }
         phones
@@ -550,15 +573,23 @@ class PersonCompositeService extends LdmService {
             if (rule?.translationValue == activeEmail.emailType &&
                     !emails.contains { activeEmail.emailType == rule?.value }) {
                 def emailList =  PersonEmail.findAllByStatusIndicatorAndPidmInList('A', [pidm])
-                emailList.each { curEmails ->
-                    if(curEmails.emailType.code ==rule.value){
-                        curEmails.emailAddress = activeEmail.emailAddress
-                        def email = personEmailService.update(curEmails)
-                        def emailDecorator = new Email(email)
-                        emailDecorator.emailType = rule.translationValue
-                        emails << emailDecorator
+                def email
+                if(emailList){
+                    emailList.each { curEmails ->
+                        if(curEmails.emailType.code ==rule.value){
+                            curEmails.emailAddress = activeEmail.emailAddress
+                            email = personEmailService.update(curEmails)
+
+                        }
                     }
+
+                }else{
+                    //Create New emails if it dosen't exists
+                    email = createEmails(pidm,[activeEmail]).get(0)
                 }
+                def emailDecorator = new Email(email)
+                emailDecorator.emailType = rule.translationValue
+                emails << emailDecorator
             }
         }
         emails
