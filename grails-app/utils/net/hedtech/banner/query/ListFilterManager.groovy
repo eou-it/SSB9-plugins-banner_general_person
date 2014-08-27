@@ -18,7 +18,9 @@ class ListFilterManager {
 
     /**
      * This defines what is available to the filter. It is an array of map values that contain:
-     *      field: The field to use
+     *      field: The field to use. This is itself is a map of the following:
+     *          code: The field that is used in the criterion
+     *          description: The description displayed to the UI
      *      preProcessor: A closure used to process the data for the field. There are some avaiable as part of this class.
      */
     def filterDefinition
@@ -79,7 +81,7 @@ class ListFilterManager {
      */
     private def getRestriction(def map) {
         // Find a definition for our field
-        def fieldDefinition = filterDefinition.find { it -> it.field == map.field }
+        def fieldDefinition = filterDefinition.find { it -> it.field.code == map.field }
         def value = map.value
         if (fieldDefinition && fieldDefinition.preProcessor ) {
             value = fieldDefinition.preProcessor(value)
