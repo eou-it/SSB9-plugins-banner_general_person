@@ -452,11 +452,14 @@ class PersonCompositeService extends LdmService {
 
         }
         def credentials
-        if(content.containsKey('credentials') &&  content?.credentials?.credentialType[0]) {
-            credentials = content?.credentials
-            personIdentification.bannerId = content?.credentials?.credentialType[0]
-            newPersonIdentificationName = personIdentificationNameCurrentService.update(personIdentification)
+
+        content?.credentials?.each { it ->
+            if (it.credentialType == 'Banner ID') {
+                personIdentification.bannerId  = it?.credentialId
+                newPersonIdentificationName = personIdentificationNameCurrentService.update(personIdentification)
+            }
         }
+
 
         //update PersonBasicPersonBase
         PersonBasicPersonBase newPersonBase = updatePersonBasicPersonBase(pidmToUpdate, content, primaryName)
@@ -484,8 +487,13 @@ class PersonCompositeService extends LdmService {
         def emails
         if(content.containsKey('emails') && content.emails instanceof List && content.emails.size > 0 )
             emails = updateEmails(pidmToUpdate,content.emails)
+
+        //update races
+        def races
+        if(content.containsKey('races') && content.races instanceof List && content.races.size > 0 )
+            updateRaces(pidmToUpdate, content.races)
         //Build decorator to return LDM response.
-        new Person(newPersonBase, content.guid, credentials, addresses, phones, emails, names, newPersonBase?.maritalStatus,ethnicity)
+        new Person(newPersonBase, content.guid, credentials, addresses, phones, emails, names, newPersonBase?.maritalStatus,ethnicity,races)
 
     }
 
@@ -638,6 +646,25 @@ class PersonCompositeService extends LdmService {
             }
         }
         emails
+    }
+
+    List<PersonRace> updateRaces (def pidm, List<Map> newRaces) {
+        def races = []
+        newRaces?.each { activeRace ->
+            if( activeRace?.guid ) {
+                def race = raceCompositeService.get(activeRace?.guid)
+                if (!race) {
+                    throw new ApplicationException(PersonCompositeService, "@@r1:race.invalid:BusinessLogicValidationException@@")
+                }
+                PersonRace personRace= PersonRace.fetchByPidm(pidm)
+                personRace.race = race.race
+                races << personRaceService.update(personRace)
+            }
+            else {
+                throw new ApplicationException(PersonCompositeService, "@@r1:race.invalid:BusinessLogicValidationException@@")
+            }
+        }
+        races
     }
 
     Map parsePhoneNumber(String phoneNumber) {
