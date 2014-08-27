@@ -33,7 +33,6 @@ import net.hedtech.banner.general.system.Nation
 import net.hedtech.banner.general.system.State
 import net.hedtech.banner.general.system.TelephoneType
 import net.hedtech.banner.general.system.ldm.v1.Metadata
-import net.hedtech.banner.general.system.ldm.v1.RaceDetail
 import net.hedtech.banner.restfulapi.RestfulApiValidationException
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -154,16 +153,16 @@ class PersonCompositeService extends LdmService {
                     null)
         }
         persons.put(newPersonIdentificationName.pidm, currentRecord)
-        def addresses = createAddresses(newPersonIdentificationName.pidm,
+        def addresses = createAddresses(newPersonIdentificationName.pidm, person?.metadata,
                 person.addresses instanceof List ? person.addresses : [])
         persons = buildPersonAddresses(addresses, persons )
-        def phones = createPhones(newPersonIdentificationName.pidm,
+        def phones = createPhones(newPersonIdentificationName.pidm, person?.metadata,
                 person.phones instanceof List ? person.phones : [])
         persons = buildPersonTelephones(phones, persons)
-        def emails = createEmails(newPersonIdentificationName.pidm,
+        def emails = createEmails(newPersonIdentificationName.pidm, person?.metadata,
                 person.emails instanceof List ? person.emails : [])
         persons = buildPersonEmails(emails, persons)
-        def races = createRaces(newPersonIdentificationName.pidm,
+        def races = createRaces(newPersonIdentificationName.pidm, person?.metadata,
                 person.races instanceof List ? person.races : [] )
         persons = buildPersonRaces(races, persons)
         persons.get(newPersonIdentificationName.pidm)
@@ -182,7 +181,7 @@ class PersonCompositeService extends LdmService {
         globalUniqueIdentifierService.update(newEntity)
     }
 
-    List<PersonAddress> createAddresses (def pidm, List<Map> newAddresses) {
+    List<PersonAddress> createAddresses (def pidm, Map metadata, List<Map> newAddresses) {
         def addresses = []
         newAddresses?.each { activeAddress ->
             IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_ADDRESS_TYPE, activeAddress.addressType)
@@ -211,6 +210,7 @@ class PersonCompositeService extends LdmService {
                     }
                 }
                 activeAddress.put('pidm', pidm)
+                activeAddress.put('dataOrigin', metadata?.dataOrigin)
                 validateAddressRequiredFields(activeAddress)
                 addresses << personAddressService.create(activeAddress)
             }
@@ -226,7 +226,7 @@ class PersonCompositeService extends LdmService {
         if( !address.zip ) { throw new RestfulApiValidationException('PersonCompositeService.postalCode.invalid')}
     }
 
-    List<PersonRace> createRaces (def pidm, List<Map> newRaces) {
+    List<PersonRace> createRaces (def pidm, Map metadata, List<Map> newRaces) {
         def races = []
         newRaces?.each { activeRace ->
             if( activeRace?.guid ) {
@@ -237,7 +237,7 @@ class PersonCompositeService extends LdmService {
                 def newRace = new PersonRace()
                 newRace.pidm = pidm
                 newRace.race = race.race
-                newRace.dataOrigin = ""
+                newRace.dataOrigin = metadata?.dataOrigin
                 races << personRaceService.create(newRace)
             }
             else {
@@ -249,7 +249,7 @@ class PersonCompositeService extends LdmService {
 
 
 
-    def createPhones(def pidm, List<Map> newPhones) {
+    def createPhones(def pidm, Map metadata, List<Map> newPhones) {
         def phones = []
         newPhones?.each { activePhone ->
             IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_PHONE_TYPE, activePhone.phoneType)
@@ -258,6 +258,7 @@ class PersonCompositeService extends LdmService {
                     !phones.contains { activePhone.phoneType == rule?.value }) {
                 activePhone.put('telephoneType', TelephoneType.findByCode(rule?.value) )
                 activePhone.put('pidm', pidm)
+                activePhone.put('dataOrigin', metadata?.dataOrigin)
                 validatePhoneRequiredFields(activePhone)
                 Map phoneNumber = parsePhoneNumber(activePhone.phoneNumber)
                 phoneNumber.keySet().each { key ->
@@ -275,7 +276,7 @@ class PersonCompositeService extends LdmService {
         if( !phone.phoneNumber ) { throw new RestfulApiValidationException('PersonCompositeService.phoneNumber.invalid')}
     }
 
-    def createEmails(def pidm, List<Map> newEmails) {
+    def createEmails(def pidm, Map metadata, List<Map> newEmails) {
         def emails = []
 
         newEmails?.each { activeEmail ->
@@ -284,6 +285,7 @@ class PersonCompositeService extends LdmService {
                     !emails.contains { activeEmail.emailType == rule?.value }) {
                 activeEmail.emailType = EmailType.findByCode(rule?.value)
                 activeEmail.put('pidm', pidm)
+                activeEmail.put('dataOrigin', metadata?.dataOrigin)
                 validateEmailRequiredFields(activeEmail)
                 emails << personEmailService.create(activeEmail)
             }
