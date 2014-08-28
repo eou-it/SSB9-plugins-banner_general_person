@@ -245,9 +245,32 @@ class PersonCompositeService extends LdmService {
         person.put('preferenceFirstName', newPersonIdentification.get('preferenceFirstName'))
         //Translate enumerations and defaults
         person.put('sex', person?.sex == 'Male' ? 'M':(person?.sex == 'Female' ? 'F' :(person?.sex == 'Unknown' ? 'N' : null)))
-        def maritalStatus = person.maritalStatusDetail?.guid ? maritalStatusCompositeService.get(person.maritalStatusDetail?.guid) : null
+        def maritalStatus
+        try {
+            maritalStatus = person.maritalStatusDetail?.guid ? maritalStatusCompositeService.get(person.maritalStatusDetail?.guid) : null
+        }catch (ApplicationException e) {
+            if( e.wrappedException instanceof NotFoundException ) {
+                throw new ApplicationException("PersonCompositeService", "@@r1:maritalStatus.invalid:BusinessLogicValidationException@@")
+                maritalStatus = null
+            }
+            else {
+                throw e
+            }
+        }
         person.put('maritalStatus', maritalStatus ? MaritalStatus.findByCode(maritalStatus?.code) : null)
-        def ethnicity = person.ethnicityDetail?.guid ? ethnicityCompositeService.get(person.ethnicityDetail?.guid) : null
+        def ethnicity
+        try {
+            ethnicity = person.ethnicityDetail?.guid ? ethnicityCompositeService.get(person.ethnicityDetail?.guid) : null
+        }
+        catch (ApplicationException e) {
+            if( e.wrappedException instanceof NotFoundException ) {
+                throw new ApplicationException("PersonCompositeService", "@@r1:ethnicity.invalid:BusinessLogicValidationException@@")
+                ethnicity = null
+            }
+            else {
+                throw e
+            }
+        }
         person.put('ethnicity', ethnicity ? Ethnicity.findByCode(ethnicity?.code) : null)
         person.put('ethnic', ethnicity ? ethnicity.ethnic : null)
         person.put('deadIndicator', person.get('deadDate') ? 'Y' : null)
@@ -350,7 +373,7 @@ class PersonCompositeService extends LdmService {
             if( activeRace?.guid ) {
                 def race = raceCompositeService.get(activeRace?.guid)
                 if (!race) {
-                    throw new ApplicationException(PersonCompositeService, "@@r1:race.invalid:BusinessLogicValidationException@@")
+                    throw new ApplicationException('PersonCompositeService', "@@r1:race.invalid:BusinessLogicValidationException@@")
                 }
                 def newRace = new PersonRace()
                 newRace.pidm = pidm
@@ -359,7 +382,7 @@ class PersonCompositeService extends LdmService {
                 races << personRaceService.create(newRace)
             }
             else {
-                throw new ApplicationException(PersonCompositeService, "@@r1:race.invalid:BusinessLogicValidationException@@")
+                throw new ApplicationException('PersonCompositeService', "@@r1:race.invalid:BusinessLogicValidationException@@")
             }
         }
         races
