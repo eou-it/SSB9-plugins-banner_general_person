@@ -34,8 +34,12 @@ import net.hedtech.banner.general.system.State
 import net.hedtech.banner.general.system.TelephoneType
 import net.hedtech.banner.general.system.ldm.v1.Metadata
 import net.hedtech.banner.restfulapi.RestfulApiValidationException
+import net.hedtech.banner.restfulapi.RestfulApiValidationUtility
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
+
+import java.sql.CallableStatement
+import java.sql.SQLException
 
 @Transactional
 class PersonCompositeService extends LdmService {
@@ -60,20 +64,134 @@ class PersonCompositeService extends LdmService {
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     def list(params) {
-        def pidms = []
-            // This'll be populated by the pidm(s) returned from common matching, or the list we query from matching results.
-
-
-        def persons = buildLdmPersonObjects(pidms)
         def resultList
-        try {  // Avoid restful-api plugin dependencies.
-            resultList = this.class.classLoader.loadClass('net.hedtech.restfulapi.PagedResultArrayList').newInstance(persons.values(), persons.values()?.size())
+
+        //RestfulApiValidationUtility.correctMaxAndOffset(params, 10, 30)
+        def allowedSortFields = ["firstName", "lastName"]
+        if (params.sort) {
+            RestfulApiValidationUtility.validateSortField(params.sort, allowedSortFields)
         }
-        catch (ClassNotFoundException e) {
-            resultList = persons.values()
+
+        if (params.order) {
+            RestfulApiValidationUtility.validateSortOrder(params.order)
+        }
+
+        // Check if it is qapi request, if so do matching
+        if (RestfulApiValidationUtility.isQApiRequest( params )) {
+            log.info "Person Dulplicate service:"
+            log.debug "Request parameters: ${params}"
+
+            def primaryName = params.names.find {primaryNameType ->
+                primaryNameType.nameType == "Primary"
+            }
+
+            if (primaryName?.firstName && primaryName?.lastName) {
+                def pidms = searchPerson( params )
+                // This'll be populated by the pidm(s) returned from common matching, or the list we query from matching results.
+
+                def persons = buildLdmPersonObjects( pidms )
+
+                try {  // Avoid restful-api plugin dependencies.
+                    resultList = this.class.classLoader.loadClass( 'net.hedtech.restfulapi.PagedResultArrayList' ).newInstance( persons.values(), persons.values()?.size() )
+                }
+                catch (ClassNotFoundException e) {
+                    resultList = persons.values()
+                }
+            } else {
+                throw new ApplicationException( "Person", "@@r1:missing.first.last.name:BusinessLogicValidationException@@" )
+            }
+        } else {
+            //TODO this is GET - list() call, return the list of persons that are part of gorguid table with ldm name that matches with 'person'
+            //resultList = globalUniqueIdentifierService.findByLdmName(PERSON_LDM_NAME)
+
         }
         resultList
     }
+
+
+    private List<String> searchPerson( Map params ) {
+
+        def ctx = ServletContextHolder.servletContext.getAttribute( GrailsApplicationAttributes.APPLICATION_CONTEXT )
+        def sessionFactory = ctx.sessionFactory
+
+        List<Integer> personList = []
+        def commonMatchingResults
+        IntegrationConfiguration rule = IntegrationConfiguration.findByProcessCodeAndSettingName( PROCESS_CODE, PERSON_MATCH_RULE )
+
+        def primaryName = params.names.find {primaryNameType ->
+            primaryNameType.nameType == "Primary"
+        }
+        def ssnCredentials = params.credentials.find {credential ->
+            credential.credentialType == "Social Security Number"
+        }
+        def bannerIdCredentials = params.credentials.find {credential ->
+            credential.credentialType == "Banner ID"
+        }
+        def emailInstitution = params.emails.find {email ->
+            email.emailType == "Institution"
+        }
+        def emailPersonal = params.emails.find {email ->
+            email.emailType == "Personal"
+        }
+        def emailWork = params.emails.find {email ->
+            email.emailType == "Work"
+        }
+
+        CallableStatement sqlCall
+        try {
+            def connection = sessionFactory.currentSession.connection()
+            String matchPersonQuery = "{ call skkcmth.f_common_mtch(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) }"
+            sqlCall = connection.prepareCall( matchPersonQuery )
+
+            sqlCall.setString( 1, rule?.value )
+            sqlCall.setString( 2, primaryName?.firstName )
+            sqlCall.setString( 3, primaryName?.lastName )
+            sqlCall.setString( 4, primaryName?.middleName )
+            sqlCall.setString( 5, params?.dateOfBirth )
+            sqlCall.setString( 6, params?.gender )
+            sqlCall.setString( 7, ssnCredentials?.credentialType )
+            sqlCall.setString( 8, ssnCredentials?.credentialId )
+            sqlCall.setString( 9, bannerIdCredentials?.credentialType )
+            sqlCall.setString( 10, bannerIdCredentials?.credentialId )
+            sqlCall.setString( 11, emailInstitution?.emailType )
+            sqlCall.setString( 12, emailInstitution?.emailAddress )
+            sqlCall.setString( 13, emailPersonal?.emailType )
+            sqlCall.setString( 14, emailPersonal?.emailAddress )
+            sqlCall.setString( 15, emailWork?.emailType )
+            sqlCall.setString( 16, emailWork?.emailAddress )
+
+            sqlCall.registerOutParameter( 17, java.sql.Types.VARCHAR )
+            sqlCall.executeUpdate()
+
+            String errorCode = sqlCall.getString( 8 )
+            if (!errorCode) {
+                commonMatchingResults = commonMatchingResultsGlobalTemporaryService.findAll()
+            } else {
+                throw new ApplicationException( this.class.name, errorCode )
+            }
+        }
+        catch (SQLException sqlEx) {
+            log.error "Error executing skkcmth.f_common_mtch: " + sqlEx.stackTrace
+            throw new ApplicationException(this.class.name, sqlEx)
+        }
+        catch (Exception ex) {
+            log.error "Exception while searching person ${ex}" + ex.stackTrace
+            throw new ApplicationException(this.class.name, ex)
+        }
+        finally {
+            try {
+                sqlCall?.close()
+            } catch (SQLException sqlEx) {
+                log.trace "Sql Statement is already closed, no need to close it."
+            }
+        }
+
+        commonMatchingResults?.pidm?.each { pidm ->
+            personList << pidm
+        }
+        return personList
+    }
+
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     def get(id) {
