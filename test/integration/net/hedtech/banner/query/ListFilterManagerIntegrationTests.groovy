@@ -14,16 +14,16 @@ import net.hedtech.banner.testing.BaseIntegrationTestCase
 /**
  *
  */
-    class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
+class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
     def filterDefinition
 
     protected void setUp( ) {
         formContext = ['GUAGMNU']
         super.setUp()
-        filterDefinition = [ [field: [code: "searchLastName", description: "Last Name"], preProcessor: ListFilterManager.capitalize],
-            [field: [code: "searchFirstName", description: "First Name"], preProcessor: ListFilterManager.capitalize],
-            [field: [code: "searchMiddleName", description: "Middle Name"], preProcessor: ListFilterManager.capitalize],
-            [field: [code: "specialLastName", description: "Spedial Last Name"], specialProcessor: ListFilterManagerIntegrationTests.specialProcessor]]
+        filterDefinition = [ [field: [code: "searchLastName", description: "Last Name"], operators: ["eq", "ne", "st"], preProcessor: ListFilterManager.capitalize],
+            [field: [code: "searchFirstName", description: "First Name"], operators: ["eq", "ne", "st"], preProcessor: ListFilterManager.capitalize],
+            [field: [code: "searchMiddleName", description: "Middle Name"], operators: ["eq", "ne", "st"], preProcessor: ListFilterManager.capitalize],
+            [field: [code: "specialLastName", description: "Spedial Last Name"], operators: ["eq", "ne", "st"], specialProcessor: ListFilterManagerIntegrationTests.specialProcessor]]
     }
 
 

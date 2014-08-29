@@ -21,7 +21,9 @@ class ListFilterManager {
      *      field: The field to use. This is itself is a map of the following:
      *          code: The field that is used in the criterion
      *          description: The description displayed to the UI
+     *      operators: [] An array of operators that match the above enumeration
      *      preProcessor: A closure used to process the data for the field. There are some avaiable as part of this class.
+     *      specialProcessor: A closure used to generate the restriction for this field.
      */
     def filterDefinition
 
