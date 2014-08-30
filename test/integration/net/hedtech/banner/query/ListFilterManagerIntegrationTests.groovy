@@ -4,6 +4,7 @@
 package net.hedtech.banner.query
 
 import net.hedtech.banner.exceptions.ApplicationException
+import net.hedtech.banner.general.person.PersonEmail
 import org.hibernate.Criteria
 import org.hibernate.criterion.Criterion
 import org.hibernate.criterion.Restrictions
@@ -20,10 +21,16 @@ class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
     protected void setUp( ) {
         formContext = ['GUAGMNU']
         super.setUp()
-        filterDefinition = [ [field: [code: "searchLastName", description: "Last Name"], operators: ["eq", "ne", "st"], preProcessor: ListFilterManager.capitalize],
-            [field: [code: "searchFirstName", description: "First Name"], operators: ["eq", "ne", "st"], preProcessor: ListFilterManager.capitalize],
-            [field: [code: "searchMiddleName", description: "Middle Name"], operators: ["eq", "ne", "st"], preProcessor: ListFilterManager.capitalize],
-            [field: [code: "specialLastName", description: "Spedial Last Name"], operators: ["eq", "ne", "st"], specialProcessor: ListFilterManagerIntegrationTests.specialProcessor]]
+        filterDefinition = [ [field: [code: "searchLastName", description: "Last Name"],
+                operators: ["eq", "ne", "st"], preProcessor: ListFilterManager.capitalize],
+            [field: [code: "searchFirstName", description: "First Name"], type: "freeform",
+                    operators: ["eq", "ne", "st"], preProcessor: ListFilterManager.capitalize],
+            [field: [code: "searchMiddleName", description: "Middle Name"], type: "freeform",
+                    operators: ["eq", "ne", "st"], preProcessor: ListFilterManager.capitalize],
+            [field: [code: "isStudent", description: "Is Student"], type: "operatoronly",
+                    operators: ["t", "f"], preProcessor: ListFilterManager.capitalize],
+            [field: [code: "specialLastName", description: "Spedial Last Name"], type: "freeform",
+                    operators: ["eq", "ne", "st"], specialProcessor: ListFilterManagerIntegrationTests.specialProcessor]]
     }
 
 
@@ -32,7 +39,7 @@ class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-    void testSaveInvalidFilter() {
+    void testSaveInvalidFilterBadOperator() {
         // bad operator
         // Setup a filter for lastName = "Smith"
         def lastNameFilter =
@@ -44,6 +51,76 @@ class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
         def lfm = new ListFilterManager(PersonPersonView, filterDefinition)
         shouldFail(ApplicationException) {
             lfm.saveFilter(lastNameFilter)
+        }
+    }
+
+
+    void testSaveInvalidFilterOperatorOnlyWithValue() {
+        // bad operator
+        // Setup a filter for lastName = "Smith"
+        def lastNameFilter =
+            ["filter[0][field]" : "isStudent",
+                    "filter[0][value]" : "shouldhavenovalue",
+                    "filter[0][operator]" : "t"
+            ]
+
+        def lfm = new ListFilterManager(PersonPersonView, filterDefinition)
+        shouldFail(ApplicationException) {
+            lfm.saveFilter(lastNameFilter)
+        }
+    }
+
+
+    void testSaveInvalidFilterNoDef() {
+        // bad operator
+        // Setup a filter for lastName = "Smith"
+        def lastNameFilter =
+            ["filter[0][field]" : "nodef",
+                    "filter[0][value]" : "shouldhavenovalue",
+                    "filter[0][operator]" : "eq"
+            ]
+
+        def lfm = new ListFilterManager(PersonPersonView, filterDefinition)
+        shouldFail(ApplicationException) {
+            lfm.saveFilter(lastNameFilter)
+        }
+    }
+
+
+    void testSaveInvalidType() {
+        def filterDef2 = [ [field: [code: "searchLastName", description: "Last Name"], type: "invalid",
+                operators: ["eq", "ne", "st"], preProcessor: ListFilterManager.capitalize]]
+
+        // bad operator
+        // Setup a filter for lastName = "Smith"
+        def lastNameFilter =
+            ["filter[0][field]" : "searchLastName",
+                    "filter[0][value]" : "shouldhavenovalue",
+                    "filter[0][operator]" : "eq"
+            ]
+
+        def lfm = new ListFilterManager(PersonPersonView, filterDef2)
+        shouldFail(ApplicationException) {
+            lfm.saveFilter(lastNameFilter)
+        }
+    }
+
+
+    void testSaveValidationTypeNoDomain() {
+        def filterDef2 = [ [field: [code: "emailType", description: "Email Type"], type: "validation",
+                operators: ["eq", "ne",]] ]
+
+        // bad operator
+        // Setup a filter for lastName = "Smith"
+        def emailTypeFilter =
+            ["filter[0][field]" : "emailType",
+                    "filter[0][value]" : "Business",
+                    "filter[0][operator]" : "eq"
+            ]
+
+        def lfm = new ListFilterManager(PersonEmail, filterDef2)
+        shouldFail(ApplicationException) {
+            lfm.saveFilter(emailTypeFilter)
         }
     }
 
