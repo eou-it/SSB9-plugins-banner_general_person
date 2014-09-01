@@ -36,6 +36,8 @@ import net.hedtech.banner.general.system.ldm.v1.Metadata
 import net.hedtech.banner.restfulapi.RestfulApiValidationException
 import net.hedtech.banner.restfulapi.RestfulApiValidationUtility
 import org.springframework.transaction.annotation.Propagation
+import org.codehaus.groovy.grails.web.context.ServletContextHolder
+import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes
 import org.springframework.transaction.annotation.Transactional
 
 import java.sql.CallableStatement
@@ -54,12 +56,14 @@ class PersonCompositeService extends LdmService {
     def ethnicityCompositeService
     def raceCompositeService
     def personRaceService
+    def commonMatchingResultsGlobalTemporaryService
 
     def static ldmName = 'persons'
     static final String PERSON_ADDRESS_TYPE = "person.addresses.addressType"
     static final String PERSON_PHONE_TYPE = "person.phones.phoneType"
     static final String PERSON_EMAIL_TYPE = "person.emails.emailType"
     static final String PROCESS_CODE = "LDM"
+    static final String PERSON_MATCH_RULE = "persons.matchRule"
 
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
@@ -140,7 +144,7 @@ class PersonCompositeService extends LdmService {
         CallableStatement sqlCall
         try {
             def connection = sessionFactory.currentSession.connection()
-            String matchPersonQuery = "{ call skkcmth.f_common_mtch(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) }"
+            String matchPersonQuery = "{ call spkcmth.f_common_mtch(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) }"
             sqlCall = connection.prepareCall( matchPersonQuery )
 
             sqlCall.setString( 1, rule?.value )
@@ -171,7 +175,7 @@ class PersonCompositeService extends LdmService {
             }
         }
         catch (SQLException sqlEx) {
-            log.error "Error executing skkcmth.f_common_mtch: " + sqlEx.stackTrace
+            log.error "Error executing spkcmth.f_common_mtch: " + sqlEx.stackTrace
             throw new ApplicationException(this.class.name, sqlEx)
         }
         catch (Exception ex) {
