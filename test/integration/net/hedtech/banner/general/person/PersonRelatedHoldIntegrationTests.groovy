@@ -210,6 +210,33 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
         assertNotNull(holdList)
     }
 
+
+    void testfetchAllDistinctHoldTypeByPidmAndDateCompare() {
+
+        Integer pidm = PersonUtility.getPerson("HOSADV001").pidm
+        def holdList = PersonRelatedHold.fetchByPidm(pidm)
+        holdList?.each{it.delete(flush: true, failOnError: true)}
+
+        def personRelatedHold = newPersonRelatedHold()
+        personRelatedHold.pidm  = pidm
+        personRelatedHold.save(flush: true, failOnError: true)
+
+        def personRelatedHold1 = newPersonRelatedHold()
+        personRelatedHold1.pidm  = pidm
+        personRelatedHold1.save(flush: true, failOnError: true)
+
+        def df1 = new SimpleDateFormat("yyyy-MM-dd")
+        def holdDate = df1.parse("2010-08-01")
+
+        def personHoldList1 = PersonRelatedHold.fetchByPidmAndDateCompare(pidm, holdDate)
+        assertNotNull(personHoldList1)
+        assertEquals 2, personHoldList1.size()
+
+        def personHoldList2 = PersonRelatedHold.fetchAllDistinctHoldTypeByPidmAndDateCompare(pidm, holdDate)
+        assertNotNull(personHoldList2)
+        assertEquals 1, personHoldList1.size()
+    }
+
     void testFetchByPidmListAndDateCompare() {
         def holdList = [newPersonRelatedHold()]
         def personRelatedHold = newPersonRelatedHold()
