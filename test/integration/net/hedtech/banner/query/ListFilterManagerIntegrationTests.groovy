@@ -11,6 +11,7 @@ import org.hibernate.criterion.Restrictions
 import org.hibernate.Session
 import net.hedtech.banner.general.person.view.PersonPersonView
 import net.hedtech.banner.testing.BaseIntegrationTestCase
+import net.hedtech.banner.general.system.EmailType
 
 /**
  *
@@ -262,6 +263,19 @@ class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
         results.each { it ->
             assertTrue "Smith" != it.lastName
         }
+    }
+
+
+    void testDefaultMapGenerator() {
+        def all = EmailType.findAll()
+        assertNotNull all
+        assertTrue all.size() > 0
+        all.each { it->
+            def map = ListFilterManager.defaultMapGenerator(it)
+            assertEquals it.description, map?.description
+            assertEquals it.code, map?.code
+        }
+
     }
 
 

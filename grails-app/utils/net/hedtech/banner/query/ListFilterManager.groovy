@@ -153,4 +153,9 @@ class ListFilterManager {
     static def capitalize = { it ->
         return it.toUpperCase()
     }
+
+
+    static def defaultMapGenerator = {it ->
+        return [description: it.description, code: it.code]
+    }
 }
