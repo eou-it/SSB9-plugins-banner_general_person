@@ -119,7 +119,6 @@ class PersonCompositeService extends LdmService {
         def sessionFactory = ctx.sessionFactory
 
         List<Integer> personList = []
-        def commonMatchingResults
         IntegrationConfiguration personMatchRule = IntegrationConfiguration.findByProcessCodeAndSettingName( PROCESS_CODE, PERSON_MATCH_RULE )
 
         def primaryName = params.names.find {primaryNameType ->
@@ -185,7 +184,7 @@ class PersonCompositeService extends LdmService {
             if (!errorCode) {
                 personList = getCommonMatchingResults()
             } else {
-                //throw new ApplicationException( this.class.name, errorCode )
+                throw new ApplicationException( this.class.name, errorCode )
             }
         }
         catch (SQLException sqlEx) {
@@ -224,11 +223,11 @@ class PersonCompositeService extends LdmService {
             }
         }
         catch (SQLException ae) {
-            log.error "SqlException in gotcmrt exception ${ae}"
+            log.error "SqlException while fetching person details from gotcmrt ${ae}"
             throw ae
         }
         catch (Exception ae) {
-            log.error "Exception in gotcmrt ${ae} "
+            log.error "Exception while fetching person details ${ae} "
             throw ae
         }
         finally {
