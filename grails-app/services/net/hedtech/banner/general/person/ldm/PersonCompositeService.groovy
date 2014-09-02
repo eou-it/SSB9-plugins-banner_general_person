@@ -5,6 +5,7 @@ package net.hedtech.banner.general.person.ldm
 
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.i18n.phonenumbers.Phonenumber
+import groovy.sql.Sql
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.exceptions.NotFoundException
 import net.hedtech.banner.general.overall.IntegrationConfiguration
@@ -35,11 +36,11 @@ import net.hedtech.banner.general.system.TelephoneType
 import net.hedtech.banner.general.system.ldm.v1.Metadata
 import net.hedtech.banner.restfulapi.RestfulApiValidationException
 import net.hedtech.banner.restfulapi.RestfulApiValidationUtility
+import org.apache.log4j.Logger
 import org.springframework.transaction.annotation.Propagation
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes
 import org.springframework.transaction.annotation.Transactional
-
 import java.sql.CallableStatement
 import java.sql.SQLException
 
@@ -56,7 +57,6 @@ class PersonCompositeService extends LdmService {
     def ethnicityCompositeService
     def raceCompositeService
     def personRaceService
-    def commonMatchingResultsGlobalTemporaryService
 
     def static ldmName = 'persons'
     static final String PERSON_ADDRESS_TYPE = "person.addresses.addressType"
@@ -113,14 +113,14 @@ class PersonCompositeService extends LdmService {
     }
 
 
-    private List<String> searchPerson( Map params ) {
+    private List<Integer> searchPerson( Map params ) {
 
         def ctx = ServletContextHolder.servletContext.getAttribute( GrailsApplicationAttributes.APPLICATION_CONTEXT )
         def sessionFactory = ctx.sessionFactory
 
         List<Integer> personList = []
         def commonMatchingResults
-        IntegrationConfiguration rule = IntegrationConfiguration.findByProcessCodeAndSettingName( PROCESS_CODE, PERSON_MATCH_RULE )
+        IntegrationConfiguration personMatchRule = IntegrationConfiguration.findByProcessCodeAndSettingName( PROCESS_CODE, PERSON_MATCH_RULE )
 
         def primaryName = params.names.find {primaryNameType ->
             primaryNameType.nameType == "Primary"
@@ -134,20 +134,34 @@ class PersonCompositeService extends LdmService {
         def emailInstitution = params.emails.find {email ->
             email.emailType == "Institution"
         }
+        def emailInstitutionRuleValue
+        if(emailInstitution?.emailType){
+            emailInstitutionRuleValue = IntegrationConfiguration.fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_EMAIL_TYPE, emailInstitution['emailType'])[0]?.value
+        }
+
         def emailPersonal = params.emails.find {email ->
             email.emailType == "Personal"
         }
+        def emailPersonalRuleValue
+        if(emailPersonal?.emailType){
+            emailPersonalRuleValue = IntegrationConfiguration.fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_EMAIL_TYPE, emailPersonal['emailType'])[0]?.value
+        }
+
         def emailWork = params.emails.find {email ->
             email.emailType == "Work"
+        }
+        def emailWorkRuleValue
+        if(emailWork?.emailType){
+            emailWorkRuleValue = IntegrationConfiguration.fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_EMAIL_TYPE, emailWork['emailType'])[0]?.value
         }
 
         CallableStatement sqlCall
         try {
             def connection = sessionFactory.currentSession.connection()
-            String matchPersonQuery = "{ call spkcmth.f_common_mtch(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) }"
+            String matchPersonQuery = "{ call spkcmth.p_common_mtch(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) }"
             sqlCall = connection.prepareCall( matchPersonQuery )
 
-            sqlCall.setString( 1, rule?.value )
+            sqlCall.setString( 1, personMatchRule?.value )
             sqlCall.setString( 2, primaryName?.firstName )
             sqlCall.setString( 3, primaryName?.lastName )
             sqlCall.setString( 4, primaryName?.middleName )
@@ -155,27 +169,27 @@ class PersonCompositeService extends LdmService {
             sqlCall.setString( 6, params?.gender )
             sqlCall.setString( 7, ssnCredentials?.credentialType )
             sqlCall.setString( 8, ssnCredentials?.credentialId )
-            sqlCall.setString( 9, bannerIdCredentials?.credentialType )
-            sqlCall.setString( 10, bannerIdCredentials?.credentialId )
-            sqlCall.setString( 11, emailInstitution?.emailType )
+            sqlCall.setString( 9, bannerIdCredentials?.credentialType?: null )
+            sqlCall.setString( 10, bannerIdCredentials?.credentialId?: null )
+            sqlCall.setString( 11, emailInstitutionRuleValue?: null )
             sqlCall.setString( 12, emailInstitution?.emailAddress )
-            sqlCall.setString( 13, emailPersonal?.emailType )
+            sqlCall.setString( 13, emailPersonalRuleValue?: null )
             sqlCall.setString( 14, emailPersonal?.emailAddress )
-            sqlCall.setString( 15, emailWork?.emailType )
+            sqlCall.setString( 15, emailWorkRuleValue?: null )
             sqlCall.setString( 16, emailWork?.emailAddress )
 
             sqlCall.registerOutParameter( 17, java.sql.Types.VARCHAR )
-            sqlCall.executeUpdate()
+            sqlCall.executeQuery()
 
-            String errorCode = sqlCall.getString( 8 )
+            String errorCode = sqlCall.getString( 17 )
             if (!errorCode) {
-                commonMatchingResults = commonMatchingResultsGlobalTemporaryService.findAll()
+                personList = getCommonMatchingResults()
             } else {
-                throw new ApplicationException( this.class.name, errorCode )
+                //throw new ApplicationException( this.class.name, errorCode )
             }
         }
         catch (SQLException sqlEx) {
-            log.error "Error executing spkcmth.f_common_mtch: " + sqlEx.stackTrace
+            log.error "Error executing spkcmth.p_common_mtch: " + sqlEx.stackTrace
             throw new ApplicationException(this.class.name, sqlEx)
         }
         catch (Exception ex) {
@@ -190,12 +204,38 @@ class PersonCompositeService extends LdmService {
             }
         }
 
-        commonMatchingResults?.pidm?.each { pidm ->
-            personList << pidm
-        }
         return personList
     }
 
+
+    private def getCommonMatchingResults(){
+        List<Integer> personPidmList = []
+        def ctx = ServletContextHolder.servletContext.getAttribute(GrailsApplicationAttributes.APPLICATION_CONTEXT)
+        def log = Logger.getLogger(this.getClass())
+        def sessionFactory = ctx.sessionFactory
+        def session = sessionFactory.currentSession
+        def sql
+        try {
+            sql = new Sql(session.connection())
+            def commonMatchSql = """SELECT gotcmrt_pidm pidm FROM gotcmrt"""
+
+            sql.eachRow(commonMatchSql) { commonMatchPerson ->
+                personPidmList << commonMatchPerson.pidm.intValue()
+            }
+        }
+        catch (SQLException ae) {
+            log.error "SqlException in gotcmrt exception ${ae}"
+            throw ae
+        }
+        catch (Exception ae) {
+            log.error "Exception in gotcmrt ${ae} "
+            throw ae
+        }
+        finally {
+            sql?.close()
+        }
+        return personPidmList
+    }
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     def get(id) {
