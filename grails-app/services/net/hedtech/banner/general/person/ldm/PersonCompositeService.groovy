@@ -257,14 +257,16 @@ class PersonCompositeService extends LdmService {
         def sql
         try {
             sql = new Sql(session.connection())
-            def commonMatchSql = """SELECT gotcmrt_pidm pidm FROM gotcmrt"""
+            def commonMatchSql = """SELECT govcmrt_pidm pidm, govcmrt_id
+                                      FROM govcmrt
+                                     WHERE govcmrt_result_ind = 'M'"""
 
             sql.eachRow(commonMatchSql) { commonMatchPerson ->
                 personPidmList << commonMatchPerson.pidm.intValue()
             }
         }
         catch (SQLException ae) {
-            log.error "SqlException while fetching person details from gotcmrt ${ae}"
+            log.error "SqlException while fetching person details from govcmrt ${ae}"
             throw ae
         }
         catch (Exception ae) {
