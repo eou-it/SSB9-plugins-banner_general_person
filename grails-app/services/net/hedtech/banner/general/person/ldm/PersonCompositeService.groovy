@@ -73,18 +73,23 @@ class PersonCompositeService extends LdmService {
         def resultList = []
 
         def sortAndPagingParams = [:]
+        def allowedSortFields = ["firstName", "lastName"]
         if( params.containsKey('max') ) sortAndPagingParams.put('max',params.max)
         if( params.containsKey('offset') ) sortAndPagingParams.put('offset',params.offset)
-        if( params.containsKey('sort') ) sortAndPagingParams.put('sort',params.sort)
-        if( params.containsKey('order') ) sortAndPagingParams.put('order',params.sort)
+        if( params.containsKey('sort') ) sortAndPagingParams.put( 'sort', params.sort )
+        if( params.containsKey('order') ) sortAndPagingParams.put( 'order', params.order )
         RestfulApiValidationUtility.correctMaxAndOffset(sortAndPagingParams, 500, 0)
-        def allowedSortFields = ["firstName", "lastName"]
+
         if (params.sort) {
             RestfulApiValidationUtility.validateSortField(sortAndPagingParams.sort, allowedSortFields)
+        } else {
+            sortAndPagingParams.put( 'sort', allowedSortFields[1] )
         }
 
         if (sortAndPagingParams.order) {
             RestfulApiValidationUtility.validateSortOrder(sortAndPagingParams.order)
+        } else {
+            sortAndPagingParams.put( 'order', "asc" )
         }
 
         // Check if it is qapi request, if so do matching
@@ -115,6 +120,29 @@ class PersonCompositeService extends LdmService {
         List<PersonIdentificationNameCurrent> personIdentificationList =
                 PersonIdentificationNameCurrent.findAllByPidmInList(pidms, sortAndPagingParams)
         def persons = buildLdmPersonObjects( personIdentificationList )
+
+        //sorting start
+        if(persons?.size() > 0) {
+            if (sortAndPagingParams.sort == "firstName") {
+                if (sortAndPagingParams.order == "desc") {
+                    log.trace "Persons - sort: firstName - order: desc"
+                    persons = persons.sort {a, b -> b.value.names[0].firstName<=> a.value.names[0].firstName}
+                } else {
+                    log.trace "Persons - sort: firstName - order: asc"
+                    persons = persons.sort {it.value.names[0].firstName}
+                }
+
+            } else if (sortAndPagingParams.sort == "lastName") {
+                if (sortAndPagingParams.order == "desc") {
+                    log.trace "Persons - sort: lastName - order: desc"
+                    persons = persons.sort {a, b -> b.value.names[0].lastName <=> a.value.names[0].lastName}
+                } else {
+                    log.trace "Persons - sort: lastName - order: asc"
+                    persons = persons.sort {it.value.names[0].lastName}
+                }
+            }
+        }
+        //sorting end
 
         try {  // Avoid restful-api plugin dependencies.
             resultList = this.class.classLoader.loadClass( 'net.hedtech.restfulapi.PagedResultArrayList' ).newInstance( persons.values(), pidms?.size() )
