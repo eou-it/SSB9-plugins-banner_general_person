@@ -121,7 +121,7 @@ class PersonCompositeService extends LdmService {
                 PersonIdentificationNameCurrent.findAllByPidmInList(pidms, sortAndPagingParams)
         def persons = buildLdmPersonObjects( personIdentificationList )
 
-        //sorting start
+        /*sorting start
         if(persons?.size() > 0) {
             if (sortAndPagingParams.sort == "firstName") {
                 if (sortAndPagingParams.order == "desc") {
@@ -142,7 +142,7 @@ class PersonCompositeService extends LdmService {
                 }
             }
         }
-        //sorting end
+        //sorting end */
 
         try {  // Avoid restful-api plugin dependencies.
             resultList = this.class.classLoader.loadClass( 'net.hedtech.restfulapi.PagedResultArrayList' ).newInstance( persons.values(), pidms?.size() )
@@ -317,7 +317,7 @@ class PersonCompositeService extends LdmService {
 
         }
         else {
-            def entity = GlobalUniqueIdentifier.fetchByLdmNameAndDomainId(ldmName, newPersonIdentificationName.id)
+            def entity = GlobalUniqueIdentifier.findByLdmNameAndDomainId(ldmName, newPersonIdentificationName.id)
             person.put('guid', entity)
         }
 
