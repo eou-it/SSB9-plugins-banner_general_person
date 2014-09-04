@@ -727,23 +727,23 @@ class PersonCompositeService extends LdmService {
         //update Address
          def addresses
 
-        if(content.containsKey('addresses') && content.addresses instanceof List && content.addresses.size > 0)
-                addresses = updateAddresses(pidmToUpdate,content.addresses)
+        if (content.containsKey('addresses') && content.addresses instanceof List && content.addresses.size > 0)
+            addresses = updateAddresses(pidmToUpdate, content.metadata, content.addresses)
 
         //update Telephones
         def phones
-        if(content.containsKey('phones') && content.phones instanceof List && content.phones.size > 0 )
-            phones = updatePhones(pidmToUpdate, content.phones)
+        if (content.containsKey('phones') && content.phones instanceof List && content.phones.size > 0)
+            phones = updatePhones(pidmToUpdate, content.metadata, content.phones)
 
         //update Emails
         def emails
-        if(content.containsKey('emails') && content.emails instanceof List && content.emails.size > 0 )
-            emails = updateEmails(pidmToUpdate,content.emails)
+        if (content.containsKey('emails') && content.emails instanceof List && content.emails.size > 0)
+            emails = updateEmails(pidmToUpdate, content.metadata, content.emails)
 
         //update races
         def races
-        if(content.containsKey('races') && content.races instanceof List && content.races.size > 0 )
-            updateRaces(pidmToUpdate, content.races)
+        if (content.containsKey('races') && content.races instanceof List && content.races.size > 0)
+            updateRaces(pidmToUpdate, content.metadata, content.races)
         //Build decorator to return LDM response.
         new Person(newPersonBase, content.guid, credentials, addresses, phones, emails, names, newPersonBase?.maritalStatus,ethnicity,races)
 
@@ -790,53 +790,53 @@ class PersonCompositeService extends LdmService {
     }
 
 
-    private  updateAddresses(def pidm, List<PersonAddress> newAddresses) {
+    private updateAddresses(def pidm, Map metadata, List<PersonAddress> newAddresses) {
         def addresses = []
         newAddresses?.each { activeAddress ->
             IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_ADDRESS_TYPE, activeAddress.addressType)
-            if (rule?.translationValue == activeAddress.addressType && !addresses.contains {
+            if (rule?.translationValue == activeAddress.addressType && !addresses.contains) {
                 activeAddress.addressType == rule?.value
-            }) {
-                def currAddress = PersonAddress.fetchListActiveAddressByPidmAndAddressType([pidm], [AddressType.findByCode(rule.value)])
+            }
+                def currAddressList = PersonAddress.fetchListActiveAddressByPidmAndAddressType([pidm], [AddressType.findByCode(rule.value)])
                 def address
                 //address exists in DB
-                if(currAddress){
-                    if(activeAddress.state)
-                        currAddress.state = State.findByDescription(activeAddress.state)
-                    if (activeAddress?.nation?.containsKey('code')) {
-                        def nation = Nation.findByNation(activeAddress?.country?.code)
-                        if(nation){
-                            currAddress.nation = nation
-                        }else{
-                            log.error "Nation not found for code: ${activeAddress?.country?.code}"
+                if (currAddressList) {
+                    currAddressList.each { currAddress ->
+                        if (activeAddress.state)
+                            currAddress.state = State.findByDescription(activeAddress.state)
+                        if (activeAddress?.nation?.containsKey('code')) {
+                            def nation = Nation.findByNation(activeAddress?.country?.code)
+                            if (nation) {
+                                currAddress.nation = nation
+                            } else {
+                                log.error "Nation not found for code: ${activeAddress?.country?.code}"
+                            }
                         }
-                    }
-                    if (activeAddress.containsKey('county')) {
-                        def country =  County.findByDescription(activeAddress.county)
-                        if(country){
-                            currAddress.county =country
+                        if (activeAddress.containsKey('county')) {
+                            def country = County.findByDescription(activeAddress.county)
+                            if (country) {
+                                currAddress.county = country
+                            } else {
+                                log.warn "County not found for code: ${activeAddress.county}"
+                            }
                         }
-                        else {
-                            log.warn "County not found for code: ${activeAddress.county}"
-                        }
-                    }
-                    address = personAddressService.update(currAddress)
 
-                }else{
+                        address = personAddressService.update(currAddress)
+                    }
 
-                    address = createAddresses(pidm,[activeAddress]).get(0)
+                } else {
+                    address = createAddresses(pidm, metadata, [activeAddress]).get(0)
                 }
 
                 def addressDecorator = new Address(address)
                 addressDecorator.addressType = rule?.translationValue
                 addresses << addressDecorator
             }
-        }
         addresses
 
     }
 
-    private  updatePhones(def pidm, List<PersonTelephone> newPhones) {
+    private updatePhones(def pidm, Map metadata, List<PersonTelephone> newPhones) {
         def phones = []
         newPhones?.each { activePhone ->
             IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_ADDRESS_TYPE, activePhone.phoneType)
@@ -858,7 +858,7 @@ class PersonCompositeService extends LdmService {
 
                 }else{
                     //Create New Telephones if it dosen't exists
-                    phone = createPhones(pidm,[activePhone]).get(0)
+                    phone = createPhones(pidm, metadata, [activePhone]).get(0)
                 }
                 def phoneDecorator = new Phone(phone)
                 phoneDecorator.phoneType = rule.translationValue
@@ -871,7 +871,7 @@ class PersonCompositeService extends LdmService {
     }
 
 
-    private updateEmails(def pidm, List<PersonEmail> newEmails) {
+    private updateEmails(def pidm, Map metadata, List<PersonEmail> newEmails) {
         def emails = []
         newEmails?.each { activeEmail ->
             IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_EMAIL_TYPE, activeEmail.emailType)
@@ -890,7 +890,7 @@ class PersonCompositeService extends LdmService {
 
                 }else{
                     //Create New emails if it dosen't exists
-                    email = createEmails(pidm,[activeEmail]).get(0)
+                    email = createEmails(pidm, metadata, [activeEmail]).get(0)
                 }
                 def emailDecorator = new Email(email)
                 emailDecorator.emailType = rule.translationValue
@@ -900,7 +900,8 @@ class PersonCompositeService extends LdmService {
         emails
     }
 
-    List<PersonRace> updateRaces (def pidm, List<Map> newRaces) {
+
+    List<PersonRace> updateRaces(def pidm, Map metadata, List<Map> newRaces) {
         def races = []
         newRaces?.each { activeRace ->
             if( activeRace?.guid ) {
@@ -908,9 +909,18 @@ class PersonCompositeService extends LdmService {
                 if (!race) {
                     throw new ApplicationException(PersonCompositeService, "@@r1:race.invalid:BusinessLogicValidationException@@")
                 }
-                PersonRace personRace= PersonRace.fetchByPidm(pidm)
-                personRace.race = race.race
-                races << personRaceService.update(personRace)
+                def personRaceList = PersonRace.fetchByPidm(pidm)
+                if (personRaceList) {
+                    personRaceList.each { personRace ->
+                        personRace.race = race.race
+                        races << personRaceService.update(personRace)
+                    }
+
+                } else {
+                    //Create New races if it dosen't exists
+                    races = createRaces(pidm, metadata, [activeRace]).get(0)
+                }
+
             }
             else {
                 throw new ApplicationException(PersonCompositeService, "@@r1:race.invalid:BusinessLogicValidationException@@")
