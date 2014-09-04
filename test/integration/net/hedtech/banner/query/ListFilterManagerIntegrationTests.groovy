@@ -49,7 +49,7 @@ class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
                     "filter[0][operator]" : "nope"
             ]
 
-        def lfm = new ListFilterManager(PersonPersonView, filterDefinition)
+        def lfm = new ListFilterManager(filterDefinition)
         shouldFail(ApplicationException) {
             lfm.saveFilter(lastNameFilter)
         }
@@ -65,7 +65,7 @@ class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
                     "filter[0][operator]" : "t"
             ]
 
-        def lfm = new ListFilterManager(PersonPersonView, filterDefinition)
+        def lfm = new ListFilterManager(filterDefinition)
         shouldFail(ApplicationException) {
             lfm.saveFilter(lastNameFilter)
         }
@@ -81,7 +81,7 @@ class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
                     "filter[0][operator]" : "eq"
             ]
 
-        def lfm = new ListFilterManager(PersonPersonView, filterDefinition)
+        def lfm = new ListFilterManager(filterDefinition)
         shouldFail(ApplicationException) {
             lfm.saveFilter(lastNameFilter)
         }
@@ -100,7 +100,7 @@ class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
                     "filter[0][operator]" : "eq"
             ]
 
-        def lfm = new ListFilterManager(PersonPersonView, filterDef2)
+        def lfm = new ListFilterManager(filterDef2)
         shouldFail(ApplicationException) {
             lfm.saveFilter(lastNameFilter)
         }
@@ -119,7 +119,7 @@ class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
                     "filter[0][operator]" : "eq"
             ]
 
-        def lfm = new ListFilterManager(PersonEmail, filterDef2)
+        def lfm = new ListFilterManager(filterDef2)
         shouldFail(ApplicationException) {
             lfm.saveFilter(emailTypeFilter)
         }
@@ -134,7 +134,7 @@ class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
                  "filter[0][operator]" : "eq"
                 ]
 
-        def lfm = new ListFilterManager(PersonPersonView, filterDefinition)
+        def lfm = new ListFilterManager(filterDefinition)
         lfm.saveFilter(lastNameFilter)
         Session session = sessionFactory.getCurrentSession()
         Criterion cro = lfm.getCriterionObject()
@@ -161,7 +161,7 @@ class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
                     "filter[1][operator]" : "st"
             ]
 
-        def lfm = new ListFilterManager(PersonPersonView, filterDefinition)
+        def lfm = new ListFilterManager(filterDefinition)
         lfm.saveFilter(lastNameFilter)
         Session session = sessionFactory.getCurrentSession()
         Criterion cro = lfm.getCriterionObject()
@@ -192,7 +192,7 @@ class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
                     "filter[2][operator]" : "co"
             ]
 
-        def lfm = new ListFilterManager(PersonPersonView, filterDefinition)
+        def lfm = new ListFilterManager(filterDefinition)
         lfm.saveFilter(lastNameFilter)
         Session session = sessionFactory.getCurrentSession()
         Criterion cro = lfm.getCriterionObject()
@@ -224,7 +224,7 @@ class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
                     "filter[2][operator]" : "ne"
             ]
 
-        def lfm = new ListFilterManager(PersonPersonView, filterDefinition)
+        def lfm = new ListFilterManager(filterDefinition)
         lfm.saveFilter(lastNameFilter)
         Session session = sessionFactory.getCurrentSession()
         Criterion cro = lfm.getCriterionObject()
@@ -250,7 +250,7 @@ class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
                     "filter[0][operator]" : "eq"
             ]
 
-        def lfm = new ListFilterManager(PersonPersonView, filterDefinition)
+        def lfm = new ListFilterManager(filterDefinition)
         lfm.saveFilter(lastNameFilter)
         Session session = sessionFactory.getCurrentSession()
         Criterion cro = lfm.getCriterionObject()
