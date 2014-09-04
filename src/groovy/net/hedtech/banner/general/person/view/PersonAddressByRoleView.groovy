@@ -61,15 +61,24 @@ class PersonAddressByRoleView {
     String city
 
     @Column(name = "SPRADDR_STAT_CODE")
+    String stateCode
+
+    @Column(name = "STVSTAT_DESC")
     String state
 
     @Column(name = "SPRADDR_ZIP")
     String zip
 
     @Column(name = "SPRADDR_CNTY_CODE")
+    String countyCode
+
+    @Column(name = "STVCNTY_DESC")
     String county
 
     @Column(name = "SPRADDR_NATN_CODE")
+    String nationCode
+
+    @Column(name = "STVNATN_DESC")
     String nation
 
     @Column(name = "SPRADDR_FROM_DATE")
@@ -107,8 +116,11 @@ class PersonAddressByRoleView {
 					streetLine4=$streetLine4,
 					addressTypeDescription=$addressTypeDescription,
 					state=$state,
+                    stateCode=\$stateCode,
 					county=$county,
+                    countyCode=\$countyCode,
 					nation=$nation,
+                    nationCode=\$nationCode,
 					userRole=$userRole,
                     priviledgeIndicator=$priviledgeIndicator,
                     priviledgeSequence=$priviledgeSequence]"""
@@ -141,7 +153,9 @@ class PersonAddressByRoleView {
         if (version != that.version) return false
         if (zip != that.zip) return false
         if (county != that.county) return false
-        if (nation != that.nation) return false
+        if (countyCode != that.countyCode) return false
+        if (nationCode != that.nationCode) return false
+        if (stateCode != that.stateCode) return false
 
         return true
     }
@@ -160,6 +174,7 @@ class PersonAddressByRoleView {
         result = 31 * result + (streetLine3 != null ? streetLine3.hashCode() : 0)
         result = 31 * result + (streetLine4 != null ? streetLine4.hashCode() : 0)
         result = 31 * result + (city != null ? city.hashCode() : 0)
+        result = 31 * result + (stateCode != null ? stateCode.hashCode() : 0)
         result = 31 * result + (state != null ? state.hashCode() : 0)
         result = 31 * result + (zip != null ? zip.hashCode() : 0)
         result = 31 * result + (fromDate != null ? fromDate.hashCode() : 0)
@@ -167,6 +182,8 @@ class PersonAddressByRoleView {
         result = 31 * result + (priviledgeIndicator != null ? priviledgeIndicator.hashCode() : 0)
         result = 31 * result + (userRole != null ? userRole.hashCode() : 0)
         result = 31 * result + (priviledgeSequence != null ? priviledgeSequence.hashCode() : 0)
+        result = 31 * result + (countyCode != null ? countyCode.hashCode() : 0)
+        result = 31 * result + (nationCode != null ? nationCode.hashCode() : 0)
         result = 31 * result + (county != null ? county.hashCode() : 0)
         result = 31 * result + (nation != null ? nation.hashCode() : 0)
         return result
