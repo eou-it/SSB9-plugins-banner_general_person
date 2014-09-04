@@ -66,13 +66,12 @@ class PersonAddressUtility {
         if (addressFormat.contains("\$streetLine1")) displayLine = displayLine.replace("\$streetLine1", personAddressMap?.streetLine1 ?: '')
         if (addressFormat.contains("\$streetLine2")) displayLine = displayLine.replace("\$streetLine2", personAddressMap?.streetLine2 ?: '')
         if (addressFormat.contains("\$streetLine3")) displayLine = displayLine.replace("\$streetLine3", personAddressMap?.streetLine3 ?: '')
-        if (addressFormat.contains("\$streetLine4")) displayLine = displayLine.replace("\$streetLine4", personAddressMap?.streetLine4 ?: '')
+        if ((personAddressMap?.displayStreetLine4))  {
+            if (addressFormat.contains("\$streetLine4")) displayLine = displayLine.replace("\$streetLine4", personAddressMap?.streetLine4 ?: '')
+        } else displayLine = displayLine.replace("\$streetLine4", '')
         if (addressFormat.contains("\$city")) displayLine = displayLine.replace("\$city", personAddressMap?.city ?: '')
         if (addressFormat.contains("\$state")) displayLine = displayLine.replace("\$state", personAddressMap?.state ?: '')
-        if ((personAddressMap?.displayCounty))  {
-            if (addressFormat.contains("\$county"))
-                displayLine = displayLine.replace("\$county", personAddressMap?.county ?: '')  }
-        else displayLine = displayLine.replace("\$county",'')
+        if (addressFormat.contains("\$county")) displayLine = displayLine.replace("\$county", personAddressMap?.county ?: '')
 
         if (addressFormat.contains("\$zip")) displayLine = displayLine.replace("\$zip", personAddressMap?.zip ?: '')
         if (addressFormat.contains("\$country")) displayLine = displayLine.replace("\$country", personAddressMap?.country ?: '')
