@@ -401,6 +401,7 @@ class PersonCompositeService extends LdmService {
         def races = createRaces(newPersonIdentificationName.pidm, person?.metadata,
                 person.races instanceof List ? person.races : [] )
         persons = buildPersonRaces(races, persons)
+        persons = buildPersonRoles(persons)
         persons.get(newPersonIdentificationName.pidm)
     }
 
@@ -595,6 +596,7 @@ class PersonCompositeService extends LdmService {
         persons = buildPersonTelephones(personTelephoneList, persons)
         persons = buildPersonEmails(personEmailList, persons)
         persons = buildPersonRaces(personRaceList,persons)
+        persons = buildPersonRoles(persons)
         persons // Map of person objects with pidm as index.
     }
 
@@ -658,13 +660,26 @@ class PersonCompositeService extends LdmService {
     }
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    def buildPersonRaces( List<PersonRace> personRacesList, persons) {
+    def buildPersonRaces( List<PersonRace> personRacesList, Map persons) {
         personRacesList.each { activeRace ->
             Person currentRecord = persons.get(activeRace.pidm)
             def race = raceCompositeService.fetchByRaceCode(activeRace.race)
             race.dataOrigin = activeRace.dataOrigin
             currentRecord.races << race
             persons.put(activeRace.pidm, currentRecord)
+        }
+        persons
+    }
+
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    def buildPersonRoles( Map persons) {
+        def pidms = []
+        persons.each { key, value ->
+            pidms << key
+        }
+        userRoleCompositeService.fetchAllRolesByPidmInList(pidms).each { role ->
+            Person currentRecord = persons.get(role.key)
+            currentRecord.roles = role.value
         }
         persons
     }
