@@ -318,7 +318,7 @@ class PersonCompositeService extends LdmService {
         }
         else {
             def entity = GlobalUniqueIdentifier.findByLdmNameAndDomainId(ldmName, newPersonIdentificationName.id)
-            person.put('guid', entity)
+            person.put('guid', entity?.guid)
         }
 
         //Copy ssn attribute from credential to person map.
