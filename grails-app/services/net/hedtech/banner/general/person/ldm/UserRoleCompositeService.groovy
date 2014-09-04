@@ -10,13 +10,11 @@ import net.hedtech.banner.student.faculty.FacultyAppointmentAccessView
 
 class UserRoleCompositeService {
 
-    def dataSource
-
     Map fetchAllByRole( role ) {
+        def endTerms = Term.findAllByEndDateGreaterThan(new Date(),[sort: "code"])
         def results = [:]
             switch (role) {
                 case 'Faculty':
-                    def endTerms = Term.findAllByEndDateGreaterThan(new Date(),[sort: "code"])
                     if( endTerms.size() > 0 ) {
                         try {
                             def domainClass = Class.forName("net.hedtech.banner.student.faculty.FacultyAppointmentAccessView",
@@ -37,9 +35,27 @@ class UserRoleCompositeService {
                     }
                     break
                 case 'Student':
+                    if( endTerms.size() > 0 ) {
+                        try {
+                            def domainClass = Class.forName("",
+                                    true, Thread.currentThread().getContextClassLoader() )
+                            domainClass.fetchAllActiveByMinTermEffective(endTerms[0]?.code).each { it ->
+                                def newRole = new RoleDetail()
+                                newRole.role = 'Student'
+                                Term startDate = Term.findByCode(it.termEffective)
+                                newRole.effectiveStartDate = startDate.startDate
+                                results.put(it.pidm, newRole)
+                            }
+                        }
+                        catch( ClassNotFoundException e ){
+                            log.warn "Student faculty plugin not present, unable to process Faculty roles"
+                        }
+                    }
                     break
             }
 
         results
     }
+
+
 }
