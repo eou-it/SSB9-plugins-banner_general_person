@@ -32,7 +32,7 @@ grails.project.dependency.resolution = {
 
 
     dependencies {
-        build 'com.googlecode.libphonenumber:libphonenumber:6.2'
+        compile 'com.googlecode.libphonenumber:libphonenumber:6.2'
 
     }
 
