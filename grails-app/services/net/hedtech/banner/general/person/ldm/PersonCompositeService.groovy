@@ -326,7 +326,7 @@ class PersonCompositeService extends LdmService {
             person?.credentials?.each { it ->
                 if( it instanceof Map ) {
                     if (it.credentialType == 'Social Security Number') {
-                        if( it?.credentialId.length() > 15) {throw new ApplicationException("PersonCompositeService", "@@r1:credentialId.invalid:BusinessLogicValidationException@@")}
+                        if( it?.credentialId.length() > 9) {throw new ApplicationException("PersonCompositeService", "@@r1:credentialId.invalid:BusinessLogicValidationException@@")}
                         person.put('ssn', it?.credentialId)
                     } else if (it.credentialType == 'Social Insurance Number') {
                         person.put('ssn', it?.credentialId)

@@ -5,7 +5,6 @@ package net.hedtech.banner.general.person.ldm
 
 import net.hedtech.banner.general.person.ldm.v1.RoleDetail
 import net.hedtech.banner.general.system.Term
-import net.hedtech.banner.student.faculty.FacultyAppointmentAccessView
 
 
 class UserRoleCompositeService {
