@@ -918,7 +918,7 @@ class PersonCompositeService extends LdmService {
 
                 } else {
                     //Create New races if it dosen't exists
-                    races = createRaces(pidm, metadata, [activeRace]).get(0)
+                    races << createRaces(pidm, metadata, [activeRace]).get(0)
                 }
 
             }
