@@ -33,15 +33,15 @@ class RestrictionTypeCompositeService {
     def holdTypeService
     def
     private static final String RESTRICTION_TYPE_LDM_NAME = 'restriction-types'
-    private static final String LDM_NAME = "persons"
+    private static final String PERSONS_LDM_NAME = "persons"
 
 
     List<RestrictionType> list(Map params) {
-        if (params?.parentPluralizedResourceName) {
+        if (params?.parentPluralizedResourceName == "persons") {
             def returnLists = []
             if(params?.parentId){
-                String guid = params.parentId?.trim()
-                GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(LDM_NAME, guid)
+                String guid = params.parentId?.trim()?.toLowerCase()
+                GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(PERSONS_LDM_NAME, guid)
                 if (!globalUniqueIdentifier) {
                     throw new ApplicationException(GlobalUniqueIdentifierService.API, new NotFoundException(id: Person.class.simpleName))
                 }
@@ -84,8 +84,8 @@ class RestrictionTypeCompositeService {
     Long count(params) {
         Integer count
         if (params?.parentPluralizedResourceName) {
-            String guid = params.parentId?.trim()
-            GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(LDM_NAME, guid)
+            String guid = params.parentId?.trim()?.toLowerCase()
+            GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(PERSONS_LDM_NAME, guid)
             PersonIdentificationName personIdentificationName = PersonUtility.getPerson(globalUniqueIdentifier.domainKey.toInteger())
             List<PersonRelatedHold> restrictionTypes = []
             restrictionTypes = PersonRelatedHold.fetchByPidmAndDateCompare(personIdentificationName.pidm, new Date())
