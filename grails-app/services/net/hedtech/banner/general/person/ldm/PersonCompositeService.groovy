@@ -705,7 +705,13 @@ class PersonCompositeService extends LdmService {
             }
         }
         def entity = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(ldmName, content.guid)
-        if (!entity) {
+        if (content.guid) {
+            if (!entity) {
+                //Per strategy when a GUID was provided, the create should happen.
+                return create(content)
+            }
+        }
+        else {
             throw new ApplicationException("Person", "@@r1:guid.record.not.found.message:Person@@")
         }
         def pidmToUpdate = entity.domainKey?.toInteger()
@@ -768,7 +774,8 @@ class PersonCompositeService extends LdmService {
         if (content.containsKey('races') && content.races instanceof List && content.races.size > 0)
             updateRaces(pidmToUpdate, content.metadata, content.races)
         //Build decorator to return LDM response.
-        new Person(newPersonBase, content.guid, credentials, addresses, phones, emails, names, newPersonBase?.maritalStatus,ethnicity,races)
+        def person = new Person(newPersonBase, content.guid, credentials, addresses, phones, emails, names, newPersonBase?.maritalStatus,ethnicity,races,[])
+        person = buildPersonRoles([pidmToUpdate:person]).get(pidmToUpdate)
 
     }
 
@@ -1026,26 +1033,31 @@ class PersonCompositeService extends LdmService {
     Map parsePhoneNumber(String phoneNumber) {
         Map parsedNumber = [:]
         List<InstitutionalDescription> institutions = InstitutionalDescription.list()
-        def institution = institutions.size() > 0 ? institutions[0]: null
+        def institution = institutions.size() > 0 ? institutions[0] : null
         Nation countryLdmCode
-        if( institution?.natnCode ) {
+        if (institution?.natnCode) {
             countryLdmCode = Nation.findByCode(institution.natnCode)
         }
-        PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance()
-        Phonenumber.PhoneNumber parsedResult = phoneUtil.parse(phoneNumber, countryLdmCode?.scodIso ?: 'US')
-        if ( phoneUtil.isNANPACountry(countryLdmCode?.scodIso ?: 'US') ) {
-            String nationalNumber = parsedResult.getNationalNumber()
-            if( nationalNumber.length() == 10 ) {
-                parsedNumber.put('phoneArea', nationalNumber[0..2])
-                parsedNumber.put('phoneNumber', nationalNumber[3..-1])
+        Phonenumber.PhoneNumber parsedResult
+        try {
+            PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance()
+            parsedResult = phoneUtil.parse(phoneNumber, countryLdmCode?.scodIso ?: 'US')
+            if (phoneUtil.isNANPACountry(countryLdmCode?.scodIso ?: 'US')) {
+                String nationalNumber = parsedResult.getNationalNumber()
+                if (nationalNumber.length() == 10) {
+                    parsedNumber.put('phoneArea', nationalNumber[0..2])
+                    parsedNumber.put('phoneNumber', nationalNumber[3..-1])
+                } else {
+                    parsedNumber.put('phoneNumber', nationalNumber)
+                }
+
             }
             else {
-                parsedNumber.put('phoneNumber', nationalNumber)
+                parsedNumber.put('internationalAccess', parsedResult.getCountryCode() + parsedResult.getNationalNumber())
             }
-
         }
-        else {
-            parsedNumber.put('internationalAccess', parsedResult.getCountryCode() + parsedResult.getNationalNumber())
+        catch (Exception e) {
+            throw new ApplicationException(PersonCompositeService, "@@r1:phoneNumber.malformed:BusinessLogicValidationException@@")
         }
         if( parsedResult.getExtension() ) {
             parsedNumber.put('phoneExtension', parsedResult.getExtension())
