@@ -195,6 +195,11 @@ class PersonCompositeService extends LdmService {
             emailWorkRuleValue = IntegrationConfiguration.fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_EMAIL_TYPE, emailWork['emailType'])[0]?.value
         }
 
+        def dob = null
+        if(params?.dateOfBirth){
+            dob = new Date().parse("yyyy-MM-dd", params?.dateOfBirth).format("dd-MMM-yyyy")
+        }
+
         CallableStatement sqlCall
         try {
             def connection = sessionFactory.currentSession.connection()
@@ -205,7 +210,7 @@ class PersonCompositeService extends LdmService {
             sqlCall.setString( 2, primaryName?.firstName )
             sqlCall.setString( 3, primaryName?.lastName )
             sqlCall.setString( 4, primaryName?.middleName )
-            sqlCall.setString( 5, params?.dateOfBirth )
+            sqlCall.setString( 5, dob )
             sqlCall.setString( 6, params?.gender )
             sqlCall.setString( 7, ssnCredentials?.credentialType )
             sqlCall.setString( 8, ssnCredentials?.credentialId )
