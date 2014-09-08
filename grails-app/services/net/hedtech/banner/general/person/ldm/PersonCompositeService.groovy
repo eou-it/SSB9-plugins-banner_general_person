@@ -775,8 +775,10 @@ class PersonCompositeService extends LdmService {
             updateRaces(pidmToUpdate, content.metadata, content.races)
         //Build decorator to return LDM response.
         def person = new Person(newPersonBase, content.guid, credentials, addresses, phones, emails, names, newPersonBase?.maritalStatus,ethnicity,races,[])
-        person = buildPersonRoles([pidmToUpdate:person]).get(pidmToUpdate)
+        def personMap = [:]
+        personMap.put(pidmToUpdate, person)
 
+        person = buildPersonRoles(personMap).get(pidmToUpdate)
     }
 
 
