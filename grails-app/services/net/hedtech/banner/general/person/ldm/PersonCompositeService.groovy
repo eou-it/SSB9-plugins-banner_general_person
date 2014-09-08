@@ -994,7 +994,11 @@ class PersonCompositeService extends LdmService {
                     if (curEmails.emailType.code == rule.value) {
                         curEmails.emailAddress = activeEmail.emailAddress
                         def map = [domainModel: curEmails]
-                        email = personEmailService.update(map)
+                        try {
+                            email = personEmailService.update(map)
+                        } catch(ApplicationException e) {
+                            throw new ApplicationException(PersonCompositeService, "@@r1:email.address.cannot.modified:BusinessLogicValidationException@@")
+                        }
                     }
 
                 } else {
@@ -1009,6 +1013,7 @@ class PersonCompositeService extends LdmService {
         emails
     }
 
+    
     List<PersonRace> updateRaces(def pidm, Map metadata, List<Map> newRaces) {
         def races = []
         newRaces?.each { activeRace ->
