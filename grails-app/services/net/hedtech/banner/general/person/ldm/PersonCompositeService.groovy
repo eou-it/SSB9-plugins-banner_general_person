@@ -43,6 +43,7 @@ import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes
 import org.springframework.transaction.annotation.Transactional
 import java.sql.CallableStatement
 import java.sql.SQLException
+import java.text.ParseException
 
 @Transactional
 class PersonCompositeService extends LdmService {
@@ -195,9 +196,15 @@ class PersonCompositeService extends LdmService {
             emailWorkRuleValue = IntegrationConfiguration.fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_EMAIL_TYPE, emailWork['emailType'])[0]?.value
         }
 
-        def dob = null
+        String dob = null
         if(params?.dateOfBirth){
-            dob = new Date().parse("yyyy-MM-dd", params?.dateOfBirth).format("dd-MMM-yyyy")
+            Date date
+            try {
+                date = Date.parse("yyyy-MM-dd", params?.dateOfBirth)
+            }catch(ParseException pe){
+                throw new ApplicationException("Person", "@@r1:date.parse.error:BusinessLogicValidationException@@")
+            }
+            dob = date.format("dd-MMM-yyyy")
         }
 
         CallableStatement sqlCall
