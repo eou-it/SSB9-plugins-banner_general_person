@@ -928,8 +928,6 @@ class PersonCompositeService extends LdmService {
                             currAddress.streetLine3 = activeAddress.streetLine3
                         if (activeAddress.containsKey('zip'))
                             currAddress.zip = activeAddress.zip
-                        if (activeAddress.containsKey('county'))
-                            currAddress.county = activeAddress.county
                         address = personAddressService.update(currAddress)
                     }
 
