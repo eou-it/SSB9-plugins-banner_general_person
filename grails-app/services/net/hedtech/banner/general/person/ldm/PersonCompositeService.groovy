@@ -951,19 +951,18 @@ class PersonCompositeService extends LdmService {
             if (rule?.translationValue == activePhone.phoneType &&
                     !phones.contains { activePhone.phoneType == rule?.value }) {
                 def telephoneType = TelephoneType.findByCode(rule?.value)
-                def personTelephoneList = PersonTelephone.fetchActiveTelephoneByPidmInList([pidm])
+                List<PersonTelephone> personTelephoneList = PersonTelephone.fetchActiveTelephoneByPidmInList([pidm])
                 def phone
                 if (personTelephoneList) {
                     personTelephoneList.each { curPhones ->
                         if (curPhones.telephoneType.code == rule.value) {
                             // curPhones.phoneArea
                             curPhones.phoneExtension = activePhone.phoneExtension
-                            curPhones.phoneNumber = activePhone.phoneNumber
+                            Map phoneNumber = parsePhoneNumber(activePhone.phoneNumber)
+                            curPhones.properties = phoneNumber
                             phone = personTelephoneService.update(curPhones)
-
                         }
                     }
-
                 } else {
                     //Create New Telephones if it dosen't exists
                     phone = createPhones(pidm, metadata, [activePhone]).get(0)
@@ -975,7 +974,6 @@ class PersonCompositeService extends LdmService {
             }
         }
         phones
-
     }
 
 
@@ -1054,22 +1052,21 @@ class PersonCompositeService extends LdmService {
         try {
             PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance()
             parsedResult = phoneUtil.parse(phoneNumber, countryLdmCode?.scodIso ?: 'US')
-            if (phoneUtil.isNANPACountry(countryLdmCode?.scodIso ?: 'US')) {
-                String nationalNumber = parsedResult.getNationalNumber()
-                if (nationalNumber.length() == 10) {
-                    parsedNumber.put('phoneArea', nationalNumber[0..2])
-                    parsedNumber.put('phoneNumber', nationalNumber[3..-1])
-                } else {
-                    parsedNumber.put('phoneNumber', nationalNumber)
-                }
-
+            String nationalNumber = parsedResult.getNationalNumber()
+            def nationalDestinationCodeLength = phoneUtil.getLengthOfNationalDestinationCode(parsedResult);
+            if( nationalDestinationCodeLength > 0 ) {
+                parsedNumber.put('phoneArea', nationalNumber[0..(nationalDestinationCodeLength - 1)])
+                parsedNumber.put('phoneNumber', nationalNumber[nationalDestinationCodeLength..-1])
             }
             else {
-                parsedNumber.put('internationalAccess', parsedResult.getCountryCode() + parsedResult.getNationalNumber())
+                parsedNumber.put('phoneNumber', nationalNumber)
             }
+            parsedNumber.put('countryPhone', parsedResult.getCountryCode() )
+
         }
         catch (Exception e) {
             throw new ApplicationException(PersonCompositeService, "@@r1:phoneNumber.malformed:BusinessLogicValidationException@@")
+            log.error e.toString()
         }
         if( parsedResult.getExtension() ) {
             parsedNumber.put('phoneExtension', parsedResult.getExtension())

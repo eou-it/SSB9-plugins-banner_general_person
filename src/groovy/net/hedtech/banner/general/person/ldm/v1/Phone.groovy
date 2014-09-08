@@ -15,7 +15,7 @@ class Phone {
 
     def Phone( PersonTelephone phone ) {
         this.phone = phone
-        this.phoneNumberDetail = phone.internationalAccess ?: phone.phoneArea + phone.phoneNumber
+        this.phoneNumberDetail = (phone.countryPhone ?: "") + (phone.phoneArea ?:  "") + (phone.phoneNumber ?: "")
     }
 
     def getTelephoneType() {
