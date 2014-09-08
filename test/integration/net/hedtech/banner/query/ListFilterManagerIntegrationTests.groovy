@@ -279,6 +279,53 @@ class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+    void testDeleteFilterAttribute() {
+        // Setup a filter for lastName = "Smith"
+        def lastNameFilter =
+            ["filter[0][field]" : "searchLastName",
+                    "filter[0][value]" : "SmitH",
+                    "filter[0][operator]" : "eq",
+                    "filter[1][field]" : "searchFirstName",
+                    "filter[1][value]" : "am",
+                    "filter[1][operator]" : "st"
+            ]
+
+        def lfm = new ListFilterManager(filterDefinition)
+        lfm.saveFilter(lastNameFilter)
+
+        def filter = lfm.getFilter()
+        assertEquals 2, filter.size()
+
+        lfm.deleteAttributeFromFilter("searchFirstName")
+        filter = lfm.getFilter()
+        assertEquals 1, filter.size()
+        assertEquals "searchLastName", filter[0].field
+
+    }
+
+
+    void testDeleteFilter() {
+        // Setup a filter for lastName = "Smith"
+        def lastNameFilter =
+            ["filter[0][field]" : "searchLastName",
+                    "filter[0][value]" : "SmitH",
+                    "filter[0][operator]" : "eq",
+                    "filter[1][field]" : "searchFirstName",
+                    "filter[1][value]" : "am",
+                    "filter[1][operator]" : "st"
+            ]
+
+        def lfm = new ListFilterManager(filterDefinition)
+        lfm.saveFilter(lastNameFilter)
+
+        def filter = lfm.getFilter()
+        assertEquals 2, filter.size()
+
+        lfm.deleteFilter()
+        assertNull lfm.getFilter()
+    }
+
+
     static def specialProcessor = { it ->
         // We get the whole map, which includes field, operator
         // For our test, return a restriction.ne regardless of the operator
