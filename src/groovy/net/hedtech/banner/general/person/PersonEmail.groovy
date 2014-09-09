@@ -41,7 +41,11 @@ query = """FROM PersonEmail a
 @NamedQuery(name = "PersonEmail.fetchByEmailAddressAndActiveStatus",
 query = """FROM PersonEmail a
     WHERE upper(a.emailAddress) = upper(:emailAddress)
-    AND a.statusIndicator = :statusIndicator""")
+    AND a.statusIndicator = :statusIndicator"""),
+@NamedQuery(name = "PersonEmail.fetchListByPidmAndEmailTypes",
+query = """FROM PersonEmail a
+    WHERE a.pidm = :pidm
+    AND a.emailType.code IN (:emailTypes)""")
 ])
 class PersonEmail implements Serializable {
     static def log = Logger.getLogger('net.hedtech.banner.general.person.PersonEmail')
@@ -277,4 +281,13 @@ class PersonEmail implements Serializable {
         }
         return personEmail
     }
+
+    public static List fetchListByPidmAndEmailTypes(Integer pidm, def emailTypes) {
+        def emails = PersonEmail.withSession {session ->
+            session.getNamedQuery('PersonEmail.fetchListByPidmAndEmailTypes').setInteger('pidm', pidm).setParameterList('emailTypes', emailTypes).list()
+        }
+
+        return emails
+    }
+
 }

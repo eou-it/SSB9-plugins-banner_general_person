@@ -926,6 +926,7 @@ class PersonCompositeService extends LdmService {
                                         }
                                     } else {
                                         log.error "Nation not found for code: ${activeAddress?.country?.code}"
+                                        throw new RestfulApiValidationException('PersonCompositeService.country.invalid')
                                     }
                                 }
                                 if (activeAddress.containsKey('county')) {
@@ -937,7 +938,8 @@ class PersonCompositeService extends LdmService {
                                             break;
                                         }
                                     } else {
-                                        log.warn "County not found for code: ${activeAddress.county}"
+                                        log.error "County not found for code: ${activeAddress.county}"
+                                        throw new RestfulApiValidationException('PersonCompositeService.county.invalid')
                                     }
                                 }
                                 if (activeAddress.containsKey('streetLine1')) {
@@ -1033,29 +1035,39 @@ class PersonCompositeService extends LdmService {
 
     private updateEmails(def pidm, Map metadata, List<PersonEmail> newEmails) {
         def emails = []
-        newEmails?.each { activeEmail ->
-            IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_EMAIL_TYPE, activeEmail.emailType)
-            if (rule?.translationValue == activeEmail.emailType &&
-                    !emails.contains { activeEmail.emailType == rule?.value }) {
-                def emailList = PersonEmail.findAllByStatusIndicatorAndPidmInList('A', [pidm])
-                def email
-                if (emailList.size > 0) {
-                    PersonEmail curEmails = emailList.get(0)
-                    if (curEmails.emailType.code == rule.value) {
-                        curEmails.emailAddress = activeEmail.emailAddress
-                        def map = [domainModel: curEmails]
-                        try {
-                            email = personEmailService.update(map)
-                        } catch(ApplicationException e) {
-                            throw new ApplicationException(PersonCompositeService, "@@r1:email.address.cannot.modified:BusinessLogicValidationException@@")
-                        }
-                    }
+        def personEmailListUpdate = []
+        def emailRule = IntegrationConfiguration.findAllByProcessCodeAndSettingName(PROCESS_CODE, PERSON_EMAIL_TYPE)
+        def emailRuleValues = []
+        emailRule?.each {
+            emailRuleValues << it.value
+        }
+        def personEmailList = PersonEmail.fetchListByPidmAndEmailTypes(pidm, emailRuleValues) ?: null
+        if (personEmailList) {
+            personEmailList.each {
+                it.statusIndicator = "I"
+                def map = [domainModel: it]
+                personEmailListUpdate << personEmailService.update(map)
 
-                } else {
-                    //Create New emails if it dosen't exists
-                    email = createEmails(pidm, metadata, [activeEmail]).get(0)
+            }
+        }
+
+        newEmails?.each { activeEmail ->
+            def email = []
+            IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_EMAIL_TYPE, activeEmail.emailType)
+
+            if (rule?.translationValue == activeEmail.emailType && !emails.contains {
+                activeEmail.emailType == rule?.value
+            }) {
+
+                def existingEmailRecord = personEmailListUpdate?.find { it.emailType.code == rule?.value && it.emailAddress == activeEmail.emailAddress && rule?.translationValue == activeEmail.emailType }
+                if(existingEmailRecord) {
+                    existingEmailRecord.statusIndicator = "A"
+                        def map = [domainModel: existingEmailRecord]
+                        email[0] = personEmailService.update(map)
+                    } else {
+                    email = createEmails(pidm, metadata, [activeEmail])
                 }
-                def emailDecorator = new Email(email)
+                def emailDecorator = new Email(email.get(0))
                 emailDecorator.emailType = rule.translationValue
                 emails << emailDecorator
             }
