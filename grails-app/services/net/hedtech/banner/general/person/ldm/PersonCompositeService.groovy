@@ -446,7 +446,7 @@ class PersonCompositeService extends LdmService {
                             activeAddress.put('nation', nation)
                         } else {
                             log.error "Nation not found for code: ${activeAddress?.nation?.code}"
-                            throw new RestfulApiValidationException('PersonCompositeService.country.invalid')
+                            throw new ApplicationException("Person", "@@r1:country.not.found.message:BusinessLogicValidationException@@")
                         }
                     }
                     if (activeAddress.containsKey('county')) {
@@ -455,7 +455,7 @@ class PersonCompositeService extends LdmService {
                             activeAddress.put('county', country)
                         } else {
                             log.error "County not found for code: ${activeAddress.county}"
-                            throw new RestfulApiValidationException('PersonCompositeService.county.invalid')
+                            throw new ApplicationException("Person", "@@r1:county.not.found.message:BusinessLogicValidationException@@")
                         }
                     }
                     activeAddress.put('pidm', pidm)
@@ -926,7 +926,7 @@ class PersonCompositeService extends LdmService {
                                         }
                                     } else {
                                         log.error "Nation not found for code: ${activeAddress?.country?.code}"
-                                        throw new RestfulApiValidationException('PersonCompositeService.country.invalid')
+                                        throw new ApplicationException("Person", "@@r1:country.not.found.message:BusinessLogicValidationException@@")
                                     }
                                 }
                                 if (activeAddress.containsKey('county')) {
@@ -939,7 +939,7 @@ class PersonCompositeService extends LdmService {
                                         }
                                     } else {
                                         log.error "County not found for code: ${activeAddress.county}"
-                                        throw new RestfulApiValidationException('PersonCompositeService.county.invalid')
+                                        throw new ApplicationException("Person", "@@r1:county.not.found.message:BusinessLogicValidationException@@")
                                     }
                                 }
                                 if (activeAddress.containsKey('streetLine1')) {
