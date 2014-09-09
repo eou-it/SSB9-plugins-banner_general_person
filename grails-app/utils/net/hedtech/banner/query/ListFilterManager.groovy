@@ -47,9 +47,15 @@ class ListFilterManager {
      *      operators: [] An array of operators that match the above enumeration
      *      preProcessor: A closure used to process the data for the field. There are some avaiable as part of this class.
      *      specialProcessor: A closure used to generate the restriction for this field.
+     *      trueFalseProcessor: For t/f operators, this is called to convert t and f to expected values.
      */
     def filterDefinition
 
+    /**
+     * The constructor takes a definition
+     * @param filterDefinitionToUse  The filter definition.
+     * @return
+     */
     def ListFilterManager(def filterDefinitionToUse) {
         filterDefinition = filterDefinitionToUse
     }
@@ -67,6 +73,10 @@ class ListFilterManager {
         filter = filterToSave.asList()
     }
 
+    /**
+     * Returns the Criterion object that is based on the filter and it's definition.
+     * @return A hibernate criterion object used for filtering.
+     */
     Criterion getCriterionObject() {
         Criterion cr
         def restrictionsList = []
@@ -89,7 +99,10 @@ class ListFilterManager {
         return cr
     }
 
-
+    /**
+     * Deletes the given line from the filter. The attribute is the filter's field.
+     * @param attribute The field of the line to delete.
+     */
     void deleteAttributeFromFilter(def attribute) {
         for (def i=0;i<filter?.size(); i++) {
             if (filter[i].field == attribute) {
@@ -99,6 +112,9 @@ class ListFilterManager {
         }
     }
 
+    /**
+     * Removes the filter from the manager.
+     */
     void deleteFilter() {
         filter = null
     }
