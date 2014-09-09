@@ -115,25 +115,26 @@ class ListFilterManager {
                 def filterDef = filterDefinition.find{ fd -> fd.field.code == it.field}
                 if (filterDef) {
                     if (filterDef.type) {
+
                         // Ensure type if valid
                         ListFilterManager.type.valueOf(filterDef.type)
 
                         if (filterDef.type == ListFilterManager.type.operatoronly.toString()) {
                             // If our definition has a type of operatoronly, no value is allowed in the filter
                             if (it.value) {
-                                throw new IllegalArgumentException()
+                                throw new IllegalArgumentException("Value exists for operatoronly operation: " + it)
                             }
                         }
                         else if (filterDef.type == ListFilterManager.type.validation.toString()) {
                             if (!filterDef.validationDomain) {
-                                throw new IllegalArgumentException()
+                                throw new IllegalArgumentException("Missing domain for validation object: " + it)
                             }
                         }
                     }
                 }
                 else {
                     // No def for our filter
-                    throw new IllegalArgumentException()
+                    throw new IllegalArgumentException("Missing filter definition for filter: " + it)
                 }
             }
         } catch (IllegalArgumentException ile) {
@@ -174,6 +175,24 @@ class ListFilterManager {
             else if (map.operator == "ne") {
                 return Restrictions.ne(map.field, value)
             }
+            else if (map.operator == "t") {
+                if (fieldDefinition.trueFalseProcessor) {
+                    value = fieldDefinition.trueFalseProcessor("t")
+                }
+                else {
+                    value = ListFilterManager.defaultTrueFalseGenerator("t")
+                }
+                return Restrictions.eq(map.field, value)
+            }
+            else if (map.operator == "f") {
+                if (fieldDefinition.trueFalseProcessor) {
+                    value = fieldDefinition.trueFalseProcessor("f")
+                }
+                else {
+                    value = ListFilterManager.defaultTrueFalseGenerator("f")
+                }
+                return Restrictions.eq(map.field, value)
+            }
         }
     }
 
@@ -184,5 +203,16 @@ class ListFilterManager {
 
     static def defaultMapGenerator = {it ->
         return [description: it.description, code: it.code]
+    }
+
+
+    static def defaultTrueFalseGenerator = { it ->
+        if (it == "t") {
+            return true
+        }
+        else {
+            return false
+        }
+
     }
 }

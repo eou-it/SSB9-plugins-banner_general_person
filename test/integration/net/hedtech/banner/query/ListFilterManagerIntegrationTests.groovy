@@ -266,6 +266,62 @@ class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+    void testTrueFalseGeneratorTrue() {
+        def filterDef2 = [ [field: [code: "displayWebIndicator", description: "Display Web Indicator"], type: "operatoronly",
+                operators: ["t", "f",]] ]
+
+        // bad operator
+        // Setup a filter for lastName = "Smith"
+        def emailTypeFilter =
+            ["filter[0][field]" : "displayWebIndicator",
+                    "filter[0][operator]" : "t"
+            ]
+
+        def lfm = new ListFilterManager(filterDef2)
+        lfm.saveFilter(emailTypeFilter)
+
+        Session session = sessionFactory.getCurrentSession()
+        Criterion cro = lfm.getCriterionObject()
+        Criteria cr = session.createCriteria(EmailType, "cr1")
+        cr.add(cro)
+
+        def results = cr.list()
+        assertTrue results.size() > 0
+
+        results.each { it ->
+            assertTrue it.displayWebIndicator
+        }
+   }
+
+
+    void testTrueFalseGeneratorFalse() {
+        def filterDef2 = [ [field: [code: "displayWebIndicator", description: "Display Web Indicator"], type: "operatoronly",
+                operators: ["t", "f",]] ]
+
+        // bad operator
+        // Setup a filter for lastName = "Smith"
+        def emailTypeFilter =
+            ["filter[0][field]" : "displayWebIndicator",
+                    "filter[0][operator]" : "f"
+            ]
+
+        def lfm = new ListFilterManager(filterDef2)
+        lfm.saveFilter(emailTypeFilter)
+
+        Session session = sessionFactory.getCurrentSession()
+        Criterion cro = lfm.getCriterionObject()
+        Criteria cr = session.createCriteria(EmailType, "cr1")
+        cr.add(cro)
+
+        def results = cr.list()
+        assertTrue results.size() > 0
+
+        results.each { it ->
+            assertFalse it.displayWebIndicator
+        }
+    }
+
+
     void testDefaultMapGenerator() {
         def all = EmailType.findAll()
         assertNotNull all
