@@ -699,6 +699,18 @@ class PersonCompositeService extends LdmService {
      * @return erson
      */
     def update(Map content) {
+        String personGuid = content?.id?.trim()?.toLowerCase()
+        GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(ldmName, personGuid)
+
+        if(personGuid){
+            if(!globalUniqueIdentifier) {
+                content.put('guid', personGuid)
+                //Per strategy when a GUID was provided, the create should happen.
+                return create(content)
+            }
+        } else {
+            throw new ApplicationException(GlobalUniqueIdentifierService.API, new NotFoundException(id: Person.class.simpleName))
+        }
 
         def primaryName
         content?.names?.each { it ->
@@ -706,17 +718,7 @@ class PersonCompositeService extends LdmService {
                 primaryName = it
             }
         }
-        def entity = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(ldmName, content.guid)
-        if (content.guid) {
-            if (!entity) {
-                //Per strategy when a GUID was provided, the create should happen.
-                return create(content)
-            }
-        }
-        else {
-            throw new ApplicationException("Person", "@@r1:guid.record.not.found.message:Person@@")
-        }
-        def pidmToUpdate = entity.domainKey?.toInteger()
+        def pidmToUpdate = globalUniqueIdentifier.domainKey?.toInteger()
         List<PersonIdentificationNameCurrent> personIdentificationList = PersonIdentificationNameCurrent.findAllByPidmInList([pidmToUpdate])
 
         def personIdentification
