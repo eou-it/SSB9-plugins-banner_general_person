@@ -779,7 +779,7 @@ class PersonCompositeService extends LdmService {
         if (content.containsKey('races') && content.races instanceof List)
             updateRaces(pidmToUpdate, content.metadata, content.races)
         //Build decorator to return LDM response.
-        def person = new Person(newPersonBase, content.guid, credentials, addresses, phones, emails, names, newPersonBase?.maritalStatus,ethnicity,races,[])
+        def person = new Person(newPersonBase, personGuid, credentials, addresses, phones, emails, names, newPersonBase?.maritalStatus,ethnicity,races,[])
         def personMap = [:]
         personMap.put(pidmToUpdate, person)
 
