@@ -198,12 +198,7 @@ class PersonCompositeService extends LdmService {
 
         String dob = null
         if(params?.dateOfBirth){
-            Date date
-            try {
-                date = Date.parse("yyyy-MM-dd", params?.dateOfBirth)
-            }catch(ParseException pe){
-                throw new ApplicationException("Person", "@@r1:date.parse.error:BusinessLogicValidationException@@")
-            }
+            Date date = LdmService.convertString2Date(params?.dateOfBirth)
             dob = date.format("dd-MMM-yyyy")
         }
 
@@ -1075,7 +1070,7 @@ class PersonCompositeService extends LdmService {
         emails
     }
 
-    
+
     List<PersonRace> updateRaces(def pidm, Map metadata, List<Map> newRaces) {
         def races = []
         newRaces?.each { activeRace ->
