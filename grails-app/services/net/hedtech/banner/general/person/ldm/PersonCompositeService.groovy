@@ -34,6 +34,7 @@ import net.hedtech.banner.general.system.Nation
 import net.hedtech.banner.general.system.State
 import net.hedtech.banner.general.system.TelephoneType
 import net.hedtech.banner.general.system.ldm.v1.Metadata
+import net.hedtech.banner.general.system.ldm.v1.RaceDetail
 import net.hedtech.banner.restfulapi.RestfulApiValidationException
 import net.hedtech.banner.restfulapi.RestfulApiValidationUtility
 import org.apache.log4j.Logger
@@ -733,6 +734,7 @@ class PersonCompositeService extends LdmService {
             personIdentification.firstName = primaryName.firstName
             personIdentification.lastName = primaryName.lastName
             personIdentification.middleName = primaryName.middleName
+            personIdentification.surnamePrefix primaryName.surnamePrefix
             newPersonIdentificationName = personIdentificationNameCurrentService.update(personIdentification)
 
         }
@@ -770,22 +772,22 @@ class PersonCompositeService extends LdmService {
         //update Address
          def addresses
 
-        if (content.containsKey('addresses') && content.addresses instanceof List && content.addresses.size > 0)
+        if (content.containsKey('addresses') && content.addresses instanceof List)
             addresses = updateAddresses(pidmToUpdate, content.metadata, content.addresses)
 
         //update Telephones
         def phones
-        if (content.containsKey('phones') && content.phones instanceof List && content.phones.size > 0)
+        if (content.containsKey('phones') && content.phones instanceof List)
             phones = updatePhones(pidmToUpdate, content.metadata, content.phones)
 
         //update Emails
         def emails
-        if (content.containsKey('emails') && content.emails instanceof List && content.emails.size > 0)
+        if (content.containsKey('emails') && content.emails instanceof List)
             emails = updateEmails(pidmToUpdate, content.metadata, content.emails)
 
         //update races
         def races
-        if (content.containsKey('races') && content.races instanceof List && content.races.size > 0)
+        if (content.containsKey('races') && content.races instanceof List)
             races = updateRaces(pidmToUpdate, content.metadata, content.races)
         //Build decorator to return LDM response.
         def person = new Person(newPersonBase, personGuid, credentials, addresses, phones, emails, names,maritalStatusDetail,ethnicityDetail,races,[])
@@ -822,7 +824,7 @@ class PersonCompositeService extends LdmService {
                 }
 
                 //Translate enumerations and defaults
-                personBase.sex = person?.sex == 'Male' ? 'M' : (person?.sex == 'Female' ? 'F' : 'N')
+                personBase.sex = person?.sex == 'Male' ? 'M' : (person?.sex == 'Female' ? 'F' : (person?.sex == 'Unknown' ? 'N' : null))
                 if(person.containsKey('maritalStatusDetail')){
                     def maritalStatus
                     try {
@@ -1022,38 +1024,60 @@ class PersonCompositeService extends LdmService {
 
     }
 
-    private updatePhones(def pidm, Map metadata, List<PersonTelephone> newPhones) {
+    private updatePhones(def pidm, Map metadata, List<Map> newPhones) {
         def phones = []
-        newPhones?.each { activePhone ->
-            IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_PHONE_TYPE, activePhone.phoneType)
-            if (rule?.translationValue == activePhone.phoneType &&
-                    !phones.contains { activePhone.phoneType == rule?.value }) {
-                def telephoneType = TelephoneType.findByCode(rule?.value)
-                List<PersonTelephone> personTelephoneList = PersonTelephone.fetchActiveTelephoneByPidmInList([pidm])
-                def phone
-                if (personTelephoneList) {
-                    personTelephoneList.each { curPhones ->
-                        if (curPhones.telephoneType.code == rule.value) {
-                            // curPhones.phoneArea
-                            curPhones.phoneExtension = activePhone.phoneExtension
-                            Map phoneNumber = parsePhoneNumber(activePhone.phoneNumber)
-                            curPhones.properties = phoneNumber
-                            phone = personTelephoneService.update(curPhones)
+        List<PersonTelephone> personTelephoneList = PersonTelephone.fetchActiveTelephoneByPidmInList([pidm]).each { currentPhone ->
+            def thisType = findAllByProcessCodeAndSettingNameAndValue(PROCESS_CODE, PERSON_PHONE_TYPE, currentPhone.telephoneType?.code)?.translationValue
+            def activePhones = newPhones.findAll { it ->
+                        it.phoneType == thisType
+            }
+            if (activePhones.size() > 0) {
+                def invalidPhone = false
+                activePhones.each { activePhone ->
+                    if (activePhone.containsKey('phoneExtension')){
+                        if (activePhone.phoneExtension != currentPhone.phoneExtension) {
+                            log.debug "Phone extension different"
+                            invalidPhone = true
                         }
                     }
-                    if(!phone){
-                        phone = createPhones(pidm, metadata, [activePhone]).get(0)
+                    if (activePhone.containsKey('phoneNumber')){
+                        def parsedResult = parsePhoneNumber(activePhone.phoneNumber)
+                        if (parsedResult.phoneNumber.toString() != currentPhone.phoneNumber) {
+                            log.debug "Phone number different"
+                            invalidPhone = true
+                        }
+                        if (parsedResult.phoneArea.toString() != currentPhone.phoneArea) {
+                            log.debug "Phone area code different"
+                            invalidPhone = true
+                        }
+                        if (parsedResult.countryPhone.toString() != currentPhone.countryPhone) {
+                            log.debug "Phone country code different:" + parsedResult.countryPhone + " : " + currentPhone.countryPhone
+                            invalidPhone = true
+                        }
                     }
-
-                } else {
-                    //Create New Telephones if it dosen't exists
-                    phone = createPhones(pidm, metadata, [activePhone]).get(0)
+                    if( invalidPhone ) {
+                        currentPhone.statusIndicator = 'I'
+                        log.debug "Inactivating phone:" + currentPhone.toString()
+                        personTelephoneService.update(currentPhone)
+                    }
+                    else {
+                        def phoneDecorator = new Phone(currentPhone)
+                        phoneDecorator.phoneType = activePhone.phoneType
+                        phones << phoneDecorator
+                        newPhones.remove(activePhone)
+                    }
                 }
-                def phoneDecorator = new Phone(phone)
-                phoneDecorator.phoneType = rule.translationValue
-                phones << phoneDecorator
-
             }
+            else {
+                currentPhone.statusIndicator = 'I'
+                log.debug "Inactivating phone:" + currentPhone.toString()
+                personTelephoneService.update(currentPhone)
+            }
+        }
+        createPhones(pidm,metadata,newPhones).each { currentPhone ->
+            def phoneDecorator = new Phone(currentPhone)
+            phoneDecorator.phoneType = findAllByProcessCodeAndSettingNameAndValue(PROCESS_CODE, PERSON_PHONE_TYPE, currentPhone.telephoneType.code)?.translationValue
+            phones << phoneDecorator
         }
         phones
     }
@@ -1102,33 +1126,33 @@ class PersonCompositeService extends LdmService {
     }
 
 
-    List<PersonRace> updateRaces(def pidm, Map metadata, List<Map> newRaces) {
+    List<RaceDetail> updateRaces(def pidm, Map metadata, List<Map> newRaces) {
         def races = []
-        newRaces?.each { activeRace ->
-            if (activeRace?.guid) {
-                def race = raceCompositeService.get(activeRace?.guid)
-                if (!race) {
-                    throw new ApplicationException(PersonCompositeService, "@@r1:race.invalid:BusinessLogicValidationException@@")
-                }
-                def personRace = PersonRace.fetchByPidmAndRace(pidm,race.race)
-
-                if (!personRace) {
-                    //Create New race
-                    personRace = createRaces(pidm, metadata, [activeRace]).get(0)
-
-                }
-                def  raceDetail= raceCompositeService.fetchByRaceCode(personRace.race)
-                raceDetail.dataOrigin = personRace.dataOrigin
-                races << raceDetail
-
-
-            } else {
-                throw new ApplicationException(PersonCompositeService, "@@r1:race.invalid:BusinessLogicValidationException@@")
+        List<PersonRace> personRaceList = PersonRace.fetchByPidm(pidm)
+        personRaceList.each { currentRace ->
+            def raceGuid = GlobalUniqueIdentifier.findByLdmNameAndDomainKey('races', currentRace.race)?.guid
+            def activeRaces = newRaces.findAll { it ->
+                it.guid == raceGuid
             }
+            log.debug "currentRace:" + currentRace.toString() + " : " + raceGuid
+            log.debug "Races matching:" + activeRaces.toString()
+            log.debug "Races to create:" + newRaces.toString()
+            if( activeRaces.size() > 0 ) {
+                newRaces.remove(activeRaces[0])
+                def race = raceCompositeService.get(activeRaces[0].guid)
+                races << race
+            }
+            else {
+                personRaceService.delete(currentRace)
+                log.debug "Removing race:" + currentRace.toString()
+            }
+        }
+        createRaces(pidm, metadata, newRaces).each { currentRace ->
+            def race = raceCompositeService.fetchByRaceCode(currentRace.race)
+            races << race
         }
         races
     }
-
 
     Map parsePhoneNumber(String phoneNumber) {
         Map parsedNumber = [:]
