@@ -736,19 +736,28 @@ class PersonCompositeService extends LdmService {
             newPersonIdentificationName = personIdentificationNameCurrentService.update(personIdentification)
 
         }
-        def credentials
-
         content?.credentials?.each { it ->
             if (it.credentialType == 'Banner ID') {
                 personIdentification.bannerId  = it?.credentialId
                 newPersonIdentificationName = personIdentificationNameCurrentService.update(personIdentification)
-                credentials << new Credential ("Banner ID", newPersonIdentificationName.bannerId, null, null)
             }
         }
-
-
+       
         //update PersonBasicPersonBase
         PersonBasicPersonBase newPersonBase = updatePersonBasicPersonBase(pidmToUpdate, newPersonIdentificationName, content, primaryName)
+        def credentials = []
+        if( newPersonBase.ssn ) {
+            credentials << new Credential("Social Security Number",
+                    newPersonBase.ssn,
+                    null,
+                    null)
+        }
+        if(newPersonIdentificationName.bannerId){
+            credentials << new Credential("Banner ID",
+                    newPersonIdentificationName.bannerId,
+                    null,
+                    null)
+        }
         def names = []
         def name = new Name(newPersonIdentificationName, newPersonBase)
         if(primaryName)
@@ -756,30 +765,30 @@ class PersonCompositeService extends LdmService {
         names << name
 
 
-        def ethnicity = content.ethnicity?.guid ? ethnicityCompositeService.get(content.ethnicity?.guid) : null
-
+        def ethnicityDetail = content.ethnicityDetail?.guid ? ethnicityCompositeService.get(content.ethnicityDetail?.guid) : null
+        def maritalStatusDetail =  content.maritalStatusDetail instanceof Map && content.maritalStatusDetail?.guid ? maritalStatusCompositeService.get(content.maritalStatusDetail?.guid) : null
         //update Address
          def addresses
 
-        if (content.containsKey('addresses') && content.addresses instanceof List)
+        if (content.containsKey('addresses') && content.addresses instanceof List && content.addresses.size > 0)
             addresses = updateAddresses(pidmToUpdate, content.metadata, content.addresses)
 
         //update Telephones
         def phones
-        if (content.containsKey('phones') && content.phones instanceof List)
+        if (content.containsKey('phones') && content.phones instanceof List && content.phones.size > 0)
             phones = updatePhones(pidmToUpdate, content.metadata, content.phones)
 
         //update Emails
         def emails
-        if (content.containsKey('emails') && content.emails instanceof List)
+        if (content.containsKey('emails') && content.emails instanceof List && content.emails.size > 0)
             emails = updateEmails(pidmToUpdate, content.metadata, content.emails)
 
         //update races
         def races
-        if (content.containsKey('races') && content.races instanceof List)
-            updateRaces(pidmToUpdate, content.metadata, content.races)
+        if (content.containsKey('races') && content.races instanceof List && content.races.size > 0)
+            races = updateRaces(pidmToUpdate, content.metadata, content.races)
         //Build decorator to return LDM response.
-        def person = new Person(newPersonBase, personGuid, credentials, addresses, phones, emails, names, newPersonBase?.maritalStatus,ethnicity,races,[])
+        def person = new Person(newPersonBase, content.guid, credentials, addresses, phones, emails, names,maritalStatusDetail,ethnicityDetail,races,[])
         def personMap = [:]
         personMap.put(pidmToUpdate, person)
 
@@ -811,18 +820,34 @@ class PersonCompositeService extends LdmService {
                 if (changedPersonIdentification.containsKey('preferenceFirstName')) {
                     personBase.preferenceFirstName = changedPersonIdentification.get('preferenceFirstName')
                 }
+
                 //Translate enumerations and defaults
                 personBase.sex = person?.sex == 'Male' ? 'M' : (person?.sex == 'Female' ? 'F' : 'N')
-                def maritalStatus = person.maritalStatus?.guid ? maritalStatusCompositeService.get(person.maritalStatus?.guid) : null
-                personBase.maritalStatus = maritalStatus ? MaritalStatus.findByCode(maritalStatus?.code) : null
-                if (person.containsKey('ethnicity')) {
-                    def ethnicity = person.ethnicity?.guid ? ethnicityCompositeService.get(person.ethnicity?.guid) : null
+                if(person.containsKey('maritalStatusDetail')){
+                    def maritalStatus
+                    try {
+                        maritalStatus = person.maritalStatusDetail instanceof Map && person.maritalStatusDetail?.guid ? maritalStatusCompositeService.get(person.maritalStatusDetail?.guid) : null
+                    }catch (ApplicationException e) {
+                        throw new ApplicationException("PersonCompositeService", "@@r1:maritalStatus.invalid:BusinessLogicValidationException@@")
+                    }
+                    personBase.maritalStatus = maritalStatus ? MaritalStatus.findByCode(maritalStatus?.code) : null
+
+                }
+
+                if (person.containsKey('ethnicityDetail')) {
+                    def ethnicity = person.ethnicityDetail?.guid ? ethnicityCompositeService.get(person.ethnicityDetail?.guid) : null
                     personBase.ethnicity = ethnicity ? Ethnicity.findByCode(ethnicity?.code) : null
                     personBase.ethnic = person.ethnic == "Non-Hispanic" ? '1' : (person.ethnic == "Hispanic" ? '2' : null)
                 }
+                if (person.containsKey('deadDate')){
+                    personBase.deadIndicator = person.get('deadDate') != null ? 'Y' : null
+                    personBase.deadDate= person.get('deadDate')
 
-                if (person.containsKey('dateDeceased'))
-                    personBase.deadIndicator = person.get('dateDeceased') != null ? 'Y' : null
+                }
+                if(person.containsKey('birthDate')){
+                    personBase.birthDate =person.get('birthDate')
+                }
+
 
                 newPersonBase = personBasicPersonBaseService.update(personBase)
             }
@@ -1016,6 +1041,10 @@ class PersonCompositeService extends LdmService {
                             phone = personTelephoneService.update(curPhones)
                         }
                     }
+                    if(!phone){
+                        phone = createPhones(pidm, metadata, [activePhone]).get(0)
+                    }
+
                 } else {
                     //Create New Telephones if it dosen't exists
                     phone = createPhones(pidm, metadata, [activePhone]).get(0)
@@ -1081,19 +1110,17 @@ class PersonCompositeService extends LdmService {
                 if (!race) {
                     throw new ApplicationException(PersonCompositeService, "@@r1:race.invalid:BusinessLogicValidationException@@")
                 }
-                def raceList = PersonRace.fetchByPidm(pidm)
-                def personRace
-                if (raceList) {
-                    raceList.each { personsRace ->
-                        personsRace.race = race.race
-                        personRace = personRaceService.update(personsRace)
-                    }
+                def personRace = PersonRace.fetchByPidmAndRace(pidm,race.race)
 
-                } else {
+                if (!personRace) {
                     //Create New race
                     personRace = createRaces(pidm, metadata, [activeRace]).get(0)
+
                 }
-                races << personRace
+                def  raceDetail= raceCompositeService.fetchByRaceCode(personRace.race)
+                raceDetail.dataOrigin = personRace.dataOrigin
+                races << raceDetail
+
 
             } else {
                 throw new ApplicationException(PersonCompositeService, "@@r1:race.invalid:BusinessLogicValidationException@@")
