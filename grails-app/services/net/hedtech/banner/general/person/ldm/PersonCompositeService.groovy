@@ -436,7 +436,7 @@ class PersonCompositeService extends LdmService {
             if(activeAddress instanceof Map) {
                 IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_ADDRESS_TYPE, activeAddress.addressType)
                 if (rule?.translationValue == activeAddress.addressType && !addresses.contains {
-                    activeAddress.addressType == rule?.value
+                    it.addressType == rule?.value
                 }) {
                     activeAddress.put('addressType', AddressType.findByCode(rule?.value))
                     activeAddress.put('state', State.findByDescription(activeAddress.state))
@@ -745,6 +745,7 @@ class PersonCompositeService extends LdmService {
             if (it.credentialType == 'Banner ID') {
                 personIdentification.bannerId  = it?.credentialId
                 newPersonIdentificationName = personIdentificationNameCurrentService.update(personIdentification)
+                credentials << new Credential ("Banner ID", newPersonIdentificationName.bannerId, null, null)
             }
         }
 
@@ -763,22 +764,22 @@ class PersonCompositeService extends LdmService {
         //update Address
          def addresses
 
-        if (content.containsKey('addresses') && content.addresses instanceof List && content.addresses.size > 0)
+        if (content.containsKey('addresses') && content.addresses instanceof List)
             addresses = updateAddresses(pidmToUpdate, content.metadata, content.addresses)
 
         //update Telephones
         def phones
-        if (content.containsKey('phones') && content.phones instanceof List && content.phones.size > 0)
+        if (content.containsKey('phones') && content.phones instanceof List)
             phones = updatePhones(pidmToUpdate, content.metadata, content.phones)
 
         //update Emails
         def emails
-        if (content.containsKey('emails') && content.emails instanceof List && content.emails.size > 0)
+        if (content.containsKey('emails') && content.emails instanceof List)
             emails = updateEmails(pidmToUpdate, content.metadata, content.emails)
 
         //update races
         def races
-        if (content.containsKey('races') && content.races instanceof List && content.races.size > 0)
+        if (content.containsKey('races') && content.races instanceof List)
             updateRaces(pidmToUpdate, content.metadata, content.races)
         //Build decorator to return LDM response.
         def person = new Person(newPersonBase, content.guid, credentials, addresses, phones, emails, names, newPersonBase?.maritalStatus,ethnicity,races,[])
@@ -892,53 +893,106 @@ class PersonCompositeService extends LdmService {
     }
 
 
-    private updateAddresses(def pidm, Map metadata, List<PersonAddress> newAddresses) {
+    private updateAddresses(def pidm, Map metadata, List<Map> newAddresses) {
         def addresses = []
-        newAddresses?.each { activeAddress ->
-            IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_ADDRESS_TYPE, activeAddress.addressType)
-            if (rule?.translationValue == activeAddress.addressType && !addresses.contains { activeAddress.addressType == rule?.value }) {
-                def currAddr = PersonAddress.fetchListActiveAddressByPidmAndAddressType([pidm], [AddressType.findByCode(rule.value)])
-                def address
-                //address exists in DB
-                if (currAddr.size > 0) {
-                    currAddr.each { currAddress ->
-                        if (activeAddress.containsKey('state'))
-                            currAddress.state = State.findByDescription(activeAddress.state)
-                        if (activeAddress?.nation?.containsKey('code')) {
-                            def nation = Nation.findByNation(activeAddress?.country?.code)
-                            if (nation) {
-                                currAddress.nation = nation
-                            } else {
-                                log.error "Nation not found for code: ${activeAddress?.country?.code}"
-                            }
-                        }
-                        if (activeAddress.containsKey('county')) {
-                            def country = County.findByDescription(activeAddress.county)
-                            if (country) {
-                                currAddress.county = country
-                            } else {
-                                log.warn "County not found for code: ${activeAddress.county}"
-                            }
-                        }
-                        if (activeAddress.containsKey('streetLine1'))
-                            currAddress.streetLine1 = activeAddress.streetLine1
-                        if (activeAddress.containsKey('streetLine2'))
-                            currAddress.streetLine2 = activeAddress.streetLine2
-                        if (activeAddress.containsKey('streetLine3'))
-                            currAddress.streetLine3 = activeAddress.streetLine3
-                        if (activeAddress.containsKey('zip'))
-                            currAddress.zip = activeAddress.zip
-                        address = personAddressService.update(currAddress)
-                    }
-
-                } else {
-                    address = createAddresses(pidm, metadata, [activeAddress]).get(0)
+        List<PersonAddress> currentAddresses = PersonAddress.fetchActiveAddressesByPidm(['pidm':pidm]).get('list')
+        currentAddresses.each { currentAddress ->
+            if(findAllByProcessCodeAndSettingNameAndValue(PROCESS_CODE, PERSON_ADDRESS_TYPE, currentAddress.addressType.code)) {
+                def activeAddresses = newAddresses.findAll { it ->
+                    fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_ADDRESS_TYPE,
+                            it.addressType)?.value == currentAddress.addressType.code
                 }
-
-                def addressDecorator = new Address(address)
-                addressDecorator.addressType = rule?.translationValue
-                addresses << addressDecorator
+                log.debug "NewAddresses:" + newAddresses.toString()
+                log.debug "ActiveAddresses:" + activeAddresses.toString()
+                log.debug "CurrentAddress:" + currentAddress.toString()
+                def invalidAddress = false
+                if (activeAddresses.size() > 0) {
+                    activeAddresses.each { activeAddress ->
+                        switch (activeAddress?.addressType) {
+                            default:
+                                if (activeAddress.containsKey('state'))
+                                    if (activeAddress.state != currentAddress.state.description) {
+                                        log.debug "State different"
+                                        invalidAddress = true
+                                        break;
+                                    }
+                                if (activeAddress?.nation?.containsKey('code')) {
+                                    def nation = Nation.findByScodIso(activeAddress?.nation?.code)
+                                    if (nation) {
+                                        if (nation.code != currentAddress.nation?.code) {
+                                            log.debug "Nation different:" + nation.code + " : " + currentAddress.nation?.code
+                                            invalidAddress = true
+                                            break;
+                                        }
+                                    } else {
+                                        log.error "Nation not found for code: ${activeAddress?.country?.code}"
+                                    }
+                                }
+                                if (activeAddress.containsKey('county')) {
+                                    def county = County.findByDescription(activeAddress.county)
+                                    if (county) {
+                                        if (county.code != currentAddress.county?.code) {
+                                            log.debug "County different"
+                                            invalidAddress = true
+                                            break;
+                                        }
+                                    } else {
+                                        log.warn "County not found for code: ${activeAddress.county}"
+                                    }
+                                }
+                                if (activeAddress.containsKey('streetLine1')) {
+                                    if (activeAddress.streetLine1 != currentAddress.streetLine1) {
+                                        log.debug "Street1 different"
+                                        invalidAddress = true
+                                        break;
+                                    }
+                                }
+                                if (activeAddress.containsKey('streetLine2')) {
+                                    if (activeAddress.streetLine2 != currentAddress.streetLine2) {
+                                        log.debug "Street2 different"
+                                        invalidAddress = true
+                                        break;
+                                    }
+                                }
+                                if (activeAddress.containsKey('streetLine3')) {
+                                    if (activeAddress.streetLine3 != currentAddress.streetLine3) {
+                                        log.debug "Street3 different"
+                                        invalidAddress = true
+                                        break;
+                                    }
+                                }
+                                if (activeAddress.containsKey('zip')) {
+                                    if (activeAddress.zip != currentAddress.zip) {
+                                        log.debug "Zip different"
+                                        invalidAddress = true
+                                        break;
+                                    }
+                                }
+                                break;
+                        }
+                        if (invalidAddress) {
+                            currentAddress.statusIndicator = 'I'
+                            log.debug "Inactivating address:" + currentAddress.toString()
+                            personAddressService.update(currentAddress)
+                        } else {
+                            def addressDecorator = new Address(currentAddress)
+                            addressDecorator.addressType = activeAddress.addressType
+                            addresses << addressDecorator
+                            newAddresses.remove(activeAddress)
+                            log.debug "After match, and removal of match from new to create:" + newAddresses.toString()
+                        }
+                    }
+                } else {
+                    currentAddress.statusIndicator = 'I'
+                    log.debug "Inactivating address:" + currentAddress.toString()
+                    personAddressService.update(currentAddress)
+                }
             }
+        }
+        createAddresses(pidm, metadata, newAddresses).each { currentAddress ->
+            def addressDecorator = new Address(currentAddress)
+            addressDecorator.addressType = findAllByProcessCodeAndSettingNameAndValue(PROCESS_CODE, PERSON_ADDRESS_TYPE, currentAddress.addressType.code)?.translationValue
+            addresses << addressDecorator
         }
         addresses
 
@@ -947,7 +1001,7 @@ class PersonCompositeService extends LdmService {
     private updatePhones(def pidm, Map metadata, List<PersonTelephone> newPhones) {
         def phones = []
         newPhones?.each { activePhone ->
-            IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_ADDRESS_TYPE, activePhone.phoneType)
+            IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_PHONE_TYPE, activePhone.phoneType)
             if (rule?.translationValue == activePhone.phoneType &&
                     !phones.contains { activePhone.phoneType == rule?.value }) {
                 def telephoneType = TelephoneType.findByCode(rule?.value)
