@@ -2,11 +2,15 @@ package net.hedtech.banner.general.person.ldm
 
 import groovy.sql.Sql
 import net.hedtech.banner.general.overall.ldm.GlobalUniqueIdentifier
+import net.hedtech.banner.general.person.PersonAddress
 import net.hedtech.banner.general.person.PersonBasicPersonBase
 import net.hedtech.banner.general.person.PersonIdentificationName
 import net.hedtech.banner.general.person.PersonIdentificationNameAlternate
 import net.hedtech.banner.general.person.PersonIdentificationNameCurrent
+import net.hedtech.banner.general.system.AddressSource
+import net.hedtech.banner.general.system.AddressType
 import net.hedtech.banner.general.system.CitizenType
+import net.hedtech.banner.general.system.County
 import net.hedtech.banner.general.system.Ethnicity
 import net.hedtech.banner.general.system.Legacy
 import net.hedtech.banner.general.system.MaritalStatus
@@ -68,12 +72,12 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
     def i_success_confirmedReDate = new Date()
     def i_success_armedServiceMedalVetIndicator = true
 
+
+
     void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
         initializeTestDataForReferences()
-
-
     }
 
     protected void tearDown() {
@@ -137,6 +141,81 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
         assertEquals 'CCCCC', personBasicPersonBase.ssn
     }
 
+
+
+    void testUpdatetestPersonAddressValidUpdate(){
+        PersonBasicPersonBase personBasicPersonBase = createPersonBasicPersonBase()
+        PersonIdentificationNameCurrent  personIdentificationNameCurrent= PersonIdentificationNameCurrent.findAllByPidmInList([personBasicPersonBase.pidm]).get(0)
+        GlobalUniqueIdentifier uniqueIdentifier = GlobalUniqueIdentifier.findByLdmNameAndDomainKey("persons", personIdentificationNameCurrent.pidm)
+
+        Map params = getPersonWithNewAdressRequest(personIdentificationNameCurrent,uniqueIdentifier.guid);
+        //update PersonBasicPersonBase info, since Address won't exists create new Adress through update
+        personCompositeService.update(params)
+
+        List<PersonAddress> personAddressList = PersonAddress.fetchActiveAddressesByPidm([pidm:personBasicPersonBase.pidm]).get('list')
+        personAddressList.each { currAddress ->
+           if(currAddress.addressType.code =='MA'){
+                assertEquals 'Southeastern', currAddress.city
+                assertEquals 'Pennsylvania', currAddress.state.description
+                assertEquals '5890 139th Ave', currAddress.streetLine1
+                assertEquals '19398',currAddress.zip
+            }
+            if(currAddress.addressType.code =='PR'){
+                assertEquals 'Pavo', currAddress.city
+                assertEquals 'Georgia', currAddress.state.description
+                assertEquals '123 Main Line', currAddress.streetLine1
+                assertEquals '31778',currAddress.zip
+            }
+
+        }
+        //modify the Address and update
+        Map modifiedAddress= getPersonWithModifiedAdressRequest(personIdentificationNameCurrent,uniqueIdentifier.guid);
+
+        //update MOdified Address
+        personCompositeService.update(modifiedAddress)
+
+        List<PersonAddress> modifiedAddressList = PersonAddress.fetchActiveAddressesByPidm([pidm:personBasicPersonBase.pidm]).get('list')
+        modifiedAddressList.each { currAddress ->
+            if(currAddress.addressType.code =='PR'){
+                assertEquals 'Southeastern', currAddress.city
+                assertEquals 'Pennsylvania', currAddress.state.description
+                assertEquals '5890 139th Ave', currAddress.streetLine1
+                assertEquals '19398',currAddress.zip
+            }
+            if(currAddress.addressType.code =='MA'){
+                assertEquals 'Pavo', currAddress.city
+                assertEquals 'Georgia', currAddress.state.description
+                assertEquals '123 Main Line', currAddress.streetLine1
+                assertEquals '31778',currAddress.zip
+            }
+
+        }
+
+        Map unchangedAddress= getPersonWithModifiedAdressRequest(personIdentificationNameCurrent,uniqueIdentifier.guid);
+
+        //update with same Address
+        personCompositeService.update(unchangedAddress)
+
+        List<PersonAddress> address = PersonAddress.fetchActiveAddressesByPidm([pidm:personBasicPersonBase.pidm]).get('list')
+        address.each { currAddress ->
+            if(currAddress.addressType.code =='PR'){
+                assertEquals 'Southeastern', currAddress.city
+                assertEquals 'Pennsylvania', currAddress.state.description
+                assertEquals '5890 139th Ave', currAddress.streetLine1
+                assertEquals '19398',currAddress.zip
+            }
+            if(currAddress.addressType.code =='MA'){
+                assertEquals 'Pavo', currAddress.city
+                assertEquals 'Georgia', currAddress.state.description
+                assertEquals '123 Main Line', currAddress.streetLine1
+                assertEquals '31778',currAddress.zip
+            }
+
+        }
+
+
+    }
+
     //This method is used to initialize test data for references.
     //A method is required to execute database calls as it requires a active transaction
     void initializeTestDataForReferences() {
@@ -150,6 +229,7 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
         i_success_stateDriver = State.findByCode("PA")
         i_success_nationDriver = Nation.findByCode("157")
     }
+
 
     private def createPersonBasicPersonBase() {
         def sql = new Sql(sessionFactory.getCurrentSession().connection())
@@ -217,41 +297,93 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
         return personBasicPersonBase
     }
 
+    private def newValidForCreatePersonAddress(pidmToUpdate) {
+        def personAddress = new PersonAddress(
+                pidm: pidmToUpdate,
+                //sequenceNumber: i_success_sequenceNumber,
+                fromDate: i_success_fromDate,
+                toDate: i_success_toDate,
+                streetLine1: i_success_streetLine1,
+                streetLine2: i_success_streetLine2,
+                streetLine3: i_success_streetLine3,
+                city: i_success_city,
+                zip: i_success_zip,
+                phoneArea: i_success_phoneArea,
+                phoneNumber: i_success_phoneNumber,
+                phoneExtension: i_success_phoneExtension,
+                statusIndicator: i_success_statusIndicator,
+                userData: i_success_userData,
+                deliveryPoint: i_success_deliveryPoint,
+                correctionDigit: i_success_correctionDigit,
+                carrierRoute: i_success_carrierRoute,
+                goodsAndServiceTaxTaxId: i_success_goodsAndServiceTaxTaxId,
+                reviewedIndicator: i_success_reviewedIndicator,
+                reviewedUser: i_success_reviewedUser,
+                countryPhone: i_success_countryPhone,
+                houseNumber: i_success_houseNumber,
+                streetLine4: i_success_streetLine4,
+                addressType: i_success_addressType,
+                state: i_success_state,
+                county: i_success_county,
+                nation: i_success_nation,
+                addressSource: i_success_addressSource
+        )
+        return personAddress
+    }
+
+
 
 
     private Map getPersonWithFirstNameChangeRequest(personIdentificationNameCurrent, guid) {
-        Map params = [ guid		    : guid,
+        Map params = [ id		    : guid,
                        names		: [[lastName:personIdentificationNameCurrent.lastName,middleName:personIdentificationNameCurrent.middleName, firstName:'CCCCCC', nameType:'Primary']],
                        credentials  : [[credentialType:personIdentificationNameCurrent.bannerId, credentialId:'MITTERS']]
         ]
-
         return params
     }
 
     private Map getPersonWithLastNameChangeRequest(personIdentificationNameCurrent,guid) {
-        Map params = [ guid		    : guid,
+        Map params = [ id		    : guid,
                        names		: [[lastName:'CCCCCC',middleName:personIdentificationNameCurrent.middleName, firstName:personIdentificationNameCurrent.firstName, nameType:'Primary']],
                        credentials  : [[credentialType:personIdentificationNameCurrent.bannerId, credentialId:'MITTERS']]
         ]
-
         return params
     }
     private Map getPersonWithIdChangeRequest(personIdentificationNameCurrent,guid) {
-        Map params = [ guid		    : guid,
+        Map params = [ id		    : guid,
                        names		: [[lastName:personIdentificationNameCurrent.lastName,middleName:personIdentificationNameCurrent.middleName, firstName:personIdentificationNameCurrent.firstName, nameType:'Primary']],
                        credentials  : [[credentialType:'Banner ID', credentialId:'CHANGED']]
         ]
-
         return params
     }
 
     private Map getPersonWithPersonBasicPersonBaseChangeRequest(personIdentificationNameCurrent,guid) {
-        Map params = [ guid		    : guid,
+        Map params = [ id		    : guid,
                        names		: [[lastName:personIdentificationNameCurrent.lastName,middleName:personIdentificationNameCurrent.middleName, firstName:personIdentificationNameCurrent.firstName, nameType:'Primary',namePrefix:'CCCCC', nameSuffix:'CCCCC',preferenceFirstName:'CCCCC']],
                        credentials  : [[credentialType:'Social Security Number', credentialId:'CCCCC']],
                        sex          : 'Female'
-        ]
 
+        ]
+        return params
+    }
+
+    private Map getPersonWithNewAdressRequest(personIdentificationNameCurrent,guid) {
+        Map params = [ id		    : guid,
+                       names		: [[lastName:personIdentificationNameCurrent.lastName,middleName:personIdentificationNameCurrent.middleName, firstName:personIdentificationNameCurrent.firstName, nameType:'Primary',namePrefix:'CCCCC', nameSuffix:'CCCCC',preferenceFirstName:'CCCCC']],
+                       credentials  : [[credentialType:'Social Security Number', credentialId:'TTTTT']],
+                       sex          : 'Male',
+                       addresses:[[addressType:'Mailing', city:'Southeastern', state:'Pennsylvania', streetLine1:'5890 139th Ave', zip:'19398'], [addressType:'Home', city:'Pavo', state:'Georgia', streetLine1:'123 Main Line', zip:'31778']]
+        ]
+        return params
+    }
+
+    private Map getPersonWithModifiedAdressRequest(personIdentificationNameCurrent,guid) {
+        Map params = [ id		    : guid,
+                       names		: [[lastName:personIdentificationNameCurrent.lastName,middleName:personIdentificationNameCurrent.middleName, firstName:personIdentificationNameCurrent.firstName, nameType:'Primary',namePrefix:'CCCCC', nameSuffix:'CCCCC',preferenceFirstName:'CCCCC']],
+                       credentials  : [[credentialType:'Social Security Number', credentialId:'TTTTT']],
+                       sex          : 'Male',
+                       addresses:[[addressType:'Mailing', city:'Pavo', state:'Georgia', streetLine1:'123 Main Line', zip:'31778'], [addressType:'Home', city:'Southeastern', state:'Pennsylvania', streetLine1:'5890 139th Ave', zip:'19398']]
+        ]
         return params
     }
 
