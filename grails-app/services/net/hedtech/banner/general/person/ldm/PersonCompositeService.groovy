@@ -734,7 +734,7 @@ class PersonCompositeService extends LdmService {
             personIdentification.firstName = primaryName.firstName
             personIdentification.lastName = primaryName.lastName
             personIdentification.middleName = primaryName.middleName
-            personIdentification.surnamePrefix primaryName.surnamePrefix
+            personIdentification.surnamePrefix = primaryName.surnamePrefix
             newPersonIdentificationName = personIdentificationNameCurrentService.update(personIdentification)
 
         }
