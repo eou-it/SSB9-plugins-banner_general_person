@@ -748,23 +748,25 @@ class PersonCompositeService extends LdmService {
         //update PersonBasicPersonBase
         PersonBasicPersonBase newPersonBase = updatePersonBasicPersonBase(pidmToUpdate, newPersonIdentificationName, content, primaryName)
         def credentials = []
-        if( newPersonBase.ssn ) {
+        if( newPersonBase && newPersonBase.ssn ) {
             credentials << new Credential("Social Security Number",
                     newPersonBase.ssn,
                     null,
                     null)
         }
-        if(newPersonIdentificationName.bannerId){
+        if(newPersonIdentificationName && newPersonIdentificationName.bannerId){
             credentials << new Credential("Banner ID",
                     newPersonIdentificationName.bannerId,
                     null,
                     null)
         }
         def names = []
-        def name = new Name(newPersonIdentificationName, newPersonBase)
-        if(primaryName)
-            name.setNameType("Primary")
-        names << name
+        if(newPersonBase && newPersonIdentificationName) {
+            def name = new Name(newPersonIdentificationName, newPersonBase)
+            if (primaryName)
+                name.setNameType("Primary")
+            names << name
+        }
 
 
         def ethnicityDetail = content.ethnicityDetail?.guid ? ethnicityCompositeService.get(content.ethnicityDetail?.guid) : null
@@ -813,14 +815,16 @@ class PersonCompositeService extends LdmService {
                         personBase.ssn = it?.credentialId
                     }
                 }
-                if (changedPersonIdentification.containsKey('namePrefix')) {
-                    personBase.namePrefix = changedPersonIdentification.get('namePrefix')
-                }
-                if (changedPersonIdentification.containsKey('nameSuffix')) {
-                    personBase.nameSuffix = changedPersonIdentification.get('nameSuffix')
-                }
-                if (changedPersonIdentification.containsKey('preferenceFirstName')) {
-                    personBase.preferenceFirstName = changedPersonIdentification.get('preferenceFirstName')
+                if(changedPersonIdentification) {
+                    if (changedPersonIdentification.containsKey('namePrefix')) {
+                        personBase.namePrefix = changedPersonIdentification.get('namePrefix')
+                    }
+                    if (changedPersonIdentification.containsKey('nameSuffix')) {
+                        personBase.nameSuffix = changedPersonIdentification.get('nameSuffix')
+                    }
+                    if (changedPersonIdentification.containsKey('preferenceFirstName')) {
+                        personBase.preferenceFirstName = changedPersonIdentification.get('preferenceFirstName')
+                    }
                 }
 
                 //Translate enumerations and defaults
