@@ -31,7 +31,9 @@ class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
             [field: [code: "isStudent", description: "Is Student"], type: "operatoronly",
                     operators: ["t", "f"], preProcessor: ListFilterManager.capitalize],
             [field: [code: "specialLastName", description: "Spedial Last Name"], type: "freeform",
-                    operators: ["eq", "ne", "st"], specialProcessor: ListFilterManagerIntegrationTests.specialProcessor]]
+                    operators: ["eq", "ne", "st"], specialProcessor: ListFilterManagerIntegrationTests.specialProcessor],
+            [field: [code: "gender", description: "Gender"], type: "operatoronly",
+                    operators: ["has", "hasnot"]]]
     }
 
 
@@ -238,6 +240,65 @@ class ListFilterManagerIntegrationTests extends BaseIntegrationTestCase {
             assertEquals "Smith", it.lastName
             assertTrue it.firstName.startsWith("Am")
             assertTrue it.middleName.indexOf("Lynn") == -1
+        }
+    }
+
+
+
+    void testGetCriteriaHasNot( ) {
+        // Setup a filter for lastName = "Smith"
+        def lastNameFilter =
+            ["filter[0][field]" : "searchLastName",
+                    "filter[0][value]" : "SmitH",
+                    "filter[0][operator]" : "eq",
+                    "filter[1][field]": "gender",
+                    "filter[1][operator]": "hasnot"
+            ]
+
+        def lfm = new ListFilterManager(filterDefinition)
+        lfm.saveFilter(lastNameFilter)
+        Session session = sessionFactory.getCurrentSession()
+        Criterion cro = lfm.getCriterionObject()
+        Criteria cr = session.createCriteria(PersonPersonView, "cr1")
+        cr.add(cro)
+
+
+        def results = cr.list()
+        assertTrue results.size() > 0
+
+        results.each { it ->
+            println "Q### --> " + it.lastName + " / " + it.gender
+            assertEquals "smith", it.lastName.toLowerCase()
+            assertTrue null == it.gender || it.gender == ""
+        }
+    }
+
+
+    void testGetCriteriaHas( ) {
+        // Setup a filter for lastName = "Smith"
+        def lastNameFilter =
+            ["filter[0][field]" : "searchLastName",
+                    "filter[0][value]" : "SmitH",
+                    "filter[0][operator]" : "eq",
+                    "filter[1][field]": "gender",
+                    "filter[1][operator]": "has"
+            ]
+
+        def lfm = new ListFilterManager(filterDefinition)
+        lfm.saveFilter(lastNameFilter)
+        Session session = sessionFactory.getCurrentSession()
+        Criterion cro = lfm.getCriterionObject()
+        Criteria cr = session.createCriteria(PersonPersonView, "cr1")
+        cr.add(cro)
+
+
+        def results = cr.list()
+        assertTrue results.size() > 0
+
+        results.each { it ->
+            println "Q### --> " + it.lastName + " / " + it.gender
+            assertEquals "smith", it.lastName.toLowerCase()
+            assertTrue it.gender.length() == 1
         }
     }
 

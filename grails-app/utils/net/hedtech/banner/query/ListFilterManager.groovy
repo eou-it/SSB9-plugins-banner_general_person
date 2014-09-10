@@ -209,6 +209,18 @@ class ListFilterManager {
                 }
                 return Restrictions.eq(map.field, value)
             }
+            else if (map.operator == "hasnot") {
+                def ourRestriction = Restrictions.disjunction()
+                ourRestriction.add(Restrictions.isNull(map.field))
+                ourRestriction.add(Restrictions.eq(map.field, ""))
+
+            }
+            else if (map.operator == "has") {
+                return Restrictions.isNotNull(map.field)
+            }
+            else {
+                throw new IllegalArgumentException("Unsupported operator " + map.operator)
+            }
         }
     }
 
