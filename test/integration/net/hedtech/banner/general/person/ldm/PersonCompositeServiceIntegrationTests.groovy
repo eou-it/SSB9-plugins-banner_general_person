@@ -7,6 +7,7 @@ import net.hedtech.banner.general.person.PersonBasicPersonBase
 import net.hedtech.banner.general.person.PersonIdentificationName
 import net.hedtech.banner.general.person.PersonIdentificationNameAlternate
 import net.hedtech.banner.general.person.PersonIdentificationNameCurrent
+import net.hedtech.banner.general.person.ldm.v1.Person
 import net.hedtech.banner.general.system.AddressSource
 import net.hedtech.banner.general.system.AddressType
 import net.hedtech.banner.general.system.CitizenType
@@ -150,19 +151,18 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
 
         Map params = getPersonWithNewAdressRequest(personIdentificationNameCurrent,uniqueIdentifier.guid);
         //update PersonBasicPersonBase info, since Address won't exists create new Adress through update
-        personCompositeService.update(params)
+        def newAddressList = personCompositeService.update(params).addresses
 
-        List<PersonAddress> personAddressList = PersonAddress.fetchActiveAddressesByPidm([pidm:personBasicPersonBase.pidm]).get('list')
-        personAddressList.each { currAddress ->
-           if(currAddress.addressType.code =='MA'){
+        newAddressList.each { currAddress ->
+           if(currAddress.addressType =='Mailing'){
                 assertEquals 'Southeastern', currAddress.city
-                assertEquals 'Pennsylvania', currAddress.state.description
+                assertEquals 'Pennsylvania', currAddress.state
                 assertEquals '5890 139th Ave', currAddress.streetLine1
                 assertEquals '19398',currAddress.zip
             }
-            if(currAddress.addressType.code =='PR'){
+            if(currAddress.addressType =='Home'){
                 assertEquals 'Pavo', currAddress.city
-                assertEquals 'Georgia', currAddress.state.description
+                assertEquals 'Georgia', currAddress.state
                 assertEquals '123 Main Line', currAddress.streetLine1
                 assertEquals '31778',currAddress.zip
             }
@@ -172,19 +172,18 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
         Map modifiedAddress= getPersonWithModifiedAdressRequest(personIdentificationNameCurrent,uniqueIdentifier.guid);
 
         //update MOdified Address
-        personCompositeService.update(modifiedAddress)
+        def modifiedAddressList = personCompositeService.update(modifiedAddress).addresses
 
-        List<PersonAddress> modifiedAddressList = PersonAddress.fetchActiveAddressesByPidm([pidm:personBasicPersonBase.pidm]).get('list')
         modifiedAddressList.each { currAddress ->
-            if(currAddress.addressType.code =='PR'){
+            if(currAddress.addressType =='Home'){
                 assertEquals 'Southeastern', currAddress.city
-                assertEquals 'Pennsylvania', currAddress.state.description
+                assertEquals 'Pennsylvania', currAddress.state
                 assertEquals '5890 139th Ave', currAddress.streetLine1
                 assertEquals '19398',currAddress.zip
             }
-            if(currAddress.addressType.code =='MA'){
+            if(currAddress.addressType =='Mailing'){
                 assertEquals 'Pavo', currAddress.city
-                assertEquals 'Georgia', currAddress.state.description
+                assertEquals 'Georgia', currAddress.state
                 assertEquals '123 Main Line', currAddress.streetLine1
                 assertEquals '31778',currAddress.zip
             }
@@ -194,19 +193,18 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
         Map unchangedAddress= getPersonWithModifiedAdressRequest(personIdentificationNameCurrent,uniqueIdentifier.guid);
 
         //update with same Address
-        personCompositeService.update(unchangedAddress)
+        def unchangedAddressList  =  personCompositeService.update(unchangedAddress).addresses
 
-        List<PersonAddress> address = PersonAddress.fetchActiveAddressesByPidm([pidm:personBasicPersonBase.pidm]).get('list')
-        address.each { currAddress ->
-            if(currAddress.addressType.code =='PR'){
+        unchangedAddressList.each { currAddress ->
+            if(currAddress.addressType =='Home'){
                 assertEquals 'Southeastern', currAddress.city
-                assertEquals 'Pennsylvania', currAddress.state.description
+                assertEquals 'Pennsylvania', currAddress.state
                 assertEquals '5890 139th Ave', currAddress.streetLine1
                 assertEquals '19398',currAddress.zip
             }
-            if(currAddress.addressType.code =='MA'){
+            if(currAddress.addressType =='Mailing'){
                 assertEquals 'Pavo', currAddress.city
-                assertEquals 'Georgia', currAddress.state.description
+                assertEquals 'Georgia', currAddress.state
                 assertEquals '123 Main Line', currAddress.streetLine1
                 assertEquals '31778',currAddress.zip
             }
