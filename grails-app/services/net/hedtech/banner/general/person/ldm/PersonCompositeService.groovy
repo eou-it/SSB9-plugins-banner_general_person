@@ -123,29 +123,6 @@ class PersonCompositeService extends LdmService {
                 PersonIdentificationNameCurrent.findAllByPidmInList(pidms, sortAndPagingParams)
         def persons = buildLdmPersonObjects( personIdentificationList )
 
-        /*sorting start
-        if(persons?.size() > 0) {
-            if (sortAndPagingParams.sort == "firstName") {
-                if (sortAndPagingParams.order == "desc") {
-                    log.trace "Persons - sort: firstName - order: desc"
-                    persons = persons.sort {a, b -> b.value.names[0].firstName<=> a.value.names[0].firstName}
-                } else {
-                    log.trace "Persons - sort: firstName - order: asc"
-                    persons = persons.sort {it.value.names[0].firstName}
-                }
-
-            } else if (sortAndPagingParams.sort == "lastName") {
-                if (sortAndPagingParams.order == "desc") {
-                    log.trace "Persons - sort: lastName - order: desc"
-                    persons = persons.sort {a, b -> b.value.names[0].lastName <=> a.value.names[0].lastName}
-                } else {
-                    log.trace "Persons - sort: lastName - order: asc"
-                    persons = persons.sort {it.value.names[0].lastName}
-                }
-            }
-        }
-        //sorting end */
-
         try {  // Avoid restful-api plugin dependencies.
             resultList = this.class.classLoader.loadClass( 'net.hedtech.restfulapi.PagedResultArrayList' ).newInstance( persons.values(), pidms?.size() )
         }
@@ -722,7 +699,7 @@ class PersonCompositeService extends LdmService {
         def pidmToUpdate = globalUniqueIdentifier.domainKey?.toInteger()
         List<PersonIdentificationNameCurrent> personIdentificationList = PersonIdentificationNameCurrent.findAllByPidmInList([pidmToUpdate])
 
-        def personIdentification
+        PersonIdentificationNameCurrent personIdentification
         personIdentificationList.each { identification ->
             if (identification.changeIndicator == null) {
                 personIdentification = identification
@@ -744,7 +721,8 @@ class PersonCompositeService extends LdmService {
                 newPersonIdentificationName = personIdentificationNameCurrentService.update(personIdentification)
             }
         }
-       
+        if( !newPersonIdentificationName )
+            newPersonIdentificationName = personIdentification
         //update PersonBasicPersonBase
         PersonBasicPersonBase newPersonBase = updatePersonBasicPersonBase(pidmToUpdate, newPersonIdentificationName, content, primaryName)
         def credentials = []
@@ -754,6 +732,7 @@ class PersonCompositeService extends LdmService {
                     null,
                     null)
         }
+
         if(newPersonIdentificationName && newPersonIdentificationName.bannerId){
             credentials << new Credential("Banner ID",
                     newPersonIdentificationName.bannerId,
@@ -761,41 +740,44 @@ class PersonCompositeService extends LdmService {
                     null)
         }
         def names = []
-        if(newPersonBase && newPersonIdentificationName) {
-            def name = new Name(newPersonIdentificationName, newPersonBase)
-            if (primaryName)
-                name.setNameType("Primary")
-            names << name
-        }
+        def name = new Name(newPersonIdentificationName, newPersonBase)
+        name.setNameType("Primary")
+        names << name
 
-
-        def ethnicityDetail = content.ethnicityDetail?.guid ? ethnicityCompositeService.get(content.ethnicityDetail?.guid) : null
-        def maritalStatusDetail =  content.maritalStatusDetail instanceof Map && content.maritalStatusDetail?.guid ? maritalStatusCompositeService.get(content.maritalStatusDetail?.guid) : null
+        def ethnicityDetail = newPersonBase.ethnicity ? ethnicityCompositeService.fetchByEthnicityCode(newPersonBase.ethnicity?.code) : null
+        def maritalStatusDetail = newPersonBase.maritalStatus ? maritalStatusCompositeService.fetchByMaritalStatusCode(newPersonBase.maritalStatus?.code) : null
         //update Address
-         def addresses
+         def addresses = []
 
         if (content.containsKey('addresses') && content.addresses instanceof List)
             addresses = updateAddresses(pidmToUpdate, content.metadata, content.addresses)
 
         //update Telephones
-        def phones
+        def phones = []
         if (content.containsKey('phones') && content.phones instanceof List)
             phones = updatePhones(pidmToUpdate, content.metadata, content.phones)
 
         //update Emails
-        def emails
+        def emails = []
         if (content.containsKey('emails') && content.emails instanceof List)
             emails = updateEmails(pidmToUpdate, content.metadata, content.emails)
 
         //update races
-        def races
+        def races = []
         if (content.containsKey('races') && content.races instanceof List)
             races = updateRaces(pidmToUpdate, content.metadata, content.races)
         //Build decorator to return LDM response.
         def person = new Person(newPersonBase, personGuid, credentials, addresses, phones, emails, names,maritalStatusDetail,ethnicityDetail,races,[])
         def personMap = [:]
         personMap.put(pidmToUpdate, person)
-
+        if(addresses.size() == 0)
+            personMap = buildPersonAddresses(PersonAddress.fetchActiveAddressesByPidmInList([pidmToUpdate]),personMap)
+        if(phones.size() == 0)
+            personMap = buildPersonTelephones(PersonTelephone.fetchActiveTelephoneByPidmInList([pidmToUpdate]),personMap)
+        if(emails.size() == 0)
+            personMap = buildPersonEmails(PersonEmail.findAllByStatusIndicatorAndPidmInList('A',[pidmToUpdate]),personMap)
+        if(races.size() == 0)
+            personMap = buildPersonRaces(PersonRace.findAllByPidmInList([pidmToUpdate]),personMap)
         person = buildPersonRoles(personMap).get(pidmToUpdate)
     }
 
@@ -826,7 +808,6 @@ class PersonCompositeService extends LdmService {
                         personBase.preferenceFirstName = changedPersonIdentification.get('preferenceFirstName')
                     }
                 }
-
                 //Translate enumerations and defaults
                 personBase.sex = person?.sex == 'Male' ? 'M' : (person?.sex == 'Female' ? 'F' : (person?.sex == 'Unknown' ? 'N' : null))
                 if(person.containsKey('maritalStatusDetail')){
@@ -851,7 +832,7 @@ class PersonCompositeService extends LdmService {
 
                 }
                 if(person.containsKey('birthDate')){
-                    personBase.birthDate =person.get('birthDate')
+                    personBase.birthDate = person.get('birthDate')
                 }
 
 
