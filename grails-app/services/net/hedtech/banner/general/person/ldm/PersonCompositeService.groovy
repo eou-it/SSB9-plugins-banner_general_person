@@ -380,7 +380,7 @@ class PersonCompositeService extends LdmService {
         def phones = createPhones(newPersonIdentificationName.pidm, person?.metadata,
                 person.phones instanceof List ? person.phones : [])
         persons = buildPersonTelephones(phones, persons)
-        def emails = createEmails(newPersonIdentificationName.pidm, person?.metadata,
+        def emails = createPersonEmails(newPersonIdentificationName.pidm, person?.metadata,
                 person.emails instanceof List ? person.emails : [])
         persons = buildPersonEmails(emails, persons)
         def races = createRaces(newPersonIdentificationName.pidm, person?.metadata,
@@ -510,23 +510,81 @@ class PersonCompositeService extends LdmService {
         if( !phone.phoneNumber ) { throw new RestfulApiValidationException('PersonCompositeService.phoneNumber.invalid')}
     }
 
-    def createEmails(def pidm, Map metadata, List<Map> newEmails) {
-        def emails = []
-        newEmails?.each { activeEmail ->
-            if( activeEmail instanceof Map) {
-                IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_EMAIL_TYPE, activeEmail.emailType)
-                if (rule?.translationValue == activeEmail.emailType &&
-                        !emails.contains { activeEmail.emailType == rule?.value }) {
-                    activeEmail.emailType = EmailType.findByCode(rule?.value)
-                    activeEmail.put('pidm', pidm)
-                    activeEmail.put('dataOrigin', metadata?.dataOrigin)
-                    validateEmailRequiredFields(activeEmail)
-                    emails << personEmailService.create(activeEmail)
+    private List<PersonEmail> createPersonEmails(def pidm, Map metadata, List<Map> emailsInRequest) {
+        List<PersonEmail> personEmails = []
+
+        List<String> processedEmailTypes = []
+        PersonEmail personEmail
+        emailsInRequest?.each {
+            if (it instanceof Map) {
+                validateEmailRequiredFields(it)
+                if (!processedEmailTypes.contains { it.emailType.trim() }) {
+                    personEmail = createPersonEmail(pidm, metadata, it)
+                    personEmails << personEmail
+                    processedEmailTypes << it.emailType.trim()
                 }
             }
         }
-        emails
+
+        return personEmails
     }
+
+    private PersonEmail createPersonEmail(def pidm, Map metadata, def emailInRequest) {
+        PersonEmail personEmail
+
+        IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_EMAIL_TYPE, emailInRequest.emailType.trim())
+        if (rule?.value) {
+            personEmail = new PersonEmail(pidm: pidm, emailAddress: emailInRequest.emailAddress, statusIndicator: "A", emailType: EmailType.findByCode(rule.value), dataOrigin: metadata?.dataOrigin)
+            personEmail = personEmailService.create([domainModel: personEmail])
+        }
+
+        return personEmail
+    }
+
+
+    private def updatePersonEmails(def pidm, Map metadata, def emailsInRequest) {
+        def emailDecorators = []
+        List<PersonEmail> personEmails = []
+
+        def bannerEmailTypes = []
+        def rules = IntegrationConfiguration.findAllByProcessCodeAndSettingName(PROCESS_CODE, PERSON_EMAIL_TYPE)
+        rules?.each {
+            bannerEmailTypes << it.value
+        }
+
+        List<PersonEmail> existingPersonEmails = PersonEmail.fetchListByPidmAndEmailTypes(pidm, bannerEmailTypes) ?: []
+        if (existingPersonEmails) {
+            existingPersonEmails.each {
+                it.statusIndicator = "I"
+                personEmailService.update([domainModel: it])
+            }
+        }
+
+        List<String> processedEmailTypes = []
+        PersonEmail personEmail
+        emailsInRequest?.each {
+            validateEmailRequiredFields(it)
+            if (!processedEmailTypes.contains(it.emailType.trim())) {
+                IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_EMAIL_TYPE, it.emailType.trim())
+                if (rule?.value) {
+                    PersonEmail existingPersonEmail = existingPersonEmails?.find { existingPersonEmail -> existingPersonEmail.emailType.code == rule?.value && existingPersonEmail.emailAddress == it.emailAddress }
+                    if (existingPersonEmail) {
+                        existingPersonEmail.statusIndicator = "A"
+                        personEmail = personEmailService.update([domainModel: existingPersonEmail])
+                        existingPersonEmails.remove(existingPersonEmail)
+                    } else {
+                        personEmail = createPersonEmail(pidm, metadata, it)
+                    }
+                    personEmails << personEmail
+                    processedEmailTypes << it.emailType.trim()
+                    emailDecorators << it
+                }
+            }
+        }
+
+        return emailDecorators
+    }
+
 
     def validateEmailRequiredFields(email) {
         if( !email.emailType ) { throw new RestfulApiValidationException('PersonCompositeService.emailType.invalid')}
@@ -602,6 +660,7 @@ class PersonCompositeService extends LdmService {
         persons
     }
 
+
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     def buildPersonTelephones( List<PersonTelephone> personTelephoneList, Map persons) {
         personTelephoneList.each { activePhone ->
@@ -674,7 +733,7 @@ class PersonCompositeService extends LdmService {
      * Updates the Person Information like PersonIdentificationNameCurrent, PersonBasicPersonBase, Address
      * Telephones and Emails
      * @param person - Map containing the changes person details
-     * @return erson
+     * @return person
      */
     def update(Map content) {
         String personGuid = content?.id?.trim()?.toLowerCase()
@@ -759,8 +818,9 @@ class PersonCompositeService extends LdmService {
 
         //update Emails
         def emails = []
-        if (content.containsKey('emails') && content.emails instanceof List)
-            emails = updateEmails(pidmToUpdate, content.metadata, content.emails)
+        if (content.containsKey('emails') && content.emails instanceof List) {
+            emails = updatePersonEmails(pidmToUpdate, content.metadata, content.emails)
+        }
 
         //update races
         def races = []
@@ -774,8 +834,9 @@ class PersonCompositeService extends LdmService {
             personMap = buildPersonAddresses(PersonAddress.fetchActiveAddressesByPidmInList([pidmToUpdate]),personMap)
         if(phones.size() == 0)
             personMap = buildPersonTelephones(PersonTelephone.fetchActiveTelephoneByPidmInList([pidmToUpdate]),personMap)
-        if(emails.size() == 0)
-            personMap = buildPersonEmails(PersonEmail.findAllByStatusIndicatorAndPidmInList('A',[pidmToUpdate]),personMap)
+        if(emails.size() == 0) {
+            personMap = buildPersonEmails(PersonEmail.findAllByStatusIndicatorAndPidmInList('A', [pidmToUpdate]), personMap)
+        }
         if(races.size() == 0)
             personMap = buildPersonRaces(PersonRace.findAllByPidmInList([pidmToUpdate]),personMap)
         person = buildPersonRoles(personMap).get(pidmToUpdate)
@@ -1068,47 +1129,7 @@ class PersonCompositeService extends LdmService {
     }
 
 
-    private updateEmails(def pidm, Map metadata, List<PersonEmail> newEmails) {
-        def emails = []
-        def personEmailListUpdate = []
-        def emailRule = IntegrationConfiguration.findAllByProcessCodeAndSettingName(PROCESS_CODE, PERSON_EMAIL_TYPE)
-        def emailRuleValues = []
-        emailRule?.each {
-            emailRuleValues << it.value
-        }
-        def personEmailList = PersonEmail.fetchListByPidmAndEmailTypes(pidm, emailRuleValues) ?: null
-        if (personEmailList) {
-            personEmailList.each {
-                it.statusIndicator = "I"
-                def map = [domainModel: it]
-                personEmailListUpdate << personEmailService.update(map)
 
-            }
-        }
-
-        newEmails?.each { activeEmail ->
-            def email = []
-            IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_EMAIL_TYPE, activeEmail.emailType)
-
-            if (rule?.translationValue == activeEmail.emailType && !emails.contains {
-                activeEmail.emailType == rule?.value
-            }) {
-
-                def existingEmailRecord = personEmailListUpdate?.find { it.emailType.code == rule?.value && it.emailAddress == activeEmail.emailAddress && rule?.translationValue == activeEmail.emailType }
-                if(existingEmailRecord) {
-                    existingEmailRecord.statusIndicator = "A"
-                        def map = [domainModel: existingEmailRecord]
-                        email[0] = personEmailService.update(map)
-                    } else {
-                    email = createEmails(pidm, metadata, [activeEmail])
-                }
-                def emailDecorator = new Email(email.get(0))
-                emailDecorator.emailType = rule.translationValue
-                emails << emailDecorator
-            }
-        }
-        emails
-    }
 
 
     List<RaceDetail> updateRaces(def pidm, Map metadata, List<Map> newRaces) {
