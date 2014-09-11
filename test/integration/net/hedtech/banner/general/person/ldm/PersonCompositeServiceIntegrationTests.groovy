@@ -3,16 +3,11 @@ package net.hedtech.banner.general.person.ldm
 import groovy.sql.Sql
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.overall.ldm.GlobalUniqueIdentifier
-import net.hedtech.banner.general.person.PersonAddress
 import net.hedtech.banner.general.person.PersonBasicPersonBase
 import net.hedtech.banner.general.person.PersonIdentificationName
 import net.hedtech.banner.general.person.PersonIdentificationNameAlternate
 import net.hedtech.banner.general.person.PersonIdentificationNameCurrent
-import net.hedtech.banner.general.person.ldm.v1.Person
-import net.hedtech.banner.general.system.AddressSource
-import net.hedtech.banner.general.system.AddressType
 import net.hedtech.banner.general.system.CitizenType
-import net.hedtech.banner.general.system.County
 import net.hedtech.banner.general.system.Ethnicity
 import net.hedtech.banner.general.system.Legacy
 import net.hedtech.banner.general.system.MaritalStatus
@@ -140,6 +135,7 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
         PersonBasicPersonBase personBasicPersonBase = createPersonBasicPersonBase()
         PersonIdentificationNameCurrent  personIdentificationNameCurrent= PersonIdentificationNameCurrent.findAllByPidmInList([personBasicPersonBase.pidm]).get(0)
         GlobalUniqueIdentifier uniqueIdentifier = GlobalUniqueIdentifier.findByLdmNameAndDomainKey("persons", personIdentificationNameCurrent.pidm)
+        assertNotNull uniqueIdentifier
         Map params = getPersonWithFirstNameChangeRequest(personIdentificationNameCurrent,uniqueIdentifier.guid);
 
         //update person with FirstName change
@@ -164,7 +160,7 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
         PersonBasicPersonBase personBasicPersonBase = createPersonBasicPersonBase()
         PersonIdentificationNameCurrent  personIdentificationNameCurrent= PersonIdentificationNameCurrent.findAllByPidmInList([personBasicPersonBase.pidm]).get(0)
         GlobalUniqueIdentifier uniqueIdentifier = GlobalUniqueIdentifier.findByLdmNameAndDomainKey("persons", personIdentificationNameCurrent.pidm)
-        System.out.println(">>>>>>> guid for pidm: "+ personIdentificationNameCurrent.pidm+"is :"+uniqueIdentifier.guid)
+        assertNotNull uniqueIdentifier
 
         Map params = getPersonWithIdChangeRequest(personIdentificationNameCurrent,uniqueIdentifier.guid);
         //update person with ID change
@@ -199,13 +195,17 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
         PersonBasicPersonBase personBasicPersonBase = createPersonBasicPersonBase()
         PersonIdentificationNameCurrent  personIdentificationNameCurrent= PersonIdentificationNameCurrent.findAllByPidmInList([personBasicPersonBase.pidm]).get(0)
         GlobalUniqueIdentifier uniqueIdentifier = GlobalUniqueIdentifier.findByLdmNameAndDomainKey("persons", personIdentificationNameCurrent.pidm)
+        assertNotNull uniqueIdentifier
 
         Map params = getPersonWithNewAdressRequest(personIdentificationNameCurrent,uniqueIdentifier.guid);
         //update PersonBasicPersonBase info, since Address won't exists create new Adress through update
         def newAddressList = personCompositeService.update(params).addresses
+        assertNotNull newAddressList
+        assertTrue newAddressList.size > 0
+        assertTrue newAddressList.size == 2
 
         newAddressList.each { currAddress ->
-           if(currAddress.addressType =='Mailing'){
+            if(currAddress.addressType =='Mailing'){
                 assertEquals 'Southeastern', currAddress.city
                 assertEquals 'Pennsylvania', currAddress.state
                 assertEquals '5890 139th Ave', currAddress.streetLine1
@@ -222,8 +222,11 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
         //modify the Address and update
         Map modifiedAddress= getPersonWithModifiedAdressRequest(personIdentificationNameCurrent,uniqueIdentifier.guid);
 
-        //update MOdified Address
+        //update Modified Address
         def modifiedAddressList = personCompositeService.update(modifiedAddress).addresses
+
+        assertTrue modifiedAddressList.size > 0
+        assertTrue modifiedAddressList.size == 2
 
         modifiedAddressList.each { currAddress ->
             if(currAddress.addressType =='Home'){
@@ -246,6 +249,9 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
         //update with same Address
         def unchangedAddressList  =  personCompositeService.update(unchangedAddress).addresses
 
+        assertTrue unchangedAddressList.size > 0
+        assertTrue unchangedAddressList.size == 2
+
         unchangedAddressList.each { currAddress ->
             if(currAddress.addressType =='Home'){
                 assertEquals 'Southeastern', currAddress.city
@@ -259,9 +265,141 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
                 assertEquals '123 Main Line', currAddress.streetLine1
                 assertEquals '31778',currAddress.zip
             }
+        }
+    }
+    void testUpdatetestPersonPhonesValidUpdate(){
+        PersonBasicPersonBase personBasicPersonBase = createPersonBasicPersonBase()
+        PersonIdentificationNameCurrent  personIdentificationNameCurrent= PersonIdentificationNameCurrent.findAllByPidmInList([personBasicPersonBase.pidm]).get(0)
+        GlobalUniqueIdentifier uniqueIdentifier = GlobalUniqueIdentifier.findByLdmNameAndDomainKey("persons", personIdentificationNameCurrent.pidm)
+        assertNotNull uniqueIdentifier
+        Map newPhones = getPersonWithNewPhonesRequest(personIdentificationNameCurrent,uniqueIdentifier.guid);
+        // create new phone through update()
+        def  newPhonesList = personCompositeService.update(newPhones).phones
 
+        assertTrue newPhonesList.size > 0
+        assertTrue newPhonesList.size == 2
+
+        newPhonesList.each { currPhone ->
+
+            def phoneList = newPhones.phones
+            phoneList.each {phone ->
+                if(currPhone.phoneType =='Home' && phone.phoneType =='Home'){
+                    def phoneNumber =(phone.countryPhone ?: "") + (phone.phoneArea ?:  "") + (phone.phoneNumber ?: "")
+                    assert phoneNumber,currPhone.phoneNumberDetail
+                }
+                if(currPhone.phoneType =='Mobile' && phone.phoneType =='Home'){
+                    def phoneNumber =(phone.countryPhone ?: "") + (phone.phoneArea ?:  "") + (phone.phoneNumber ?: "")
+                    assert phoneNumber,currPhone.phoneNumberDetail
+                }
+            }
         }
 
+        //modify the Phones
+        Map modifiedPhones =  getPersonWithModifiedPhonesRequest(personIdentificationNameCurrent,uniqueIdentifier.guid);
+
+        //update Modified Phones
+        def modifiedPhonesList = personCompositeService.update(modifiedPhones).phones
+
+        assertTrue modifiedPhonesList.size > 0
+        assertTrue modifiedPhonesList.size == 2
+
+        modifiedPhonesList.each { currPhone ->
+            def phoneList = modifiedPhones.phones
+            phoneList.each {phone ->
+                if(currPhone.phoneType =='Home' && phone.phoneType =='Home'){
+                    def phoneNumber =(phone.countryPhone ?: "") + (phone.phoneArea ?:  "") + (phone.phoneNumber ?: "")
+                    assert phoneNumber,currPhone.phoneNumberDetail
+                }
+                if(currPhone.phoneType =='Mobile' && phone.phoneType =='Home'){
+                    def phoneNumber =(phone.countryPhone ?: "") + (phone.phoneArea ?:  "") + (phone.phoneNumber ?: "")
+                    assert phoneNumber,currPhone.phoneNumberDetail
+                }
+            }
+        }
+
+        //unchanged  phones
+        Map unchangedPhones =  getPersonWithModifiedPhonesRequest(personIdentificationNameCurrent,uniqueIdentifier.guid);
+
+        //update unchanged  phones
+        def unchangedPhonesList = personCompositeService.update(unchangedPhones).phones
+
+        assertTrue unchangedPhonesList.size > 0
+        assertTrue unchangedPhonesList.size == 2
+
+        unchangedPhonesList.each { currPhone ->
+            def phoneList = unchangedPhones.phones
+            phoneList.each {phone ->
+                if(currPhone.phoneType =='Home' && phone.phoneType =='Home'){
+                    def phoneNumber =(phone.countryPhone ?: "") + (phone.phoneArea ?:  "") + (phone.phoneNumber ?: "")
+                    assert phoneNumber,currPhone.phoneNumberDetail
+                }
+                if(currPhone.phoneType =='Mobile' && phone.phoneType =='Home'){
+                    def phoneNumber =(phone.countryPhone ?: "") + (phone.phoneArea ?:  "") + (phone.phoneNumber ?: "")
+                    assert phoneNumber,currPhone.phoneNumberDetail
+                }
+            }
+        }
+
+
+    }
+
+    void testUpdatetestPersonRacesValidUpdate(){
+
+        PersonBasicPersonBase personBasicPersonBase = createPersonBasicPersonBase()
+        PersonIdentificationNameCurrent  personIdentificationNameCurrent= PersonIdentificationNameCurrent.findAllByPidmInList([personBasicPersonBase.pidm]).get(0)
+        GlobalUniqueIdentifier uniqueIdentifier = GlobalUniqueIdentifier.findByLdmNameAndDomainKey("persons", personIdentificationNameCurrent.pidm)
+        assertNotNull uniqueIdentifier
+        def races = GlobalUniqueIdentifier.findAllByLdmName('races')
+        Map newRaces = getPersonWithNewRacesRequest(personIdentificationNameCurrent,uniqueIdentifier.guid,races)
+
+        // create new race through update()
+        def  raceList = personCompositeService.update(newRaces).races
+
+        assertEquals raceList.size ,1
+        assertEquals raceList[0].guid , races[0].guid
+
+        //  update race using same request
+        def  unchangedRaceList = personCompositeService.update(newRaces).races
+        assertEquals unchangedRaceList.size ,1
+        assertEquals unchangedRaceList[0].guid , races[0].guid
+
+        //update with new race
+        Map modifiedRaces = getPersonWithModifiedRacesRequest(personIdentificationNameCurrent,uniqueIdentifier.guid,races)
+
+        // create new race through update()
+        def  modifiedRacesList = personCompositeService.update(modifiedRaces).races
+
+        assertEquals modifiedRacesList.size ,2
+        assertEquals modifiedRacesList[0].guid , races[0].guid
+        assertEquals modifiedRacesList[1].guid , races[1].guid
+    }
+
+    void testUpdatetestPersonEthnicityValidUpdate(){
+
+        PersonBasicPersonBase personBasicPersonBase = createPersonBasicPersonBase()
+        PersonIdentificationNameCurrent  personIdentificationNameCurrent= PersonIdentificationNameCurrent.findAllByPidmInList([personBasicPersonBase.pidm]).get(0)
+        GlobalUniqueIdentifier uniqueIdentifier = GlobalUniqueIdentifier.findByLdmNameAndDomainKey("persons", personIdentificationNameCurrent.pidm)
+        assertNotNull uniqueIdentifier
+
+        def ethnicities = GlobalUniqueIdentifier.findAllByLdmName('ethnicities')
+        Map newEthnicities = getPersonWithNewEthniciiesyRequest(personIdentificationNameCurrent,uniqueIdentifier.guid,ethnicities)
+
+        // create new Ethnicity through update()
+        def  ethnicityDetail = personCompositeService.update(newEthnicities).ethnicityDetail
+
+        //assertEquals ethnicityDetail.size ,1
+        assertEquals ethnicityDetail.guid , ethnicities[0].guid
+
+        //  update Ethnicity using same request
+        def  unchangedEthnicityDetail = personCompositeService.update(newEthnicities).ethnicityDetail
+        assertEquals unchangedEthnicityDetail.guid , ethnicities[0].guid
+
+        //update with new Ethnicity
+        Map modifiedEthnicity = getPersonWithModifiedEthniciiesyRequest(personIdentificationNameCurrent,uniqueIdentifier.guid,ethnicities)
+
+        // create new Ethnicity through update()
+        def  modifiedEthnicityDetail = personCompositeService.update(modifiedEthnicity ).ethnicityDetail
+        assertEquals modifiedEthnicityDetail.guid , ethnicities[1].guid
 
     }
 
@@ -346,39 +484,6 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
         return personBasicPersonBase
     }
 
-    private def newValidForCreatePersonAddress(pidmToUpdate) {
-        def personAddress = new PersonAddress(
-                pidm: pidmToUpdate,
-                //sequenceNumber: i_success_sequenceNumber,
-                fromDate: i_success_fromDate,
-                toDate: i_success_toDate,
-                streetLine1: i_success_streetLine1,
-                streetLine2: i_success_streetLine2,
-                streetLine3: i_success_streetLine3,
-                city: i_success_city,
-                zip: i_success_zip,
-                phoneArea: i_success_phoneArea,
-                phoneNumber: i_success_phoneNumber,
-                phoneExtension: i_success_phoneExtension,
-                statusIndicator: i_success_statusIndicator,
-                userData: i_success_userData,
-                deliveryPoint: i_success_deliveryPoint,
-                correctionDigit: i_success_correctionDigit,
-                carrierRoute: i_success_carrierRoute,
-                goodsAndServiceTaxTaxId: i_success_goodsAndServiceTaxTaxId,
-                reviewedIndicator: i_success_reviewedIndicator,
-                reviewedUser: i_success_reviewedUser,
-                countryPhone: i_success_countryPhone,
-                houseNumber: i_success_houseNumber,
-                streetLine4: i_success_streetLine4,
-                addressType: i_success_addressType,
-                state: i_success_state,
-                county: i_success_county,
-                nation: i_success_nation,
-                addressSource: i_success_addressSource
-        )
-        return personAddress
-    }
 
 
 
@@ -446,6 +551,67 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
                               ]],
                 dateOfBirth : "1973-12-30"
                ]
+    }
+
+
+    private Map getPersonWithNewPhonesRequest(personIdentificationNameCurrent,guid) {
+        Map params = [ id		    : guid,
+                       names		: [[lastName:personIdentificationNameCurrent.lastName,middleName:personIdentificationNameCurrent.middleName, firstName:personIdentificationNameCurrent.firstName, nameType:'Primary',namePrefix:'TTTTT', nameSuffix:'TTTTT',preferenceFirstName:'TTTTT']],
+                       credentials  : [[credentialType:'Social Security Number', credentialId:'TTTTT']],
+                       sex          : 'Male',
+                       phones:[[phoneNumber:'6107435302', phoneType:'Mobile'], [phoneNumber:'2297795715', phoneType:'Home']]
+        ]
+        return params
+    }
+
+    private Map getPersonWithModifiedPhonesRequest(personIdentificationNameCurrent,guid) {
+        Map params = [ id		    : guid,
+                       names		: [[lastName:personIdentificationNameCurrent.lastName,middleName:personIdentificationNameCurrent.middleName, firstName:personIdentificationNameCurrent.firstName, nameType:'Primary',namePrefix:'TTTTT', nameSuffix:'TTTTT',preferenceFirstName:'TTTTT']],
+                       credentials  : [[credentialType:'Social Security Number', credentialId:'TTTTT']],
+                       sex          : 'Male',
+                       phones:[[phoneNumber:'6107435333', phoneType:'Mobile'], [phoneNumber:'2297795777', phoneType:'Home']]
+        ]
+        return params
+    }
+
+    private Map getPersonWithNewRacesRequest(personIdentificationNameCurrent,guid,races) {
+        Map params = [ id		    : guid,
+                       names		: [[lastName:personIdentificationNameCurrent.lastName,middleName:personIdentificationNameCurrent.middleName, firstName:personIdentificationNameCurrent.firstName, nameType:'Primary',namePrefix:'TTTTT', nameSuffix:'TTTTT',preferenceFirstName:'TTTTT']],
+                       credentials  : [[credentialType:'Social Security Number', credentialId:'TTTTT']],
+                       sex          : 'Male',
+                       races:[[guid:races[0].guid]]
+        ]
+        return params
+    }
+
+    private Map getPersonWithModifiedRacesRequest(personIdentificationNameCurrent,guid,races) {
+        Map params = [ id		    : guid,
+                       names		: [[lastName:personIdentificationNameCurrent.lastName,middleName:personIdentificationNameCurrent.middleName, firstName:personIdentificationNameCurrent.firstName, nameType:'Primary',namePrefix:'TTTTT', nameSuffix:'TTTTT',preferenceFirstName:'TTTTT']],
+                       credentials  : [[credentialType:'Social Security Number', credentialId:'TTTTT']],
+                       sex          : 'Male',
+                       races:[[guid:races[0].guid], [guid:races[1].guid]]
+        ]
+        return params
+    }
+
+    private Map getPersonWithNewEthniciiesyRequest(personIdentificationNameCurrent,guid,ethniciies) {
+        Map params = [ id		    : guid,
+                       names		: [[lastName:personIdentificationNameCurrent.lastName,middleName:personIdentificationNameCurrent.middleName, firstName:personIdentificationNameCurrent.firstName, nameType:'Primary',namePrefix:'TTTTT', nameSuffix:'TTTTT',preferenceFirstName:'TTTTT']],
+                       credentials  : [[credentialType:'Social Security Number', credentialId:'TTTTT']],
+                       sex          : 'Male',
+                       ethnicityDetail:[[guid:ethniciies[0].guid]]
+        ]
+        return params
+    }
+
+    private Map getPersonWithModifiedEthniciiesyRequest(personIdentificationNameCurrent,guid,ethniciies) {
+        Map params = [ id		    : guid,
+                       names		: [[lastName:personIdentificationNameCurrent.lastName,middleName:personIdentificationNameCurrent.middleName, firstName:personIdentificationNameCurrent.firstName, nameType:'Primary',namePrefix:'TTTTT', nameSuffix:'TTTTT',preferenceFirstName:'TTTTT']],
+                       credentials  : [[credentialType:'Social Security Number', credentialId:'TTTTT']],
+                       sex          : 'Male',
+                       ethnicityDetail:[[guid:ethniciies[1].guid]]
+        ]
+        return params
     }
 
 }
