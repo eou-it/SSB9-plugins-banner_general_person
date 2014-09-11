@@ -1,6 +1,7 @@
 package net.hedtech.banner.general.person.ldm
 
 import groovy.sql.Sql
+import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.overall.ldm.GlobalUniqueIdentifier
 import net.hedtech.banner.general.person.PersonAddress
 import net.hedtech.banner.general.person.PersonBasicPersonBase
@@ -83,6 +84,56 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
 
     protected void tearDown() {
         super.tearDown()
+    }
+
+    void testListQapiWithValidFirstAndLastName() {
+        Map params = getParamsWithReqiuredFields()
+        def persons = personCompositeService.list(params)
+
+        assertNotNull persons
+        assertFalse persons.isEmpty()
+
+        def firstPerson = persons.first()
+        assertNotNull firstPerson
+
+        persons.each { person ->
+            def primaryName = person.names.find {primaryNameType ->
+               primaryNameType.nameType == "Primary"
+           }
+            assertEquals primaryName.firstName, params.names[0].firstName
+            assertEquals primaryName.lastName, params.names[0].lastName
+        }
+    }
+
+    void testListQapiWithInValidFirstAndLastName() {
+        Map params = getParamsWithReqiuredFields()
+        params.names[0].firstName = "MarkTT"
+        params.names[0].lastName = "Kole"
+        def persons = personCompositeService.list(params)
+
+        assertNotNull persons
+        assertTrue persons.isEmpty()
+    }
+
+    void testListQapiWithInValidDateOfBirth() {
+        Map params = getParamsWithReqiuredFields()
+
+        params.dateOfBirth = "12-1973-30"
+        try {
+            personCompositeService.list(params)
+            fail('This should have failed as the expected date formate is yyyy-mm-dd')
+        } catch (ApplicationException ae) {
+            assertApplicationException ae, 'date.invalid.format.message'
+        }
+
+        params.dateOfBirth = "DEC-30-1973"
+
+        try {
+            personCompositeService.list(params)
+            fail('This should have failed as the expected date formate is yyyy-mm-dd')
+        } catch (ApplicationException ae) {
+            assertApplicationException ae, 'date.invalid.format.message'
+        }
     }
 
     void testUpdatePersonFirstNameAndLastNameChange(){
@@ -383,6 +434,18 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
                        addresses:[[addressType:'Mailing', city:'Pavo', state:'Georgia', streetLine1:'123 Main Line', zip:'31778'], [addressType:'Home', city:'Southeastern', state:'Pennsylvania', streetLine1:'5890 139th Ave', zip:'19398']]
         ]
         return params
+    }
+
+    private Map getParamsWithReqiuredFields() {
+        return [
+                action     : [POST: "list"],
+                names      : [[
+                                 nameType:"Primary",
+                                 firstName:"Mark",
+                                 lastName:"Mccallon"
+                              ]],
+                dateOfBirth : "1973-12-30"
+               ]
     }
 
 }
