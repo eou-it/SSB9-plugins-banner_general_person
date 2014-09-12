@@ -896,6 +896,9 @@ class PersonCompositeService extends LdmService {
                 if(person.containsKey('birthDate')){
                     personBase.birthDate = person.get('birthDate')
                 }
+                if(person.containsKey('metadata') && person.metadata.containsKey('dataOrigin')){
+                    personBase.dataOrigin = person.metadata.get('dataOrigin')
+                }
 
 
                 newPersonBase = personBasicPersonBaseService.update(personBase)
