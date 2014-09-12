@@ -35,7 +35,6 @@ import net.hedtech.banner.general.system.State
 import net.hedtech.banner.general.system.TelephoneType
 import net.hedtech.banner.general.system.ldm.v1.Metadata
 import net.hedtech.banner.general.system.ldm.v1.RaceDetail
-import net.hedtech.banner.restfulapi.RestfulApiValidationException
 import net.hedtech.banner.restfulapi.RestfulApiValidationUtility
 import org.apache.log4j.Logger
 import org.springframework.transaction.annotation.Propagation
@@ -117,7 +116,8 @@ class PersonCompositeService extends LdmService {
             }
         }
         if( pidms.size() > 1000 ) {
-            throw new RestfulApiValidationException('PersonCompositeService.max.results.exceeded')
+            throw new ApplicationException("PersonCompositeService",
+                    "@@r1:max.results.exceeded:BusinessLogicValidationException@@")
         }
         List<PersonIdentificationNameCurrent> personIdentificationList =
                 PersonIdentificationNameCurrent.findAllByPidmInList(pidms, sortAndPagingParams)
@@ -442,11 +442,11 @@ class PersonCompositeService extends LdmService {
     }
 
     def validateAddressRequiredFields(address) {
-        if( !address.addressType ) { throw new RestfulApiValidationException('PersonCompositeService.addressType.invalid')}
-        if( !address.state ) { throw new RestfulApiValidationException('PersonCompositeService.region.invalid')}
-        if( !address.streetLine1 ) { throw new RestfulApiValidationException('PersonCompositeService.streetAddress.invalid')}
-        if( !address.city ) { throw new RestfulApiValidationException('PersonCompositeService.city.invalid')}
-        if( !address.zip ) { throw new RestfulApiValidationException('PersonCompositeService.postalCode.invalid')}
+        if( !address.addressType ) { throw new ApplicationException("PersonCompositeService","@@r1:addressType.invalid:BusinessLogicValidationException@@")}
+        if( !address.state ) { throw new ApplicationException("PersonCompositeService","@@r1:region.invalid:BusinessLogicValidationException@@")}
+        if( !address.streetLine1 ) { throw new ApplicationException("PersonCompositeService","@@r1:streetAddress.invalid:BusinessLogicValidationException@@")}
+        if( !address.city ) { throw new ApplicationException("PersonCompositeService","@@r1:city.invalid:BusinessLogicValidationException@@")}
+        if( !address.zip ) { throw new ApplicationException("PersonCompositeService","@@r1:postalCode.invalid:BusinessLogicValidationException@@")}
     }
 
     List<PersonRace> createRaces (def pidm, Map metadata, List<Map> newRaces) {
@@ -506,8 +506,8 @@ class PersonCompositeService extends LdmService {
     }
 
     def validatePhoneRequiredFields(phone) {
-        if( !phone.telephoneType ) { throw new RestfulApiValidationException('PersonCompositeService.phoneType.invalid')}
-        if( !phone.phoneNumber ) { throw new RestfulApiValidationException('PersonCompositeService.phoneNumber.invalid')}
+        if( !phone.telephoneType ) { throw new ApplicationException('PersonCompositeService', "@@r1:phoneType.invalid:BusinessLogicValidationException@@") }
+        if( !phone.phoneNumber ) { throw new ApplicationException('PersonCompositeService', "@@r1:phoneNumber.invalid:BusinessLogicValidationException@@") }
     }
 
     private List<PersonEmail> createPersonEmails(def pidm, Map metadata, List<Map> emailsInRequest) {
@@ -587,8 +587,8 @@ class PersonCompositeService extends LdmService {
 
 
     def validateEmailRequiredFields(email) {
-        if( !email.emailType ) { throw new RestfulApiValidationException('PersonCompositeService.emailType.invalid')}
-        if( !email.emailAddress ) { throw new RestfulApiValidationException('PersonCompositeService.emailAddress.invalid')}
+        if( !email.emailType ) { throw new ApplicationException('PersonCompositeService', "@@r1:emailType.invalid:BusinessLogicValidationException@@")}
+        if( !email.emailAddress ) { throw new ApplicationException('PersonCompositeService', "@@r1:emailAddress.invalid:BusinessLogicValidationException@@")}
     }
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
@@ -603,7 +603,7 @@ class PersonCompositeService extends LdmService {
             return persons
         }
         else if( pidms.size() > 1000 ) {
-            throw new RestfulApiValidationException('PersonCompositeService.max.results.exceeded')
+            throw new ApplicationException('PersonCompositeService', "@@r1:max.results.exceeded:BusinessLogicValidationException@@")
         }
         List<PersonBasicPersonBase> personBaseList = PersonBasicPersonBase.findAllByPidmInList(pidms)
         List<PersonAddress> personAddressList = PersonAddress.fetchActiveAddressesByPidmInList(pidms)
@@ -670,6 +670,7 @@ class PersonCompositeService extends LdmService {
                     !(currentRecord.phones.contains { it.phoneType == rule?.translationValue })) {
                 def phone = new Phone(activePhone)
                 phone.phoneType = rule?.translationValue
+                phone.phoneNumberDetail = formatPhoneNumber((phone.countryPhone ? "+" + phone.countryPhone: "") + (phone.phoneArea ?:  "") + (phone.phoneNumber ?: ""))
                 currentRecord.phones << phone
             }
             persons.put(activePhone.pidm, currentRecord)
@@ -1088,15 +1089,15 @@ class PersonCompositeService extends LdmService {
                     }
                     if (activePhone.containsKey('phoneNumber')){
                         def parsedResult = parsePhoneNumber(activePhone.phoneNumber)
-                        if (parsedResult.phoneNumber.toString() != currentPhone.phoneNumber) {
+                        if ((parsedResult.phoneNumber ? parsedResult.phoneNumber.toString() : null) != currentPhone.phoneNumber) {
                             log.debug "Phone number different"
                             invalidPhone = true
                         }
-                        if (parsedResult.phoneArea.toString() != currentPhone.phoneArea) {
+                        if ((parsedResult.phoneArea ? parsedResult.phoneArea.toString() : null) != currentPhone.phoneArea) {
                             log.debug "Phone area code different"
                             invalidPhone = true
                         }
-                        if (parsedResult.countryPhone.toString() != currentPhone.countryPhone) {
+                        if ((parsedResult.countryPhone ? parsedResult.countryPhone.toString() : null) != currentPhone.countryPhone) {
                             log.debug "Phone country code different:" + parsedResult.countryPhone + " : " + currentPhone.countryPhone
                             invalidPhone = true
                         }
@@ -1109,6 +1110,8 @@ class PersonCompositeService extends LdmService {
                     else {
                         def phoneDecorator = new Phone(currentPhone)
                         phoneDecorator.phoneType = activePhone.phoneType
+                        phoneDecorator.phoneNumberDetail = formatPhoneNumber((currentPhone.countryPhone ? "+" + currentPhone.countryPhone: "") +
+                                (currentPhone.phoneArea ?:  "") + (currentPhone.phoneNumber ?: ""))
                         phones << phoneDecorator
                         newPhones.remove(activePhone)
                     }
@@ -1123,6 +1126,8 @@ class PersonCompositeService extends LdmService {
         createPhones(pidm,metadata,newPhones).each { currentPhone ->
             def phoneDecorator = new Phone(currentPhone)
             phoneDecorator.phoneType = findAllByProcessCodeAndSettingNameAndValue(PROCESS_CODE, PERSON_PHONE_TYPE, currentPhone.telephoneType.code)?.translationValue
+            phoneDecorator.phoneNumberDetail = formatPhoneNumber((currentPhone.countryPhone ? "+" + currentPhone.countryPhone: "") +
+                    (currentPhone.phoneArea ?:  "") + (currentPhone.phoneNumber ?: ""))
             phones << phoneDecorator
         }
         phones
@@ -1172,26 +1177,52 @@ class PersonCompositeService extends LdmService {
         try {
             PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance()
             parsedResult = phoneUtil.parse(phoneNumber, countryLdmCode?.scodIso ?: 'US')
-            String nationalNumber = parsedResult.getNationalNumber()
-            def nationalDestinationCodeLength = phoneUtil.getLengthOfNationalDestinationCode(parsedResult);
-            if( nationalDestinationCodeLength > 0 ) {
-                parsedNumber.put('phoneArea', nationalNumber[0..(nationalDestinationCodeLength - 1)])
-                parsedNumber.put('phoneNumber', nationalNumber[nationalDestinationCodeLength..-1])
+            if( phoneUtil.isValidNumber(parsedResult)) {
+                String nationalNumber = parsedResult.getNationalNumber()
+                def nationalDestinationCodeLength = phoneUtil.getLengthOfNationalDestinationCode(parsedResult);
+                if (nationalDestinationCodeLength > 0) {
+                    parsedNumber.put('phoneArea', nationalNumber[0..(nationalDestinationCodeLength - 1)])
+                    parsedNumber.put('phoneNumber', nationalNumber[nationalDestinationCodeLength..-1])
+                } else {
+                    parsedNumber.put('phoneNumber', nationalNumber)
+                }
+                parsedNumber.put('countryPhone', parsedResult.getCountryCode())
             }
             else {
-                parsedNumber.put('phoneNumber', nationalNumber)
+                throw new ApplicationException("PersonCompositeService", "@@r1:phoneNumber.malformed:BusinessLogicValidationException@@")
             }
-            parsedNumber.put('countryPhone', parsedResult.getCountryCode() )
-
         }
         catch (Exception e) {
-            throw new ApplicationException(PersonCompositeService, "@@r1:phoneNumber.malformed:BusinessLogicValidationException@@")
             log.error e.toString()
+            throw new ApplicationException("PersonCompositeService", "@@r1:phoneNumber.malformed:BusinessLogicValidationException@@")
+
         }
         if( parsedResult.getExtension() ) {
             parsedNumber.put('phoneExtension', parsedResult.getExtension())
         }
         parsedNumber
+    }
+
+    String formatPhoneNumber(String phoneNumber) {
+        List<InstitutionalDescription> institutions = InstitutionalDescription.list()
+        def institution = institutions.size() > 0 ? institutions[0] : null
+        Nation countryLdmCode
+        if (institution?.natnCode) {
+            countryLdmCode = Nation.findByCode(institution.natnCode)
+        }
+        Phonenumber.PhoneNumber parsedResult
+        try {
+            PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance()
+            parsedResult = phoneUtil.parse(phoneNumber, countryLdmCode?.scodIso ?: 'US')
+            log.error "AfterPhone:" + phoneUtil.format(parsedResult, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL)
+                return phoneUtil.format(parsedResult, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL)
+        }
+        catch (Exception e) {
+            log.error e.toString()
+            return phoneNumber
+            //throw new ApplicationException("PersonCompositeService", "@@r1:phoneNumber.malformed:BusinessLogicValidationException@@")
+
+        }
     }
 
 }
