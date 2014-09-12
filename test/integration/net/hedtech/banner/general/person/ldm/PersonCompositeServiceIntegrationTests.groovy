@@ -1,3 +1,6 @@
+/*********************************************************************************
+ Copyright 2014 Ellucian Company L.P. and its affiliates.
+ **********************************************************************************/
 package net.hedtech.banner.general.person.ldm
 
 import groovy.sql.Sql
@@ -17,9 +20,7 @@ import net.hedtech.banner.general.system.State
 import net.hedtech.banner.general.system.UnitOfMeasure
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 
-/**
- * Created by lokeshn on 8/27/2014.
- */
+
 class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
 
     def personCompositeService
