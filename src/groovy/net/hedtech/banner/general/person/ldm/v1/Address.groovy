@@ -23,7 +23,7 @@ class Address {
     }
 
     def getState() {
-        this.address?.state?.description
+        this.address?.state?.code
     }
 
     def getCounty() {
