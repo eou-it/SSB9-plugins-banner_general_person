@@ -453,7 +453,7 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
 
         assertNotNull o_person_update
         assertEquals i_success_guid, o_person_update.guid
-        assertEquals 2, o_person_update1.emails?.size()
+        assertEquals 2, o_person_update.emails?.size()
         assertEquals i_success_emailType_personal, o_person_update.emails[0].emailType
         assertEquals i_success_emailAddress_personal, o_person_update.emails[0].emailAddress
         assertEquals i_success_emailType_institution, o_person_update.emails[1].emailType
