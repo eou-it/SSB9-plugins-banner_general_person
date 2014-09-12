@@ -407,12 +407,13 @@ class PersonCompositeService extends LdmService {
         def addresses = []
         newAddresses?.each { activeAddress ->
             if(activeAddress instanceof Map) {
-                IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_ADDRESS_TYPE, activeAddress.addressType)
+                IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(
+                        PROCESS_CODE, PERSON_ADDRESS_TYPE, activeAddress.addressType)
                 if (rule?.translationValue == activeAddress.addressType && !addresses.contains {
                     it.addressType == rule?.value
                 }) {
                     activeAddress.put('addressType', AddressType.findByCode(rule?.value))
-                    activeAddress.put('state', State.findByDescription(activeAddress.state))
+                    activeAddress.put('state', State.findByCode(activeAddress.state))
                     if (activeAddress?.nation?.containsKey('code')) {
                         Nation nation = Nation.findByScodIso(activeAddress?.nation?.code)
                         if (nation) {
@@ -985,7 +986,7 @@ class PersonCompositeService extends LdmService {
                         switch (activeAddress?.addressType) {
                             default:
                                 if (activeAddress.containsKey('state'))
-                                    if (activeAddress.state != currentAddress.state.description) {
+                                    if (activeAddress.state != currentAddress.state.code) {
                                         log.debug "State different"
                                         invalidAddress = true
                                         break;
