@@ -486,7 +486,7 @@ class PersonCompositeService extends LdmService {
             if( activePhone instanceof Map ) {
                 IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_PHONE_TYPE, activePhone.phoneType)
                 if (!rule) {
-                    log.error activePhone.toString()
+                    log.error "Rule not found for phone:" + activePhone.toString()
                 }
                 if (rule?.translationValue == activePhone.phoneType &&
                         !phones.contains { activePhone.phoneType == rule?.value }) {
@@ -1192,12 +1192,12 @@ class PersonCompositeService extends LdmService {
                 parsedNumber.put('countryPhone', parsedResult.getCountryCode())
             }
             else {
-                throw new ApplicationException("PersonCompositeService", "@@r1:phoneNumber.malformed:BusinessLogicValidationException@@")
+                throw new ApplicationException("PersonCompositeService", "@@r1:phoneNumber.malformed:${phoneNumber}:BusinessLogicValidationException@@")
             }
         }
         catch (Exception e) {
-            log.error e.toString()
-            throw new ApplicationException("PersonCompositeService", "@@r1:phoneNumber.malformed:BusinessLogicValidationException@@")
+            log.debug e.toString()
+            throw new ApplicationException("PersonCompositeService", "@@r1:phoneNumber.malformed:${phoneNumber}:BusinessLogicValidationException@@")
 
         }
         if( parsedResult.getExtension() ) {
@@ -1217,11 +1217,11 @@ class PersonCompositeService extends LdmService {
         try {
             PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance()
             parsedResult = phoneUtil.parse(phoneNumber, countryLdmCode?.scodIso ?: 'US')
-            log.error "AfterPhone:" + phoneUtil.format(parsedResult, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL)
+            log.debug "AfterPhone:" + phoneUtil.format(parsedResult, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL)
                 return phoneUtil.format(parsedResult, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL)
         }
         catch (Exception e) {
-            log.error e.toString()
+            log.debug e.toString()
             return phoneNumber
             //throw new ApplicationException("PersonCompositeService", "@@r1:phoneNumber.malformed:BusinessLogicValidationException@@")
 
