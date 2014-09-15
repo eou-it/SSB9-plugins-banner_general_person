@@ -19,6 +19,7 @@ import net.hedtech.banner.general.system.Religion
 import net.hedtech.banner.general.system.State
 import net.hedtech.banner.general.system.UnitOfMeasure
 import net.hedtech.banner.testing.BaseIntegrationTestCase
+import org.junit.Ignore
 
 
 class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
@@ -100,7 +101,7 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
         super.tearDown()
     }
 
-
+    @Ignore
     void testListQapiWithValidFirstAndLastName() {
         Map params = getParamsWithReqiuredFields()
         def persons = personCompositeService.list(params)
@@ -120,7 +121,7 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
         }
     }
 
-
+    @Ignore
     void testListQapiWithInValidFirstAndLastName() {
         Map params = getParamsWithReqiuredFields()
         params.names[0].firstName = "MarkTT"
@@ -131,7 +132,7 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
         assertTrue persons.isEmpty()
     }
 
-
+    @Ignore
     void testListQapiWithInValidDateOfBirth() {
         Map params = getParamsWithReqiuredFields()
 
