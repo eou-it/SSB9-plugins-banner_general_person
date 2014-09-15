@@ -415,21 +415,31 @@ class PersonCompositeService extends LdmService {
                     activeAddress.put('addressType', AddressType.findByCode(rule?.value))
                     activeAddress.put('state', State.findByCode(activeAddress.state))
                     if (activeAddress?.nation?.containsKey('code')) {
-                        Nation nation = Nation.findByScodIso(activeAddress?.nation?.code)
-                        if (nation) {
-                            activeAddress.put('nation', nation)
-                        } else {
-                            log.error "Nation not found for code: ${activeAddress?.nation?.code}"
-                            throw new ApplicationException("Person", "@@r1:country.not.found.message:BusinessLogicValidationException@@")
+                        if(activeAddress.nation.code) {
+                            Nation nation = Nation.findByScodIso(activeAddress?.nation?.code)
+                            if (nation) {
+                                activeAddress.put('nation', nation)
+                            } else {
+                                log.error "Nation not found for code: ${activeAddress?.nation?.code}"
+                                throw new ApplicationException("Person", "@@r1:country.not.found.message:BusinessLogicValidationException@@")
+                            }
+                        }
+                        else {
+                            activeAddress.put('nation',null)
                         }
                     }
                     if (activeAddress.containsKey('county')) {
-                        County country = County.findByDescription(activeAddress.county)
-                        if (country) {
-                            activeAddress.put('county', country)
-                        } else {
-                            log.error "County not found for code: ${activeAddress.county}"
-                            throw new ApplicationException("Person", "@@r1:county.not.found.message:BusinessLogicValidationException@@")
+                        if( activeAddress.county) {
+                            County country = County.findByDescription(activeAddress.county)
+                            if (country) {
+                                activeAddress.put('county', country)
+                            } else {
+                                log.error "County not found for code: ${activeAddress.county}"
+                                throw new ApplicationException("Person", "@@r1:county.not.found.message:BusinessLogicValidationException@@")
+                            }
+                        }
+                        else {
+                            activeAddress.put('county',null)
                         }
                     }
                     activeAddress.put('pidm', pidm)
@@ -994,29 +1004,33 @@ class PersonCompositeService extends LdmService {
                                         break;
                                     }
                                 if (activeAddress?.nation?.containsKey('code')) {
-                                    def nation = Nation.findByScodIso(activeAddress?.nation?.code)
-                                    if (nation) {
-                                        if (nation.code != currentAddress.nation?.code) {
-                                            log.debug "Nation different:" + nation.code + " : " + currentAddress.nation?.code
-                                            invalidAddress = true
-                                            break;
+                                    def nation
+                                    if(activeAddress.nation?.code) {
+                                        nation = Nation.findByScodIso(activeAddress?.nation?.code)
+                                        if (!nation) {
+                                            log.error "Nation not found for code: ${activeAddress?.country?.code}"
+                                            throw new ApplicationException("Person", "@@r1:country.not.found.message:BusinessLogicValidationException@@")
                                         }
-                                    } else {
-                                        log.error "Nation not found for code: ${activeAddress?.country?.code}"
-                                        throw new ApplicationException("Person", "@@r1:country.not.found.message:BusinessLogicValidationException@@")
+                                    }
+                                    if (nation?.code != currentAddress.nation?.code) {
+                                        log.debug "Nation different:" + nation.code + " : " + currentAddress.nation?.code
+                                        invalidAddress = true
+                                        break;
                                     }
                                 }
                                 if (activeAddress.containsKey('county')) {
-                                    def county = County.findByDescription(activeAddress.county)
-                                    if (county) {
-                                        if (county.code != currentAddress.county?.code) {
-                                            log.debug "County different"
-                                            invalidAddress = true
-                                            break;
+                                    def county
+                                    if( activeAddress.county ) {
+                                        county = County.findByDescription(activeAddress.county)
+                                        if( !county ) {
+                                            log.error "County not found for code: ${activeAddress.county}"
+                                            throw new ApplicationException("Person", "@@r1:county.not.found.message:BusinessLogicValidationException@@")
                                         }
-                                    } else {
-                                        log.error "County not found for code: ${activeAddress.county}"
-                                        throw new ApplicationException("Person", "@@r1:county.not.found.message:BusinessLogicValidationException@@")
+                                    }
+                                    if (county?.code != currentAddress.county?.code) {
+                                        log.debug "County different"
+                                        invalidAddress = true
+                                        break;
                                     }
                                 }
                                 if (activeAddress.containsKey('streetLine1')) {
