@@ -892,7 +892,9 @@ class PersonCompositeService extends LdmService {
                 if (person.containsKey('deadDate')){
                     personBase.deadIndicator = person.get('deadDate') != null ? 'Y' : null
                     personBase.deadDate= person.get('deadDate')
-
+                    if(personBase.deadDate !=null && personBase.birthDate !=null && personBase.deadDate.before(personBase.birthDate)  ){
+                        throw new ApplicationException("PersonCompositeService", "@@r1:dateDeceased.invalid:${personBase.deadDate}:BusinessLogicValidationException@@")
+                    }
                 }
                 if(person.containsKey('birthDate')){
                     personBase.birthDate = person.get('birthDate')
