@@ -480,7 +480,13 @@ class PersonCompositeService extends LdmService {
                 newRace.pidm = pidm
                 newRace.race = race.race
                 newRace.dataOrigin = metadata?.dataOrigin
-                races << personRaceService.create(newRace)
+                PersonRace personRace= PersonRace.fetchByPidmAndRace(pidm,newRace.race)
+                if(personRace == null){
+                    races << personRaceService.create(newRace)
+                }else{
+                    throw new ApplicationException('PersonCompositeService', "@@r1:race.exists:${race.guid}::BusinessLogicValidationException@@")
+                }
+
             }
             else {
                 throw new ApplicationException('PersonCompositeService', "@@r1:race.invalid:BusinessLogicValidationException@@")
