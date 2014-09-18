@@ -390,6 +390,15 @@ class PersonCompositeService extends LdmService {
         persons.get(newPersonIdentificationName.pidm)
     }
 
+
+	public Integer getPidm( String guid ) {
+        def entity = GlobalUniqueIdentifier.fetchByLdmNameAndGuid( ldmName, guid?.toLowerCase() )
+        if (!entity)
+            throw new ApplicationException( GlobalUniqueIdentifierService.API, new NotFoundException( id: Person.class.simpleName ) )
+        return entity.domainKey?.toInteger()
+    }
+
+
     private void updateGuidValue(def id, def guid) {
         // Update the GUID to the one we received.
         GlobalUniqueIdentifier newEntity = GlobalUniqueIdentifier.findByLdmNameAndDomainId(ldmName, id)
