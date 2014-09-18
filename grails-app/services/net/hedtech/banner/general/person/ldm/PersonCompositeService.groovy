@@ -872,8 +872,15 @@ class PersonCompositeService extends LdmService {
             personBaseList.each { personBase ->
                 //Copy personBase attributes into person map from Primary names object.
                 person?.credentials?.each { it ->
-                    if (it.credentialType == 'Social Security Number') {
-                        personBase.ssn = it?.credentialId
+                    if (it.credentialType == 'Social Security Number' && personBase.ssn != it?.credentialId) {
+                        if(personBase.ssn == null && it?.credentialId.trim()=='' ){
+                            throw new ApplicationException("PersonCompositeService", "@@r1:ssn.isEmpty:BusinessLogicValidationException@@")
+                        }
+                        if(personBase.ssn == null ){
+                            personBase.ssn = it?.credentialId
+                        }else{
+                            throw new ApplicationException("PersonCompositeService", "@@r1:ssn.exists:BusinessLogicValidationException@@")
+                        }
                     }
                 }
                 if(changedPersonIdentification) {
