@@ -3,6 +3,9 @@
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
+import org.junit.Before
+import org.junit.Test
+import org.junit.After
 
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.system.Disability
@@ -17,17 +20,20 @@ class MedicalInformationServiceIntegrationTests extends BaseIntegrationTestCase 
     def medicalInformationService
 
 
-    protected void setUp() {
+	@Before
+	public void setUp() {
         formContext = ['GUAGMNU']// Since we are not testing a controller, we need to explicitly set this  (removing GOAMEDI because of GUOBOBS_UI_VERSION = B)
         super.setUp()
     }
 
 
-    protected void tearDown() {
+	@After
+	public void tearDown() {
         super.tearDown()
     }
 
 
+	@Test
     void testCreate() {
 
         def medicalInformation = newMedicalInformation()
@@ -39,6 +45,7 @@ class MedicalInformationServiceIntegrationTests extends BaseIntegrationTestCase 
     }
 
 
+	@Test
     void testUpdate() {
 
         def medicalInformation = newMedicalInformation()
@@ -59,6 +66,7 @@ class MedicalInformationServiceIntegrationTests extends BaseIntegrationTestCase 
 
 
 
+	@Test
     void testCreateWithAPIError() {
         def entity = newMedicalInformation()
         entity = medicalInformationService.create([domainModel: entity])
@@ -87,6 +95,7 @@ class MedicalInformationServiceIntegrationTests extends BaseIntegrationTestCase 
     }
 
 
+	@Test
     void testUpdateWithAPIError() {
         def entity = newMedicalInformation()
         entity = medicalInformationService.create([domainModel: entity])
@@ -119,6 +128,7 @@ class MedicalInformationServiceIntegrationTests extends BaseIntegrationTestCase 
     }
 
 
+	@Test
     void testReadOnly() {
         def medicalInfo = newMedicalInformation()
         medicalInfo = medicalInformationService.create([domainModel: medicalInfo])
@@ -139,6 +149,7 @@ class MedicalInformationServiceIntegrationTests extends BaseIntegrationTestCase 
     }
 
 
+	@Test
     void testMedicalInformationDelete() {
         def medicalInformation = newMedicalInformation()
 

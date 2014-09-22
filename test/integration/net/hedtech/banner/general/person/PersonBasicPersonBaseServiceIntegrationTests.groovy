@@ -5,6 +5,9 @@ Copyright 2012 Ellucian Company L.P. and its affiliates.
  Copyright 2013 Ellucian Company L.P. and its affiliates.
  ****************************************************************************** */
 package net.hedtech.banner.general.person
+import org.junit.Before
+import org.junit.Test
+import org.junit.After
 
 import groovy.sql.Sql
 import net.hedtech.banner.exceptions.ApplicationException
@@ -183,7 +186,8 @@ class PersonBasicPersonBaseServiceIntegrationTests extends BaseIntegrationTestCa
     def u_failure_armedServiceMedalVetIndicator = true
 
 
-    protected void setUp() {
+	@Before
+	public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
         initializeTestDataForReferences()
@@ -234,11 +238,13 @@ class PersonBasicPersonBaseServiceIntegrationTests extends BaseIntegrationTestCa
     }
 
 
-    protected void tearDown() {
+	@After
+	public void tearDown() {
         super.tearDown()
     }
 
 
+	@Test
     void testPersonBasicPersonBaseValidCreate() {
         def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()
         def map = [domainModel: personBasicPersonBase]
@@ -261,6 +267,7 @@ class PersonBasicPersonBaseServiceIntegrationTests extends BaseIntegrationTestCa
     }
 
 
+	@Test
     void testPersonBasicPersonBaseInvalidCreate() {
         def personBasicPersonBase = newInvalidForCreatePersonBasicPersonBase()
         def map = [domainModel: personBasicPersonBase]
@@ -270,6 +277,7 @@ class PersonBasicPersonBaseServiceIntegrationTests extends BaseIntegrationTestCa
     }
 
 
+	@Test
     void testPersonBasicPersonBaseValidUpdate() {
         def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()
         def map = [domainModel: personBasicPersonBase]
@@ -376,6 +384,7 @@ class PersonBasicPersonBaseServiceIntegrationTests extends BaseIntegrationTestCa
     }
 
 
+	@Test
     void testPersonBasicPersonBaseInvalidUpdate() {
         def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()
         def map = [domainModel: personBasicPersonBase]
@@ -443,6 +452,7 @@ class PersonBasicPersonBaseServiceIntegrationTests extends BaseIntegrationTestCa
     }
 
 
+	@Test
     void testPersonBasicPersonBaseDelete() {
         def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()
         def map = [domainModel: personBasicPersonBase]
@@ -455,6 +465,7 @@ class PersonBasicPersonBaseServiceIntegrationTests extends BaseIntegrationTestCa
     }
 
 
+	@Test
     void testReadOnly() {
         def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()
         def map = [domainModel: personBasicPersonBase]
@@ -471,6 +482,7 @@ class PersonBasicPersonBaseServiceIntegrationTests extends BaseIntegrationTestCa
     }
 
 
+	@Test
     void testSsnTooLong() {
         def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()
         personBasicPersonBase.ssn = "TTTTTTTTTTTTTTTTTTTT"

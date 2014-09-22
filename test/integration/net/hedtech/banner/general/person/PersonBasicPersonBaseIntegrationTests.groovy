@@ -2,6 +2,9 @@
  Copyright 2012-2014 Ellucian Company L.P. and its affiliates.
  ****************************************************************************** */
 package net.hedtech.banner.general.person
+import org.junit.Before
+import org.junit.Test
+import org.junit.After
 
 import grails.validation.ValidationException
 import groovy.sql.Sql
@@ -182,7 +185,8 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     def u_failure_armedServiceMedalVetIndicator = true
 
 
-    protected void setUp() {
+	@Before
+	public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
         initializeTestDataForReferences()
@@ -233,11 +237,13 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-    protected void tearDown() {
+	@After
+	public void tearDown() {
         super.tearDown()
     }
 
 
+	@Test
     void testCreateValidPersonBasicPersonBase() {
         def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()
         personBasicPersonBase.save(failOnError: true, flush: true)
@@ -246,6 +252,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testCalculateAge() {
         def df = new SimpleDateFormat("MM/dd/yyyy");
         def birthDate = new java.sql.Date(df.parse("10/17/1966").getTime());
@@ -268,6 +275,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testCreateInvalidPersonBasicPersonBase() {
         def personBasicPersonBase = newInvalidForCreatePersonBasicPersonBase()
         shouldFail(ValidationException) {
@@ -276,6 +284,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testUpdateValidPersonBasicPersonBase() {
         def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()
         personBasicPersonBase.save(failOnError: true, flush: true)
@@ -397,6 +406,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testUpdateInvalidPersonBasicPersonBase() {
         def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()
         personBasicPersonBase.save(failOnError: true, flush: true)
@@ -478,6 +488,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testDates() {
         def time = new SimpleDateFormat('HHmmss')
         def hour = new SimpleDateFormat('HH')
@@ -511,6 +522,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testOptimisticLock() {
         def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()
         personBasicPersonBase.save(failOnError: true, flush: true)
@@ -559,6 +571,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testDeletePersonBasicPersonBase() {
         def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()
         personBasicPersonBase.save(failOnError: true, flush: true)
@@ -569,12 +582,14 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testValidation() {
         def personBasicPersonBase = newInvalidForCreatePersonBasicPersonBase()
         assertFalse "PersonBasicPersonBase could not be validated as expected due to ${personBasicPersonBase.errors}", personBasicPersonBase.validate()
     }
 
 
+	@Test
     void testNullValidationFailure() {
         def personBasicPersonBase = new PersonBasicPersonBase()
         assertFalse "PersonBasicPersonBase should have failed validation", personBasicPersonBase.validate()
@@ -627,6 +642,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testMaxSizeValidationFailures() {
         def personBasicPersonBase = new PersonBasicPersonBase(
                 ssn: 'XXXXXXXXXXXXXXXXX',
@@ -653,6 +669,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFindByPidm() {
         def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()
         personBasicPersonBase.save(failOnError: true, flush: true)
@@ -664,6 +681,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFetchByPidmList() {
         def personList = []
         (0..5).each {
@@ -679,6 +697,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFetchBySsn() {
         def personBasicPersonBase1 = newValidForCreatePersonBasicPersonBase()
         personBasicPersonBase1.save(failOnError: true, flush: true)
@@ -764,6 +783,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
         return personBasicPersonBase
     }
 
+	@Test
     void testFetchSurveyConfirmedFlagByPidm() {
         def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()
         personBasicPersonBase.save(failOnError: true, flush: true)

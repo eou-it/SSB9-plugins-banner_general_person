@@ -2,6 +2,9 @@
 Copyright 2012 Ellucian Company L.P. and its affiliates.
 **********************************************************************************/
 package net.hedtech.banner.general.person
+import org.junit.Before
+import org.junit.Test
+import org.junit.After
 
 import grails.validation.ValidationException
 import groovy.sql.Sql
@@ -109,7 +112,8 @@ class PersonEmergencyContactIntegrationTests extends BaseIntegrationTestCase {
     def u_failure_streetLine4 = "TTTTT"
 
 
-    protected void setUp() {
+	@Before
+	public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
         initializeTestDataForReferences()
@@ -144,11 +148,13 @@ class PersonEmergencyContactIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-    protected void tearDown() {
+	@After
+	public void tearDown() {
         super.tearDown()
     }
 
 
+	@Test
     void testCreateValidPersonEmergencyContact() {
         def personEmergencyContact = newValidForCreatePersonEmergencyContact()
         personEmergencyContact.save(failOnError: true, flush: true)
@@ -157,6 +163,7 @@ class PersonEmergencyContactIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testCreateInvalidPersonEmergencyContact() {
         def personEmergencyContact = newInvalidForCreatePersonEmergencyContact()
         shouldFail(ValidationException) {
@@ -165,6 +172,7 @@ class PersonEmergencyContactIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testUpdateValidPersonEmergencyContact() {
         def personEmergencyContact = newValidForCreatePersonEmergencyContact()
         personEmergencyContact.save(failOnError: true, flush: true)
@@ -235,6 +243,7 @@ class PersonEmergencyContactIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testUpdateInvalidPersonEmergencyContact() {
         def personEmergencyContact = newValidForCreatePersonEmergencyContact()
         personEmergencyContact.save(failOnError: true, flush: true)
@@ -288,6 +297,7 @@ class PersonEmergencyContactIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testDates() {
         def hour = new SimpleDateFormat('HH')
         def date = new SimpleDateFormat('yyyy-M-d')
@@ -309,6 +319,7 @@ class PersonEmergencyContactIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testOptimisticLock() {
         def personEmergencyContact = newValidForCreatePersonEmergencyContact()
         personEmergencyContact.save(failOnError: true, flush: true)
@@ -343,6 +354,7 @@ class PersonEmergencyContactIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testDeletePersonEmergencyContact() {
         def personEmergencyContact = newValidForCreatePersonEmergencyContact()
         personEmergencyContact.save(failOnError: true, flush: true)
@@ -353,12 +365,14 @@ class PersonEmergencyContactIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testValidation() {
         def personEmergencyContact = newInvalidForCreatePersonEmergencyContact()
         assertFalse "PersonEmergencyContact could not be validated as expected due to ${personEmergencyContact.errors}", personEmergencyContact.validate()
     }
 
 
+	@Test
     void testNullValidationFailure() {
         def personEmergencyContact = new PersonEmergencyContact()
         assertFalse "PersonEmergencyContact should have failed validation", personEmergencyContact.validate()
@@ -392,6 +406,7 @@ class PersonEmergencyContactIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testMaxSizeValidationFailures() {
         def personEmergencyContact = new PersonEmergencyContact(
                 middleInitial: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
@@ -412,6 +427,7 @@ class PersonEmergencyContactIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFetchByPidmOrderByPriority() {
         def pidm = PersonUtility.getPerson("HOS00001").pidm
         def personEmergencyContact = newValidForCreatePersonEmergencyContact()

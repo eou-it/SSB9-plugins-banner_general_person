@@ -2,6 +2,9 @@
  Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
+import org.junit.Before
+import org.junit.Test
+import org.junit.After
 
 import grails.validation.ValidationException
 import groovy.sql.Sql
@@ -52,7 +55,8 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     def u_failure_displayWebIndicator = true
 
 
-    protected void setUp( ) {
+    @Before
+    public void setUp( ) {
         formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this (removing GEAPART because of GUOBOBS_UI_VERSION = B)
         super.setUp()
         initializeTestDataForReferences()
@@ -66,11 +70,13 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-    protected void tearDown( ) {
+    @After
+    public void tearDown( ) {
         super.tearDown()
     }
 
 
+    @Test
     void testCreateValidPersonEmail( ) {
         def personEmail = newValidForCreatePersonEmail()
         personEmail.save( failOnError: true, flush: true )
@@ -79,6 +85,7 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+    @Test
     void testCreateInvalidPersonEmail( ) {
         def personEmail = newInvalidForCreatePersonEmail()
         shouldFail( ValidationException ) {
@@ -87,6 +94,7 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+    @Test
     void testUpdateValidPersonEmail( ) {
         def personEmail = newValidForCreatePersonEmail()
         personEmail.save( failOnError: true, flush: true )
@@ -113,6 +121,7 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+    @Test
     void testUpdateInvalidPersonEmail( ) {
         def personEmail = newValidForCreatePersonEmail()
         personEmail.save( failOnError: true, flush: true )
@@ -135,6 +144,7 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+    @Test
     void testDeletePersonEmail( ) {
         def personEmail = newValidForCreatePersonEmail()
         personEmail.save( failOnError: true, flush: true )
@@ -145,12 +155,14 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+    @Test
     void testValidation( ) {
         def personEmail = newInvalidForCreatePersonEmail()
         assertFalse "PersonEmail could not be validated as expected due to ${personEmail.errors}", personEmail.validate()
     }
 
 
+    @Test
     void testNullValidationFailure( ) {
         def personEmail = new PersonEmail()
         personEmail.statusIndicator = null
@@ -169,6 +181,7 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+    @Test
     void testMaxSizeValidationFailures( ) {
         def personEmail = new PersonEmail(
                 commentData: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX' )
@@ -177,6 +190,7 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+    @Test
     void testOptimisticLock( ) {
         def personEmail = newValidForCreatePersonEmail()
         personEmail.save( failOnError: true, flush: true )

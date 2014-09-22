@@ -6,6 +6,9 @@ Copyright 2012 Ellucian Company L.P. and its affiliates.
  ****************************************************************************** */
 
 package net.hedtech.banner.general.person
+import org.junit.Before
+import org.junit.Test
+import org.junit.After
 
 import net.hedtech.banner.general.system.EmailType
 import net.hedtech.banner.testing.BaseIntegrationTestCase
@@ -16,17 +19,20 @@ class PersonEmailCompositeServiceIntegrationTests extends BaseIntegrationTestCas
     def personEmailCompositeService
 
 
-    protected void setUp() {
+	@Before
+	public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
     }
 
 
-    protected void tearDown() {
+	@After
+	public void tearDown() {
         super.tearDown()
     }
 
 
+	@Test
     void testCreate() {
 
         def personEmails = newPersonEmails()
@@ -40,6 +46,7 @@ class PersonEmailCompositeServiceIntegrationTests extends BaseIntegrationTestCas
     }
 
 
+	@Test
     void testPersonEmailDelete() {
         def personEmails = newPersonEmails()
         def pidm = personEmails[0].pidm
@@ -55,6 +62,7 @@ class PersonEmailCompositeServiceIntegrationTests extends BaseIntegrationTestCas
     }
 
 
+	@Test
     void testUpdateOfComment() {
 
         def personEmail = newSinglePersonEmail()
@@ -75,6 +83,7 @@ class PersonEmailCompositeServiceIntegrationTests extends BaseIntegrationTestCas
     }
 
 
+	@Test
     void testUpdateOfEmailType() {
 
         def personEmail = newSinglePersonEmail()
@@ -95,6 +104,7 @@ class PersonEmailCompositeServiceIntegrationTests extends BaseIntegrationTestCas
     }
 
 
+	@Test
       void testUpdateOfEmailAddress() {
 
         def personEmail = newSinglePersonEmail()
@@ -115,6 +125,7 @@ class PersonEmailCompositeServiceIntegrationTests extends BaseIntegrationTestCas
     }
 
 
+	@Test
       void testUpdateOfEmailAddressAndType() {
 
         def personEmail = newSinglePersonEmail()
@@ -136,6 +147,7 @@ class PersonEmailCompositeServiceIntegrationTests extends BaseIntegrationTestCas
     }
 
 
+	@Test
      void testUpdateOfEmailAddressAndTypeAndComment() {
 
         def personEmail = newSinglePersonEmail()

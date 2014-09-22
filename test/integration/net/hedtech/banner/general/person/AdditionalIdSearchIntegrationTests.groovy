@@ -3,6 +3,9 @@
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
+import org.junit.Before
+import org.junit.Test
+import org.junit.After
 
 import net.hedtech.banner.general.person.view.PersonAdditionalIdView
 import net.hedtech.banner.testing.BaseIntegrationTestCase
@@ -10,19 +13,22 @@ import net.hedtech.banner.testing.BaseIntegrationTestCase
 class AdditionalIdSearchIntegrationTests extends BaseIntegrationTestCase {
 
 
-    protected void setUp() {
+	@Before
+	public void setUp() {
         formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this (removing GEAPART because of GUOBOBS_UI_VERSION = B)
         super.setUp()
     }
 
-    protected void tearDown() {
+	@After
+	public void tearDown() {
         super.tearDown()
     }
 
     /**
      * Tests the list of additional ids by filter and pagination.
      */
-    def testAdditionalIdSearchByFilterAndPagination() {
+	@Test
+    void testAdditionalIdSearchByFilterAndPagination() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
         def filter = "nne1"   //DEANNE1
@@ -40,7 +46,8 @@ class AdditionalIdSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests the list of additional ids by filter.
      */
-    def testAdditionalIdSearchByFilter() {
+	@Test
+    void testAdditionalIdSearchByFilter() {
 
         def filter = "nne1"  //DEANNE1
         def results = PersonAdditionalIdView.fetchByAdditionalId(filter)
@@ -57,7 +64,8 @@ class AdditionalIdSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests the list of additional ids by filter with birthday
      */
-    def testAdditionalIdSearchByFilterBirthday() {
+	@Test
+    void testAdditionalIdSearchByFilterBirthday() {
 
         def filter = "glasses"  //Wears glasses
         def results = PersonAdditionalIdView.fetchByAdditionalId(filter)
@@ -75,7 +83,8 @@ class AdditionalIdSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests the list of additional ids for inquire page.
      */
-    def testDynamicFinder() {
+	@Test
+    void testDynamicFinder() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
 
@@ -102,7 +111,8 @@ class AdditionalIdSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests the list of additional ids for the pidm list
      */
-    def testAdditionalIdSearchByFilterAndPidm() {
+	@Test
+    void testAdditionalIdSearchByFilterAndPidm() {
         def pidmList = []
         pidmList.add(new Integer("36336"))
 

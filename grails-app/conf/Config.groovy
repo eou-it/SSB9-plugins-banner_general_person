@@ -27,7 +27,7 @@ def locationAdder = ConfigFinder.&addLocation.curry(grails.config.locations)
 ].each { envName, defaultFileName -> locationAdder(envName, defaultFileName) }
 
 
-
+grails.databinding.useSpringBinder=true
 grails.project.groupId = "net.hedtech" // used when deploying to a maven repo
 
 grails.mime.file.extensions = true // enables the parsing of file extensions from URLs into the request format

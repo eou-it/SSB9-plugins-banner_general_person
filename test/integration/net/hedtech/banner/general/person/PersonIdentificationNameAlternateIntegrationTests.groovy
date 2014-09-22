@@ -6,6 +6,9 @@ Copyright 2012 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
+import org.junit.Before
+import org.junit.Test
+import org.junit.After
 
 import groovy.sql.Sql
 import net.hedtech.banner.general.system.NameType
@@ -16,17 +19,20 @@ class PersonIdentificationNameAlternateIntegrationTests extends BaseIntegrationT
     def personIdentificationNameAlternate
 
 
-    protected void setUp() {
+	@Before
+	public void setUp() {
         formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this
         super.setUp()
     }
 
 
-    protected void tearDown() {
+	@After
+	public void tearDown() {
         super.tearDown()
     }
 
 
+	@Test
     void testCreatePersonIdentificationNameAlternate() {
         def personIdentificationNameCurrent = setupNewPersonIdentificationNameCurrent("P")
 
@@ -59,6 +65,7 @@ class PersonIdentificationNameAlternateIntegrationTests extends BaseIntegrationT
     }
 
 
+	@Test
     void testDeletePersonIdentificationNameAlternate() {
         def personIdentificationNameCurrent = setupNewPersonIdentificationNameCurrent("P")
         def personIdentificationNameAlternate = newIdChange(personIdentificationNameCurrent)
@@ -77,6 +84,7 @@ class PersonIdentificationNameAlternateIntegrationTests extends BaseIntegrationT
     }
 
 
+	@Test
     void testValidation() {
         def personIdentificationNameAlternate = new PersonIdentificationNameAlternate(
                 pidm: 1234,
@@ -94,6 +102,7 @@ class PersonIdentificationNameAlternateIntegrationTests extends BaseIntegrationT
     }
 
 
+	@Test
     void testNullValidationFailure() {
         def personIdentificationNameAlternate = new PersonIdentificationNameAlternate()
         assertFalse "PersonIdentificationNameAlternate should have failed validation", personIdentificationNameAlternate.validate()
@@ -122,6 +131,7 @@ class PersonIdentificationNameAlternateIntegrationTests extends BaseIntegrationT
     }
 
 
+	@Test
     void testInListValidationFailure() {
         def personIdentificationNameAlternate = new PersonIdentificationNameAlternate(
                 pidm: 1234,
@@ -146,6 +156,7 @@ class PersonIdentificationNameAlternateIntegrationTests extends BaseIntegrationT
 
 
 
+	@Test
     void testMaxSizeValidationFailures() {
         def personIdentificationNameAlternate = new PersonIdentificationNameAlternate(
                 firstName: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',

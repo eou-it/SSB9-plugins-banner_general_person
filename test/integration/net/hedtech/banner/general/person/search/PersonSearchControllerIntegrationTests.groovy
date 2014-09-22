@@ -2,6 +2,9 @@
 Copyright 2012 Ellucian Company L.P. and its affiliates.
 **********************************************************************************/
 package net.hedtech.banner.general.person.search
+import org.junit.Before
+import org.junit.Test
+import org.junit.After
 
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 import grails.converters.JSON
@@ -11,20 +14,23 @@ class PersonSearchControllerIntegrationTests extends BaseIntegrationTestCase {
     def controller
     def personSearchService
 
-    protected void setUp() {
+	@Before
+	public void setUp() {
         formContext = ['GUAGMNU'] //(removing GEAPART because of GUOBOBS_UI_VERSION = B)
         controller = new PersonSearchController()
         super.setUp()
     }
 
-    protected void tearDown() {
+	@After
+	public void tearDown() {
         super.tearDown()
     }
 
     /**
      * Test controller by Id.
      */
-    def testSearchById() {
+	@Test
+    void testSearchById() {
         controller.request.contentType = "text/json"
         controller.params.searchFilter = "HOS00001"
         controller.searchById()
@@ -38,7 +44,8 @@ class PersonSearchControllerIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Test controller by Name.
      */
-    def testSearchByName() {
+	@Test
+    void testSearchByName() {
         controller.request.contentType = "text/json"
         controller.params.searchFilter = "Lindblom"
         controller.searchByName()

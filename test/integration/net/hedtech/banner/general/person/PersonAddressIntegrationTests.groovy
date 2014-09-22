@@ -3,6 +3,9 @@
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
+import org.junit.Before
+import org.junit.Test
+import org.junit.After
 
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 import net.hedtech.banner.exceptions.ApplicationException
@@ -143,7 +146,8 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 	def u_failure_houseNumber = "TTTTT"
 	def u_failure_streetLine4 = "TTTTT"
 
-	protected void setUp() {
+    @Before
+	public void setUp() {
 		formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this (removing GEAPART because of GUOBOBS_UI_VERSION = B)
 		super.setUp()
 		initializeTestDataForReferences()
@@ -186,10 +190,14 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 
 	}
 
-	protected void tearDown() {
+
+    @After
+	public void tearDown() {
 		super.tearDown()
 	}
 
+
+    @Test
 	void testCreateValidPersonAddress() {
 		def personAddress = newValidForCreatePersonAddress()
 		save personAddress
@@ -197,6 +205,8 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
         assertNotNull personAddress.id
 	}
 
+
+    @Test
 	void testCreateInvalidPersonAddress() {
 		def personAddress = newInvalidForCreatePersonAddress()
 		shouldFail(ValidationException) {
@@ -204,6 +214,8 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 		}
 	}
 
+
+    @Test
 	void testUpdateValidPersonAddress() {
 		def personAddress = newValidForCreatePersonAddress()
 		save personAddress
@@ -380,6 +392,7 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 	}
 
 
+	@Test
      void testFetchByPidm() {
         def personAddress = newValidForCreatePersonAddress()
 		save personAddress
@@ -390,6 +403,7 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testOptimisticLock() {
         def sql1 = new Sql(sessionFactory.getCurrentSession().connection())
         sql1.executeUpdate("update gubinst set gubinst_finance_installed = 'Y'")
@@ -444,12 +458,14 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 		assertNull PersonAddress.get( id )
 	}
 
+	@Test
     void testValidation() {
        def personAddress = newValidForCreatePersonAddress()
        assertTrue "PersonAddress could not be validated as expected due to ${personAddress.errors}", personAddress.validate()
     }
 
 
+	@Test
     void testNullValidationFailure() {
         def personAddress = new PersonAddress()
         assertFalse "PersonAddress should have failed validation", personAddress.validate()
@@ -490,6 +506,7 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testMaxSizeValidationFailures() {
         def personAddress = new PersonAddress(
         streetLine1:'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',

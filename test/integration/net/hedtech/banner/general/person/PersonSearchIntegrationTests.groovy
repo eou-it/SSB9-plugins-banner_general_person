@@ -3,6 +3,9 @@
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
+import org.junit.Before
+import org.junit.Test
+import org.junit.After
 
 import net.hedtech.banner.general.person.view.PersonPersonView
 import net.hedtech.banner.general.system.NameType
@@ -13,19 +16,22 @@ import java.text.SimpleDateFormat
 
 class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
-    protected void setUp() {
+	@Before
+	public void setUp() {
         formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this(removing GEAPART because of GUOBOBS_UI_VERSION = B)
         super.setUp()
     }
 
-    protected void tearDown() {
+	@After
+	public void tearDown() {
         super.tearDown()
     }
 
     /**
      * Tests the Person Search.
      */
-    def testPersonSearch() {
+	@Test
+    void testPersonSearch() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
         def id
@@ -75,7 +81,8 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests the list of persons.
      */
-    def testPersonSearchByFilterAndPagination() {
+	@Test
+    void testPersonSearchByFilterAndPagination() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
         def id
@@ -103,7 +110,8 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
      * Tests the list of persons for inquiry page.
      * Search by lastName
      */
-    def testDynamicFinder1() {
+	@Test
+    void testDynamicFinder1() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
 
@@ -133,7 +141,7 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
      * Tests the list of persons for inquiry page.
      * Search by lastName with special characters
      */
-    def testDynamicFinder1_SpecialCharactersCondition() {
+    void testDynamicFinder1_SpecialCharactersCondition() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
 
@@ -165,7 +173,7 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
      * Tests the list of persons for inquiry page.
      * Search by changeIndicator is null
      */
-    def testDynamicFinder1_ChangeIndicator() {
+    void testDynamicFinder1_ChangeIndicator() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
 
@@ -208,7 +216,7 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
      * Tests the list of persons for inquiry page.
      * Search by lastName, birthDate
      */
-    def testDynamicFinder1_1() {
+    void testDynamicFinder1_1() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
 
@@ -245,7 +253,7 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
      * Tests the list of persons for inquiry page.
      * Search by lastName, birthDate
      */
-    def testDynamicFinder1_BirthDateEqualsCondition() {
+    void testDynamicFinder1_BirthDateEqualsCondition() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
 
@@ -284,7 +292,8 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
      * Tests the list of persons for inquiry page.
      * Search by lastName, firstName
      */
-    def testDynamicFinder2() {
+	@Test
+    void testDynamicFinder2() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
 
@@ -322,7 +331,8 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
      * Tests the list of persons for inquiry page.
      * Search by Id
      */
-    def testDynamicFinder3() {
+	@Test
+    void testDynamicFinder3() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
 
@@ -352,7 +362,8 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
      * Tests the list of persons for inquiry page.
      * Search by soundexLastName
      */
-    def testDynamicFinder4() {
+	@Test
+    void testDynamicFinder4() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
 
@@ -373,7 +384,7 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
      * Tests the list of persons for inquiry page.
      * Search by soundexLastName and soundexFirstName
      */
-    def testDynamicFinder4_1() {
+    void testDynamicFinder4_1() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
 
@@ -394,7 +405,8 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
      * Tests the list of persons for inquiry page.
      * Search by lastName, nameType
      */
-    def testDynamicFinder5() {
+	@Test
+    void testDynamicFinder5() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
 
@@ -432,7 +444,8 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests no data found.
      */
-    def testDynamicFinder6() {
+	@Test
+    void testDynamicFinder6() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
 
@@ -467,7 +480,8 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests the list of emails for the pidm list
      */
-    def testSearchPersonByPidm() {
+	@Test
+    void testSearchPersonByPidm() {
         def pidmList = []
         pidmList.add(new Integer("1358"))
         pidmList.add(new Integer("1355"))
@@ -490,7 +504,8 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests no parameters on query - fetch all.
      */
-    def testQueryAllWithNoParameters() {
+	@Test
+    void testQueryAllWithNoParameters() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
 
@@ -508,7 +523,8 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
      * Tests the list of persons for inquiry page.
      * Search by surnamePrefix
      */
-    def testDynamicFinderBySurnamePrefix() {
+	@Test
+    void testDynamicFinderBySurnamePrefix() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
 
@@ -541,7 +557,8 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
      * Tests the list of persons for inquiry page.
      * Search by nameSuffix
      */
-    def testDynamicFinderByNameSuffix() {
+	@Test
+    void testDynamicFinderByNameSuffix() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
 
@@ -573,7 +590,8 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests the name formatter.
      */
-    def testNameFormatter() {
+	@Test
+    void testNameFormatter() {
         def name = NameTemplate.format {
             lastName "Smith"
             firstName "John"

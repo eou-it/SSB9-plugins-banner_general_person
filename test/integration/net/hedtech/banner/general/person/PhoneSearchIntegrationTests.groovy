@@ -5,22 +5,28 @@
 
 import net.hedtech.banner.general.person.view.PersonPhoneView
 import net.hedtech.banner.testing.BaseIntegrationTestCase
+import org.junit.Before
+import org.junit.Test
+import org.junit.After
 
 class PhoneSearchIntegrationTests extends BaseIntegrationTestCase {
 
-    protected void setUp() {
+	@Before
+	public void setUp() {
         formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this (removing GEAPART because of GUOBOBS_UI_VERSION = B)
         super.setUp()
     }
 
-    protected void tearDown() {
+	@After
+	public void tearDown() {
         super.tearDown()
     }
 
     /**
      * Tests the list of phones by filter and pagination with.
      */
-    def testPhoneSearchByFilterAndPagination() {
+	@Test
+    void testPhoneSearchByFilterAndPagination() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
         def filter = "1235000"
@@ -39,7 +45,8 @@ class PhoneSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests the list of phones by filter and pagination with the phone format.
      */
-    def testPhoneSearchWithFormatByFilterAndPagination() {
+	@Test
+    void testPhoneSearchWithFormatByFilterAndPagination() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
         def filter = "(610) 111 -"   //610) 111 -
@@ -56,7 +63,8 @@ class PhoneSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests the list of phones by filter.
      */
-    def testPhoneSearchByFilter() {
+	@Test
+    void testPhoneSearchByFilter() {
 
         def filter = "1235000"
         def results = PersonPhoneView.fetchByPhone(filter)
@@ -75,7 +83,8 @@ class PhoneSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests the list of phones for inquire page.
      */
-    def testDynamicFinder() {
+	@Test
+    void testDynamicFinder() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
 
@@ -102,7 +111,8 @@ class PhoneSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests the list of phones for the pidm list
      */
-    def testPhoneSearchByFilterAndPidm() {
+	@Test
+    void testPhoneSearchByFilterAndPidm() {
         def pidmList = []
         pidmList.add(new Integer("35540"))
 
@@ -122,7 +132,8 @@ class PhoneSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests the list of phones for inquire page.
      */
-    def testDynamicFinder1() {
+	@Test
+    void testDynamicFinder1() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
 

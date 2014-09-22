@@ -3,13 +3,15 @@
  ********************************************************************************* */
  package net.hedtech.banner.general.person
 
+import groovy.sql.Sql
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.system.Disability
 import net.hedtech.banner.general.system.DisabilityAssistance
 import net.hedtech.banner.general.system.MedicalCondition
 import net.hedtech.banner.general.system.MedicalEquipment
 import net.hedtech.banner.testing.BaseIntegrationTestCase
-import groovy.sql.Sql
+import org.junit.Before
+import org.junit.Test
 import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
 
 /**
@@ -20,12 +22,14 @@ class MedicalInformationIntegrationTests extends BaseIntegrationTestCase {
     def medicalInformationService       // injected via spring
 
 
-    protected void setUp() {
+	@Before
+	public void setUp() {
         formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this (removing GOAMEDI because of GUOBOBS_UI_VERSION = B)
         super.setUp()
     }
 
 
+	@Test
     void testCreate() {
         def entity = newMedicalInformation()
         save entity
@@ -33,6 +37,7 @@ class MedicalInformationIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testUpdate() {
         def entity = newMedicalInformation()
         save entity
@@ -50,6 +55,7 @@ class MedicalInformationIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testOptimisticLock() {
         def entity = newMedicalInformation()
         save entity
@@ -67,6 +73,7 @@ class MedicalInformationIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testDelete() {
         def entity = newMedicalInformation()
         save entity
@@ -76,24 +83,28 @@ class MedicalInformationIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testList() {
         def medInfos = MedicalInformation.list()
         assertTrue medInfos.size() > 0
     }
 
 
+	@Test
     void testFindWhere() {
         def entity = MedicalInformation.findWhere(onsetAge: 12)
         assertEquals "FindWhere did not return expected entity", 12, entity.onsetAge
     }
 
 
+	@Test
     void testFindAll() {
         def medInfos = MedicalInformation.findAll()
         assertTrue medInfos.size() >= 10
     }
 
 
+	@Test
     void testFindAllWithHQL() {
         String hql = "from MedicalInformation as m where m.onsetAge != null"
         def medInfos = MedicalInformation.findAll(hql)
@@ -101,6 +112,7 @@ class MedicalInformationIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFindByOnsetAge() {
         def entity = newMedicalInformation()
         save entity
@@ -111,6 +123,7 @@ class MedicalInformationIntegrationTests extends BaseIntegrationTestCase {
 
 
 
+	@Test
     void testAssociations() {
         def entity = newMedicalInformation()
         save entity
@@ -122,6 +135,7 @@ class MedicalInformationIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testValidation() {
         def medicalInformation = newMedicalInformation()
         medicalInformation.pidm = null
@@ -132,6 +146,7 @@ class MedicalInformationIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testCreateWithAPIError() {
         def entity = newMedicalInformation()
         assertNotNull entity.id

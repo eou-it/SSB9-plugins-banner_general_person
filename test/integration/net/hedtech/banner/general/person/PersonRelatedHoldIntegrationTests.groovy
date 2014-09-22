@@ -3,6 +3,9 @@
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
+import org.junit.Before
+import org.junit.Test
+import org.junit.After
 
 import net.hedtech.banner.general.system.HoldType
 import net.hedtech.banner.general.system.Originator
@@ -16,17 +19,20 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
 
     //def personRelatedHoldService
 
-    protected void setUp() {
+	@Before
+	public void setUp() {
         formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this  (removing SOAHOLD because of GUOBOBS_UI_VERSION = B)
         super.setUp()
     }
 
 
-    protected void tearDown() {
+	@After
+	public void tearDown() {
         super.tearDown()
     }
 
 
+	@Test
     void testCreatePersonRelatedHold() {
         def personRelatedHold = newPersonRelatedHold()
         save personRelatedHold
@@ -35,6 +41,7 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testUpdatePersonRelatedHold() {
         def personRelatedHold = newPersonRelatedHold()
         save personRelatedHold
@@ -76,6 +83,7 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testOptimisticLock() {
         def personRelatedHold = newPersonRelatedHold()
         save personRelatedHold
@@ -103,6 +111,7 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testDeletePersonRelatedHold() {
         def personRelatedHold = newPersonRelatedHold()
         save personRelatedHold
@@ -113,12 +122,14 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testValidation() {
         def personRelatedHold = newPersonRelatedHold()
         assertTrue "PersonRelatedHold could not be validated as expected due to ${personRelatedHold.errors}", personRelatedHold.validate()
     }
 
 
+	@Test
     void testNullValidationFailure() {
         def personRelatedHold = new PersonRelatedHold()
         assertFalse "PersonRelatedHold should have failed validation", personRelatedHold.validate()
@@ -139,6 +150,7 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testMaxSizeValidationFailures() {
         def personRelatedHold = new PersonRelatedHold(
                 reason: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
@@ -148,6 +160,7 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
 
 
     @Ignore //validation error test fails due to presence of scale constraint in the domain
+	@Test
     void testDates() {
         String fromDate = "2010-10-01"
         String toDate = "2010-09-01"
@@ -163,6 +176,7 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFetchByPidm() {
         def personRelatedHold = newPersonRelatedHold()
         save personRelatedHold
@@ -173,6 +187,7 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFetchByPidmAndDateBetween() {
         def personRelatedHold = newPersonRelatedHold()
         save personRelatedHold
@@ -185,6 +200,7 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFetchByPidmDateAndHoldType() {
         def personRelatedHold = newPersonRelatedHold()
         save personRelatedHold
@@ -199,6 +215,7 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
 
 
 
+	@Test
     void testFetchByPidmAndDateCompare() {
         def personRelatedHold = newPersonRelatedHold()
         save personRelatedHold
@@ -210,6 +227,7 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
         assertNotNull(holdList)
     }
 
+	@Test
     void testFetchByPidmListAndDateCompare() {
         def holdList = [newPersonRelatedHold()]
         def personRelatedHold = newPersonRelatedHold()
@@ -228,6 +246,7 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFetchRegistrationHoldsExist() {
         def personRelatedHold = newPersonRelatedHold()
         save personRelatedHold
@@ -240,6 +259,7 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testAdvanceFilter() {
         def pidm = PersonUtility.getPerson("HOS00001").pidm
         def personRelatedHold1 = newPersonRelatedHold()

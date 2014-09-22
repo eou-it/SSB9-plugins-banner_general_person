@@ -3,6 +3,9 @@
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
+import org.junit.Before
+import org.junit.Test
+import org.junit.After
 
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.system.HoldType
@@ -16,17 +19,20 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
     def personRelatedHoldService
 
 
-    protected void setUp() {
+	@Before
+	public void setUp() {
         formContext = ['GUAGMNU'] // (removing SOAHOLD because of GUOBOBS_UI_VERSION = B)
         super.setUp()
     }
 
 
-    protected void tearDown() {
+	@After
+	public void tearDown() {
         super.tearDown()
     }
 
 
+	@Test
     void testCreateAndUpdatePersonRelatedHold() {
         //Create the new record by usr "grails_user"
         def personRelatedHold = newPersonRelatedHold()
@@ -191,6 +197,7 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testDeletePersonRelatedHold() {
         def personRelatedHold = newPersonRelatedHold()
         def map = [domainModel: personRelatedHold]
@@ -208,6 +215,7 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testDeleteWithReleaseIndicatorBySameUser() {
         def personRelatedHold = newPersonRelatedHold()
         personRelatedHold.releaseIndicator = true
@@ -226,6 +234,7 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testDeleteWithReleaseIndicatorOffByDifferentUser() {
         def sql
         def personRelatedHold = newPersonRelatedHold()
@@ -254,6 +263,7 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testDeleteWithReleaseIndicatorOnByDifferentUser() {
         def sql
         def personRelatedHold = newPersonRelatedHold()
@@ -286,6 +296,7 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testReadOnlyPIDM() {
         def personRelatedHold = newPersonRelatedHold()
         personRelatedHold.releaseIndicator = true

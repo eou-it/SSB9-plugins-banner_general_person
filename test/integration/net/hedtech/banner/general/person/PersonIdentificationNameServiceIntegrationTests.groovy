@@ -3,6 +3,9 @@
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
+import org.junit.Before
+import org.junit.Test
+import org.junit.After
 
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.system.NameType
@@ -14,17 +17,20 @@ class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTes
     def personIdentificationNameService
 
 
-    protected void setUp() {
+	@Before
+	public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
     }
 
 
-    protected void tearDown() {
+	@After
+	public void tearDown() {
         super.tearDown()
     }
 
 
+	@Test
     void testCreatePersonIdentificationName() {
         def personIdentificationName = newPersonIdentificationName()
 
@@ -38,6 +44,7 @@ class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTes
      }
 
 
+	@Test
     void testUpdatePersonIdentificationName() {
         def personIdentificationName = newPersonIdentificationName()
         personIdentificationName.save(failOnError: true, flush: true)
@@ -56,6 +63,7 @@ class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTes
     }
 
 
+	@Test
     void testDeletePersonIdentificationName() {
         def personIdentificationName = newPersonIdentificationName()
         personIdentificationName.save(failOnError: true, flush: true)
@@ -71,11 +79,13 @@ class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTes
     }
 
 
+	@Test
     void testSystemGeneratedIdPrefix() {
         assertEquals('A', personIdentificationNameService.getSystemGeneratedIdPrefix())
     }
 
 
+	@Test
     void testGetPrefixDisplayIndForSelfService() {
         def updateSql = """update  gordmsk set gordmsk_display_ind = 'N' where  gordmsk_objs_code   = '**SSB_MASKING'
                And Gordmsk_Block_Name  = 'F_FORMAT_NAME'
@@ -87,6 +97,7 @@ class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTes
     }
 
 
+	@Test
     void testGetFormattedNameFL() {
         def fmt
         def pidm
