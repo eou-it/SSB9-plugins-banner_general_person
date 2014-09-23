@@ -1232,7 +1232,12 @@ class PersonCompositeService extends LdmService {
                 parsedNumber.put('countryPhone', parsedResult.getCountryCode())
             }
             else {
-                throw new ApplicationException("PersonCompositeService", "@@r1:phoneNumber.malformed:${phoneNumber}:BusinessLogicValidationException@@")
+                if( phoneNumber.length() < 12 ){
+                    parsedNumber.put('phoneNumber', phoneNumber)
+                }
+                else {
+                    throw new ApplicationException("PersonCompositeService", "@@r1:phoneNumber.malformed:${phoneNumber}:BusinessLogicValidationException@@")
+                }
             }
         }
         catch (Exception e) {
