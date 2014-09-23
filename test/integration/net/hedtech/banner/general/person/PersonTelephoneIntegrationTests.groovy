@@ -555,7 +555,7 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	def testFetchListActiveTelephoneByPidmAndTelephoneType() {
+	void testFetchListActiveTelephoneByPidmAndTelephoneType() {
 		def pidmList = [PersonUtility.getPerson("HOF00714").pidm, PersonUtility.getPerson("HOF00716").pidm]
 		def results = PersonTelephone.fetchListActiveTelephoneByPidmAndTelephoneType(pidmList, [TelephoneType.findByCode("MA"), TelephoneType.findByCode("PR")])
 
@@ -654,3 +654,4 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
         i_success_source = AddressSource.findByCode("BRD")
     }
 }
+

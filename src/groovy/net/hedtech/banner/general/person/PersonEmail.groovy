@@ -33,6 +33,13 @@ query = """SELECT a.emailAddress
     AND a.statusIndicator = :statusIndicator
     AND a.preferredIndicator = :preferredIndicator
     AND a.displayWebIndicator = :displayWebIndicator"""),
+@NamedQuery(name = "PersonEmail.fetchByPidmAndEmailTypeAndStatusAndWebDisplayAndPreferredIndicator",
+        query = """FROM PersonEmail a
+    WHERE a.pidm = :pidm
+    AND a.emailType.code = :emailType
+    AND a.statusIndicator = :statusIndicator
+    AND a.preferredIndicator = :preferredIndicator
+    AND a.displayWebIndicator = :displayWebIndicator"""),
 @NamedQuery(name = "PersonEmail.fetchListByPidmAndStatusAndWebDisplay",
 query = """FROM PersonEmail a
     WHERE a.pidm IN :pidm
@@ -41,7 +48,12 @@ query = """FROM PersonEmail a
 @NamedQuery(name = "PersonEmail.fetchByEmailAddressAndActiveStatus",
 query = """FROM PersonEmail a
     WHERE upper(a.emailAddress) = upper(:emailAddress)
-    AND a.statusIndicator = :statusIndicator""")
+    AND a.statusIndicator = :statusIndicator"""),
+@NamedQuery(name = "PersonEmail.fetchByPidmAndStatusAndWebDisplay",
+        query = """FROM PersonEmail a
+    WHERE a.pidm = :pidm
+    AND a.statusIndicator = :statusIndicator
+    AND a.displayWebIndicator = :displayWebIndicator""")
 ])
 class PersonEmail implements Serializable {
     static def log = Logger.getLogger('net.hedtech.banner.general.person.PersonEmail')
@@ -260,6 +272,18 @@ class PersonEmail implements Serializable {
     }
 
 
+    public static PersonEmail fetchByPidmAndEmailTypeAndStatusAndWebDisplayAndPreferredIndicator(Integer pidm, String emailType, String statusIndicator,
+                                                                              String displayWebIndicator, String preferredIndicator) {
+
+        def email = PersonEmail.withSession {session ->
+            session.getNamedQuery('PersonEmail.fetchByPidmAndEmailTypeAndStatusAndWebDisplayAndPreferredIndicator').setInteger('pidm', pidm).setString('emailType',emailType).setString('statusIndicator', statusIndicator).setString('displayWebIndicator', displayWebIndicator).setString('preferredIndicator', preferredIndicator).list()
+        }
+        log.debug "Executing fetchByPidmAndEmailTypeAndStatusAndWebDisplayAndPreferredIndicator  with pidm = ${pidm} and status = ${statusIndicator} and displayWebIndicator = ${displayWebIndicator} and preferredIndicator = {$preferredIndicator}"
+        log.debug "Fetched number of emails ${email.size()}"
+        return email[0]
+    }
+
+
     public static List fetchListByPidmAndStatusAndWebDisplay(List pidm, String statusIndicator, String displayWebIndicator) {
         def emails = PersonEmail.withSession {session ->
             session.getNamedQuery('PersonEmail.fetchListByPidmAndStatusAndWebDisplay').setParameterList('pidm', pidm).setString('statusIndicator', statusIndicator).setString('displayWebIndicator', displayWebIndicator).list()
@@ -270,6 +294,7 @@ class PersonEmail implements Serializable {
         return emails
     }
 
+
     public static PersonEmail fetchByEmailAddressAndActiveStatus( String address ) {
         PersonEmail personEmail = PersonEmail.withSession { session ->
             session.getNamedQuery( 'PersonEmail.fetchByEmailAddressAndActiveStatus' ).setString( 'emailAddress',
@@ -277,4 +302,17 @@ class PersonEmail implements Serializable {
         }
         return personEmail
     }
+
+
+    public static List fetchByPidmAndStatusAndWebDisplay(Integer pidm, String statusIndicator,
+                                                                              String displayWebIndicator) {
+
+        def emails = PersonEmail.withSession {session ->
+            session.getNamedQuery('PersonEmail.fetchByPidmAndStatusAndWebDisplay').setInteger('pidm', pidm).setString('statusIndicator', statusIndicator).setString('displayWebIndicator', displayWebIndicator).list()
+        }
+        log.debug "Executing fetchByPidmAndStatusAndWebDisplayAndPreferredIndiator  with pidm = ${pidm} and status = ${statusIndicator} and displayWebIndicator = ${displayWebIndicator}"
+        log.debug "Fetched number of emails ${emails.size()}"
+        return emails
+    }
+
 }

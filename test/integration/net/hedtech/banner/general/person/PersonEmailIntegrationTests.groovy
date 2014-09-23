@@ -276,7 +276,21 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-    def testFetchByPidmAndStatusAndWebDisplayAndPreferredIndicator( ) {
+    void testFetchByPidmAndEmailTypeAndStatusAndWebDisplayAndPreferredIndicator() {
+        def res = PersonEmail.fetchByPidmAndEmailTypeAndStatusAndWebDisplayAndPreferredIndicator(PersonUtility.getPerson("966049236").pidm, 'PERS','A', 'Y', 'Y')
+        assertEquals res.version, 0
+        assertEquals res.pidm, 33784
+        assertEquals res.emailAddress, "einstein2be@verizon.net"
+        assertEquals res.statusIndicator, "A"
+        assertEquals res.preferredIndicator, true
+        assertEquals res.commentData, null
+        assertEquals res.displayWebIndicator, true
+        assertEquals res.dataOrigin, "Banner"
+
+    }
+
+
+    void testFetchByPidmAndStatusAndWebDisplayAndPreferredIndicator( ) {
         def results = PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator( PersonUtility.getPerson( "966049236" ).pidm, 'A', 'Y', 'Y' )
 
         assertTrue results.size() == 1
@@ -296,7 +310,7 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-    def testFetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicator( ) {
+    void testFetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicator( ) {
         def results = PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator( PersonUtility.getPerson( "966049236" ).pidm, 'A', 'Y', 'Y' )
 
         assertTrue results.size() == 1
@@ -310,7 +324,7 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-    def testFetchFirstByPidmAndStatus( ) {
+    void testFetchFirstByPidmAndStatus( ) {
         def emails = PersonEmail.findAllByPidm( PersonUtility.getPerson( "HOS00003" ).pidm )
         assertEquals 2, emails.size()
         emails.each {
@@ -324,7 +338,7 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-    def testFetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicatorWhenNoneExists( ) {
+    void testFetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicatorWhenNoneExists( ) {
         def pidm = PersonUtility.getPerson( "HOSL0003" ).pidm
         assertNotNull pidm
         def results = PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator( PersonUtility.getPerson( "HOSL0003" ).pidm, 'A', 'Y', 'Y' )
@@ -338,7 +352,7 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-    def testFetchListByPidmAndStatusAndWebDisplay( ) {
+    void testFetchListByPidmAndStatusAndWebDisplay( ) {
         def pidmList = [PersonUtility.getPerson( "966049236" ).pidm, PersonUtility.getPerson( "HOS00003" ).pidm]
         def results = PersonEmail.fetchListByPidmAndStatusAndWebDisplay( pidmList, 'A', 'Y' )
 
@@ -347,33 +361,36 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-    def testFetchByEmailAddressAndActiveStatus_ActivePreferred( ) {
+    void testFetchByEmailAddressAndActiveStatus_ActivePreferred( ) {
         PersonEmail result = PersonEmail.fetchByEmailAddressAndActiveStatus( "Ben29322@Ellucian.edu" )
         assertEquals( 29322, result.pidm )
     }
 
 
-    def testFetchByEmailAddressCaseInsensitive( ) {
+    void testFetchByEmailAddressCaseInsensitive( ) {
         PersonEmail result = PersonEmail.fetchByEmailAddressAndActiveStatus( "beN29322@Ellucian.edu" )
         assertEquals( 29322, result.pidm )
     }
 
 
-    def testFetchByEmailAddressAndActiveStatus_ActiveNotPreferred( ) {
+    void testFetchByEmailAddressAndActiveStatus_ActiveNotPreferred( ) {
         def result = PersonEmail.fetchByEmailAddressAndActiveStatus( "Neil29311@Ellucian.edu" )
         assertTrue result instanceof PersonEmail
         assertEquals( 29311, result.pidm )
     }
 
 
-    def testFetchByEmailAddressAndActiveStatus_NoSuchAddress( ) {
+    void testFetchByEmailAddressAndActiveStatus_NoSuchAddress( ) {
         def result = PersonEmail.fetchByEmailAddressAndActiveStatus( "jksdhfiwjencvwe@Ellucian.edu" )
         assertNull(result)
     }
 
 
-    def testFetchByEmailAddressAndActiveStatus_Inactive( ) {
+    void testFetchByEmailAddressAndActiveStatus_Inactive( ) {
         def result = PersonEmail.fetchByEmailAddressAndActiveStatus( "Stuart29321@Ellucian.edu" )
         assertNull(result)
     }
+
+
 }
+
