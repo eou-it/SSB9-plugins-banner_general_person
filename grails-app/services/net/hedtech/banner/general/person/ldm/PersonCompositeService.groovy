@@ -905,7 +905,9 @@ class PersonCompositeService extends LdmService {
                     }
                 }
                 //Translate enumerations and defaults
-                personBase.sex = person?.sex == 'Male' ? 'M' : (person?.sex == 'Female' ? 'F' : (person?.sex == 'Unknown' ? 'N' : null))
+                if(person.containsKey('sex')){
+                    personBase.sex = person?.sex == 'Male' ? 'M' : (person?.sex == 'Female' ? 'F' : (person?.sex == 'Unknown' ? 'N' : null))
+                }
                 if(person.containsKey('maritalStatusDetail')){
                     def maritalStatus
                     try {
