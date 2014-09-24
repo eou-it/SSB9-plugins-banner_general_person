@@ -232,13 +232,13 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
         newAddressList.each { currAddress ->
             if (currAddress.addressType == 'Mailing') {
                 assertEquals 'Southeastern', currAddress.city
-                assertEquals 'Pennsylvania', currAddress.state
+                assertEquals 'CA', currAddress.state
                 assertEquals '5890 139th Ave', currAddress.streetLine1
                 assertEquals '19398', currAddress.zip
             }
             if (currAddress.addressType == 'Home') {
                 assertEquals 'Pavo', currAddress.city
-                assertEquals 'Georgia', currAddress.state
+                assertEquals 'GA', currAddress.state
                 assertEquals '123 Main Line', currAddress.streetLine1
                 assertEquals '31778', currAddress.zip
             }
@@ -256,13 +256,13 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
         modifiedAddressList.each { currAddress ->
             if (currAddress.addressType == 'Home') {
                 assertEquals 'Southeastern', currAddress.city
-                assertEquals 'Pennsylvania', currAddress.state
+                assertEquals 'CA', currAddress.state
                 assertEquals '5890 139th Ave', currAddress.streetLine1
                 assertEquals '19398', currAddress.zip
             }
             if (currAddress.addressType == 'Mailing') {
                 assertEquals 'Pavo', currAddress.city
-                assertEquals 'Georgia', currAddress.state
+                assertEquals 'GA', currAddress.state
                 assertEquals '123 Main Line', currAddress.streetLine1
                 assertEquals '31778', currAddress.zip
             }
@@ -280,13 +280,13 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
         unchangedAddressList.each { currAddress ->
             if (currAddress.addressType == 'Home') {
                 assertEquals 'Southeastern', currAddress.city
-                assertEquals 'Pennsylvania', currAddress.state
+                assertEquals 'CA', currAddress.state
                 assertEquals '5890 139th Ave', currAddress.streetLine1
                 assertEquals '19398', currAddress.zip
             }
             if (currAddress.addressType == 'Mailing') {
                 assertEquals 'Pavo', currAddress.city
-                assertEquals 'Georgia', currAddress.state
+                assertEquals 'GA', currAddress.state
                 assertEquals '123 Main Line', currAddress.streetLine1
                 assertEquals '31778', currAddress.zip
             }
@@ -614,7 +614,7 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
                       names      : [[lastName: personIdentificationNameCurrent.lastName, middleName: personIdentificationNameCurrent.middleName, firstName: personIdentificationNameCurrent.firstName, nameType: 'Primary', namePrefix: 'CCCCC', nameSuffix: 'CCCCC', preferenceFirstName: 'CCCCC']],
                       credentials: [[credentialType: 'Social Security Number', credentialId: 'TTTTT']],
                       sex        : 'Male',
-                      addresses  : [[addressType: 'Mailing', city: 'Southeastern', state: 'Pennsylvania', streetLine1: '5890 139th Ave', zip: '19398'], [addressType: 'Home', city: 'Pavo', state: 'Georgia', streetLine1: '123 Main Line', zip: '31778']]
+                      addresses  : [[addressType: 'Mailing', city: 'Southeastern', state: 'CA', streetLine1: '5890 139th Ave', zip: '19398'], [addressType: 'Home', city: 'Pavo', state: 'GA', streetLine1: '123 Main Line', zip: '31778']]
         ]
         return params
     }
@@ -625,7 +625,7 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
                       names      : [[lastName: personIdentificationNameCurrent.lastName, middleName: personIdentificationNameCurrent.middleName, firstName: personIdentificationNameCurrent.firstName, nameType: 'Primary', namePrefix: 'CCCCC', nameSuffix: 'CCCCC', preferenceFirstName: 'CCCCC']],
                       credentials: [[credentialType: 'Social Security Number', credentialId: 'TTTTT']],
                       sex        : 'Male',
-                      addresses  : [[addressType: 'Mailing', city: 'Pavo', state: 'Georgia', streetLine1: '123 Main Line', zip: '31778'], [addressType: 'Home', city: 'Southeastern', state: 'Pennsylvania', streetLine1: '5890 139th Ave', zip: '19398']]
+                      addresses  : [[addressType: 'Mailing', city: 'Pavo', state: 'GA', streetLine1: '123 Main Line', zip: '31778'], [addressType: 'Home', city: 'Southeastern', state: 'CA', streetLine1: '5890 139th Ave', zip: '19398']]
         ]
         return params
     }
