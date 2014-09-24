@@ -3,6 +3,7 @@
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.After
 
@@ -74,7 +75,8 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
      * Tests the id search.
      *
      */
-	@Test
+	@Ignore
+    //HRU- 5512
     void testAdvancedSearchByCurrentId() {
         def institutionalDescription  = InstitutionalDescription.list()[0]
         assertNotNull institutionalDescription

@@ -4,6 +4,7 @@ Copyright 2012-2014 Ellucian Company L.P. and its affiliates.
 
 package net.hedtech.banner.general.person
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.After
 
@@ -130,7 +131,7 @@ class AdditionalIDServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+	@Ignore
     void testAdditionalIDDelete() {
         def additionalID = newValidForCreateAdditionalID()
         def map = [domainModel: additionalID]
