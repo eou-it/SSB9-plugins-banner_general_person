@@ -13,6 +13,8 @@ import net.hedtech.banner.general.overall.ldm.GlobalUniqueIdentifierService
 import net.hedtech.banner.general.person.PersonAddress
 import net.hedtech.banner.general.person.PersonBasicPersonBase
 import net.hedtech.banner.general.person.PersonEmail
+import net.hedtech.banner.general.person.PersonIdentificationName
+import net.hedtech.banner.general.person.PersonIdentificationNameAlternate
 import net.hedtech.banner.general.person.PersonIdentificationNameCurrent
 import net.hedtech.banner.general.person.PersonRace
 import net.hedtech.banner.general.person.PersonTelephone
@@ -49,6 +51,7 @@ import java.text.ParseException
 class PersonCompositeService extends LdmService {
 
     def personIdentificationNameCurrentService
+    def personIdentificationNameAlternateService
     def personBasicPersonBaseService
     def personAddressService
     def personTelephoneService
@@ -755,7 +758,6 @@ class PersonCompositeService extends LdmService {
         persons
     }
 
-    // @Transactional(readOnly = false, propagation = Propagation.SUPPORTS)
     /**
      * Updates the Person Information like PersonIdentificationNameCurrent, PersonBasicPersonBase, Address
      * Telephones and Emails
@@ -793,13 +795,28 @@ class PersonCompositeService extends LdmService {
         }
         //update PersonIdentificationNameCurrent
         PersonIdentificationNameCurrent newPersonIdentificationName
+        PersonIdentificationNameCurrent oldPersonIdentificationName = new PersonIdentificationNameCurrent(personIdentification.properties)
         if(primaryName) {
             personIdentification.firstName = primaryName.firstName
             personIdentification.lastName = primaryName.lastName
             personIdentification.middleName = primaryName.middleName
             personIdentification.surnamePrefix = primaryName.surnamePrefix
-            newPersonIdentificationName = personIdentificationNameCurrentService.update(personIdentification)
-
+            if( !personIdentification.equals(oldPersonIdentificationName) ) {
+                PersonIdentificationNameAlternate.findAllByPidm(oldPersonIdentificationName.pidm).each { oldRecord ->
+                    if( oldPersonIdentificationName.firstName == oldRecord.firstName &&
+                        oldPersonIdentificationName.lastName == oldRecord.lastName &&
+                        oldPersonIdentificationName.middleName == oldRecord.middleName &&
+                        oldPersonIdentificationName.surnamePrefix == oldRecord.surnamePrefix &&
+                        oldPersonIdentificationName.bannerId == oldRecord.bannerId &&
+                        oldPersonIdentificationName.nameType == oldRecord.nameType &&
+                        oldRecord.changeIndicator == 'N'
+                    ) {
+                        //Can't get around this, Hibernate updates before it deletes, triggering table-api errors.
+                        PersonIdentificationNameAlternate.executeUpdate("delete from PersonIdentificationNameAlternate where id = :id", [id:oldRecord.id])
+                    }
+                }
+                newPersonIdentificationName = personIdentificationNameCurrentService.update(personIdentification)
+            }
         }
         content?.credentials?.each { it ->
             if (it.credentialType == 'Banner ID') {
