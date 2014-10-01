@@ -456,6 +456,7 @@ class PersonCompositeService extends LdmService {
                     }
                     activeAddress.put('pidm', pidm)
                     activeAddress.put('dataOrigin', metadata?.dataOrigin)
+                    activeAddress.put('fromDate',  new Date())
                     validateAddressRequiredFields(activeAddress)
                     addresses << personAddressService.create(activeAddress)
                 }
