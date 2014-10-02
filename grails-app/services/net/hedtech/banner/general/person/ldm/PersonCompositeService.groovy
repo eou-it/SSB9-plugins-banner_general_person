@@ -64,11 +64,11 @@ class PersonCompositeService extends LdmService {
     def userRoleCompositeService
 
     def static ldmName = 'persons'
-    static final String PERSON_ADDRESS_TYPE = "person.addresses.addressType"
-    static final String PERSON_PHONE_TYPE = "person.phones.phoneType"
-    static final String PERSON_EMAIL_TYPE = "person.emails.emailType"
+    static final String PERSON_ADDRESS_TYPE = "PERSON.ADDRESSES.ADDRESSTYPE"
+    static final String PERSON_PHONE_TYPE = "PERSON.PHONES.PHONETYPE"
+    static final String PERSON_EMAIL_TYPE = "PERSON.EMAILS.EMAILTYPE"
     static final String PROCESS_CODE = "LDM"
-    static final String PERSON_MATCH_RULE = "persons.matchRule"
+    static final String PERSON_MATCH_RULE = "PERSON.MATCHRULE"
 
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
