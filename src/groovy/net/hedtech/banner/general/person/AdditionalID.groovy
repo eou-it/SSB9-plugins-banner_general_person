@@ -10,6 +10,8 @@ import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
+import javax.persistence.NamedQueries
+import javax.persistence.NamedQuery
 import javax.persistence.Table
 import javax.persistence.Version
 import javax.persistence.GenerationType
@@ -26,6 +28,13 @@ import net.hedtech.banner.general.system.AdditionalIdentificationType
 /**
  * This Table contains one to many additional Ids per PIDM.
  */
+@NamedQueries(value = [
+        @NamedQuery(name = "AdditionalId.fetchAllByPidmInListAndAdditionalIdentificationTypeInList",
+        query = """ FROM AdditionalID a
+                            WHERE  a.pidm IN :pidms
+                            AND a.additionalIdentificationType.code IN :idTypes
+                """)
+])
 @Entity
 @Table(name = "GV_GORADID")
 class AdditionalID implements Serializable {
@@ -161,5 +170,14 @@ class AdditionalID implements Serializable {
     def private static finderByAll = {
         def query = """FROM AdditionalID a WHERE a.pidm = :pidm"""
         return new DynamicFinder(AdditionalID.class, query, "a")
+    }
+
+    static List<AdditionalID> fetchByPidmInListAndAdditionalIdentificationTypeInList(List<Integer> pidms, List<String> idTypes)  {
+        if( pidms.isEmpty() || idTypes.isEmpty() ) { return [] }
+        AdditionalID.withSession { session ->
+            session.getNamedQuery('AdditionalId.fetchAllByPidmInListAndAdditionalIdentificationTypeInList')
+                    .setParameterList('pidms', pidms)
+                    .setParameterList('idTypes', idTypes).list()
+        }
     }
 }

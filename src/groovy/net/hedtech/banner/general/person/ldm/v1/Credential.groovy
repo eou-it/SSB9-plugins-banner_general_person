@@ -12,6 +12,8 @@ class Credential {
     Date effectiveStartDate
     Date effectiveEndDate
 
+    public static final additionalIdMap = ['ELV8':'Elevate ID']
+
     def Credential( String credentialType, String credentialId,
                     Date effectiveStartDate, Date effectiveEndDate) {
         this.credentialType = credentialType

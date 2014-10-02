@@ -10,6 +10,7 @@ import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.exceptions.NotFoundException
 import net.hedtech.banner.general.overall.IntegrationConfiguration
 import net.hedtech.banner.general.overall.ldm.GlobalUniqueIdentifierService
+import net.hedtech.banner.general.person.AdditionalID
 import net.hedtech.banner.general.person.PersonAddress
 import net.hedtech.banner.general.person.PersonBasicPersonBase
 import net.hedtech.banner.general.person.PersonEmail
@@ -26,6 +27,7 @@ import net.hedtech.banner.general.person.ldm.v1.Email
 import net.hedtech.banner.general.person.ldm.v1.Name
 import net.hedtech.banner.general.person.ldm.v1.Person
 import net.hedtech.banner.general.person.ldm.v1.Phone
+import net.hedtech.banner.general.system.AdditionalIdentificationType
 import net.hedtech.banner.general.system.AddressType
 import net.hedtech.banner.general.system.County
 import net.hedtech.banner.general.system.EmailType
@@ -62,6 +64,7 @@ class PersonCompositeService extends LdmService {
     def raceCompositeService
     def personRaceService
     def userRoleCompositeService
+    def additionalIDService
 
     def static ldmName = 'persons'
     static final String PERSON_ADDRESS_TYPE = "PERSON.ADDRESSES.ADDRESSTYPE"
@@ -78,56 +81,56 @@ class PersonCompositeService extends LdmService {
 
         def sortAndPagingParams = [:]
         def allowedSortFields = ["firstName", "lastName"]
-        if( params.containsKey('max') ) sortAndPagingParams.put('max',params.max)
-        if( params.containsKey('offset') ) sortAndPagingParams.put('offset',params.offset)
-        if( params.containsKey('sort') ) sortAndPagingParams.put( 'sort', params.sort )
-        if( params.containsKey('order') ) sortAndPagingParams.put( 'order', params.order )
+        if (params.containsKey('max')) sortAndPagingParams.put('max', params.max)
+        if (params.containsKey('offset')) sortAndPagingParams.put('offset', params.offset)
+        if (params.containsKey('sort')) sortAndPagingParams.put('sort', params.sort)
+        if (params.containsKey('order')) sortAndPagingParams.put('order', params.order)
         RestfulApiValidationUtility.correctMaxAndOffset(sortAndPagingParams, 500, 0)
 
         if (params.sort) {
             RestfulApiValidationUtility.validateSortField(sortAndPagingParams.sort, allowedSortFields)
         } else {
-            sortAndPagingParams.put( 'sort', allowedSortFields[1] )
+            sortAndPagingParams.put('sort', allowedSortFields[1])
         }
 
         if (sortAndPagingParams.order) {
             RestfulApiValidationUtility.validateSortOrder(sortAndPagingParams.order)
         } else {
-            sortAndPagingParams.put( 'order', "asc" )
+            sortAndPagingParams.put('order', "asc")
         }
 
         // Check if it is qapi request, if so do matching
-        if (RestfulApiValidationUtility.isQApiRequest( params )) {
+        if (RestfulApiValidationUtility.isQApiRequest(params)) {
             log.info "Person Duplicate service:"
             log.debug "Request parameters: ${params}"
 
-            def primaryName = params.names.find {primaryNameType ->
+            def primaryName = params.names.find { primaryNameType ->
                 primaryNameType.nameType == "Primary"
             }
 
             if (primaryName?.firstName && primaryName?.lastName) {
-                pidms = searchPerson( params )
+                pidms = searchPerson(params)
             } else {
-                throw new ApplicationException( "Person", "@@r1:missing.first.last.name:BusinessLogicValidationException@@" )
+                throw new ApplicationException("Person", "@@r1:missing.first.last.name:BusinessLogicValidationException@@")
             }
         } else {
-            if( params.role ) {
+            if (params.role) {
                 def roles = userRoleCompositeService.fetchAllByRole(params.role)
                 roles.each { key, value ->
                     pidms << key
                 }
             }
         }
-        if( pidms.size() > 1000 ) {
+        if (pidms.size() > 1000) {
             throw new ApplicationException("PersonCompositeService",
                     "@@r1:max.results.exceeded:BusinessLogicValidationException@@")
         }
         List<PersonIdentificationNameCurrent> personIdentificationList =
                 PersonIdentificationNameCurrent.findAllByPidmInList(pidms, sortAndPagingParams)
-        def persons = buildLdmPersonObjects( personIdentificationList )
+        def persons = buildLdmPersonObjects(personIdentificationList)
 
         try {  // Avoid restful-api plugin dependencies.
-            resultList = this.class.classLoader.loadClass( 'net.hedtech.restfulapi.PagedResultArrayList' ).newInstance( persons.values(), pidms?.size() )
+            resultList = this.class.classLoader.loadClass('net.hedtech.restfulapi.PagedResultArrayList').newInstance(persons.values(), pidms?.size())
         }
         catch (ClassNotFoundException e) {
             resultList = persons.values()
@@ -136,49 +139,49 @@ class PersonCompositeService extends LdmService {
     }
 
 
-    private List<Integer> searchPerson( Map params ) {
+    private List<Integer> searchPerson(Map params) {
 
-        def ctx = ServletContextHolder.servletContext.getAttribute( GrailsApplicationAttributes.APPLICATION_CONTEXT )
+        def ctx = ServletContextHolder.servletContext.getAttribute(GrailsApplicationAttributes.APPLICATION_CONTEXT)
         def sessionFactory = ctx.sessionFactory
 
         List<Integer> personList = []
-        IntegrationConfiguration personMatchRule = IntegrationConfiguration.findByProcessCodeAndSettingName( PROCESS_CODE, PERSON_MATCH_RULE )
+        IntegrationConfiguration personMatchRule = IntegrationConfiguration.findByProcessCodeAndSettingName(PROCESS_CODE, PERSON_MATCH_RULE)
 
-        def primaryName = params.names.find {primaryNameType ->
+        def primaryName = params.names.find { primaryNameType ->
             primaryNameType.nameType == "Primary"
         }
-        def ssnCredentials = params.credentials.find {credential ->
+        def ssnCredentials = params.credentials.find { credential ->
             credential.credentialType == "Social Security Number"
         }
-        def bannerIdCredentials = params.credentials.find {credential ->
+        def bannerIdCredentials = params.credentials.find { credential ->
             credential.credentialType == "Banner ID"
         }
-        def emailInstitution = params.emails.find {email ->
+        def emailInstitution = params.emails.find { email ->
             email.emailType == "Institution"
         }
         def emailInstitutionRuleValue
-        if(emailInstitution?.emailType){
+        if (emailInstitution?.emailType) {
             emailInstitutionRuleValue = IntegrationConfiguration.fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_EMAIL_TYPE, emailInstitution['emailType'])[0]?.value
         }
 
-        def emailPersonal = params.emails.find {email ->
+        def emailPersonal = params.emails.find { email ->
             email.emailType == "Personal"
         }
         def emailPersonalRuleValue
-        if(emailPersonal?.emailType){
+        if (emailPersonal?.emailType) {
             emailPersonalRuleValue = IntegrationConfiguration.fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_EMAIL_TYPE, emailPersonal['emailType'])[0]?.value
         }
 
-        def emailWork = params.emails.find {email ->
+        def emailWork = params.emails.find { email ->
             email.emailType == "Work"
         }
         def emailWorkRuleValue
-        if(emailWork?.emailType){
+        if (emailWork?.emailType) {
             emailWorkRuleValue = IntegrationConfiguration.fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_EMAIL_TYPE, emailWork['emailType'])[0]?.value
         }
 
         String dob = null
-        if(params?.dateOfBirth){
+        if (params?.dateOfBirth) {
             Date date = LdmService.convertString2Date(params?.dateOfBirth)
             dob = date.format("dd-MMM-yyyy")
         }
@@ -187,33 +190,33 @@ class PersonCompositeService extends LdmService {
         try {
             def connection = sessionFactory.currentSession.connection()
             String matchPersonQuery = "{ call spkcmth.p_common_mtch(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) }"
-            sqlCall = connection.prepareCall( matchPersonQuery )
+            sqlCall = connection.prepareCall(matchPersonQuery)
 
-            sqlCall.setString( 1, personMatchRule?.value )
-            sqlCall.setString( 2, primaryName?.firstName )
-            sqlCall.setString( 3, primaryName?.lastName )
-            sqlCall.setString( 4, primaryName?.middleName )
-            sqlCall.setString( 5, dob )
-            sqlCall.setString( 6, params?.gender )
-            sqlCall.setString( 7, ssnCredentials?.credentialType )
-            sqlCall.setString( 8, ssnCredentials?.credentialId )
-            sqlCall.setString( 9, bannerIdCredentials?.credentialType?: null )
-            sqlCall.setString( 10, bannerIdCredentials?.credentialId?: null )
-            sqlCall.setString( 11, emailInstitutionRuleValue?: null )
-            sqlCall.setString( 12, emailInstitution?.emailAddress )
-            sqlCall.setString( 13, emailPersonalRuleValue?: null )
-            sqlCall.setString( 14, emailPersonal?.emailAddress )
-            sqlCall.setString( 15, emailWorkRuleValue?: null )
-            sqlCall.setString( 16, emailWork?.emailAddress )
+            sqlCall.setString(1, personMatchRule?.value)
+            sqlCall.setString(2, primaryName?.firstName)
+            sqlCall.setString(3, primaryName?.lastName)
+            sqlCall.setString(4, primaryName?.middleName)
+            sqlCall.setString(5, dob)
+            sqlCall.setString(6, params?.gender)
+            sqlCall.setString(7, ssnCredentials?.credentialType)
+            sqlCall.setString(8, ssnCredentials?.credentialId)
+            sqlCall.setString(9, bannerIdCredentials?.credentialType ?: null)
+            sqlCall.setString(10, bannerIdCredentials?.credentialId ?: null)
+            sqlCall.setString(11, emailInstitutionRuleValue ?: null)
+            sqlCall.setString(12, emailInstitution?.emailAddress)
+            sqlCall.setString(13, emailPersonalRuleValue ?: null)
+            sqlCall.setString(14, emailPersonal?.emailAddress)
+            sqlCall.setString(15, emailWorkRuleValue ?: null)
+            sqlCall.setString(16, emailWork?.emailAddress)
 
-            sqlCall.registerOutParameter( 17, java.sql.Types.VARCHAR )
+            sqlCall.registerOutParameter(17, java.sql.Types.VARCHAR)
             sqlCall.executeQuery()
 
-            String errorCode = sqlCall.getString( 17 )
+            String errorCode = sqlCall.getString(17)
             if (!errorCode) {
                 personList = getCommonMatchingResults()
             } else {
-                throw new ApplicationException( this.class.name, errorCode )
+                throw new ApplicationException(this.class.name, errorCode)
             }
         }
         catch (SQLException sqlEx) {
@@ -236,7 +239,7 @@ class PersonCompositeService extends LdmService {
     }
 
 
-    private def getCommonMatchingResults(){
+    private def getCommonMatchingResults() {
         List<Integer> personPidmList = []
         def ctx = ServletContextHolder.servletContext.getAttribute(GrailsApplicationAttributes.APPLICATION_CONTEXT)
         def log = Logger.getLogger(this.getClass())
@@ -270,7 +273,7 @@ class PersonCompositeService extends LdmService {
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     def get(id) {
         def entity = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(ldmName, id)
-        if( !entity ) {
+        if (!entity) {
             throw new ApplicationException(GlobalUniqueIdentifierService.API, new NotFoundException(id: Person.class.simpleName))
         }
         List<PersonIdentificationNameCurrent> personIdentificationList =
@@ -280,77 +283,83 @@ class PersonCompositeService extends LdmService {
     }
 
     def create(Map person) {
-        Map<Integer,Person> persons = [:]
+        Map<Integer, Person> persons = [:]
         def newPersonIdentification
-        if( person.names instanceof List) {
+        if (person.names instanceof List) {
             person?.names?.each { it ->
-                if( it instanceof Map ) {
+                if (it instanceof Map) {
                     if (it.nameType == 'Primary') {
                         newPersonIdentification = it
                     }
                 }
             }
         }
-        newPersonIdentification.put('bannerId','GENERATED')
+        Map metadata = person.metadata
+        newPersonIdentification.put('bannerId', 'GENERATED')
         newPersonIdentification.put('entityIndicator', 'P')
         newPersonIdentification.put('changeIndicator', null)
-        newPersonIdentification.put('dataOrigin', person?.metadata?.dataOrigin)
+        newPersonIdentification.put('dataOrigin', metadata?.dataOrigin)
         newPersonIdentification.remove('nameType') // ID won't generate if this is set.
         //Create the new PersonIdentification record
         PersonIdentificationNameCurrent newPersonIdentificationName =
                 personIdentificationNameCurrentService.create(newPersonIdentification)
         //Fix the GUID if provided as DB will assign one
-        if( person.guid ) {
+        if (person.guid) {
             updateGuidValue(newPersonIdentificationName.id, person.guid)
 
-        }
-        else {
+        } else {
             def entity = GlobalUniqueIdentifier.findByLdmNameAndDomainId(ldmName, newPersonIdentificationName.id)
             person.put('guid', entity?.guid)
         }
 
         //Copy ssn attribute from credential to person map.
-        if( person?.credentials instanceof List) {
+        def additionalIds = []
+        if (person?.credentials instanceof List) {
             person?.credentials?.each { it ->
-                if( it instanceof Map ) {
+                if (it instanceof Map) {
                     if (it.credentialType == 'Social Security Number') {
-                        if( it?.credentialId.length() > 9) {throw new ApplicationException("PersonCompositeService",
-                                "@@r1:credentialId.invalid:BusinessLogicValidationException@@")}
+                        if (it?.credentialId.length() > 9) {
+                            throw new ApplicationException("PersonCompositeService",
+                                    "@@r1:credentialId.invalid:BusinessLogicValidationException@@")
+                        }
                         person.put('ssn', it?.credentialId)
                     } else if (it.credentialType == 'Social Insurance Number') {
-                        if( it?.credentialId.length() > 9) {throw new ApplicationException("PersonCompositeService",
-                                "@@r1:credentialId.invalid:BusinessLogicValidationException@@")}
+                        if (it?.credentialId.length() > 9) {
+                            throw new ApplicationException("PersonCompositeService",
+                                    "@@r1:credentialId.invalid:BusinessLogicValidationException@@")
+                        }
                         person.put('ssn', it?.credentialId)
+                    } else if( Credential.additionalIdMap.containsValue(it.credentialType) ) {
+                        additionalIds << createOrUpdateAdditionalId(newPersonIdentificationName, it, metadata)
                     }
                 }
             }
         }
         //Copy personBase attributes into person map from Primary names object.
-        person.put('dataOrigin', person?.metadata?.dataOrigin)
+        person.put('dataOrigin', metadata?.dataOrigin)
         person.put('namePrefix', newPersonIdentification.get('namePrefix'))
         person.put('nameSuffix', newPersonIdentification.get('nameSuffix'))
         person.put('preferenceFirstName', newPersonIdentification.get('preferenceFirstName'))
         //Translate enumerations and defaults
-        person.put('sex', person?.sex == 'Male' ? 'M':(person?.sex == 'Female' ? 'F' :(person?.sex == 'Unknown' ? 'N' : null)))
+        person.put('sex', person?.sex == 'Male' ? 'M': (person?.sex == 'Female' ? 'F' : (person?.sex == 'Unknown' ? 'N' : null)))
         def maritalStatus
         try {
             maritalStatus = person.maritalStatusDetail instanceof Map && person.maritalStatusDetail?.guid ? maritalStatusCompositeService.get(person.maritalStatusDetail?.guid) : null
-        }catch (ApplicationException e) {
-                throw new ApplicationException("PersonCompositeService", "@@r1:maritalStatus.invalid:BusinessLogicValidationException@@")
+        } catch (ApplicationException e) {
+            throw new ApplicationException("PersonCompositeService", "@@r1:maritalStatus.invalid:BusinessLogicValidationException@@")
         }
         person.put('maritalStatus', maritalStatus ? MaritalStatus.findByCode(maritalStatus?.code) : null)
         def ethnicity
         try {
-            if( person.ethnicityDetail instanceof Map ) {
+            if (person.ethnicityDetail instanceof Map) {
                 ethnicity = person.ethnicityDetail?.guid ? ethnicityCompositeService.get(person.ethnicityDetail?.guid) : null
             }
         }
         catch (ApplicationException e) {
-            if( e.wrappedException instanceof NotFoundException ) {
+            if (e.wrappedException instanceof NotFoundException) {
                 throw new ApplicationException("PersonCompositeService", "@@r1:ethnicity.invalid:BusinessLogicValidationException@@")
                 ethnicity = null
-            }
-            else {
+            } else {
                 throw e
             }
         }
@@ -370,34 +379,35 @@ class PersonCompositeService extends LdmService {
         //Store the credential we already have
         currentRecord.credentials = []
         currentRecord.credentials << new Credential("Banner ID", newPersonIdentificationName.bannerId, null, null)
-        if( newPersonBase.ssn ) {
+        if (newPersonBase.ssn) {
             currentRecord.credentials << new Credential("Social Security Number",
                     newPersonBase.ssn,
                     null,
                     null)
         }
         persons.put(newPersonIdentificationName.pidm, currentRecord)
-        def addresses = createAddresses(newPersonIdentificationName.pidm, person?.metadata,
+        def addresses = createAddresses(newPersonIdentificationName.pidm, metadata,
                 person.addresses instanceof List ? person.addresses : [])
-        persons = buildPersonAddresses(addresses, persons )
-        def phones = createPhones(newPersonIdentificationName.pidm, person?.metadata,
+        persons = buildPersonAddresses(addresses, persons)
+        def phones = createPhones(newPersonIdentificationName.pidm, metadata,
                 person.phones instanceof List ? person.phones : [])
         persons = buildPersonTelephones(phones, persons)
-        def emails = createPersonEmails(newPersonIdentificationName.pidm, person?.metadata,
+        def emails = createPersonEmails(newPersonIdentificationName.pidm, metadata,
                 person.emails instanceof List ? person.emails : [])
         persons = buildPersonEmails(emails, persons)
-        def races = createRaces(newPersonIdentificationName.pidm, person?.metadata,
-                person.races instanceof List ? person.races : [] )
+        def races = createRaces(newPersonIdentificationName.pidm, metadata,
+                person.races instanceof List ? person.races : [])
         persons = buildPersonRaces(races, persons)
         persons = buildPersonRoles(persons)
+        persons = buildPersonAdditionalIds(additionalIds, persons)
         persons.get(newPersonIdentificationName.pidm)
     }
 
 
-	public Integer getPidm( String guid ) {
-        def entity = GlobalUniqueIdentifier.fetchByLdmNameAndGuid( ldmName, guid?.toLowerCase() )
+    public Integer getPidm(String guid) {
+        def entity = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(ldmName, guid?.toLowerCase())
         if (!entity)
-            throw new ApplicationException( GlobalUniqueIdentifierService.API, new NotFoundException( id: Person.class.simpleName ) )
+            throw new ApplicationException(GlobalUniqueIdentifierService.API, new NotFoundException(id: Person.class.simpleName))
         return entity.domainKey?.toInteger()
     }
 
@@ -405,20 +415,20 @@ class PersonCompositeService extends LdmService {
     private void updateGuidValue(def id, def guid) {
         // Update the GUID to the one we received.
         GlobalUniqueIdentifier newEntity = GlobalUniqueIdentifier.findByLdmNameAndDomainId(ldmName, id)
-        if( !newEntity ) {
+        if (!newEntity) {
             throw new ApplicationException(GlobalUniqueIdentifierService.API, new NotFoundException(id: Person.class.simpleName))
         }
-        if( !newEntity ) {
+        if (!newEntity) {
             throw new ApplicationException(GlobalUniqueIdentifierService.API, new NotFoundException(id: Person.class.simpleName))
         }
         newEntity.guid = guid
         globalUniqueIdentifierService.update(newEntity)
     }
 
-    List<PersonAddress> createAddresses (def pidm, Map metadata, List<Map> newAddresses) {
+    List<PersonAddress> createAddresses(def pidm, Map metadata, List<Map> newAddresses) {
         def addresses = []
         newAddresses?.each { activeAddress ->
-            if(activeAddress instanceof Map) {
+            if (activeAddress instanceof Map) {
                 IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(
                         PROCESS_CODE, PERSON_ADDRESS_TYPE, activeAddress.addressType)
                 if (rule?.translationValue == activeAddress.addressType && !addresses.contains {
@@ -427,7 +437,7 @@ class PersonCompositeService extends LdmService {
                     activeAddress.put('addressType', AddressType.findByCode(rule?.value))
                     activeAddress.put('state', State.findByCode(activeAddress.state))
                     if (activeAddress?.nation?.containsKey('code')) {
-                        if(activeAddress.nation.code) {
+                        if (activeAddress.nation.code) {
                             Nation nation = Nation.findByScodIso(activeAddress?.nation?.code)
                             if (nation) {
                                 activeAddress.put('nation', nation)
@@ -435,13 +445,12 @@ class PersonCompositeService extends LdmService {
                                 log.error "Nation not found for code: ${activeAddress?.nation?.code}"
                                 throw new ApplicationException("Person", "@@r1:country.not.found.message:BusinessLogicValidationException@@")
                             }
-                        }
-                        else {
-                            activeAddress.put('nation',null)
+                        } else {
+                            activeAddress.put('nation', null)
                         }
                     }
                     if (activeAddress.containsKey('county')) {
-                        if( activeAddress.county) {
+                        if (activeAddress.county) {
                             County country = County.findByDescription(activeAddress.county)
                             if (country) {
                                 activeAddress.put('county', country)
@@ -449,14 +458,13 @@ class PersonCompositeService extends LdmService {
                                 log.error "County not found for code: ${activeAddress.county}"
                                 throw new ApplicationException("Person", "@@r1:county.not.found.message:BusinessLogicValidationException@@")
                             }
-                        }
-                        else {
-                            activeAddress.put('county',null)
+                        } else {
+                            activeAddress.put('county', null)
                         }
                     }
                     activeAddress.put('pidm', pidm)
                     activeAddress.put('dataOrigin', metadata?.dataOrigin)
-                    activeAddress.put('fromDate',  new Date())
+                    activeAddress.put('fromDate', new Date())
                     validateAddressRequiredFields(activeAddress)
                     addresses << personAddressService.create(activeAddress)
                 }
@@ -466,26 +474,35 @@ class PersonCompositeService extends LdmService {
     }
 
     def validateAddressRequiredFields(address) {
-        if( !address.addressType ) { throw new ApplicationException("PersonCompositeService","@@r1:addressType.invalid:BusinessLogicValidationException@@")}
-        if( !address.state ) { throw new ApplicationException("PersonCompositeService","@@r1:region.invalid:BusinessLogicValidationException@@")}
-        if( !address.streetLine1 ) { throw new ApplicationException("PersonCompositeService","@@r1:streetAddress.invalid:BusinessLogicValidationException@@")}
-        if( !address.city ) { throw new ApplicationException("PersonCompositeService","@@r1:city.invalid:BusinessLogicValidationException@@")}
-        if( !address.zip ) { throw new ApplicationException("PersonCompositeService","@@r1:postalCode.invalid:BusinessLogicValidationException@@")}
+        if (!address.addressType) {
+            throw new ApplicationException("PersonCompositeService", "@@r1:addressType.invalid:BusinessLogicValidationException@@")
+        }
+        if (!address.state) {
+            throw new ApplicationException("PersonCompositeService", "@@r1:region.invalid:BusinessLogicValidationException@@")
+        }
+        if (!address.streetLine1) {
+            throw new ApplicationException("PersonCompositeService", "@@r1:streetAddress.invalid:BusinessLogicValidationException@@")
+        }
+        if (!address.city) {
+            throw new ApplicationException("PersonCompositeService", "@@r1:city.invalid:BusinessLogicValidationException@@")
+        }
+        if (!address.zip) {
+            throw new ApplicationException("PersonCompositeService", "@@r1:postalCode.invalid:BusinessLogicValidationException@@")
+        }
     }
 
-    List<PersonRace> createRaces (def pidm, Map metadata, List<Map> newRaces) {
+    List<PersonRace> createRaces(def pidm, Map metadata, List<Map> newRaces) {
         def races = []
         newRaces?.each { activeRace ->
-            if( activeRace instanceof Map && activeRace?.guid ) {
+            if (activeRace instanceof Map && activeRace?.guid) {
                 def race
                 try {
                     race = raceCompositeService.get(activeRace?.guid)
                 }
                 catch (ApplicationException e) {
-                    if( e.wrappedException instanceof NotFoundException ) {
+                    if (e.wrappedException instanceof NotFoundException) {
                         throw new ApplicationException("PersonCompositeService", "@@r1:race.invalid:BusinessLogicValidationException@@")
-                    }
-                    else {
+                    } else {
                         throw e
                     }
                 }
@@ -493,15 +510,14 @@ class PersonCompositeService extends LdmService {
                 newRace.pidm = pidm
                 newRace.race = race.race
                 newRace.dataOrigin = metadata?.dataOrigin
-                PersonRace personRace= PersonRace.fetchByPidmAndRace(pidm,newRace.race)
-                if(personRace == null){
+                PersonRace personRace = PersonRace.fetchByPidmAndRace(pidm, newRace.race)
+                if (personRace == null) {
                     races << personRaceService.create(newRace)
-                }else{
+                } else {
                     throw new ApplicationException('PersonCompositeService', "@@r1:race.exists:${race.guid}::BusinessLogicValidationException@@")
                 }
 
-            }
-            else {
+            } else {
                 throw new ApplicationException('PersonCompositeService', "@@r1:race.invalid:BusinessLogicValidationException@@")
             }
         }
@@ -509,11 +525,10 @@ class PersonCompositeService extends LdmService {
     }
 
 
-
     def createPhones(def pidm, Map metadata, List<Map> newPhones) {
         def phones = []
         newPhones?.each { activePhone ->
-            if( activePhone instanceof Map ) {
+            if (activePhone instanceof Map) {
                 IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_PHONE_TYPE, activePhone.phoneType)
                 if (!rule) {
                     log.error "Rule not found for phone:" + activePhone.toString()
@@ -536,8 +551,12 @@ class PersonCompositeService extends LdmService {
     }
 
     def validatePhoneRequiredFields(phone) {
-        if( !phone.telephoneType ) { throw new ApplicationException('PersonCompositeService', "@@r1:phoneType.invalid:BusinessLogicValidationException@@") }
-        if( !phone.phoneNumber ) { throw new ApplicationException('PersonCompositeService', "@@r1:phoneNumber.invalid:BusinessLogicValidationException@@") }
+        if (!phone.telephoneType) {
+            throw new ApplicationException('PersonCompositeService', "@@r1:phoneType.invalid:BusinessLogicValidationException@@")
+        }
+        if (!phone.phoneNumber) {
+            throw new ApplicationException('PersonCompositeService', "@@r1:phoneNumber.invalid:BusinessLogicValidationException@@")
+        }
     }
 
     private List<PersonEmail> createPersonEmails(def pidm, Map metadata, List<Map> emailsInRequest) {
@@ -617,8 +636,12 @@ class PersonCompositeService extends LdmService {
 
 
     def validateEmailRequiredFields(email) {
-        if( !email.emailType ) { throw new ApplicationException('PersonCompositeService', "@@r1:emailType.invalid:BusinessLogicValidationException@@")}
-        if( !email.emailAddress ) { throw new ApplicationException('PersonCompositeService', "@@r1:emailAddress.invalid:BusinessLogicValidationException@@")}
+        if (!email.emailType) {
+            throw new ApplicationException('PersonCompositeService', "@@r1:emailType.invalid:BusinessLogicValidationException@@")
+        }
+        if (!email.emailAddress) {
+            throw new ApplicationException('PersonCompositeService', "@@r1:emailAddress.invalid:BusinessLogicValidationException@@")
+        }
     }
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
@@ -629,10 +652,9 @@ class PersonCompositeService extends LdmService {
             pidms << personIdentification.pidm
             persons.put(personIdentification.pidm, null) //Preserve list order.
         }
-        if( pidms.size() < 1 ) {
+        if (pidms.size() < 1) {
             return persons
-        }
-        else if( pidms.size() > 1000 ) {
+        } else if (pidms.size() > 1000) {
             throw new ApplicationException('PersonCompositeService', "@@r1:max.results.exceeded:BusinessLogicValidationException@@")
         }
         List<PersonBasicPersonBase> personBaseList = PersonBasicPersonBase.findAllByPidmInList(pidms)
@@ -644,7 +666,7 @@ class PersonCompositeService extends LdmService {
             Person currentRecord = new Person(personBase)
             currentRecord.maritalStatusDetail = maritalStatusCompositeService.fetchByMaritalStatusCode(personBase.maritalStatus?.code)
             currentRecord.ethnicityDetail = personBase.ethnicity?.code ? ethnicityCompositeService.fetchByEthnicityCode(personBase.ethnicity?.code) : null
-          /*  if( personBase.ssn ) {
+            /*  if( personBase.ssn ) {
                 currentRecord.credentials << new Credential("Social Security Number",
                         personBase.ssn,
                         null,
@@ -661,23 +683,23 @@ class PersonCompositeService extends LdmService {
             domainIds << identification.id
             currentRecord.metadata = new Metadata(identification.dataOrigin)
             currentRecord.names << name
-            currentRecord.credentials << new Credential ("Banner ID", identification.bannerId, null, null)
+            currentRecord.credentials << new Credential("Banner ID", identification.bannerId, null, null)
             persons.put(identification.pidm, currentRecord)
         }
         persons = buildPersonGuids(domainIds, persons)
         persons = buildPersonAddresses(personAddressList, persons)
         persons = buildPersonTelephones(personTelephoneList, persons)
         persons = buildPersonEmails(personEmailList, persons)
-        persons = buildPersonRaces(personRaceList,persons)
+        persons = buildPersonRaces(personRaceList, persons)
         persons = buildPersonRoles(persons)
         persons // Map of person objects with pidm as index.
     }
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    def buildPersonEmails( personEmailList, persons) {
+    def buildPersonEmails(personEmailList, persons) {
         personEmailList.each { PersonEmail activeEmail ->
             Person currentRecord = persons.get(activeEmail.pidm)
-            IntegrationConfiguration rule = findAllByProcessCodeAndSettingNameAndValue(PROCESS_CODE, PERSON_EMAIL_TYPE,activeEmail?.emailType.code)
+            IntegrationConfiguration rule = findAllByProcessCodeAndSettingNameAndValue(PROCESS_CODE, PERSON_EMAIL_TYPE, activeEmail?.emailType.code)
             if (rule?.value == activeEmail?.emailType?.code &&
                     !currentRecord.emails.contains { it.emailType == rule?.translationValue }) {
                 def email = new Email(activeEmail)
@@ -692,7 +714,7 @@ class PersonCompositeService extends LdmService {
 
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    def buildPersonTelephones( List<PersonTelephone> personTelephoneList, Map persons) {
+    def buildPersonTelephones(List<PersonTelephone> personTelephoneList, Map persons) {
         personTelephoneList.each { activePhone ->
             Person currentRecord = persons.get(activePhone.pidm)
             IntegrationConfiguration rule = findAllByProcessCodeAndSettingNameAndValue(PROCESS_CODE, PERSON_PHONE_TYPE, activePhone?.telephoneType.code)
@@ -700,7 +722,7 @@ class PersonCompositeService extends LdmService {
                     !(currentRecord.phones.contains { it.phoneType == rule?.translationValue })) {
                 def phone = new Phone(activePhone)
                 phone.phoneType = rule?.translationValue
-                phone.phoneNumberDetail = formatPhoneNumber((phone.countryPhone ? "+" + phone.countryPhone: "") + (phone.phoneArea ?:  "") + (phone.phoneNumber ?: ""))
+                phone.phoneNumberDetail = formatPhoneNumber((phone.countryPhone ? "+" + phone.countryPhone : "") + (phone.phoneArea ?: "") + (phone.phoneNumber ?: ""))
                 currentRecord.phones << phone
             }
             persons.put(activePhone.pidm, currentRecord)
@@ -709,7 +731,7 @@ class PersonCompositeService extends LdmService {
     }
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    def buildPersonAddresses( List<PersonAddress> personAddressList, Map persons) {
+    def buildPersonAddresses(List<PersonAddress> personAddressList, Map persons) {
         personAddressList.each { activeAddress ->
             Person currentRecord = persons.get(activeAddress.pidm)
             IntegrationConfiguration rule = findAllByProcessCodeAndSettingNameAndValue(PROCESS_CODE, PERSON_ADDRESS_TYPE, activeAddress.addressType.code)
@@ -735,7 +757,7 @@ class PersonCompositeService extends LdmService {
     }
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    def buildPersonRaces( List<PersonRace> personRacesList, Map persons) {
+    def buildPersonRaces(List<PersonRace> personRacesList, Map persons) {
         personRacesList.each { activeRace ->
             Person currentRecord = persons.get(activeRace.pidm)
             def race = raceCompositeService.fetchByRaceCode(activeRace.race)
@@ -747,7 +769,7 @@ class PersonCompositeService extends LdmService {
     }
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    def buildPersonRoles( Map persons) {
+    def buildPersonRoles(Map persons) {
         def pidms = []
         persons.each { key, value ->
             pidms << key
@@ -759,6 +781,16 @@ class PersonCompositeService extends LdmService {
         persons
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    def buildPersonAdditionalIds(List<AdditionalID> additionalIds, Map persons) {
+        additionalIds.each { credential ->
+            Person currentRecord = persons.get(credential.pidm)
+            currentRecord.credentials << new Credential(Credential.additionalIdMap[credential.additionalIdentificationType.code],
+                    credential.additionalId,null,null)
+            persons.put(credential.pidm, currentRecord)
+        }
+        persons
+    }
     /**
      * Updates the Person Information like PersonIdentificationNameCurrent, PersonBasicPersonBase, Address
      * Telephones and Emails
@@ -769,9 +801,10 @@ class PersonCompositeService extends LdmService {
         String personGuid = content?.id?.trim()?.toLowerCase()
         GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(ldmName, personGuid)
 
-        if(personGuid){
-            if(!globalUniqueIdentifier) {
-                content.put('guid', personGuid)
+        if (personGuid) {
+            if (!globalUniqueIdentifier) {
+                if(!content.get('guid'))
+                    content.put('guid', personGuid)
                 //Per strategy when a GUID was provided, the create should happen.
                 return create(content)
             }
@@ -797,23 +830,23 @@ class PersonCompositeService extends LdmService {
         //update PersonIdentificationNameCurrent
         PersonIdentificationNameCurrent newPersonIdentificationName
         PersonIdentificationNameCurrent oldPersonIdentificationName = new PersonIdentificationNameCurrent(personIdentification.properties)
-        if(primaryName) {
+        if (primaryName) {
             personIdentification.firstName = primaryName.firstName
             personIdentification.lastName = primaryName.lastName
             personIdentification.middleName = primaryName.middleName
             personIdentification.surnamePrefix = primaryName.surnamePrefix
-            if( !personIdentification.equals(oldPersonIdentificationName) ) {
+            if (!personIdentification.equals(oldPersonIdentificationName)) {
                 PersonIdentificationNameAlternate.findAllByPidm(oldPersonIdentificationName.pidm).each { oldRecord ->
-                    if( oldPersonIdentificationName.firstName == oldRecord.firstName &&
-                        oldPersonIdentificationName.lastName == oldRecord.lastName &&
-                        oldPersonIdentificationName.middleName == oldRecord.middleName &&
-                        oldPersonIdentificationName.surnamePrefix == oldRecord.surnamePrefix &&
-                        oldPersonIdentificationName.bannerId == oldRecord.bannerId &&
-                        oldPersonIdentificationName.nameType == oldRecord.nameType &&
-                        oldRecord.changeIndicator == 'N'
+                    if (oldPersonIdentificationName.firstName == oldRecord.firstName &&
+                            oldPersonIdentificationName.lastName == oldRecord.lastName &&
+                            oldPersonIdentificationName.middleName == oldRecord.middleName &&
+                            oldPersonIdentificationName.surnamePrefix == oldRecord.surnamePrefix &&
+                            oldPersonIdentificationName.bannerId == oldRecord.bannerId &&
+                            oldPersonIdentificationName.nameType == oldRecord.nameType &&
+                            oldRecord.changeIndicator == 'N'
                     ) {
                         //Can't get around this, Hibernate updates before it deletes, triggering table-api errors.
-                        PersonIdentificationNameAlternate.executeUpdate("delete from PersonIdentificationNameAlternate where id = :id", [id:oldRecord.id])
+                        PersonIdentificationNameAlternate.executeUpdate("delete from PersonIdentificationNameAlternate where id = :id", [id: oldRecord.id])
                     }
                 }
                 newPersonIdentificationName = personIdentificationNameCurrentService.update(personIdentification)
@@ -821,23 +854,25 @@ class PersonCompositeService extends LdmService {
         }
         content?.credentials?.each { it ->
             if (it.credentialType == 'Banner ID') {
-                personIdentification.bannerId  = it?.credentialId
+                personIdentification.bannerId = it?.credentialId
                 newPersonIdentificationName = personIdentificationNameCurrentService.update(personIdentification)
+            } else if (it.credentialType == 'Elevate ID') {
+                createOrUpdateAdditionalId(personIdentification, it, content?.metadata)
             }
         }
-        if( !newPersonIdentificationName )
+        if (!newPersonIdentificationName)
             newPersonIdentificationName = personIdentification
         //update PersonBasicPersonBase
         PersonBasicPersonBase newPersonBase = updatePersonBasicPersonBase(pidmToUpdate, newPersonIdentificationName, content, primaryName)
         def credentials = []
-        if( newPersonBase && newPersonBase.ssn ) {
+        if (newPersonBase && newPersonBase.ssn) {
             credentials << new Credential("Social Security Number",
                     newPersonBase.ssn,
                     null,
                     null)
         }
 
-        if(newPersonIdentificationName && newPersonIdentificationName.bannerId){
+        if (newPersonIdentificationName && newPersonIdentificationName.bannerId) {
             credentials << new Credential("Banner ID",
                     newPersonIdentificationName.bannerId,
                     null,
@@ -851,7 +886,7 @@ class PersonCompositeService extends LdmService {
         def ethnicityDetail = newPersonBase.ethnicity ? ethnicityCompositeService.fetchByEthnicityCode(newPersonBase.ethnicity?.code) : null
         def maritalStatusDetail = newPersonBase.maritalStatus ? maritalStatusCompositeService.fetchByMaritalStatusCode(newPersonBase.maritalStatus?.code) : null
         //update Address
-         def addresses = []
+        def addresses = []
 
         if (content.containsKey('addresses') && content.addresses instanceof List)
             addresses = updateAddresses(pidmToUpdate, content.metadata, content.addresses)
@@ -872,18 +907,21 @@ class PersonCompositeService extends LdmService {
         if (content.containsKey('races') && content.races instanceof List)
             races = updateRaces(pidmToUpdate, content.metadata, content.races)
         //Build decorator to return LDM response.
-        def person = new Person(newPersonBase, personGuid, credentials, addresses, phones, emails, names,maritalStatusDetail,ethnicityDetail,races,[])
-        def personMap = [:]
+        def person = new Person(newPersonBase, personGuid, credentials, addresses, phones, emails, names, maritalStatusDetail, ethnicityDetail, races, [])
+        Map personMap = [:]
         personMap.put(pidmToUpdate, person)
-        if(addresses.size() == 0)
-            personMap = buildPersonAddresses(PersonAddress.fetchActiveAddressesByPidmInList([pidmToUpdate]),personMap)
-        if(phones.size() == 0)
-            personMap = buildPersonTelephones(PersonTelephone.fetchActiveTelephoneByPidmInList([pidmToUpdate]),personMap)
-        if(emails.size() == 0) {
+        if (addresses.size() == 0)
+            personMap = buildPersonAddresses(PersonAddress.fetchActiveAddressesByPidmInList([pidmToUpdate]), personMap)
+        if (phones.size() == 0)
+            personMap = buildPersonTelephones(PersonTelephone.fetchActiveTelephoneByPidmInList([pidmToUpdate]), personMap)
+        if (emails.size() == 0) {
             personMap = buildPersonEmails(PersonEmail.findAllByStatusIndicatorAndPidmInList('A', [pidmToUpdate]), personMap)
         }
-        if(races.size() == 0)
-            personMap = buildPersonRaces(PersonRace.findAllByPidmInList([pidmToUpdate]),personMap)
+        if (races.size() == 0)
+            personMap = buildPersonRaces(PersonRace.findAllByPidmInList([pidmToUpdate]), personMap)
+        def additionalIdTypes = Credential.additionalIdMap.keySet().asList()
+        log.error additionalIdTypes
+        personMap = buildPersonAdditionalIds(AdditionalID.fetchByPidmInListAndAdditionalIdentificationTypeInList([pidmToUpdate],additionalIdTypes), personMap)
         person = buildPersonRoles(personMap).get(pidmToUpdate)
     }
 
@@ -900,18 +938,18 @@ class PersonCompositeService extends LdmService {
                 //Copy personBase attributes into person map from Primary names object.
                 person?.credentials?.each { it ->
                     if (it.credentialType == 'Social Security Number' && personBase.ssn != it?.credentialId) {
-                        if(it?.credentialId== null){
+                        if (it?.credentialId == null) {
                             throw new ApplicationException("PersonCompositeService", "@@r1:ssn.isNull:BusinessLogicValidationException@@")
                         }
-                        if(it?.credentialId.trim()==''){
+                        if (it?.credentialId.trim() == '') {
                             throw new ApplicationException("PersonCompositeService", "@@r1:ssn.isEmpty:BusinessLogicValidationException@@")
                         }
-                        if(personBase.ssn == null || personBase.ssn != it?.credentialId){
+                        if (personBase.ssn == null || personBase.ssn != it?.credentialId) {
                             personBase.ssn = it?.credentialId
                         }
                     }
                 }
-                if(changedPersonIdentification) {
+                if (changedPersonIdentification) {
                     if (changedPersonIdentification.containsKey('namePrefix')) {
                         personBase.namePrefix = changedPersonIdentification.get('namePrefix')
                     }
@@ -923,14 +961,14 @@ class PersonCompositeService extends LdmService {
                     }
                 }
                 //Translate enumerations and defaults
-                if(person.containsKey('sex')){
+                if (person.containsKey('sex')) {
                     personBase.sex = person?.sex == 'Male' ? 'M' : (person?.sex == 'Female' ? 'F' : (person?.sex == 'Unknown' ? 'N' : null))
                 }
-                if(person.containsKey('maritalStatusDetail')){
+                if (person.containsKey('maritalStatusDetail')) {
                     def maritalStatus
                     try {
                         maritalStatus = person.maritalStatusDetail instanceof Map && person.maritalStatusDetail?.guid ? maritalStatusCompositeService.get(person.maritalStatusDetail?.guid) : null
-                    }catch (ApplicationException e) {
+                    } catch (ApplicationException e) {
                         throw new ApplicationException("PersonCompositeService", "@@r1:maritalStatus.invalid:BusinessLogicValidationException@@")
                     }
                     personBase.maritalStatus = maritalStatus ? MaritalStatus.findByCode(maritalStatus?.code) : null
@@ -942,17 +980,17 @@ class PersonCompositeService extends LdmService {
                     personBase.ethnicity = ethnicity ? Ethnicity.findByCode(ethnicity?.code) : null
                     personBase.ethnic = person.ethnic == "Non-Hispanic" ? '1' : (person.ethnic == "Hispanic" ? '2' : null)
                 }
-                if (person.containsKey('deadDate')){
+                if (person.containsKey('deadDate')) {
                     personBase.deadIndicator = person.get('deadDate') != null ? 'Y' : null
-                    personBase.deadDate= person.get('deadDate')
-                    if(personBase.deadDate !=null && personBase.birthDate !=null && personBase.deadDate.before(personBase.birthDate)  ){
+                    personBase.deadDate = person.get('deadDate')
+                    if (personBase.deadDate != null && personBase.birthDate != null && personBase.deadDate.before(personBase.birthDate)) {
                         throw new ApplicationException("PersonCompositeService", "@@r1:dateDeceased.invalid:${personBase.deadDate}:BusinessLogicValidationException@@")
                     }
                 }
-                if(person.containsKey('birthDate')){
+                if (person.containsKey('birthDate')) {
                     personBase.birthDate = person.get('birthDate')
                 }
-                if(person.containsKey('metadata') && person.metadata.containsKey('dataOrigin')){
+                if (person.containsKey('metadata') && person.metadata.containsKey('dataOrigin')) {
                     personBase.dataOrigin = person.metadata.get('dataOrigin')
                 }
 
@@ -1025,9 +1063,9 @@ class PersonCompositeService extends LdmService {
 
     private updateAddresses(def pidm, Map metadata, List<Map> newAddresses) {
         def addresses = []
-        List<PersonAddress> currentAddresses = PersonAddress.fetchActiveAddressesByPidm(['pidm':pidm]).get('list')
+        List<PersonAddress> currentAddresses = PersonAddress.fetchActiveAddressesByPidm(['pidm': pidm]).get('list')
         currentAddresses.each { currentAddress ->
-            if(findAllByProcessCodeAndSettingNameAndValue(PROCESS_CODE, PERSON_ADDRESS_TYPE, currentAddress.addressType.code)) {
+            if (findAllByProcessCodeAndSettingNameAndValue(PROCESS_CODE, PERSON_ADDRESS_TYPE, currentAddress.addressType.code)) {
                 def activeAddresses = newAddresses.findAll { it ->
                     fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_ADDRESS_TYPE,
                             it.addressType)?.value == currentAddress.addressType.code
@@ -1048,7 +1086,7 @@ class PersonCompositeService extends LdmService {
                                     }
                                 if (activeAddress?.nation?.containsKey('code')) {
                                     def nation
-                                    if(activeAddress.nation?.code) {
+                                    if (activeAddress.nation?.code) {
                                         nation = Nation.findByScodIso(activeAddress?.nation?.code)
                                         if (!nation) {
                                             log.error "Nation not found for code: ${activeAddress?.country?.code}"
@@ -1063,9 +1101,9 @@ class PersonCompositeService extends LdmService {
                                 }
                                 if (activeAddress.containsKey('county')) {
                                     def county
-                                    if( activeAddress.county ) {
+                                    if (activeAddress.county) {
                                         county = County.findByDescription(activeAddress.county)
-                                        if( !county ) {
+                                        if (!county) {
                                             log.error "County not found for code: ${activeAddress.county}"
                                             throw new ApplicationException("Person", "@@r1:county.not.found.message:BusinessLogicValidationException@@")
                                         }
@@ -1139,18 +1177,18 @@ class PersonCompositeService extends LdmService {
         List<PersonTelephone> personTelephoneList = PersonTelephone.fetchActiveTelephoneByPidmInList([pidm]).each { currentPhone ->
             def thisType = findAllByProcessCodeAndSettingNameAndValue(PROCESS_CODE, PERSON_PHONE_TYPE, currentPhone.telephoneType?.code)?.translationValue
             def activePhones = newPhones.findAll { it ->
-                        it.phoneType == thisType
+                it.phoneType == thisType
             }
             if (activePhones.size() > 0) {
                 def invalidPhone = false
                 activePhones.each { activePhone ->
-                    if (activePhone.containsKey('phoneExtension')){
+                    if (activePhone.containsKey('phoneExtension')) {
                         if (activePhone.phoneExtension != currentPhone.phoneExtension) {
                             log.debug "Phone extension different"
                             invalidPhone = true
                         }
                     }
-                    if (activePhone.containsKey('phoneNumber')){
+                    if (activePhone.containsKey('phoneNumber')) {
                         def parsedResult = parsePhoneNumber(activePhone.phoneNumber)
                         if ((parsedResult.phoneNumber ? parsedResult.phoneNumber.toString() : null) != currentPhone.phoneNumber) {
                             log.debug "Phone number different"
@@ -1165,39 +1203,34 @@ class PersonCompositeService extends LdmService {
                             invalidPhone = true
                         }
                     }
-                    if( invalidPhone ) {
+                    if (invalidPhone) {
                         currentPhone.statusIndicator = 'I'
                         log.debug "Inactivating phone:" + currentPhone.toString()
                         personTelephoneService.update(currentPhone)
-                    }
-                    else {
+                    } else {
                         def phoneDecorator = new Phone(currentPhone)
                         phoneDecorator.phoneType = activePhone.phoneType
-                        phoneDecorator.phoneNumberDetail = formatPhoneNumber((currentPhone.countryPhone ? "+" + currentPhone.countryPhone: "") +
-                                (currentPhone.phoneArea ?:  "") + (currentPhone.phoneNumber ?: ""))
+                        phoneDecorator.phoneNumberDetail = formatPhoneNumber((currentPhone.countryPhone ? "+" + currentPhone.countryPhone : "") +
+                                (currentPhone.phoneArea ?: "") + (currentPhone.phoneNumber ?: ""))
                         phones << phoneDecorator
                         newPhones.remove(activePhone)
                     }
                 }
-            }
-            else {
+            } else {
                 currentPhone.statusIndicator = 'I'
                 log.debug "Inactivating phone:" + currentPhone.toString()
                 personTelephoneService.update(currentPhone)
             }
         }
-        createPhones(pidm,metadata,newPhones).each { currentPhone ->
+        createPhones(pidm, metadata, newPhones).each { currentPhone ->
             def phoneDecorator = new Phone(currentPhone)
             phoneDecorator.phoneType = findAllByProcessCodeAndSettingNameAndValue(PROCESS_CODE, PERSON_PHONE_TYPE, currentPhone.telephoneType.code)?.translationValue
-            phoneDecorator.phoneNumberDetail = formatPhoneNumber((currentPhone.countryPhone ? "+" + currentPhone.countryPhone: "") +
-                    (currentPhone.phoneArea ?:  "") + (currentPhone.phoneNumber ?: ""))
+            phoneDecorator.phoneNumberDetail = formatPhoneNumber((currentPhone.countryPhone ? "+" + currentPhone.countryPhone : "") +
+                    (currentPhone.phoneArea ?: "") + (currentPhone.phoneNumber ?: ""))
             phones << phoneDecorator
         }
         phones
     }
-
-
-
 
 
     List<RaceDetail> updateRaces(def pidm, Map metadata, List<Map> newRaces) {
@@ -1211,12 +1244,11 @@ class PersonCompositeService extends LdmService {
             log.debug "currentRace:" + currentRace.toString() + " : " + raceGuid
             log.debug "Races matching:" + activeRaces.toString()
             log.debug "Races to create:" + newRaces.toString()
-            if( activeRaces.size() > 0 ) {
+            if (activeRaces.size() > 0) {
                 newRaces.remove(activeRaces[0])
                 def race = raceCompositeService.get(activeRaces[0].guid)
                 races << race
-            }
-            else {
+            } else {
                 personRaceService.delete(currentRace)
                 log.debug "Removing race:" + currentRace.toString()
             }
@@ -1226,6 +1258,29 @@ class PersonCompositeService extends LdmService {
             races << race
         }
         races
+    }
+
+    def createOrUpdateAdditionalId ( PersonIdentificationNameCurrent personIdentification, Map credential, Map metadata ) {
+        def idCode = Credential.additionalIdMap.find { key, value ->
+            value == credential.credentialType
+        }?.key
+        log.error "Id Code: ${idCode}"
+        def idType = AdditionalIdentificationType.findByCode(idCode)
+        log.error "Id type: ${idType}"
+        List<AdditionalID> existingIds = AdditionalID.fetchByPidmInListAndAdditionalIdentificationTypeInList([personIdentification.pidm], [idCode])
+        AdditionalID existingId
+        if( existingIds.size() > 0 ) {
+            existingId = existingIds.get(0)
+            existingId.additionalId = credential?.credentialId
+        }
+        else
+            existingId = new AdditionalID(pidm: personIdentification.pidm,
+                    additionalIdentificationType: idType,
+                    additionalId: credential?.credentialId,
+                    dataOrigin: metadata?.dataOrigin
+            )
+        log.error "Existing ID: ${existingId}"
+        additionalIDService.createOrUpdate ( existingId )
     }
 
     Map parsePhoneNumber(String phoneNumber) {
