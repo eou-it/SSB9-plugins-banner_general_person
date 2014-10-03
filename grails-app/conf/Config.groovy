@@ -1,5 +1,5 @@
 /** *******************************************************************************
- Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2014 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 
 
@@ -26,7 +26,7 @@ def locationAdder = ConfigFinder.&addLocation.curry(grails.config.locations)
 [bannerGrailsAppConfig: "${userHome}/.grails/banner_configuration.groovy",
 ].each { envName, defaultFileName -> locationAdder(envName, defaultFileName) }
 
-
+grails.databinding.useSpringBinder=true
 
 grails.project.groupId = "net.hedtech" // used when deploying to a maven repo
 
@@ -65,3 +65,27 @@ grails.views.gsp.sitemesh.preprocess = true
 
 
 seedDataTarget =  ['bgp': ['/src/groovy/net/hedtech/banner/seeddata/Data/banner_general_person.xml']]
+
+// Uncomment and edit the following lines to start using Grails encoding & escaping improvements
+
+/* remove this line 
+// GSP settings
+grails {
+    views {
+        gsp {
+            encoding = 'UTF-8'
+            htmlcodec = 'xml' // use xml escaping instead of HTML4 escaping
+            codecs {
+                expression = 'html' // escapes values inside null
+                scriptlet = 'none' // escapes output from scriptlets in GSPs
+                taglib = 'none' // escapes output from taglibs
+                staticparts = 'none' // escapes output from static template parts
+            }
+        }
+        // escapes all not-encoded output at final stage of outputting
+        filteringCodecForContentType {
+            //'text/html' = 'html'
+        }
+    }
+}
+remove this line */

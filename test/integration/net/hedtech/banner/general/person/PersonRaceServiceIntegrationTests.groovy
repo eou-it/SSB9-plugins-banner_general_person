@@ -5,6 +5,9 @@ Copyright 2012 Ellucian Company L.P. and its affiliates.
  Copyright 2013 Ellucian Company L.P. and its affiliates.
  ****************************************************************************** */
 package net.hedtech.banner.general.person
+import org.junit.Before
+import org.junit.Test
+import org.junit.After
 
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.testing.BaseIntegrationTestCase
@@ -32,7 +35,8 @@ class PersonRaceServiceIntegrationTests extends BaseIntegrationTestCase {
     def u_failure_race = "MOAN"
 
 
-    protected void setUp() {
+	@Before
+	public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
         initializeTestDataForReferences()
@@ -47,11 +51,13 @@ class PersonRaceServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-    protected void tearDown() {
+	@After
+	public void tearDown() {
         super.tearDown()
     }
 
 
+	@Test
     void testPersonRaceValidCreate() {
         def personRace = newValidForCreatePersonRace()
         def map = [domainModel: personRace]
@@ -64,6 +70,7 @@ class PersonRaceServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testPersonRaceInvalidCreate() {
         def personRace = newInvalidForCreatePersonRace()
         def map = [domainModel: personRace]
@@ -73,6 +80,7 @@ class PersonRaceServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testPersonRaceInvalidUpdate() {
         def personRace = newValidForCreatePersonRace()
         def map = [domainModel: personRace]
@@ -93,6 +101,7 @@ class PersonRaceServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testPersonRaceDelete() {
         def personRace = newValidForCreatePersonRace()
         def map = [domainModel: personRace]
@@ -105,6 +114,7 @@ class PersonRaceServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testReadOnly() {
         def personRace = newValidForCreatePersonRace()
         def map = [domainModel: personRace]
@@ -121,6 +131,7 @@ class PersonRaceServiceIntegrationTests extends BaseIntegrationTestCase {
         }
     }
 
+	@Test
     void testCreateOrUpdateValid() {
         PersonRace personRace = newValidForCreatePersonRace()
 
@@ -143,6 +154,7 @@ class PersonRaceServiceIntegrationTests extends BaseIntegrationTestCase {
 
     }
 
+	@Test
     void testCreateOrUpdateInValid() {
         PersonRace personRace = newInvalidForCreatePersonRace()
         Map map = [createPersonRaces: personRace]
@@ -151,6 +163,7 @@ class PersonRaceServiceIntegrationTests extends BaseIntegrationTestCase {
         }
     }
 
+	@Test
     void testDeletePersonRacesForInValid() {
            def personRace = newInvalidForCreatePersonRace()
            def map = [deletePersonRaces: personRace]

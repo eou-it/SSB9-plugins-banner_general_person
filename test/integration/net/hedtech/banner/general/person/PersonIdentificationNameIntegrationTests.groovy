@@ -3,6 +3,9 @@
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
+import org.junit.Before
+import org.junit.Test
+import org.junit.After
 
 import groovy.sql.Sql
 import net.hedtech.banner.general.system.NameType
@@ -13,17 +16,20 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
     def personIdentificationNameService
 
 
-    protected void setUp() {
+	@Before
+	public void setUp() {
         formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this
         super.setUp()
     }
 
 
-    protected void tearDown() {
+	@After
+	public void tearDown() {
         super.tearDown()
     }
 
 
+	@Test
     void testCreatePersonIdentificationName() {
         def personIdentificationName = newPersonIdentificationName()
         save personIdentificationName
@@ -32,6 +38,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testDeletePersonIdentificationName() {
         def personIdentificationName = newPersonIdentificationName()
         save personIdentificationName
@@ -47,12 +54,14 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testValidation() {
         def personIdentificationName = newPersonIdentificationName()
         assertTrue "PersonIdentificationName could not be validated as expected due to ${personIdentificationName.errors}", personIdentificationName.validate()
     }
 
 
+	@Test
     void testNullValidationFailure() {
         def personIdentificationName = new PersonIdentificationName()
         assertFalse "PersonIdentificationName should have failed validation", personIdentificationName.validate()
@@ -82,6 +91,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testMaxSizeValidationFailures() {
         def personIdentificationName = new PersonIdentificationName(
                 firstName: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
@@ -103,6 +113,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
 
 
 
+	@Test
     void testFetchByBannerId() {
         def personIdentificationName1 = newPersonIdentificationName()
         save personIdentificationName1
@@ -130,6 +141,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFetchBySomeBannerId() {
         def invalidSearchString = "XXX"
         def results = PersonIdentificationName.fetchBySomeBannerId(invalidSearchString)
@@ -148,6 +160,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFetchBySomeName() {
         def limitSearchString1 = "%"
         def results = PersonIdentificationName.fetchBySomeName(limitSearchString1)
@@ -161,6 +174,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFetchAllPersonByNameOrBannerId() {
         def personIdentificationName1 = newPersonIdentificationName()
         personIdentificationName1.firstName = "One"
@@ -195,6 +209,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFetchAllPersonByBannerId() {
         def personIdentificationName1 = newPersonIdentificationName()
         personIdentificationName1.firstName = "One"
@@ -232,6 +247,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFetchAllPersonByLastName() {
         def personIdentificationName1 = newPersonIdentificationName()
         personIdentificationName1.firstName = "One"
@@ -269,6 +285,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFetchAllNonPersonByNameOrBannerId() {
         def personIdentificationName1 = newNonPersonIdentificationName("FIRSTCOMPANY")
         personIdentificationName1.bannerId = "UNITTEST1"
@@ -304,6 +321,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFetchAllNonPersonByBannerId() {
         def personIdentificationName1 = newNonPersonIdentificationName("FIRSTCOMPANY")
         personIdentificationName1.bannerId = "UNITTEST1"
@@ -336,6 +354,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFetchAllNonPersonByLastName() {
         def personIdentificationName1 = newNonPersonIdentificationName("FIRSTCOMPANY")
         personIdentificationName1.bannerId = "UNITTEST1"
@@ -367,6 +386,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFetchCountPersonByNameOrBannerId() {
         def personIdentificationName1 = newPersonIdentificationName()
         personIdentificationName1.firstName = "One"
@@ -407,6 +427,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFetchCountPersonByBannerId() {
         def personIdentificationName1 = newPersonIdentificationName()
         personIdentificationName1.firstName = "One"
@@ -446,6 +467,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFetchCountPersonByLastName() {
         def personIdentificationName1 = newPersonIdentificationName()
         personIdentificationName1.firstName = "One"
@@ -485,6 +507,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFetchCountNonPersonByNameOrBannerId() {
         def personIdentificationName1 = newNonPersonIdentificationName("FIRSTCOMPANY")
         personIdentificationName1.bannerId = "UNITTEST1"
@@ -519,6 +542,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFetchCountNonPersonByBannerId() {
         def personIdentificationName1 = newNonPersonIdentificationName("FIRSTCOMPANY")
         personIdentificationName1.bannerId = "UNITTEST1"
@@ -553,6 +577,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFetchCountNonPersonByLastName() {
         def personIdentificationName1 = newNonPersonIdentificationName("FIRSTCOMPANY")
         personIdentificationName1.bannerId = "UNITTEST1"
@@ -586,6 +611,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFetchBannerPersonOrNonPerson() {
         def personIdentificationName1 = newNonPersonIdentificationName("FIRSTCOMPANY")
         personIdentificationName1.bannerId = "UNITTEST1"
@@ -620,6 +646,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFetchByName() {
         def personIdentificationName1 = newPersonIdentificationName()
         personIdentificationName1.firstName = "One"
@@ -655,6 +682,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFetchPersonBySoundexName() {
         def personIdentificationName1 = newPersonIdentificationName()
         personIdentificationName1.firstName = "One"
@@ -680,6 +708,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFetchNonPersonBySoundexName() {
         def personIdentificationName1 = newPersonIdentificationName()
         personIdentificationName1.firstName = null
@@ -707,6 +736,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testBannerIdOrNameExists() {
         def person = newPersonIdentificationName()
         person.save(flush: true, failOnError: true)
@@ -723,6 +753,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFetchPersonCurrentRecord() {
         // you cannot update the spriden ID or name using the sv_spriden
         def sql = new Sql(sessionFactory.getCurrentSession().connection())
@@ -835,6 +866,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testAltId() {
         // you cannot update the spriden ID or name using the sv_spriden
         // you need to use the API. The reason is the sv_spriden trigger sets the surrogate ID
@@ -905,6 +937,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFetchBannerPerson() {
         def person = newPersonIdentificationName()
         person.firstName = "test"
@@ -918,6 +951,7 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFetchBannerPersonList() {
         def personIdentificationNameList = []
         (0..5).each {

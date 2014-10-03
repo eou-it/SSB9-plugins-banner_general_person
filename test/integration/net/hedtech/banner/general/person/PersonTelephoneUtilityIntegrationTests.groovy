@@ -3,6 +3,9 @@
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
+import org.junit.Before
+import org.junit.Test
+import org.junit.After
 
 import net.hedtech.banner.general.system.TelephoneType
 import net.hedtech.banner.person.dsl.NameTemplate
@@ -32,7 +35,8 @@ class PersonTelephoneUtilityIntegrationTests extends BaseIntegrationTestCase {
     def i_success_countryPhone = "9"
 
 
-    protected void setUp() {
+	@Before
+	public void setUp() {
         formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this
         super.setUp()
         initializeTestDataForReferences()
@@ -46,11 +50,13 @@ class PersonTelephoneUtilityIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-    protected void tearDown() {
+	@After
+	public void tearDown() {
         super.tearDown()
     }
 
 
+	@Test
     void testFormatPhone() {
         def personTelephone = newValidPersonTelephone()
         save personTelephone
@@ -79,6 +85,7 @@ class PersonTelephoneUtilityIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testFormatInternationalPhone() {
         def personTelephone = newValidPersonInternationalTelephone()
         save personTelephone
@@ -106,6 +113,7 @@ class PersonTelephoneUtilityIntegrationTests extends BaseIntegrationTestCase {
     }
 
     //Confirm that if there is international phone info, it will use that format.
+	@Test
     void testFormatInternationalPhoneWhenCountryExists() {
         def personTelephone = newValidPersonTelephoneWithInternationalAndCountry()
         save personTelephone

@@ -3,6 +3,9 @@
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
+import org.junit.Before
+import org.junit.Test
+import org.junit.After
 
 import net.hedtech.banner.general.person.view.PersonEmailView
 import net.hedtech.banner.testing.BaseIntegrationTestCase
@@ -10,19 +13,22 @@ import net.hedtech.banner.testing.BaseIntegrationTestCase
 class EmailSearchIntegrationTests extends BaseIntegrationTestCase {
 
 
-    protected void setUp() {
+	@Before
+	public void setUp() {
         formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this (removing GEAPART because of GUOBOBS_UI_VERSION = B)
         super.setUp()
     }
 
-    protected void tearDown() {
+	@After
+	public void tearDown() {
         super.tearDown()
     }
 
     /**
      * Tests the list of emails by email filter search and pagination.
      */
-    def testEmailSearchByFilterAndPagination() {
+	@Test
+    void testEmailSearchByFilterAndPagination() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
         def filter = "einstein"
@@ -41,7 +47,8 @@ class EmailSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests the list of emails by email filter search.
      */
-    def testEmailSearchByFilter() {
+	@Test
+    void testEmailSearchByFilter() {
 
         def filter = "einstein"
         def results = PersonEmailView.fetchByEmailAddress(filter)
@@ -60,7 +67,8 @@ class EmailSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests the list of emails for inquire page.
      */
-    def testDynamicFinder() {
+	@Test
+    void testDynamicFinder() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
 
@@ -87,7 +95,8 @@ class EmailSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests the list of emails for the pidm list
      */
-    def testEmailSearchByFilterAndPidm() {
+	@Test
+    void testEmailSearchByFilterAndPidm() {
         def pidmList = []
         pidmList.add(new Integer("33775"))
 

@@ -3,6 +3,9 @@
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
+import org.junit.Before
+import org.junit.Test
+import org.junit.After
 
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.system.Disability
@@ -19,17 +22,20 @@ class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegration
     def medicalInformationCompositeService
 
 
-    protected void setUp() {
+	@Before
+	public void setUp() {
         formContext = ['GUAGMNU']// Since we are not testing a controller, we need to explicitly set this  (removing GOAMEDI because of GUOBOBS_UI_VERSION = B)
         super.setUp()
     }
 
 
-    protected void tearDown() {
+	@After
+	public void tearDown() {
         super.tearDown()
     }
 
 
+	@Test
     void testCreate() {
 
         def medicalInformations = newMedicalInformation()
@@ -42,6 +48,7 @@ class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegration
     }
 
 
+	@Test
     void testMedicalInformationDelete() {
         def medicalInformations = newMedicalInformation()
         def pidm = medicalInformations[0].pidm
@@ -57,6 +64,7 @@ class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegration
     }
 
 
+	@Test
     void testUpdateOfComment() {
 
         def medicalInformation = newSingleMedicalInformation()
@@ -78,6 +86,7 @@ class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegration
     @Ignore
     // TODO for some reason this fails,  the medical condition is not flagged as being dirty,  i suspect that a domain
     // exists that has incorrect equals and hash causing this
+	@Test
     void testMediCodeUpdateNoPereacc() {
         setHRInstalledFalse()
         // create new medical information record
@@ -119,6 +128,7 @@ class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegration
     //        1728 F10000                   00           4/22/2003            ACTV              HC
 
 
+	@Test
     void testMediCodeUpdateWithPereacc() {
         setHRInstalledTrue()
         // create new medical information record
@@ -156,6 +166,7 @@ class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegration
     }
 
 
+	@Test
     void testMediCodeUpdateWithPereaccWithoutMap() {
         setHRInstalledTrue()
         // create new medical information record

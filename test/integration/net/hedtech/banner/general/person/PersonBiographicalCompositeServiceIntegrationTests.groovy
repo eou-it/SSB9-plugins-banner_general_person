@@ -6,6 +6,9 @@ Copyright 2012 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
+import org.junit.Before
+import org.junit.Test
+import org.junit.After
 
 import groovy.sql.Sql
 import net.hedtech.banner.general.system.*
@@ -16,17 +19,20 @@ class PersonBiographicalCompositeServiceIntegrationTests extends BaseIntegration
     def personBiographicalCompositeService
 
 
-    protected void setUp() {
+	@Before
+	public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
     }
 
 
-    protected void tearDown() {
+	@After
+	public void tearDown() {
         super.tearDown()
     }
 
 
+	@Test
     void testCreateBiographical() {
         def personIdentificationNameCurrent = setupNewPersonIdentificationNameCurrent()
 
@@ -56,6 +62,7 @@ class PersonBiographicalCompositeServiceIntegrationTests extends BaseIntegration
     }
 
 
+	@Test
     void testUpdateBiographical() {
         def personIdentificationNameCurrent = setupNewPersonIdentificationNameCurrent()
 
@@ -112,6 +119,7 @@ class PersonBiographicalCompositeServiceIntegrationTests extends BaseIntegration
     }
 
 
+	@Test
     void testDeleteBiographical() {
         def personIdentificationNameCurrent = setupNewPersonIdentificationNameCurrent()
 

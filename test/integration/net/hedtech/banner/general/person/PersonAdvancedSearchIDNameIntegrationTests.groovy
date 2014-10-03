@@ -2,6 +2,10 @@
   Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
+import org.junit.Before
+import org.junit.Ignore
+import org.junit.Test
+import org.junit.After
 
 import groovy.sql.Sql
 import net.hedtech.banner.testing.BaseIntegrationTestCase
@@ -15,19 +19,22 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
 
     def personSearchService
 
-    protected void setUp() {
+	@Before
+	public void setUp() {
         formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this (removing GEAPART because of GUOBOBS_UI_VERSION = B)
         super.setUp()
     }
 
-    protected void tearDown() {
+	@After
+	public void tearDown() {
         super.tearDown()
     }
 
     /**
      * Tests Pagination
      */
-    def testPagination() {
+	@Test
+    void testPagination() {
         def filterData = [:]
         def param = [:]
 
@@ -44,7 +51,8 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
         37859                  HOS00001   Jamison                                                      Emily                                                        Elizabeth                                                                       P                  07-JAN-11                 SAISUSR                        SPAIDEN                        JAMISON                                                      EMILY                                                        ELIZABETH                                                    J525                      E540                                         BANPROXY                       07-JAN-11                 GRAILS                                                                                                                     10558                  0
      */
 
-    def testAdvancedSearchById() {
+	@Test
+    void testAdvancedSearchById() {
 
         def filterData = [:]
         def param = [:]
@@ -67,7 +75,9 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
      * Tests the id search.
      *
      */
-    def testAdvancedSearchByCurrentId() {
+	@Ignore
+    //HRU- 5512
+    void testAdvancedSearchByCurrentId() {
         def institutionalDescription  = InstitutionalDescription.list()[0]
         assertNotNull institutionalDescription
         institutionalDescription.ssnSearchEnabledIndicator  = false
@@ -90,7 +100,8 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
     /**
      * Tests the name search.
      */
-    def testAdvancedSearchByName() {
+	@Test
+    void testAdvancedSearchByName() {
 
         def filterData = [:]
         def param = [:]
@@ -113,7 +124,8 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
     /**
      * Tests the advanced name search with additional parameters.
      */
-    def testAdvancedSearchByNameAndAdditionalParameters() {
+	@Test
+    void testAdvancedSearchByNameAndAdditionalParameters() {
 
         def filterData = [:]
         def param = [:]
@@ -171,7 +183,8 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
     /**
      * Tests the advanced name search with special characters.
      */
-    def testAdvancedSearchByNameWithSpecialCharacters() {
+	@Test
+    void testAdvancedSearchByNameWithSpecialCharacters() {
 
         def filterData = [:]
         def param = [:]
@@ -193,7 +206,8 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
     /**
      * Tests name format configuration.
      */
-    def testNameFormat() {
+	@Test
+    void testNameFormat() {
         def application = AH.application
         ApplicationContext applicationContext = application.mainContext
         def messageSource = applicationContext.getBean("messageSource")
@@ -203,7 +217,8 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
     /**
      * Tests the advanced search by SSN
      */
-    def testAdvancedSearchBySsn() {
+	@Test
+    void testAdvancedSearchBySsn() {
 
         def filterData = [:]
         def param = [:]
@@ -243,7 +258,8 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
     /**
      * Tests the advanced search by SSN  with additional parameters
      */
-    def testAdvancedSearchBySsnAndAdditionalParameters() {
+	@Test
+    void testAdvancedSearchBySsnAndAdditionalParameters() {
 
         def filterData = [:]
         def param = [:]
@@ -316,7 +332,8 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
      /**
      * Tests the advanced search for ssn
      */
-    def testAllAdvancedSearchForSsnNotAllowed() {
+	@Test
+    void testAllAdvancedSearchForSsnNotAllowed() {
         def filterData = [:]
         def param = [:]
 
@@ -329,6 +346,7 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
         assertTrue persons.size() == 0
     }
 
+	@Test
    void testFetchNoOfRowsInPageForGUQSRCH() {
          def sql
         try {

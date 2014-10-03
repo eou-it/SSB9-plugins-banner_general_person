@@ -6,6 +6,9 @@ Copyright 2012 Ellucian Company L.P. and its affiliates.
  ****************************************************************************** */
 
 package net.hedtech.banner.general.person
+import org.junit.Before
+import org.junit.Test
+import org.junit.After
 
 import groovy.sql.Sql
 import net.hedtech.banner.person.PersonIdentificationNameDecorator
@@ -19,17 +22,20 @@ class PersonIdentificationNameDecoratorIntegrationTests extends BaseIntegrationT
 
     def personIdentificationNameService
 
-    protected void setUp() {
+	@Before
+	public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
     }
 
 
-    protected void tearDown() {
+	@After
+	public void tearDown() {
         super.tearDown()
     }
 
 
+	@Test
     void testNullNewPerson() {
         def newPerson = new PersonIdentificationNameDecorator()
         assertNull newPerson.pidm
@@ -37,6 +43,7 @@ class PersonIdentificationNameDecoratorIntegrationTests extends BaseIntegrationT
     }
 
 
+	@Test
     void testNewSectionFromSpriden() {
 
         def newPerson = new PersonIdentificationNameDecorator(PersonUtility.getPerson("HOF00714"))
@@ -47,6 +54,7 @@ class PersonIdentificationNameDecoratorIntegrationTests extends BaseIntegrationT
     }
 
 
+	@Test
     void testNewSectionFromMap() {
         def instructor = PersonUtility.getPerson("HOF00714")
         def newPerson = new PersonIdentificationNameDecorator([pidm: instructor.pidm,
@@ -62,6 +70,7 @@ class PersonIdentificationNameDecoratorIntegrationTests extends BaseIntegrationT
     }
 
 
+	@Test
     void testNewSectionFromMapUsingNameTemplateWithSurnamePrefixOff() {
         //get the name format from General Person Plugin messages.properties
         def application = ApplicationHolder.application
@@ -100,6 +109,7 @@ class PersonIdentificationNameDecoratorIntegrationTests extends BaseIntegrationT
     }
 
 
+	@Test
     void testNameFormatUsingNameTemplateWithSurnamePrefixTurnedOn() {
         //get the name format from General Person Plugin messages.properties
         def application = ApplicationHolder.application

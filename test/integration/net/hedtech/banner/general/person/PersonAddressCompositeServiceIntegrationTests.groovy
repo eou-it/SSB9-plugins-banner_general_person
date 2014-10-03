@@ -6,6 +6,9 @@ Copyright 2012 Ellucian Company L.P. and its affiliates.
  ****************************************************************************** */
 
 package net.hedtech.banner.general.person
+import org.junit.Before
+import org.junit.Test
+import org.junit.After
 
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.system.*
@@ -18,17 +21,20 @@ class PersonAddressCompositeServiceIntegrationTests extends BaseIntegrationTestC
     def personAddressCompositeService
 
 
-    protected void setUp() {
+	@Before
+	public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
     }
 
 
-    protected void tearDown() {
+	@After
+	public void tearDown() {
         super.tearDown()
     }
 
 
+	@Test
     void testCreateInactiveAddresses() {
         //Create 2 new addresses both inactive, hence no date checking
         def ipidm = PersonIdentificationName.findByBannerId("HOF00714").pidm
@@ -53,6 +59,7 @@ class PersonAddressCompositeServiceIntegrationTests extends BaseIntegrationTestC
     }
 
 
+	@Test
     void testCreateActiveAddressesOverlappingDates() {
         //Create 2 new addresses both active
         def ipidm = PersonIdentificationName.findByBannerId("HOF00714").pidm
@@ -79,6 +86,7 @@ class PersonAddressCompositeServiceIntegrationTests extends BaseIntegrationTestC
     }
 
 
+	@Test
     void testCreateActiveAddressesNullDates() {
         //Create 2 new addresses both active
         def ipidm = PersonIdentificationName.findByBannerId("HOF00714").pidm
@@ -105,6 +113,7 @@ class PersonAddressCompositeServiceIntegrationTests extends BaseIntegrationTestC
     }
 
 
+	@Test
     void testCreateActiveAddressesSuccessfulDates() {
         //Create 2 new addresses both active
         def ipidm = PersonIdentificationName.findByBannerId("HOF00714").pidm
@@ -134,6 +143,7 @@ class PersonAddressCompositeServiceIntegrationTests extends BaseIntegrationTestC
 
 
 
+	@Test
     void testPersonAddressDelete() {
         //Delete addresses taht got added
         def ipidm = PersonIdentificationName.findByBannerId("HOF00714").pidm
@@ -156,6 +166,7 @@ class PersonAddressCompositeServiceIntegrationTests extends BaseIntegrationTestC
     }
 
 
+	@Test
     void testUpdateAddressCreatePhone() {
         //Update of addresses along with updating the telephone with new telephones.  ie. create of sprtele
         def ipidm = PersonIdentificationName.findByBannerId("HOF00714").pidm
@@ -197,6 +208,7 @@ class PersonAddressCompositeServiceIntegrationTests extends BaseIntegrationTestC
     }
 
 
+	@Test
     void testUpdateAddressUpdatePhone() {
         //Update of addresses along with updating the telephone with new telephones.  ie. update of sprtele
         def ipidm = PersonIdentificationName.findByBannerId("HOF00714").pidm
@@ -230,6 +242,7 @@ class PersonAddressCompositeServiceIntegrationTests extends BaseIntegrationTestC
     }
 
 
+	@Test
     void testUpdateAddressCannotDeletePhone() {
         //Update of addresses along with updating the telephone with new telephones.  ie. update of sprtele
         def ipidm = PersonIdentificationName.findByBannerId("HOF00714").pidm

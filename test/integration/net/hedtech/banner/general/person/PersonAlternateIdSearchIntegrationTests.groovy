@@ -2,6 +2,9 @@
   Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
+import org.junit.Before
+import org.junit.Test
+import org.junit.After
 
 
 import net.hedtech.banner.testing.BaseIntegrationTestCase
@@ -9,19 +12,22 @@ import net.hedtech.banner.general.person.view.PersonAlternateIdView
 
 class PersonAlternateIdSearchIntegrationTests extends BaseIntegrationTestCase {
 
-    protected void setUp() {
+	@Before
+	public void setUp() {
         formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this (removing GEAPART because of GUOBOBS_UI_VERSION = B)
         super.setUp()
     }
 
-    protected void tearDown() {
+	@After
+	public void tearDown() {
         super.tearDown()
     }
 
     /**
      * Tests the Person Search by SSN.
      */
-    def testPersonSearchBySSN() {
+	@Test
+    void testPersonSearchBySSN() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
         def id
@@ -53,7 +59,8 @@ class PersonAlternateIdSearchIntegrationTests extends BaseIntegrationTestCase {
      * Tests the list of persons for inquiry page.
      * Search by preferredFirstName.
      */
-    def testDynamicFinder1() {
+	@Test
+    void testDynamicFinder1() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
 

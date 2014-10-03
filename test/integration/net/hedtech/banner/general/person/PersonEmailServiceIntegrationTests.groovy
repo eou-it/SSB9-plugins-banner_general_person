@@ -5,6 +5,9 @@ Copyright 2012 Ellucian Company L.P. and its affiliates.
  Copyright 2013 Ellucian Company L.P. and its affiliates.
  ****************************************************************************** */
 package net.hedtech.banner.general.person
+import org.junit.Before
+import org.junit.Test
+import org.junit.After
 
 import groovy.sql.Sql
 import net.hedtech.banner.exceptions.ApplicationException
@@ -54,7 +57,8 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
     def u_failure_displayWebIndicator = true
 
 
-    protected void setUp() {
+	@Before
+	public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
         initializeTestDataForReferences()
@@ -69,11 +73,13 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-    protected void tearDown() {
+	@After
+	public void tearDown() {
         super.tearDown()
     }
 
 
+	@Test
     void testPersonEmailValidCreate() {
         def personEmail = newValidForCreatePersonEmail()
         def map = [domainModel: personEmail]
@@ -87,6 +93,7 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testPersonEmailInvalidCreate() {
         def personEmail = newInvalidForCreatePersonEmail()
         def map = [domainModel: personEmail]
@@ -96,6 +103,7 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testPersonEmailValidUpdate() {
         def personEmail = newValidForCreatePersonEmail()
         def map = [domainModel: personEmail]
@@ -122,6 +130,7 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testPersonEmailInvalidUpdate() {
         def personEmail = newValidForCreatePersonEmail()
         def map = [domainModel: personEmail]
@@ -145,6 +154,7 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testPersonEmailPrimaryKeyUpdate() {
         def personEmail = newValidForCreatePersonEmail()
         def map = [domainModel: personEmail]
@@ -167,6 +177,7 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testPersonEmailDelete() {
         def personEmail = newValidForCreatePersonEmail()
         def map = [domainModel: personEmail]
@@ -179,6 +190,7 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testReadOnly() {
         def personEmail = newValidForCreatePersonEmail()
         def map = [domainModel: personEmail]

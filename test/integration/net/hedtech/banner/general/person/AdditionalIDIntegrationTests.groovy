@@ -2,6 +2,10 @@
 Copyright 2012 Ellucian Company L.P. and its affiliates.
 **********************************************************************************/
 package net.hedtech.banner.general.person
+import org.junit.Before
+import org.junit.Ignore
+import org.junit.Test
+import org.junit.After
 
 import grails.validation.ValidationException
 import groovy.sql.Sql
@@ -38,7 +42,8 @@ class AdditionalIDIntegrationTests extends BaseIntegrationTestCase {
     def u_failure_additionalId = "TTTTT"
 
 
-    protected void setUp() {
+	@Before
+	public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
         initializeTestDataForReferences()
@@ -61,11 +66,13 @@ class AdditionalIDIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-    protected void tearDown() {
+	@After
+	public void tearDown() {
         super.tearDown()
     }
 
 
+	@Test
     void testCreateValidAdditionalID() {
         def additionalID = newValidForCreateAdditionalID()
         additionalID.save(failOnError: true, flush: true)
@@ -74,6 +81,7 @@ class AdditionalIDIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testCreateInvalidAdditionalID() {
         def additionalID = newInvalidForCreateAdditionalID()
         shouldFail(ValidationException) {
@@ -82,6 +90,7 @@ class AdditionalIDIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Ignore
     void testUpdateValidAdditionalID() {
         def additionalID = newValidForCreateAdditionalID()
         additionalID.save(failOnError: true, flush: true)
@@ -92,13 +101,14 @@ class AdditionalIDIntegrationTests extends BaseIntegrationTestCase {
         //Update the entity
         additionalID.additionalId = u_success_additionalId
         additionalID.save(failOnError: true, flush: true)
-        //Assert for sucessful update
+        //Assert for successful update
         additionalID = AdditionalID.get(additionalID.id)
         assertEquals 1L, additionalID?.version
 
     }
 
 
+	@Test
     void testUpdateInvalidAdditionalID() {
         def additionalID = newValidForCreateAdditionalID()
         additionalID.save(failOnError: true, flush: true)
@@ -115,6 +125,7 @@ class AdditionalIDIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testDates() {
         def hour = new SimpleDateFormat('HH')
         def date = new SimpleDateFormat('yyyy-M-d')
@@ -123,7 +134,6 @@ class AdditionalIDIntegrationTests extends BaseIntegrationTestCase {
         def additionalID = newValidForCreateAdditionalID()
 
         additionalID.save(flush: true, failOnError: true)
-        additionalID.refresh()
         assertNotNull "AdditionalID should have been saved", additionalID.id
 
         // test date values -
@@ -134,6 +144,7 @@ class AdditionalIDIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testOptimisticLock() {
         def additionalID = newValidForCreateAdditionalID()
         additionalID.save(failOnError: true, flush: true)
@@ -154,6 +165,7 @@ class AdditionalIDIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testDeleteAdditionalID() {
         def additionalID = newValidForCreateAdditionalID()
         additionalID.save(failOnError: true, flush: true)
@@ -164,12 +176,14 @@ class AdditionalIDIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testValidation() {
         def additionalID = newInvalidForCreateAdditionalID()
         assertFalse "AdditionalID could not be validated as expected due to ${additionalID.errors}", additionalID.validate()
     }
 
 
+	@Test
     void testNullValidationFailure() {
         def additionalID = new AdditionalID()
         assertFalse "AdditionalID should have failed validation", additionalID.validate()

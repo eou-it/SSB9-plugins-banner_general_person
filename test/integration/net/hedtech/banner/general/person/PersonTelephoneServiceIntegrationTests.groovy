@@ -2,6 +2,9 @@
 Copyright 2012 Ellucian Company L.P. and its affiliates.
 **********************************************************************************/
 package net.hedtech.banner.general.person
+import org.junit.Before
+import org.junit.Test
+import org.junit.After
 
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.system.AddressType
@@ -82,7 +85,8 @@ class PersonTelephoneServiceIntegrationTests extends BaseIntegrationTestCase {
 	def u_failure_countryPhone = "TTTT"
     
 
-	protected void setUp() {
+    @Before
+	public void setUp() {
 		formContext = ['GUAGMNU']
 		super.setUp()
         initializeTestDataForReferences()
@@ -111,10 +115,14 @@ class PersonTelephoneServiceIntegrationTests extends BaseIntegrationTestCase {
 
 	}
 
-	protected void tearDown() {
+
+    @After
+	public void tearDown() {
 		super.tearDown()
 	}
 
+
+    @Test
 	void testPersonTelephoneValidCreate() {
 		def personTelephone = newValidForCreatePersonTelephone()
 		def map = [domainModel: personTelephone]
@@ -128,6 +136,8 @@ class PersonTelephoneServiceIntegrationTests extends BaseIntegrationTestCase {
 	    assertNotNull personTelephone.lastModified
     }
 
+
+    @Test
 	void testPersonTelephoneInvalidCreate() {
 		def personTelephone = newInvalidForCreatePersonTelephone()
 		def map = [domainModel: personTelephone]
@@ -136,6 +146,8 @@ class PersonTelephoneServiceIntegrationTests extends BaseIntegrationTestCase {
 		}
     }
 
+
+    @Test
 	void testPersonTelephoneValidUpdate() {
 		def personTelephone = newValidForCreatePersonTelephone()
 		def map = [domainModel: personTelephone]
@@ -176,6 +188,8 @@ class PersonTelephoneServiceIntegrationTests extends BaseIntegrationTestCase {
 		assertEquals u_success_addressType, personTelephone.addressType
 	}
 
+
+    @Test
 	void testPersonTelephoneInvalidUpdate() {
 		def personTelephone = newValidForCreatePersonTelephone()
 		def map = [domainModel: personTelephone]
@@ -206,6 +220,8 @@ class PersonTelephoneServiceIntegrationTests extends BaseIntegrationTestCase {
 		}
 	}
 
+
+    @Test
 	void testPersonTelephoneDelete() {
 		def personTelephone = newValidForCreatePersonTelephone()
 		def map = [domainModel: personTelephone]
@@ -217,7 +233,8 @@ class PersonTelephoneServiceIntegrationTests extends BaseIntegrationTestCase {
 		assertNull "PersonTelephone should have been deleted", personTelephone.get(id)
   	}
 
-	
+
+    @Test
 	void testReadOnly() {
 		def personTelephone = newValidForCreatePersonTelephone()
 		def map = [domainModel: personTelephone]

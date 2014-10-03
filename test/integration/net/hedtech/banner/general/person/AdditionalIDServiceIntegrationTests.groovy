@@ -3,6 +3,10 @@ Copyright 2012-2014 Ellucian Company L.P. and its affiliates.
 **********************************************************************************/
 
 package net.hedtech.banner.general.person
+import org.junit.Before
+import org.junit.Ignore
+import org.junit.Test
+import org.junit.After
 
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.system.AdditionalIdentificationType
@@ -31,7 +35,8 @@ class AdditionalIDServiceIntegrationTests extends BaseIntegrationTestCase {
     def u_failure_additionalId = "TTTTT"
 
 
-    protected void setUp() {
+	@Before
+	public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
         initializeTestDataForReferences()
@@ -54,11 +59,13 @@ class AdditionalIDServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-    protected void tearDown() {
+	@After
+	public void tearDown() {
         super.tearDown()
     }
 
 
+	@Test
     void testAdditionalIDValidCreate() {
         def additionalID = newValidForCreateAdditionalID()
         def map = [domainModel: additionalID]
@@ -72,6 +79,7 @@ class AdditionalIDServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testAdditionalIDInvalidCreate() {
         def additionalID = newInvalidForCreateAdditionalID()
         def map = [domainModel: additionalID]
@@ -81,6 +89,7 @@ class AdditionalIDServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testAdditionalIDValidUpdate() {
         def additionalID = newValidForCreateAdditionalID()
         def map = [domainModel: additionalID]
@@ -101,6 +110,7 @@ class AdditionalIDServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testAdditionalIDInvalidUpdate() {
         def additionalID = newValidForCreateAdditionalID()
         def map = [domainModel: additionalID]
@@ -121,6 +131,7 @@ class AdditionalIDServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Ignore
     void testAdditionalIDDelete() {
         def additionalID = newValidForCreateAdditionalID()
         def map = [domainModel: additionalID]
@@ -135,6 +146,7 @@ class AdditionalIDServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
     void testReadOnly() {
         def additionalID = newValidForCreateAdditionalID()
         def map = [domainModel: additionalID]
