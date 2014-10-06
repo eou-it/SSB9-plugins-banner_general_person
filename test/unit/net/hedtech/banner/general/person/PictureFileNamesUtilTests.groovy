@@ -4,17 +4,19 @@
 package net.hedtech.banner.general.person
 
 import grails.test.GrailsUnitTestCase
+import org.junit.Test
 
 
 class PictureFileNamesUtilTests extends GrailsUnitTestCase{
-    protected void setUp() {
+    public void setUp() {
         super.setUp()
     }
 
-    protected void tearDown() {
+    public void tearDown() {
         super.tearDown()
     }
 
+    @Test
     void testImgFileNames() {
         def names = PictureFileNamesUtil.getImgFileNames('JFROST789')
 
@@ -89,7 +91,7 @@ class PictureFileNamesUtilTests extends GrailsUnitTestCase{
         assert !names.contains('IRO.GIF')
     }
 
-
+    @Test
     void testGetExtensionFromFilename() {
         assertEquals( "bmp", PictureFileNamesUtil.getExtensionFromFilenameLowercase("JFROST789.bmp"))
         assertEquals( "bmp", PictureFileNamesUtil.getExtensionFromFilenameLowercase("JFROST789.BMP"))

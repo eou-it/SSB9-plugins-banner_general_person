@@ -20,6 +20,7 @@ import net.hedtech.banner.general.system.State
 import net.hedtech.banner.general.system.UnitOfMeasure
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 import org.junit.Ignore
+import org.junit.Test
 
 
 class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
@@ -97,7 +98,7 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-    protected void tearDown() {
+    public void tearDown() {
         super.tearDown()
     }
 
@@ -154,7 +155,7 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
         }
     }
 
-
+    @Test
     void testUpdatePersonFirstNameAndLastNameChange() {
         PersonBasicPersonBase personBasicPersonBase = createPersonBasicPersonBase()
         PersonIdentificationNameCurrent personIdentificationNameCurrent = PersonIdentificationNameCurrent.findAllByPidmInList([personBasicPersonBase.pidm]).get(0)
@@ -180,7 +181,7 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
         assertEquals personIdentificationNameAlternate.changeIndicator, 'N'
     }
 
-
+    @Test
     void testUpdatePersonIDChange() {
         PersonBasicPersonBase personBasicPersonBase = createPersonBasicPersonBase()
         PersonIdentificationNameCurrent personIdentificationNameCurrent = PersonIdentificationNameCurrent.findAllByPidmInList([personBasicPersonBase.pidm]).get(0)
@@ -197,7 +198,7 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
         assertEquals personIdentificationNameAlternate.changeIndicator, 'I'
     }
 
-
+    @Test
     void testUpdatePersonPersonBasicPersonBase() {
         PersonBasicPersonBase personBasicPersonBase = createPersonBasicPersonBase()
         PersonIdentificationNameCurrent personIdentificationNameCurrent = PersonIdentificationNameCurrent.findAllByPidmInList([personBasicPersonBase.pidm]).get(0)
@@ -215,7 +216,7 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
         assertEquals 'CCCCC', personBasicPersonBase.ssn
     }
 
-
+    @Test
     void testUpdatetestPersonAddressValidUpdate() {
         PersonBasicPersonBase personBasicPersonBase = createPersonBasicPersonBase()
         PersonIdentificationNameCurrent personIdentificationNameCurrent = PersonIdentificationNameCurrent.findAllByPidmInList([personBasicPersonBase.pidm]).get(0)
@@ -293,7 +294,7 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
         }
     }
 
-
+    @Test
     void testUpdatetestPersonPhonesValidUpdate() {
         PersonBasicPersonBase personBasicPersonBase = createPersonBasicPersonBase()
         PersonIdentificationNameCurrent personIdentificationNameCurrent = PersonIdentificationNameCurrent.findAllByPidmInList([personBasicPersonBase.pidm]).get(0)
@@ -370,7 +371,7 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
 
     }
 
-
+    @Test
     void testUpdatetestPersonRacesValidUpdate() {
 
         PersonBasicPersonBase personBasicPersonBase = createPersonBasicPersonBase()
@@ -402,7 +403,7 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
         assertEquals modifiedRacesList[1].guid, races[1].guid
     }
 
-
+    @Test
     void testUpdatetestPersonEthnicityValidUpdate() {
 
         PersonBasicPersonBase personBasicPersonBase = createPersonBasicPersonBase()
@@ -433,6 +434,7 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
     //PUT- person update API
+    @Test
     void testUpdatePersonEmailWithoutExistingEmailRecord() {
         PersonBasicPersonBase personBasicPersonBase = createPersonBasicPersonBase()
 
@@ -462,6 +464,7 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
     //PUT- person update API
+    @Test
     void testUpdatePersonEmailHavingExistingActiveEmailRecord() {
         PersonBasicPersonBase personBasicPersonBase = createPersonBasicPersonBase()
 
@@ -503,7 +506,7 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
         assertEquals i_success_emailAddress_work, o_person_update2.emails[0].emailAddress
     }
 
-
+    @Test
     private def createPersonBasicPersonBase() {
         def sql = new Sql(sessionFactory.getCurrentSession().connection())
         String idSql = """select gb_common.f_generate_id bannerId, gb_common.f_generate_pidm pidm from dual """

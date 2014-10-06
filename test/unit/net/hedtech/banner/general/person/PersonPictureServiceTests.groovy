@@ -5,6 +5,7 @@ package net.hedtech.banner.general.person
 
 import grails.test.GrailsUnitTestCase
 import grails.util.Holders
+import org.junit.Test
 
 class PersonPictureServiceTests  extends GrailsUnitTestCase{
 
@@ -12,7 +13,7 @@ class PersonPictureServiceTests  extends GrailsUnitTestCase{
     def testResourcePath = System.getProperty('base.dir') + File.separator + "test" + File.separator + "resources" +
             File.separator + "images" + File.separator + "resources"
 
-    protected void setUp() {
+    public void setUp() {
         super.setUp()
 
         // Setup our configuration path to our test location
@@ -20,11 +21,11 @@ class PersonPictureServiceTests  extends GrailsUnitTestCase{
                 "resources" + File.separator + "images"
     }
 
-    protected void tearDown() {
+    public void tearDown() {
         super.tearDown()
     }
 
-
+    @Test
     void testGetPictureFileForUserWith() {
         File pictureFile = personPictureService.getPictureFileForUserWith("JFROST789")
 
@@ -32,19 +33,21 @@ class PersonPictureServiceTests  extends GrailsUnitTestCase{
         assertTrue(pictureFile.getName().endsWith(".jpg"))
     }
 
+    @Test
     void testBadBannerId() {
         shouldFail(RuntimeException) {
            personPictureService.getPictureFileForUserWith("/file/JFROST789")
         }
     }
 
-
+    @Test
     void testGetDefaultPictureFileNoProperty() {
         File pictureFile = personPictureService.getDefaultPictureFile(testResourcePath)
         assertNotNull(pictureFile)
         assertEquals(PersonPictureService.NO_PHOTO_AVAILABLE, pictureFile.getName())
     }
 
+    @Test
     void testGetDefaultPictureFileWithProperty() {
         Holders.config.banner.defaultPhoto = System.getProperty('base.dir') + File.separator + "test" + File.separator +
                 "resources" + File.separator + "images" + File.separator + "default.png"
@@ -56,6 +59,7 @@ class PersonPictureServiceTests  extends GrailsUnitTestCase{
         Holders.config.banner.remove("defaultPhoto")
     }
 
+    @Test
     void testGetDefaultPictureFileNotFound() {
         Holders.config.banner.defaultPhoto = System.getProperty('base.dir') + File.separator + "test" + File.separator +
                 "resources" + File.separator + "images" + File.separator + "defaultbad.png"
