@@ -111,8 +111,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
     def u_failure_streetLine4 = "TTTTT"
 
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
         initializeTestDataForReferences()
@@ -147,13 +147,13 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
     }
 
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
 
-	@Test
+    @Test
     void testPersonEmergencyContactValidCreate() {
         def personEmergencyContact = newValidForCreatePersonEmergencyContact()
         def map = [domainModel: personEmergencyContact]
@@ -170,7 +170,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
     }
 
 
-	@Test
+    @Test
     void testPersonEmergencyContactInvalidCreate() {
         def personEmergencyContact = newInvalidForCreatePersonEmergencyContact()
         def map = [domainModel: personEmergencyContact]
@@ -180,7 +180,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
     }
 
 
-	@Test
+    @Test
     void testPersonEmergencyContactValidUpdate() {
         def personEmergencyContact = newValidForCreatePersonEmergencyContact()
         def map = [domainModel: personEmergencyContact]
@@ -240,7 +240,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
     }
 
 
-	@Test
+    @Test
     void testPersonEmergencyContactInvalidUpdate() {
         def personEmergencyContact = newValidForCreatePersonEmergencyContact()
         def map = [domainModel: personEmergencyContact]
@@ -282,7 +282,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
     }
 
 
-	@Test
+    @Test
     void testPersonEmergencyContactDelete() {
         def personEmergencyContact = newValidForCreatePersonEmergencyContact()
         def map = [domainModel: personEmergencyContact]
@@ -295,7 +295,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
     }
 
 
-	@Test
+    @Test
     void testReadOnly() {
         def personEmergencyContact = newValidForCreatePersonEmergencyContact()
         def map = [domainModel: personEmergencyContact]

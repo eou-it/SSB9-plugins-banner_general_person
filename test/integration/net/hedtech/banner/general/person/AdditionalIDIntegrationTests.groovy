@@ -42,8 +42,8 @@ class AdditionalIDIntegrationTests extends BaseIntegrationTestCase {
     def u_failure_additionalId = "TTTTT"
 
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
         initializeTestDataForReferences()
@@ -66,13 +66,13 @@ class AdditionalIDIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
 
-	@Test
+    @Test
     void testCreateValidAdditionalID() {
         def additionalID = newValidForCreateAdditionalID()
         additionalID.save(failOnError: true, flush: true)
@@ -81,7 +81,7 @@ class AdditionalIDIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testCreateInvalidAdditionalID() {
         def additionalID = newInvalidForCreateAdditionalID()
         shouldFail(ValidationException) {
@@ -91,6 +91,7 @@ class AdditionalIDIntegrationTests extends BaseIntegrationTestCase {
 
 
 	@Ignore
+    @Test
     void testUpdateValidAdditionalID() {
         def additionalID = newValidForCreateAdditionalID()
         additionalID.save(failOnError: true, flush: true)
@@ -108,7 +109,7 @@ class AdditionalIDIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testUpdateInvalidAdditionalID() {
         def additionalID = newValidForCreateAdditionalID()
         additionalID.save(failOnError: true, flush: true)
@@ -125,7 +126,7 @@ class AdditionalIDIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testDates() {
         def hour = new SimpleDateFormat('HH')
         def date = new SimpleDateFormat('yyyy-M-d')
@@ -144,7 +145,7 @@ class AdditionalIDIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testOptimisticLock() {
         def additionalID = newValidForCreateAdditionalID()
         additionalID.save(failOnError: true, flush: true)
@@ -165,7 +166,7 @@ class AdditionalIDIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testDeleteAdditionalID() {
         def additionalID = newValidForCreateAdditionalID()
         additionalID.save(failOnError: true, flush: true)
@@ -176,14 +177,14 @@ class AdditionalIDIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testValidation() {
         def additionalID = newInvalidForCreateAdditionalID()
         assertFalse "AdditionalID could not be validated as expected due to ${additionalID.errors}", additionalID.validate()
     }
 
 
-	@Test
+    @Test
     void testNullValidationFailure() {
         def additionalID = new AdditionalID()
         assertFalse "AdditionalID should have failed validation", additionalID.validate()

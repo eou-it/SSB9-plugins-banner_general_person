@@ -57,8 +57,8 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
     def u_failure_displayWebIndicator = true
 
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
         initializeTestDataForReferences()
@@ -73,13 +73,13 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
 
-	@Test
+    @Test
     void testPersonEmailValidCreate() {
         def personEmail = newValidForCreatePersonEmail()
         def map = [domainModel: personEmail]
@@ -93,7 +93,7 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testPersonEmailInvalidCreate() {
         def personEmail = newInvalidForCreatePersonEmail()
         def map = [domainModel: personEmail]
@@ -103,7 +103,7 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testPersonEmailValidUpdate() {
         def personEmail = newValidForCreatePersonEmail()
         def map = [domainModel: personEmail]
@@ -130,7 +130,7 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testPersonEmailInvalidUpdate() {
         def personEmail = newValidForCreatePersonEmail()
         def map = [domainModel: personEmail]
@@ -154,7 +154,7 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testPersonEmailPrimaryKeyUpdate() {
         def personEmail = newValidForCreatePersonEmail()
         def map = [domainModel: personEmail]
@@ -177,7 +177,7 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testPersonEmailDelete() {
         def personEmail = newValidForCreatePersonEmail()
         def map = [domainModel: personEmail]
@@ -190,7 +190,7 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testReadOnly() {
         def personEmail = newValidForCreatePersonEmail()
         def map = [domainModel: personEmail]

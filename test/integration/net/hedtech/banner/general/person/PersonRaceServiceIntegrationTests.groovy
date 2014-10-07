@@ -35,8 +35,8 @@ class PersonRaceServiceIntegrationTests extends BaseIntegrationTestCase {
     def u_failure_race = "MOAN"
 
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
         initializeTestDataForReferences()
@@ -51,13 +51,13 @@ class PersonRaceServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
 
-	@Test
+    @Test
     void testPersonRaceValidCreate() {
         def personRace = newValidForCreatePersonRace()
         def map = [domainModel: personRace]
@@ -70,7 +70,7 @@ class PersonRaceServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testPersonRaceInvalidCreate() {
         def personRace = newInvalidForCreatePersonRace()
         def map = [domainModel: personRace]
@@ -80,7 +80,7 @@ class PersonRaceServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testPersonRaceInvalidUpdate() {
         def personRace = newValidForCreatePersonRace()
         def map = [domainModel: personRace]
@@ -101,7 +101,7 @@ class PersonRaceServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testPersonRaceDelete() {
         def personRace = newValidForCreatePersonRace()
         def map = [domainModel: personRace]
@@ -114,7 +114,7 @@ class PersonRaceServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testReadOnly() {
         def personRace = newValidForCreatePersonRace()
         def map = [domainModel: personRace]
@@ -131,7 +131,7 @@ class PersonRaceServiceIntegrationTests extends BaseIntegrationTestCase {
         }
     }
 
-	@Test
+    @Test
     void testCreateOrUpdateValid() {
         PersonRace personRace = newValidForCreatePersonRace()
 
@@ -154,7 +154,7 @@ class PersonRaceServiceIntegrationTests extends BaseIntegrationTestCase {
 
     }
 
-	@Test
+    @Test
     void testCreateOrUpdateInValid() {
         PersonRace personRace = newInvalidForCreatePersonRace()
         Map map = [createPersonRaces: personRace]
@@ -163,7 +163,7 @@ class PersonRaceServiceIntegrationTests extends BaseIntegrationTestCase {
         }
     }
 
-	@Test
+    @Test
     void testDeletePersonRacesForInValid() {
            def personRace = newInvalidForCreatePersonRace()
            def map = [deletePersonRaces: personRace]

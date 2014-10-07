@@ -22,15 +22,15 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
     def personIdentificationNameAlternateService
 
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
     }
 
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
@@ -39,7 +39,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
     // *************************************************************************************************************
 
     // TODO test with GENERATED in id
-	@Test
+    @Test
     void testCreatePersonIdentificationNameCurrent() {
         def bannerId = "ID-T00001"
         def personList = []
@@ -60,7 +60,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
     }
 
 
-	@Test
+    @Test
     void testCreateCurrentNonPersonIdentificationName() {
         def bannerId = "ID-T00001"
         def personList = []
@@ -83,7 +83,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
     }
 
 
-	@Test
+    @Test
     void testCreateCurrentPersonIdentificationNameWithInvalidChangeIndicator() {
         def bannerId = "ID-T00001"
         def personList = []
@@ -102,7 +102,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
     }
 
 
-	@Test
+    @Test
     void testCreateCurrentWhereBannerIdExists() {
         def personList = []
         def person1 = newPersonIdentificationNameCurrent("ID-T00001")
@@ -120,7 +120,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
     }
 
 
-	@Test
+    @Test
     void testUpdateCurrentBannerId() {
         def origBannerId = "ID-T00001"
         def updateBannerId = "ID-U00001"
@@ -152,7 +152,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
     }
 
 
-	@Test
+    @Test
     void testUpdateCurrentNonPersonBannerId() {
         def origBannerId = "ID-T00001"
         def updateBannerId = "ID-U00001"
@@ -184,7 +184,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
     }
 
 
-	@Test
+    @Test
     void testUpdateBannerIdToExistingBannerId() {
         def person1 = setupNewPersonIdentificationNameCurrent("ID-T00001")
         def person2 = setupNewPersonIdentificationNameCurrent("ID-T00002")
@@ -205,7 +205,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
     }
 
 
-	@Test
+    @Test
     void testUpdateCurrentName() {
         def origBannerId = "ID-T00001"
         def updateLastName = "UPDATED_LAST_NAME"
@@ -247,7 +247,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
     }
 
 
-	@Test
+    @Test
     void testUpdateCurrentNonPersonName() {
         def origBannerId = "ID-T00001"
         def updateLastName = "UPDATED_LAST_NAME"
@@ -279,7 +279,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
     }
 
 
-	@Test
+    @Test
     void testUpdateCurrentBannerIdAndName() {
         def person = setupNewPersonIdentificationNameCurrent("ID-T00001")
 
@@ -302,7 +302,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
     }
 
 
-	@Test
+    @Test
     void testUpdateCurrentNameType() {
         def bannerId = "ID-T00001"
 
@@ -328,7 +328,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
     }
 
 
-	@Test
+    @Test
     void testUpdateCurrentEntityIndicator() {
         def person = setupNewPersonIdentificationNameCurrent("ID-T00001")
 
@@ -349,7 +349,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
     }
 
 
-	@Test
+    @Test
     void testUpdateCurrentNoChanges() {
         def person = setupNewPersonIdentificationNameCurrent("ID-T00001")
 
@@ -368,7 +368,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
     }
 
 
-	@Test
+    @Test
     void testUpdateReadOnlyFields() {
         def person = setupNewPersonIdentificationNameCurrent("ID-T00001")
         def alternatePerson = setupNewAlternateBannerId(person, "ID-A00001")
@@ -387,7 +387,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
     }
 
 
-	@Test
+    @Test
     void testDeleteCurrent() {
         def person = setupNewPersonIdentificationNameCurrent("ID-T00001")
 
@@ -407,7 +407,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
     //  Perform alternate Id tests.
     // *************************************************************************************************************
 
-	@Test
+    @Test
     void testCreateAlternateBannerId() {
         def origBannerId = "ID-T00001"
         def altBannerId = "ID-U00001"
@@ -450,7 +450,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
     }
 
 
-	@Test
+    @Test
     void testCreateAlternateName() {
         def origBannerId = "ID-T00001"
         def altLastName = "ALTERNATE_LAST_NAME"
@@ -495,7 +495,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
         assertEquals 0L, alternatePerson.version
     }
 
-	@Test
+    @Test
     void testCreateAlternatePersonIdentificationNameWithNullChangeIndicator() {
         def origBannerId = "ID-T00001"
         def altBannerId = "ID-U00001"
@@ -527,7 +527,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
     }
 
 
-	@Test
+    @Test
     void testUpdateAlternateNameType() {
         def origBannerId = "ID-T00001"
         def altBannerId = "ID-A00001"
@@ -546,7 +546,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
     }
 
 
-	@Test
+    @Test
     void testUpdateAlternateOtherThanNameType() {
         def origBannerId = "ID-T00001"
         def altBannerId = "ID-A00001"
@@ -569,7 +569,7 @@ class PersonIdentificationNameCompositeServiceIntegrationTests extends BaseInteg
     }
 
 
-	@Test
+    @Test
     void testDeleteAlternatePersonIdentificationName() {
         def origBannerId = "ID-T00001"
         def altBannerId = "ID-A00001"

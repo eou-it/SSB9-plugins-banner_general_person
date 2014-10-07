@@ -14,21 +14,21 @@ import org.junit.Ignore
 
 class NonPersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this (removing GEAPART because of GUOBOBS_UI_VERSION = B)
         super.setUp()
     }
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
     /**
      * Tests the Non-Person Search.
      */
-	@Test
+    @Test
     void testNonPersonSearch() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
@@ -52,7 +52,7 @@ class NonPersonSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests the list of Non-Persons.
      */
-	@Test
+    @Test
     void testNonPersonSearchByFilterAndPagination() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
@@ -77,7 +77,7 @@ class NonPersonSearchIntegrationTests extends BaseIntegrationTestCase {
      * Tests the list of Non-Persons for inquiry page.
      * Search by lastName
      */
-	@Test
+    @Test
     void testDynamicFinder1() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
@@ -109,7 +109,7 @@ class NonPersonSearchIntegrationTests extends BaseIntegrationTestCase {
      * Tests the list of Non-Persons for inquiry page.
      * Search by Id
      */
-	@Test
+    @Test
     void testDynamicFinder3() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
@@ -149,7 +149,7 @@ class NonPersonSearchIntegrationTests extends BaseIntegrationTestCase {
     //assert result.size() == 3
     //|      |      |
     //[]     0      false
-	@Test
+    @Test
     void testDynamicFinder4() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
@@ -181,7 +181,7 @@ class NonPersonSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests no data found.
      */
-	@Test
+    @Test
     void testDynamicFinder5() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
@@ -211,7 +211,7 @@ class NonPersonSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests no parameters on query - fetch all.
      */
-	@Test
+    @Test
     void testQueryAllWithNoParameters() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
@@ -230,7 +230,7 @@ class NonPersonSearchIntegrationTests extends BaseIntegrationTestCase {
      * Tests the list of non persons for inquiry page.
      * Search by soundexLastName
      */
-	@Test
+    @Test
     void testDynamicFinderSoundex() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]

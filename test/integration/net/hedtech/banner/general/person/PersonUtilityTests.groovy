@@ -16,20 +16,20 @@ import org.springframework.context.i18n.LocaleContextHolder
 class PersonUtilityTests extends BaseIntegrationTestCase {
 
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this
         super.setUp()
     }
 
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
 
-	@Test
+    @Test
     void testValidPerson() {
         def pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("HOS00001", null).pidm
         assertNotNull pidm
@@ -42,7 +42,7 @@ class PersonUtilityTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testGetWithBannerId() {
         def pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("HOS00001", null).pidm
         assertNotNull pidm
@@ -55,7 +55,7 @@ class PersonUtilityTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testGetWithPidm() {
         def pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("HOS00001", null).pidm
         assertNotNull pidm
@@ -67,7 +67,7 @@ class PersonUtilityTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testFormatName() {
         //get the name format from General Person Plugin messages.properties
         def application = ApplicationHolder.application
@@ -90,7 +90,7 @@ class PersonUtilityTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testNullPersonFormatName() {
         def formatName = PersonUtility.formatName([])
         assertNull formatName
@@ -100,7 +100,7 @@ class PersonUtilityTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testIsPersonDeceased() {
         def pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("JCSYS0001", null).pidm
         assertNotNull pidm
@@ -109,7 +109,7 @@ class PersonUtilityTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testIsPersonConfidential() {
         def pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("EVT00023", null).pidm
         assertNotNull pidm
@@ -118,7 +118,7 @@ class PersonUtilityTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testIsPersonConfidentialOrDeceased() {
         def pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("EVT00023", null).pidm
         assertNotNull pidm
@@ -134,7 +134,7 @@ class PersonUtilityTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testGetEmailId() {
         def pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("HOF00714", null).pidm
         assertNotNull pidm

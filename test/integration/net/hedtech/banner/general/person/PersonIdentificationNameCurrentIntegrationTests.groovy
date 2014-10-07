@@ -16,20 +16,20 @@ import net.hedtech.banner.testing.BaseIntegrationTestCase
 
 class PersonIdentificationNameCurrentIntegrationTests extends BaseIntegrationTestCase {
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this
         super.setUp()
     }
 
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
 
-	@Test
+    @Test
     void testCreatePersonIdentificationNameCurrent() {
         def personIdentificationNameCurrent = newPersonIdentificationNameCurrent("P")
         save personIdentificationNameCurrent
@@ -38,7 +38,7 @@ class PersonIdentificationNameCurrentIntegrationTests extends BaseIntegrationTes
     }
 
 
-	@Test
+    @Test
     void testDeletePersonIdentificationNameCurrent() {
         def personIdentificationNameCurrent = setupNewPersonIdentificationNameCurrent("P")
         def id = personIdentificationNameCurrent.id
@@ -53,14 +53,14 @@ class PersonIdentificationNameCurrentIntegrationTests extends BaseIntegrationTes
     }
 
 
-	@Test
+    @Test
     void testValidation() {
         def personIdentificationNameCurrent = newPersonIdentificationNameCurrent("P")
         assertTrue "PersonIdentificationNameCurrent could not be validated as expected due to ${personIdentificationNameCurrent.errors}", personIdentificationNameCurrent.validate()
     }
 
 
-	@Test
+    @Test
     void testNullValidationFailure() {
         def personIdentificationNameCurrent = new PersonIdentificationNameCurrent()
         assertFalse "PersonIdentificationNameCurrent should have failed validation", personIdentificationNameCurrent.validate()
@@ -89,7 +89,7 @@ class PersonIdentificationNameCurrentIntegrationTests extends BaseIntegrationTes
     }
 
 
-	@Test
+    @Test
     void testNullChangeIndicatorValidationFailure() {
         def personIdentificationNameCurrent = newPersonIdentificationNameCurrent("P")
         personIdentificationNameCurrent.changeIndicator = "I"
@@ -100,7 +100,7 @@ class PersonIdentificationNameCurrentIntegrationTests extends BaseIntegrationTes
 
 
 
-	@Test
+    @Test
     void testMaxSizeValidationFailures() {
         def personIdentificationNameCurrent = new PersonIdentificationNameCurrent(
                 firstName: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',

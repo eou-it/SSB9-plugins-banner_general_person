@@ -22,15 +22,15 @@ class PersonIdentificationNameAlternateServiceIntegrationTests extends BaseInteg
     final def GENERATED = "GENERATED"
 
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
     }
 
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
@@ -38,7 +38,7 @@ class PersonIdentificationNameAlternateServiceIntegrationTests extends BaseInteg
     //  Perform person alternate ID tests first.  Non-person alternate ID tests follow these tests.
     // *************************************************************************************************************
 
-	@Test
+    @Test
     void testCreatePersonIdentificationNameAlternateId() {
         def person = setupNewPersonIdentificationNameCurrent()
         def origBannerId = person.bannerId
@@ -68,7 +68,7 @@ class PersonIdentificationNameAlternateServiceIntegrationTests extends BaseInteg
     }
 
 
-	@Test
+    @Test
     void testCreatePersonIdentificationNameAlternateName() {
         def person = setupNewPersonIdentificationNameCurrent()
         def origBannerId = person.bannerId
@@ -106,7 +106,7 @@ class PersonIdentificationNameAlternateServiceIntegrationTests extends BaseInteg
     }
 
 
-	@Test
+    @Test
     void testCreateAlternatePersonIdentificationNameWithNullChangeIndicator() {
         def person = setupNewPersonIdentificationNameCurrent()
 
@@ -124,7 +124,7 @@ class PersonIdentificationNameAlternateServiceIntegrationTests extends BaseInteg
     }
 
 
-	@Test
+    @Test
     void testUpdateAlternateNameType() {
         def altId = "ID-ALT001"
         def person = setupNewPersonIdentificationNameCurrent()
@@ -143,7 +143,7 @@ class PersonIdentificationNameAlternateServiceIntegrationTests extends BaseInteg
     }
 
 
-	@Test
+    @Test
     void testUpdateAlternateOtherThanNameType() {
         def person = setupNewPersonIdentificationNameCurrent()
 
@@ -164,7 +164,7 @@ class PersonIdentificationNameAlternateServiceIntegrationTests extends BaseInteg
     }
 
 
-	@Test
+    @Test
     void testDeleteAlternatePersonIdentificationName() {
         def person = setupNewPersonIdentificationNameCurrent()
 

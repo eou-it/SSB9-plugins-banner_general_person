@@ -112,8 +112,8 @@ class PersonEmergencyContactIntegrationTests extends BaseIntegrationTestCase {
     def u_failure_streetLine4 = "TTTTT"
 
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
         initializeTestDataForReferences()
@@ -148,13 +148,13 @@ class PersonEmergencyContactIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
 
-	@Test
+    @Test
     void testCreateValidPersonEmergencyContact() {
         def personEmergencyContact = newValidForCreatePersonEmergencyContact()
         personEmergencyContact.save(failOnError: true, flush: true)
@@ -163,7 +163,7 @@ class PersonEmergencyContactIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testCreateInvalidPersonEmergencyContact() {
         def personEmergencyContact = newInvalidForCreatePersonEmergencyContact()
         shouldFail(ValidationException) {
@@ -172,7 +172,7 @@ class PersonEmergencyContactIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testUpdateValidPersonEmergencyContact() {
         def personEmergencyContact = newValidForCreatePersonEmergencyContact()
         personEmergencyContact.save(failOnError: true, flush: true)
@@ -243,7 +243,7 @@ class PersonEmergencyContactIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testUpdateInvalidPersonEmergencyContact() {
         def personEmergencyContact = newValidForCreatePersonEmergencyContact()
         personEmergencyContact.save(failOnError: true, flush: true)
@@ -297,7 +297,7 @@ class PersonEmergencyContactIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testDates() {
         def hour = new SimpleDateFormat('HH')
         def date = new SimpleDateFormat('yyyy-M-d')
@@ -319,7 +319,7 @@ class PersonEmergencyContactIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testOptimisticLock() {
         def personEmergencyContact = newValidForCreatePersonEmergencyContact()
         personEmergencyContact.save(failOnError: true, flush: true)
@@ -354,7 +354,7 @@ class PersonEmergencyContactIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testDeletePersonEmergencyContact() {
         def personEmergencyContact = newValidForCreatePersonEmergencyContact()
         personEmergencyContact.save(failOnError: true, flush: true)
@@ -365,14 +365,14 @@ class PersonEmergencyContactIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testValidation() {
         def personEmergencyContact = newInvalidForCreatePersonEmergencyContact()
         assertFalse "PersonEmergencyContact could not be validated as expected due to ${personEmergencyContact.errors}", personEmergencyContact.validate()
     }
 
 
-	@Test
+    @Test
     void testNullValidationFailure() {
         def personEmergencyContact = new PersonEmergencyContact()
         assertFalse "PersonEmergencyContact should have failed validation", personEmergencyContact.validate()
@@ -406,7 +406,7 @@ class PersonEmergencyContactIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testMaxSizeValidationFailures() {
         def personEmergencyContact = new PersonEmergencyContact(
                 middleInitial: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
@@ -427,7 +427,7 @@ class PersonEmergencyContactIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testFetchByPidmOrderByPriority() {
         def pidm = PersonUtility.getPerson("HOS00001").pidm
         def personEmergencyContact = newValidForCreatePersonEmergencyContact()

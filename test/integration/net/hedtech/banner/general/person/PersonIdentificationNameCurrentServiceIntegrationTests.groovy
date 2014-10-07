@@ -29,15 +29,15 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
 
     final def GENERATED = "GENERATED"
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
     }
 
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
@@ -45,7 +45,7 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
     //  Start person tests.  Non-person tests follow these tests.
     // *************************************************************************************************************
 
-	@Test
+    @Test
     void testCreatePersonIdentificationNameCurrent() {
         def bannerId = generateBannerId()
         def person = newPersonIdentificationNameCurrent(bannerId, null)
@@ -63,7 +63,7 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
         assertEquals 0, alternatePersons.size()
     }
 
-	@Test
+    @Test
     void testCreatePersonIdentificationNameCurrentWithGeneratedId() {
         def bannerId = GENERATED
         def person = newPersonIdentificationNameCurrent(bannerId, null)
@@ -83,7 +83,7 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
     }
 
 
-	@Test
+    @Test
     void testCreateWithInvalidChangeIndicator() {
         def bannerId = generateBannerId()
         def person = newPersonIdentificationNameCurrent(bannerId, null)
@@ -99,7 +99,7 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
     }
 
 
-	@Test
+    @Test
     void testCreateCurrentWhereBannerIdExists() {
         def person = setupNewPersonIdentificationNameCurrent()
         def bannerId = person.bannerId
@@ -116,7 +116,7 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
     }
 
 
-	@Test
+    @Test
     void testUpdateCurrentBannerId() {
         def person = setupNewPersonIdentificationNameCurrent()
         def origBannerId = person.bannerId
@@ -142,7 +142,7 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
     }
 
 
-	@Test
+    @Test
     void testUpdateCurrentBannerIdToExistingBannerId() {
         def person1 = setupNewPersonIdentificationNameCurrent()
         def person2 = setupNewPersonIdentificationNameCurrent()
@@ -158,7 +158,7 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
     }
 
 
-	@Test
+    @Test
     void testUpdateCurrentBannerIdToExistingSsn() {
         def person1 = setupNewPersonIdentificationNameCurrent()
         def person2 = setupNewPersonIdentificationNameCurrent()
@@ -176,7 +176,7 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
     }
 
 
-	@Test
+    @Test
     void testUpdateCurrentName() {
         def updateLastName = "UPDATED_LAST_NAME"
         def updateFirstName = "UPDATED_FIRST_NAME"
@@ -216,7 +216,7 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
 
 
 
-	@Test
+    @Test
     void testUpdateCurrentBannerIdAndName() {
         def person = setupNewPersonIdentificationNameCurrent()
 
@@ -236,7 +236,7 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
     }
 
 
-	@Test
+    @Test
     void testUpdateCurrentNameType() {
         def person = setupNewPersonIdentificationNameCurrent()
 
@@ -257,7 +257,7 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
     }
 
 
-	@Test
+    @Test
     void testUpdateCurrentEntityIndicator() {
         def person = setupNewPersonIdentificationNameCurrent()
 
@@ -275,7 +275,7 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
     }
 
 
-	@Test
+    @Test
     void testUpdateCurrentNoChanges() {
         def person = setupNewPersonIdentificationNameCurrent()
 
@@ -291,7 +291,7 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
     }
 
 
-	@Test
+    @Test
     void testUpdateReadOnlyFields() {
         def person = setupNewPersonIdentificationNameCurrent()
 
@@ -307,7 +307,7 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
     }
 
 
-	@Test
+    @Test
     void testDeleteCurrent() {
         def person = setupNewPersonIdentificationNameCurrent()
 
@@ -321,7 +321,7 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
     }
 
 
-	@Test
+    @Test
     void testLengthFullNameWithSurnamePrefix() {
         def updateSql = """update  gordmsk set gordmsk_display_ind = 'Y' where  gordmsk_objs_code   = '**SSB_MASKING'
                And Gordmsk_Block_Name  = 'F_FORMAT_NAME'
@@ -357,7 +357,7 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
     }
 
 
-	@Test
+    @Test
     void testLengthFullNameWithOutSureNamePrefixDisplayed() {
         def updateSql = """update  gordmsk set gordmsk_display_ind = 'N' where  gordmsk_objs_code   = '**SSB_MASKING'
                   And Gordmsk_Block_Name  = 'F_FORMAT_NAME'
@@ -395,7 +395,7 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
     //  Start non-person tests.
     // *************************************************************************************************************
 
-	@Test
+    @Test
     void testCreateCurrentNonPersonIdentificationName() {
         def bannerId = generateBannerId()
         def nonPerson = newNonPersonIdentificationNameCurrent(bannerId, null)
@@ -416,7 +416,7 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
     }
 
 
-	@Test
+    @Test
     void testUpdateCurrentNonPersonBannerId() {
         def nonPerson = setupNewNonPersonIdentificationNameCurrent()
         def origBannerId = nonPerson.bannerId
@@ -443,7 +443,7 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
     }
 
 
-	@Test
+    @Test
     void testUpdateCurrentNonPersonName() {
         def updateLastName = "UPDATED_LAST_NAME"
 
@@ -472,7 +472,7 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
     }
 
 
-	@Test
+    @Test
     void testLengthFullNameForContract() {
         def bannerId = generateBannerId()
         def nonPerson = newNonPersonIdentificationNameCurrent(bannerId, null)

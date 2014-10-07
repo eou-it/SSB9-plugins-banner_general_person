@@ -144,7 +144,7 @@ class PersonAddressServiceIntegrationTests extends BaseIntegrationTestCase {
 
 
     @Before
-	public void setUp() {
+    public void setUp() {
 		formContext = ['GUAGMNU']
 		super.setUp()
         initializeTestDataForReferences()
@@ -191,7 +191,7 @@ class PersonAddressServiceIntegrationTests extends BaseIntegrationTestCase {
 
 
     @After
-	public void tearDown() {
+    public void tearDown() {
 		super.tearDown()
 	}
 
@@ -355,7 +355,7 @@ class PersonAddressServiceIntegrationTests extends BaseIntegrationTestCase {
 	}
 
 
-	@Test
+    @Test
     void testPersonEmailPrimaryKeyUpdate() {
         def personAddress = newValidForCreatePersonAddress()
         def map = [domainModel: personAddress]

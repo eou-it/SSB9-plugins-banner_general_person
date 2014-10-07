@@ -21,20 +21,20 @@ class PersonAddressCompositeServiceIntegrationTests extends BaseIntegrationTestC
     def personAddressCompositeService
 
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
     }
 
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
 
-	@Test
+    @Test
     void testCreateInactiveAddresses() {
         //Create 2 new addresses both inactive, hence no date checking
         def ipidm = PersonIdentificationName.findByBannerId("HOF00714").pidm
@@ -59,7 +59,7 @@ class PersonAddressCompositeServiceIntegrationTests extends BaseIntegrationTestC
     }
 
 
-	@Test
+    @Test
     void testCreateActiveAddressesOverlappingDates() {
         //Create 2 new addresses both active
         def ipidm = PersonIdentificationName.findByBannerId("HOF00714").pidm
@@ -86,7 +86,7 @@ class PersonAddressCompositeServiceIntegrationTests extends BaseIntegrationTestC
     }
 
 
-	@Test
+    @Test
     void testCreateActiveAddressesNullDates() {
         //Create 2 new addresses both active
         def ipidm = PersonIdentificationName.findByBannerId("HOF00714").pidm
@@ -113,7 +113,7 @@ class PersonAddressCompositeServiceIntegrationTests extends BaseIntegrationTestC
     }
 
 
-	@Test
+    @Test
     void testCreateActiveAddressesSuccessfulDates() {
         //Create 2 new addresses both active
         def ipidm = PersonIdentificationName.findByBannerId("HOF00714").pidm
@@ -143,7 +143,7 @@ class PersonAddressCompositeServiceIntegrationTests extends BaseIntegrationTestC
 
 
 
-	@Test
+    @Test
     void testPersonAddressDelete() {
         //Delete addresses taht got added
         def ipidm = PersonIdentificationName.findByBannerId("HOF00714").pidm
@@ -166,7 +166,7 @@ class PersonAddressCompositeServiceIntegrationTests extends BaseIntegrationTestC
     }
 
 
-	@Test
+    @Test
     void testUpdateAddressCreatePhone() {
         //Update of addresses along with updating the telephone with new telephones.  ie. create of sprtele
         def ipidm = PersonIdentificationName.findByBannerId("HOF00714").pidm
@@ -208,7 +208,7 @@ class PersonAddressCompositeServiceIntegrationTests extends BaseIntegrationTestC
     }
 
 
-	@Test
+    @Test
     void testUpdateAddressUpdatePhone() {
         //Update of addresses along with updating the telephone with new telephones.  ie. update of sprtele
         def ipidm = PersonIdentificationName.findByBannerId("HOF00714").pidm
@@ -242,7 +242,7 @@ class PersonAddressCompositeServiceIntegrationTests extends BaseIntegrationTestC
     }
 
 
-	@Test
+    @Test
     void testUpdateAddressCannotDeletePhone() {
         //Update of addresses along with updating the telephone with new telephones.  ie. update of sprtele
         def ipidm = PersonIdentificationName.findByBannerId("HOF00714").pidm

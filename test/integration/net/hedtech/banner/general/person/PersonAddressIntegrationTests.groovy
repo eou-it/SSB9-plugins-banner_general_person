@@ -147,7 +147,7 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 	def u_failure_streetLine4 = "TTTTT"
 
     @Before
-	public void setUp() {
+    public void setUp() {
 		formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this (removing GEAPART because of GUOBOBS_UI_VERSION = B)
 		super.setUp()
 		initializeTestDataForReferences()
@@ -192,7 +192,7 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 
 
     @After
-	public void tearDown() {
+    public void tearDown() {
 		super.tearDown()
 	}
 
@@ -322,6 +322,7 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 
 
     @Ignore
+    @Test
 	void testUpdateInvalidPersonAddress() {
 		def personAddress = newValidForCreatePersonAddress()
 		save personAddress
@@ -392,7 +393,7 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 	}
 
 
-	@Test
+    @Test
      void testFetchByPidm() {
         def personAddress = newValidForCreatePersonAddress()
 		save personAddress
@@ -403,7 +404,7 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testOptimisticLock() {
         def sql1 = new Sql(sessionFactory.getCurrentSession().connection())
         sql1.executeUpdate("update gubinst set gubinst_finance_installed = 'Y'")
@@ -449,6 +450,7 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+    @Test
 	void testDeletePersonAddress() {
 		def personAddress = newValidForCreatePersonAddress()
 		save personAddress
@@ -458,14 +460,14 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 		assertNull PersonAddress.get( id )
 	}
 
-	@Test
+    @Test
     void testValidation() {
        def personAddress = newValidForCreatePersonAddress()
        assertTrue "PersonAddress could not be validated as expected due to ${personAddress.errors}", personAddress.validate()
     }
 
 
-	@Test
+    @Test
     void testNullValidationFailure() {
         def personAddress = new PersonAddress()
         assertFalse "PersonAddress should have failed validation", personAddress.validate()
@@ -506,7 +508,7 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testMaxSizeValidationFailures() {
         def personAddress = new PersonAddress(
         streetLine1:'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
@@ -530,7 +532,8 @@ class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	def testFetchListActiveAddressByPidmAndAddressType() {
+    @Test
+	void testFetchListActiveAddressByPidmAndAddressType() {
 		def pidmList = [PersonUtility.getPerson("HOF00714").pidm, PersonUtility.getPerson("HOF00716").pidm]
 		def results = PersonAddress.fetchListActiveAddressByPidmAndAddressType(pidmList, [AddressType.findByCode("MA"), AddressType.findByCode("PO")])
 

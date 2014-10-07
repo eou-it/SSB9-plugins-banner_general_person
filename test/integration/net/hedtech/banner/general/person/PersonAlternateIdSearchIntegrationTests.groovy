@@ -12,21 +12,21 @@ import net.hedtech.banner.general.person.view.PersonAlternateIdView
 
 class PersonAlternateIdSearchIntegrationTests extends BaseIntegrationTestCase {
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this (removing GEAPART because of GUOBOBS_UI_VERSION = B)
         super.setUp()
     }
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
     /**
      * Tests the Person Search by SSN.
      */
-	@Test
+    @Test
     void testPersonSearchBySSN() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
@@ -59,7 +59,7 @@ class PersonAlternateIdSearchIntegrationTests extends BaseIntegrationTestCase {
      * Tests the list of persons for inquiry page.
      * Search by preferredFirstName.
      */
-	@Test
+    @Test
     void testDynamicFinder1() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]

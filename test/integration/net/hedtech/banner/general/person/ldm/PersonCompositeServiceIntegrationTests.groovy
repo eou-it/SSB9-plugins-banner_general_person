@@ -2,6 +2,9 @@
  Copyright 2014 Ellucian Company L.P. and its affiliates.
  **********************************************************************************/
 package net.hedtech.banner.general.person.ldm
+import org.junit.Before
+import org.junit.Test
+import org.junit.After
 
 import groovy.sql.Sql
 import net.hedtech.banner.exceptions.ApplicationException
@@ -77,7 +80,8 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
     def i_success_emailType_work = "Work"
 
 
-    void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
         initializeTestDataForReferences()
@@ -98,11 +102,13 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+    @After
     public void tearDown() {
         super.tearDown()
     }
 
     @Ignore
+    @Test
     void testListQapiWithValidFirstAndLastName() {
         Map params = getParamsWithReqiuredFields()
         def persons = personCompositeService.list(params)
@@ -123,6 +129,7 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
     @Ignore
+    @Test
     void testListQapiWithInValidFirstAndLastName() {
         Map params = getParamsWithReqiuredFields()
         params.names[0].firstName = "MarkTT"
@@ -134,6 +141,7 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
     @Ignore
+    @Test
     void testListQapiWithInValidDateOfBirth() {
         Map params = getParamsWithReqiuredFields()
 
@@ -506,7 +514,6 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
         assertEquals i_success_emailAddress_work, o_person_update2.emails[0].emailAddress
     }
 
-    @Test
     private def createPersonBasicPersonBase() {
         def sql = new Sql(sessionFactory.getCurrentSession().connection())
         String idSql = """select gb_common.f_generate_id bannerId, gb_common.f_generate_pidm pidm from dual """

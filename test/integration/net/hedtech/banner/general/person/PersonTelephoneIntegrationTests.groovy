@@ -99,8 +99,8 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
     def addressTypes = [:]
 
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this (removing GEAPART because of GUOBOBS_UI_VERSION = B)
         super.setUp()
         initializeTestDataForReferences()
@@ -143,13 +143,13 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
 
-	@Test
+    @Test
     void testCreateValidPersonTelephone() {
         def personTelephone = newValidForCreatePersonTelephone()
         save personTelephone
@@ -159,7 +159,7 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
 
 
     @Ignore
-	@Test
+    @Test
     void testCreateInvalidPersonTelephone() {
         def personTelephone = newInvalidForCreatePersonTelephone()
         personTelephone.pidm = null
@@ -169,7 +169,7 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testUpdateValidPersonTelephone() {
         def personTelephone = newValidForCreatePersonTelephone()
         save personTelephone
@@ -220,7 +220,7 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
 
 
     @Ignore
-	@Test
+    @Test
     void testUpdateInvalidPersonTelephone() {
         def personTelephone = newValidForCreatePersonTelephone()
         save personTelephone
@@ -258,7 +258,7 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testOptimisticLock() {
         def personTelephone = newValidForCreatePersonTelephone()
         save personTelephone
@@ -288,7 +288,7 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testDeletePersonTelephone() {
         def personTelephone = newValidForCreatePersonTelephone()
         save personTelephone
@@ -299,14 +299,14 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testValidation() {
         def personTelephone = newInvalidForCreatePersonTelephone()
         assertTrue "PersonTelephone could not be validated as expected due to ${personTelephone.errors}", personTelephone.validate()
     }
 
 
-	@Test
+    @Test
     void testNullValidationFailure() {
         def personTelephone = new PersonTelephone()
         assertFalse "PersonTelephone should have failed validation", personTelephone.validate()
@@ -332,7 +332,7 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testMaxSizeValidationFailures() {
         def personTelephone = new PersonTelephone(
                 phoneArea: 'XXXXXXXX',
@@ -349,7 +349,7 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testFetchByPidmAndAddressSequenceAndType() {
         def pidm = PersonUtility.getPerson("HOS00001").pidm
         def addressType = AddressType.findByCode("MA")
@@ -370,7 +370,7 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testFetchByPidmSequenceNoAndAddressTypeWithPrimaryCheck() {
         def pidm = PersonUtility.getPerson("HOS00001").pidm
         def addressType = AddressType.findByCode("MA")
@@ -381,7 +381,7 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testFetchActiveTelephoneByPidmAndTelephoneType() {
         def pidm = PersonUtility.getPerson("HOS00001").pidm
         def maxSeqNo = PersonTelephone.fetchMaxSequenceNumber(pidm)
@@ -415,7 +415,7 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testFetchActiveTelephoneByPidmAndAddressType() {
         def pidm = PersonUtility.getPerson("HOS00001").pidm
         def maxSeqNo = PersonTelephone.fetchMaxSequenceNumber(pidm)
@@ -555,7 +555,8 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	def testFetchListActiveTelephoneByPidmAndTelephoneType() {
+    @Test
+	void testFetchListActiveTelephoneByPidmAndTelephoneType() {
 		def pidmList = [PersonUtility.getPerson("HOF00714").pidm, PersonUtility.getPerson("HOF00716").pidm]
 		def results = PersonTelephone.fetchListActiveTelephoneByPidmAndTelephoneType(pidmList, [TelephoneType.findByCode("MA"), TelephoneType.findByCode("PR")])
 

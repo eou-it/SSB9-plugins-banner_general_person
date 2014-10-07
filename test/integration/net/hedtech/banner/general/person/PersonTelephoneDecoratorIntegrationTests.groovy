@@ -16,20 +16,20 @@ class PersonTelephoneDecoratorIntegrationTests extends BaseIntegrationTestCase {
     def personTelephoneService
 
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
     }
 
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
 
-	@Test
+    @Test
     void testNullNewPersonTelephone() {
         def newPersonTelephone = new PersonTelephoneDecorator()
         assertNull newPersonTelephone.pidm
@@ -50,7 +50,7 @@ class PersonTelephoneDecoratorIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testNewSectionFromSprtele() {
         def personPidm = PersonUtility.getPerson("HOF00746").pidm
         def personTelephone = PersonTelephone.fetchActiveTelephoneByPidmAndTelephoneType(personPidm, 'MA')
@@ -63,7 +63,7 @@ class PersonTelephoneDecoratorIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testNewSectionFromMap() {
         def personPidm = PersonUtility.getPerson("HOF00746").pidm
         def newPersonTelephone = new PersonTelephoneDecorator([pidm: personPidm,

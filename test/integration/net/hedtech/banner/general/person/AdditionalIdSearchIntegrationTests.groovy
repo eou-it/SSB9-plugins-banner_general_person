@@ -13,21 +13,21 @@ import net.hedtech.banner.testing.BaseIntegrationTestCase
 class AdditionalIdSearchIntegrationTests extends BaseIntegrationTestCase {
 
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this (removing GEAPART because of GUOBOBS_UI_VERSION = B)
         super.setUp()
     }
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
     /**
      * Tests the list of additional ids by filter and pagination.
      */
-	@Test
+    @Test
     void testAdditionalIdSearchByFilterAndPagination() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
@@ -46,7 +46,7 @@ class AdditionalIdSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests the list of additional ids by filter.
      */
-	@Test
+    @Test
     void testAdditionalIdSearchByFilter() {
 
         def filter = "nne1"  //DEANNE1
@@ -64,7 +64,7 @@ class AdditionalIdSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests the list of additional ids by filter with birthday
      */
-	@Test
+    @Test
     void testAdditionalIdSearchByFilterBirthday() {
 
         def filter = "glasses"  //Wears glasses
@@ -83,7 +83,7 @@ class AdditionalIdSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests the list of additional ids for inquire page.
      */
-	@Test
+    @Test
     void testDynamicFinder() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
@@ -111,7 +111,7 @@ class AdditionalIdSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests the list of additional ids for the pidm list
      */
-	@Test
+    @Test
     void testAdditionalIdSearchByFilterAndPidm() {
         def pidmList = []
         pidmList.add(new Integer("36336"))

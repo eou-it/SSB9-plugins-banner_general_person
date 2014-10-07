@@ -2,6 +2,9 @@
  Copyright 2014 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person.ldm
+import org.junit.Before
+import org.junit.Test
+import org.junit.After
 
 
 import net.hedtech.banner.exceptions.ApplicationException
@@ -34,7 +37,8 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
     def restrictionTypeCompositeService
 
 
-    void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
         initiializeDataReferences()
@@ -69,6 +73,7 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
     }
 
 
+    @Test
     void testListWithoutPaginationParams() {
         List restrictionTypes = restrictionTypeCompositeService.list([:])
         assertNotNull restrictionTypes
@@ -77,6 +82,7 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
     }
 
 
+    @Test
     void testListWithPagination() {
         def paginationParams = [max: '2', offset: '0']
         List restrictionTypes = restrictionTypeCompositeService.list(paginationParams)
@@ -86,6 +92,7 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
     }
 
 
+    @Test
     void testListForPersonRestrictionType() {
         def personHoldList1 = PersonRelatedHold.fetchByPidmAndDateCompare(pidm, new Date())
         assertNotNull(personHoldList1)
@@ -101,6 +108,7 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
     }
 
 
+    @Test
     void testListForPersonRestrictionTypeInvalidGuid() {
         try {
             List<PersonRestrictionType> restrictionTypes = restrictionTypeCompositeService.list([parentPluralizedResourceName: LDM_NAME, parentId: 'Invalid-Guid'])
@@ -110,6 +118,7 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
     }
 
 
+    @Test
     void testListForPersonRestrictionTypeNullGuid() {
         try {
             List<PersonRestrictionType> restrictionTypes = restrictionTypeCompositeService.list([parentPluralizedResourceName: LDM_NAME, parentId: null])
@@ -119,6 +128,7 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
     }
 
 
+    @Test
     void testCount() {
         assertNotNull i_success_holdType
         assertEquals HoldType.count(), restrictionTypeCompositeService.count()
@@ -126,6 +136,7 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
     }
 
 
+    @Test
     void testGetInvalidGuid() {
         try {
             restrictionTypeCompositeService.get('Invalid-guid')
@@ -135,6 +146,7 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
     }
 
 
+    @Test
     void testGetNullGuid() {
         try {
             restrictionTypeCompositeService.get(null)
@@ -144,6 +156,7 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
     }
 
 
+    @Test
     void testGet() {
         def paginationParams = [max: '1', offset: '0']
         def restrictionTypes = restrictionTypeCompositeService.list(paginationParams)
@@ -165,6 +178,7 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
     }
 
 
+    @Test
     void testFetchByRestrictionTypeIdInvalid() {
         try {
             restrictionTypeCompositeService.fetchByRestrictionTypeId(null)
@@ -174,6 +188,7 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
     }
 
 
+    @Test
     void testFetchByRestrictionTypeId() {
         RestrictionType restrictionType = restrictionTypeCompositeService.fetchByRestrictionTypeId(i_success_holdType.id)
         assertNotNull restrictionType
@@ -184,12 +199,14 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
     }
 
 
+    @Test
     void testFetchByRestrictionTypeInvalid() {
         assertNull restrictionTypeCompositeService.fetchByRestrictionTypeCode(null)
         assertNull restrictionTypeCompositeService.fetchByRestrictionTypeCode('Q')
     }
 
 
+    @Test
     void testFetchByRestrictionTypeCode() {
         RestrictionType restrictionType = restrictionTypeCompositeService.fetchByRestrictionTypeCode(i_success_holdType.code)
         assertNotNull restrictionType
