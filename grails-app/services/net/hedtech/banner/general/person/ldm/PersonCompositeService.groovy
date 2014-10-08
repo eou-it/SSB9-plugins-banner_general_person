@@ -2,6 +2,7 @@
  Copyright 2014 Ellucian Company L.P. and its affiliates.
  *******************************************************************************/
 package net.hedtech.banner.general.person.ldm
+import net.hedtech.banner.exceptions.BusinessLogicValidationException
 
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.i18n.phonenumbers.Phonenumber
@@ -111,7 +112,7 @@ class PersonCompositeService extends LdmService {
             if (primaryName?.firstName && primaryName?.lastName) {
                 pidms = searchPerson(params)
             } else {
-                throw new ApplicationException("Person", "@@r1:missing.first.last.name:BusinessLogicValidationException@@")
+                throw new ApplicationException("Person", new BusinessLogicValidationException("missing.first.last.name",["BusinessLogicValidationException"]))
             }
         } else {
             if (params.role) {
@@ -123,7 +124,7 @@ class PersonCompositeService extends LdmService {
         }
         if (pidms.size() > 1000) {
             throw new ApplicationException("PersonCompositeService",
-                    "@@r1:max.results.exceeded:BusinessLogicValidationException@@")
+                    new BusinessLogicValidationException("max.results.exceeded",["BusinessLogicValidationException"]))
         }
         List<PersonIdentificationNameCurrent> personIdentificationList =
                 PersonIdentificationNameCurrent.findAllByPidmInList(pidms, sortAndPagingParams)
@@ -320,13 +321,13 @@ class PersonCompositeService extends LdmService {
                     if (it.credentialType == 'Social Security Number') {
                         if (it?.credentialId.length() > 9) {
                             throw new ApplicationException("PersonCompositeService",
-                                    "@@r1:credentialId.invalid:BusinessLogicValidationException@@")
+                                    new BusinessLogicValidationException("credentialId.invalid",["BusinessLogicValidationException"]))
                         }
                         person.put('ssn', it?.credentialId)
                     } else if (it.credentialType == 'Social Insurance Number') {
                         if (it?.credentialId.length() > 9) {
                             throw new ApplicationException("PersonCompositeService",
-                                    "@@r1:credentialId.invalid:BusinessLogicValidationException@@")
+                                    new BusinessLogicValidationException("credentialId.invalid",["BusinessLogicValidationException"]))
                         }
                         person.put('ssn', it?.credentialId)
                     } else if( Credential.additionalIdMap.containsValue(it.credentialType) ) {
@@ -346,7 +347,7 @@ class PersonCompositeService extends LdmService {
         try {
             maritalStatus = person.maritalStatusDetail instanceof Map && person.maritalStatusDetail?.guid ? maritalStatusCompositeService.get(person.maritalStatusDetail?.guid) : null
         } catch (ApplicationException e) {
-            throw new ApplicationException("PersonCompositeService", "@@r1:maritalStatus.invalid:BusinessLogicValidationException@@")
+            throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("maritalStatus.invalid",["BusinessLogicValidationException"]))
         }
         person.put('maritalStatus', maritalStatus ? MaritalStatus.findByCode(maritalStatus?.code) : null)
         def ethnicity
@@ -357,7 +358,7 @@ class PersonCompositeService extends LdmService {
         }
         catch (ApplicationException e) {
             if (e.wrappedException instanceof NotFoundException) {
-                throw new ApplicationException("PersonCompositeService", "@@r1:ethnicity.invalid:BusinessLogicValidationException@@")
+                throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("ethnicity.invalid",["BusinessLogicValidationException"]))
                 ethnicity = null
             } else {
                 throw e
@@ -443,7 +444,7 @@ class PersonCompositeService extends LdmService {
                                 activeAddress.put('nation', nation)
                             } else {
                                 log.error "Nation not found for code: ${activeAddress?.nation?.code}"
-                                throw new ApplicationException("Person", "@@r1:country.not.found.message:BusinessLogicValidationException@@")
+                                throw new ApplicationException("Person", new BusinessLogicValidationException("country.not.found.message",["BusinessLogicValidationException"]))
                             }
                         } else {
                             activeAddress.put('nation', null)
@@ -456,7 +457,7 @@ class PersonCompositeService extends LdmService {
                                 activeAddress.put('county', country)
                             } else {
                                 log.error "County not found for code: ${activeAddress.county}"
-                                throw new ApplicationException("Person", "@@r1:county.not.found.message:BusinessLogicValidationException@@")
+                                throw new ApplicationException("Person", new BusinessLogicValidationException("county.not.found.message",["BusinessLogicValidationException"]))
                             }
                         } else {
                             activeAddress.put('county', null)
@@ -475,19 +476,19 @@ class PersonCompositeService extends LdmService {
 
     def validateAddressRequiredFields(address) {
         if (!address.addressType) {
-            throw new ApplicationException("PersonCompositeService", "@@r1:addressType.invalid:BusinessLogicValidationException@@")
+            throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("addressType.invalid",["BusinessLogicValidationException"]))
         }
         if (!address.state) {
-            throw new ApplicationException("PersonCompositeService", "@@r1:region.invalid:BusinessLogicValidationException@@")
+            throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("region.invalid",["BusinessLogicValidationException"]))
         }
         if (!address.streetLine1) {
-            throw new ApplicationException("PersonCompositeService", "@@r1:streetAddress.invalid:BusinessLogicValidationException@@")
+            throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("streetAddress.invalid",["BusinessLogicValidationException"]))
         }
         if (!address.city) {
-            throw new ApplicationException("PersonCompositeService", "@@r1:city.invalid:BusinessLogicValidationException@@")
+            throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("city.invalid",["BusinessLogicValidationException"]))
         }
         if (!address.zip) {
-            throw new ApplicationException("PersonCompositeService", "@@r1:postalCode.invalid:BusinessLogicValidationException@@")
+            throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("postalCode.invalid",["BusinessLogicValidationException"]))
         }
     }
 
@@ -501,7 +502,7 @@ class PersonCompositeService extends LdmService {
                 }
                 catch (ApplicationException e) {
                     if (e.wrappedException instanceof NotFoundException) {
-                        throw new ApplicationException("PersonCompositeService", "@@r1:race.invalid:BusinessLogicValidationException@@")
+                        throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("race.invalid",["BusinessLogicValidationException"]))
                     } else {
                         throw e
                     }
@@ -518,7 +519,7 @@ class PersonCompositeService extends LdmService {
                 }
 
             } else {
-                throw new ApplicationException('PersonCompositeService', "@@r1:race.invalid:BusinessLogicValidationException@@")
+                throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("race.invalid",["BusinessLogicValidationException"]))
             }
         }
         races
@@ -552,10 +553,10 @@ class PersonCompositeService extends LdmService {
 
     def validatePhoneRequiredFields(phone) {
         if (!phone.telephoneType) {
-            throw new ApplicationException('PersonCompositeService', "@@r1:phoneType.invalid:BusinessLogicValidationException@@")
+            throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("phoneType.invalid",["BusinessLogicValidationException"]))
         }
         if (!phone.phoneNumber) {
-            throw new ApplicationException('PersonCompositeService', "@@r1:phoneNumber.invalid:BusinessLogicValidationException@@")
+            throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("phoneNumber.invalid",["BusinessLogicValidationException"]))
         }
     }
 
@@ -637,10 +638,10 @@ class PersonCompositeService extends LdmService {
 
     def validateEmailRequiredFields(email) {
         if (!email.emailType) {
-            throw new ApplicationException('PersonCompositeService', "@@r1:emailType.invalid:BusinessLogicValidationException@@")
+            throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("emailType.invalid",["BusinessLogicValidationException"]))
         }
         if (!email.emailAddress) {
-            throw new ApplicationException('PersonCompositeService', "@@r1:emailAddress.invalid:BusinessLogicValidationException@@")
+            throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("emailAddress.invalid",["BusinessLogicValidationException"]))
         }
     }
 
@@ -655,7 +656,7 @@ class PersonCompositeService extends LdmService {
         if (pidms.size() < 1) {
             return persons
         } else if (pidms.size() > 1000) {
-            throw new ApplicationException('PersonCompositeService', "@@r1:max.results.exceeded:BusinessLogicValidationException@@")
+            throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("max.results.exceeded",["BusinessLogicValidationException"]))
         }
         List<PersonBasicPersonBase> personBaseList = PersonBasicPersonBase.findAllByPidmInList(pidms)
         List<PersonAddress> personAddressList = PersonAddress.fetchActiveAddressesByPidmInList(pidms)
@@ -939,10 +940,10 @@ class PersonCompositeService extends LdmService {
                 person?.credentials?.each { it ->
                     if (it.credentialType == 'Social Security Number' && personBase.ssn != it?.credentialId) {
                         if (it?.credentialId == null) {
-                            throw new ApplicationException("PersonCompositeService", "@@r1:ssn.isNull:BusinessLogicValidationException@@")
+                            throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("ssn.isNull",["BusinessLogicValidationException"]))
                         }
                         if (it?.credentialId.trim() == '') {
-                            throw new ApplicationException("PersonCompositeService", "@@r1:ssn.isEmpty:BusinessLogicValidationException@@")
+                            throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("ssn.isEmpty",["BusinessLogicValidationException"]))
                         }
                         if (personBase.ssn == null || personBase.ssn != it?.credentialId) {
                             personBase.ssn = it?.credentialId
@@ -969,7 +970,7 @@ class PersonCompositeService extends LdmService {
                     try {
                         maritalStatus = person.maritalStatusDetail instanceof Map && person.maritalStatusDetail?.guid ? maritalStatusCompositeService.get(person.maritalStatusDetail?.guid) : null
                     } catch (ApplicationException e) {
-                        throw new ApplicationException("PersonCompositeService", "@@r1:maritalStatus.invalid:BusinessLogicValidationException@@")
+                        throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("maritalStatus.invalid",["BusinessLogicValidationException"]))
                     }
                     personBase.maritalStatus = maritalStatus ? MaritalStatus.findByCode(maritalStatus?.code) : null
 
@@ -1034,7 +1035,7 @@ class PersonCompositeService extends LdmService {
         try {
             maritalStatus = person.maritalStatusDetail instanceof Map && person.maritalStatusDetail?.guid ? maritalStatusCompositeService.get(person.maritalStatusDetail?.guid) : null
         } catch (ApplicationException e) {
-            throw new ApplicationException("PersonCompositeService", "@@r1:maritalStatus.invalid:BusinessLogicValidationException@@")
+            throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("maritalStatus.invalid",["BusinessLogicValidationException"]))
         }
         person.put('maritalStatus', maritalStatus ? MaritalStatus.findByCode(maritalStatus?.code) : null)
         def ethnicity
@@ -1045,7 +1046,7 @@ class PersonCompositeService extends LdmService {
         }
         catch (ApplicationException e) {
             if (e.wrappedException instanceof NotFoundException) {
-                throw new ApplicationException("PersonCompositeService", "@@r1:ethnicity.invalid:BusinessLogicValidationException@@")
+                throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("ethnicity.invalid",["BusinessLogicValidationException"]))
                 ethnicity = null
             } else {
                 throw e
@@ -1090,7 +1091,7 @@ class PersonCompositeService extends LdmService {
                                         nation = Nation.findByScodIso(activeAddress?.nation?.code)
                                         if (!nation) {
                                             log.error "Nation not found for code: ${activeAddress?.country?.code}"
-                                            throw new ApplicationException("Person", "@@r1:country.not.found.message:BusinessLogicValidationException@@")
+                                            throw new ApplicationException("Person", new BusinessLogicValidationException("country.not.found.message",["BusinessLogicValidationException"]))
                                         }
                                     }
                                     if (nation?.code != currentAddress.nation?.code) {
@@ -1105,7 +1106,7 @@ class PersonCompositeService extends LdmService {
                                         county = County.findByDescription(activeAddress.county)
                                         if (!county) {
                                             log.error "County not found for code: ${activeAddress.county}"
-                                            throw new ApplicationException("Person", "@@r1:county.not.found.message:BusinessLogicValidationException@@")
+                                            throw new ApplicationException("Person", new BusinessLogicValidationException("county.not.found.message",["BusinessLogicValidationException"]))
                                         }
                                     }
                                     if (county?.code != currentAddress.county?.code) {
@@ -1343,7 +1344,7 @@ class PersonCompositeService extends LdmService {
         catch (Exception e) {
             log.debug e.toString()
             return phoneNumber
-            //throw new ApplicationException("PersonCompositeService", "@@r1:phoneNumber.malformed:BusinessLogicValidationException@@")
+            //throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("phoneNumber.malformed",["BusinessLogicValidationException"]))
 
         }
     }
