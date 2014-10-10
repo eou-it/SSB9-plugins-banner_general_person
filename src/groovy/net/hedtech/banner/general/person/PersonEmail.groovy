@@ -32,8 +32,7 @@ query = """SELECT a.emailAddress
     WHERE a.pidm = :pidm
     AND a.statusIndicator = :statusIndicator
     AND a.preferredIndicator = :preferredIndicator
-    AND a.displayWebIndicator = :displayWebIndicator
-    order by a.lastModified desc, a.id asc"""),
+    AND a.displayWebIndicator = :displayWebIndicator"""),
 @NamedQuery(name = "PersonEmail.fetchListByPidmAndStatusAndWebDisplay",
 query = """FROM PersonEmail a
     WHERE a.pidm IN :pidm
