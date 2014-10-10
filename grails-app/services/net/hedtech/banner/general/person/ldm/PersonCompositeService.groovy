@@ -389,7 +389,7 @@ class PersonCompositeService extends LdmService {
         }
         persons.put(newPersonIdentificationName.pidm, currentRecord)
         def addresses = createAddresses(newPersonIdentificationName.pidm, metadata,
-                person.addresses instanceof List ? person.addresses : [])
+                person.addresses instanceof List ? person.addresses : [], false)
         persons = buildPersonAddresses(addresses, persons)
         def phones = createPhones(newPersonIdentificationName.pidm, metadata,
                 person.phones instanceof List ? person.phones : [])
@@ -427,7 +427,7 @@ class PersonCompositeService extends LdmService {
         globalUniqueIdentifierService.update(newEntity)
     }
 
-    List<PersonAddress> createAddresses(def pidm, Map metadata, List<Map> newAddresses) {
+    List<PersonAddress> createAddresses(def pidm, Map metadata, List<Map> newAddresses, Boolean updateRequestInd = false) {
         def addresses = []
         newAddresses?.each { activeAddress ->
             if (activeAddress instanceof Map) {
@@ -438,9 +438,11 @@ class PersonCompositeService extends LdmService {
                 }) {
                     activeAddress.put('addressType', AddressType.findByCode(rule?.value))
 
-                    activeAddress = getAddressRegion(activeAddress)
+                    if(!updateRequestInd) {
+                        activeAddress = getAddressRegion(activeAddress)
 
-                    activeAddress = getAddressPostalCode(activeAddress)
+                        activeAddress = getAddressPostalCode(activeAddress)
+                    }
 
                     if (activeAddress?.nation?.containsKey('code')) {
                         if (activeAddress.nation.code) {
@@ -1078,12 +1080,19 @@ class PersonCompositeService extends LdmService {
                     activeAddresses.each { activeAddress ->
                         switch (activeAddress?.addressType) {
                             default:
-                                if (activeAddress.containsKey('state'))
-                                    if (activeAddress.state != currentAddress.state.code) {
-                                        log.debug "State different"
-                                        invalidAddress = true
-                                        break;
-                                    }
+                                activeAddress = getAddressRegion(activeAddress)
+
+                                if (activeAddress.state.code != currentAddress.state.code) {
+                                    log.debug "State different"
+                                    invalidAddress = true
+                                }
+                                activeAddress = getAddressPostalCode(activeAddress)
+
+                                if (activeAddress.zip != currentAddress.zip) {
+                                    log.debug "Zip different"
+                                    invalidAddress = true
+                                    break;
+                                }
                                 if (activeAddress?.nation?.containsKey('code')) {
                                     def nation
                                     if (activeAddress.nation?.code) {
@@ -1135,13 +1144,6 @@ class PersonCompositeService extends LdmService {
                                         break;
                                     }
                                 }
-                                if (activeAddress.containsKey('zip')) {
-                                    if (activeAddress.zip != currentAddress.zip) {
-                                        log.debug "Zip different"
-                                        invalidAddress = true
-                                        break;
-                                    }
-                                }
                                 break;
                         }
                         if (invalidAddress) {
@@ -1163,10 +1165,12 @@ class PersonCompositeService extends LdmService {
                 }
             }
         }
-        createAddresses(pidm, metadata, newAddresses).each { currentAddress ->
-            def addressDecorator = new Address(currentAddress)
-            addressDecorator.addressType = findAllByProcessCodeAndSettingNameAndValue(PROCESS_CODE, PERSON_ADDRESS_TYPE, currentAddress.addressType.code)?.translationValue
-            addresses << addressDecorator
+
+        createAddresses(pidm, metadata, newAddresses, true).each {
+            currentAddress ->
+                def addressDecorator = new Address(currentAddress)
+                addressDecorator.addressType = findAllByProcessCodeAndSettingNameAndValue(PROCESS_CODE, PERSON_ADDRESS_TYPE, currentAddress.addressType.code)?.translationValue
+                addresses << addressDecorator
         }
         addresses
 
