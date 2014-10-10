@@ -68,6 +68,8 @@ class PersonCompositeService extends LdmService {
 
     def static ldmName = 'persons'
     static final String PERSON_ADDRESS_TYPE = "PERSON.ADDRESSES.ADDRESSTYPE"
+    static final String PERSON_REGION = "PERSON.ADDRESSES.REGION"
+    static final String PERSON_POSTAL_CODE = "PERSON.ADDRESSES.POSTAL.CODE"
     static final String PERSON_PHONE_TYPE = "PERSON.PHONES.PHONETYPE"
     static final String PERSON_EMAIL_TYPE = "PERSON.EMAILS.EMAILTYPE"
     static final String PROCESS_CODE = "LDM"
@@ -435,7 +437,11 @@ class PersonCompositeService extends LdmService {
                     it.addressType == rule?.value
                 }) {
                     activeAddress.put('addressType', AddressType.findByCode(rule?.value))
-                    activeAddress.put('state', State.findByCode(activeAddress.state))
+
+                    activeAddress = getAddressRegion(activeAddress)
+
+                    activeAddress = getAddressPostalCode(activeAddress)
+
                     if (activeAddress?.nation?.containsKey('code')) {
                         if (activeAddress.nation.code) {
                             Nation nation = Nation.findByScodIso(activeAddress?.nation?.code)
@@ -477,17 +483,11 @@ class PersonCompositeService extends LdmService {
         if (!address.addressType) {
             throw new ApplicationException("PersonCompositeService", "@@r1:addressType.invalid:BusinessLogicValidationException@@")
         }
-        if (!address.state) {
-            throw new ApplicationException("PersonCompositeService", "@@r1:region.invalid:BusinessLogicValidationException@@")
-        }
         if (!address.streetLine1) {
             throw new ApplicationException("PersonCompositeService", "@@r1:streetAddress.invalid:BusinessLogicValidationException@@")
         }
         if (!address.city) {
             throw new ApplicationException("PersonCompositeService", "@@r1:city.invalid:BusinessLogicValidationException@@")
-        }
-        if (!address.zip) {
-            throw new ApplicationException("PersonCompositeService", "@@r1:postalCode.invalid:BusinessLogicValidationException@@")
         }
     }
 
@@ -734,11 +734,11 @@ class PersonCompositeService extends LdmService {
     def buildPersonAddresses(List<PersonAddress> personAddressList, Map persons) {
         personAddressList.each { activeAddress ->
             Person currentRecord = persons.get(activeAddress.pidm)
-            IntegrationConfiguration rule = findAllByProcessCodeAndSettingNameAndValue(PROCESS_CODE, PERSON_ADDRESS_TYPE, activeAddress.addressType.code)
-            if (rule?.value == activeAddress.addressType?.code &&
-                    !currentRecord.addresses.contains { it.addressType == rule?.translationValue }) {
+            IntegrationConfiguration addressTypeRule = findAllByProcessCodeAndSettingNameAndValue(PROCESS_CODE, PERSON_ADDRESS_TYPE, activeAddress.addressType.code)
+            if (addressTypeRule?.value == activeAddress.addressType?.code &&
+                    !currentRecord.addresses.contains { it.addressType == addressTypeRule?.translationValue }) {
                 def address = new Address(activeAddress)
-                address.addressType = rule?.translationValue
+                address.addressType = addressTypeRule?.translationValue
                 currentRecord.addresses << address
             }
             persons.put(activeAddress.pidm, currentRecord)
@@ -1346,6 +1346,52 @@ class PersonCompositeService extends LdmService {
             //throw new ApplicationException("PersonCompositeService", "@@r1:phoneNumber.malformed:BusinessLogicValidationException@@")
 
         }
+    }
+
+
+    private def getAddressRegion(activeAddress) {
+        State state
+        if (activeAddress.state) {
+            state = State.findByCode(activeAddress.state)
+            if (!state) {
+                log.error "State not found for code: ${activeAddress.state}"
+                throw new ApplicationException("Person", "@@r1:state.not.found.message:BusinessLogicValidationException@@")
+            }
+            activeAddress.put('state', state)
+        } else {
+            IntegrationConfiguration intConf
+            intConf = IntegrationConfiguration.findByProcessCodeAndSettingName(PROCESS_CODE, PERSON_REGION)
+            if (!intConf) {
+                throw new ApplicationException(Person, "@@r1:goriccr.not.found.message:$PERSON_REGION:BusinessLogicValidationException@@")
+            }
+            state = State.findByCode(intConf?.value)
+            if (!state) {
+                throw new ApplicationException(Person, "@@r1:goriccr.invalid.value.message:$PERSON_REGION:BusinessLogicValidationException@@")
+            }
+            activeAddress.put('state', state)
+        }
+
+        return activeAddress
+    }
+
+
+    private def getAddressPostalCode(activeAddress) {
+        if (activeAddress.zip) {
+            activeAddress.put('zip', activeAddress.zip)
+        } else {
+            IntegrationConfiguration intConf
+            intConf = IntegrationConfiguration.findByProcessCodeAndSettingName(PROCESS_CODE, PERSON_POSTAL_CODE)
+            if (!intConf) {
+                throw new ApplicationException(Person, "@@r1:goriccr.not.found.message:$PERSON_POSTAL_CODE:BusinessLogicValidationException@@")
+            }
+
+            if(intConf.value == "UPDATE_ME") {
+                throw new ApplicationException(Person, "@@r1:goriccr.invalid.value.message:$PERSON_POSTAL_CODE:BusinessLogicValidationException@@")
+            }
+            activeAddress.put('zip', intConf.value)
+        }
+
+        return activeAddress
     }
 
 }
