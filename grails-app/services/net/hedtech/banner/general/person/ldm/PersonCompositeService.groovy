@@ -54,7 +54,6 @@ import java.text.ParseException
 class PersonCompositeService extends LdmService {
 
     def personIdentificationNameCurrentService
-    def personIdentificationNameAlternateService
     def personBasicPersonBaseService
     def personAddressService
     def personTelephoneService
@@ -82,24 +81,20 @@ class PersonCompositeService extends LdmService {
         def pidms = []
         def resultList
 
-        def sortAndPagingParams = [:]
+        def sortParams = [:]
         def allowedSortFields = ["firstName", "lastName"]
-        if (params.containsKey('max')) sortAndPagingParams.put('max', params.max)
-        if (params.containsKey('offset')) sortAndPagingParams.put('offset', params.offset)
-        if (params.containsKey('sort')) sortAndPagingParams.put('sort', params.sort)
-        if (params.containsKey('order')) sortAndPagingParams.put('order', params.order)
-        RestfulApiValidationUtility.correctMaxAndOffset(sortAndPagingParams, 500, 0)
-
+        if (params.containsKey('sort')) sortParams.put('sort', params.sort)
+        if (params.containsKey('order')) sortParams.put('order', params.order)
         if (params.sort) {
-            RestfulApiValidationUtility.validateSortField(sortAndPagingParams.sort, allowedSortFields)
+            RestfulApiValidationUtility.validateSortField(sortParams.sort, allowedSortFields)
         } else {
-            sortAndPagingParams.put('sort', allowedSortFields[1])
+            sortParams.put('sort', allowedSortFields[1])
         }
 
-        if (sortAndPagingParams.order) {
-            RestfulApiValidationUtility.validateSortOrder(sortAndPagingParams.order)
+        if (sortParams.order) {
+            RestfulApiValidationUtility.validateSortOrder(sortParams.order)
         } else {
-            sortAndPagingParams.put('order', "asc")
+            sortParams.put('order', "asc")
         }
 
         // Check if it is qapi request, if so do matching
@@ -114,22 +109,25 @@ class PersonCompositeService extends LdmService {
             if (primaryName?.firstName && primaryName?.lastName) {
                 pidms = searchPerson(params)
             } else {
-                throw new ApplicationException("Person", new BusinessLogicValidationException("missing.first.last.name",["BusinessLogicValidationException"]))
+                throw new ApplicationException("Person", new BusinessLogicValidationException("missing.first.last.name",[]))
             }
         } else {
             if (params.role) {
-                def roles = userRoleCompositeService.fetchAllByRole(params.role)
-                roles.each { key, value ->
-                    pidms << key
-                }
-            }
+                pidms = userRoleCompositeService.fetchAllByRole([role:params.role, sortAndPaging:sortParams])
+            } //Add DynamicFinder on PersonIdentificationName in future.
+
         }
-        if (pidms.size() > 1000) {
-            throw new ApplicationException("PersonCompositeService",
-                    new BusinessLogicValidationException("max.results.exceeded",["BusinessLogicValidationException"]))
-        }
+        def pageParams = [:]
+        //Need to provide pre-sorted full lists of pidms for count...
+        if (params.containsKey('max')) pageParams.put('max', params.max)
+        if (params.containsKey('offset')) pageParams.put('offset', params.offset)
+        RestfulApiValidationUtility.correctMaxAndOffset(pageParams, 500, 0)
+        pageParams.offset = pageParams.offset ?: "0"
+        def endCount = (pageParams.max.toInteger() + pageParams.offset.toInteger()) > (pidms.size() - 1) ?
+                pidms.size() - 1 : pageParams.max.toInteger() + pageParams.offset.toInteger() - 1
+
         List<PersonIdentificationNameCurrent> personIdentificationList =
-                PersonIdentificationNameCurrent.findAllByPidmInList(pidms, sortAndPagingParams)
+                PersonIdentificationNameCurrent.findAllByPidmInList( pidms[pageParams.offset.toInteger()..endCount],sortParams)
         def persons = buildLdmPersonObjects(personIdentificationList)
 
         try {  // Avoid restful-api plugin dependencies.
@@ -323,13 +321,13 @@ class PersonCompositeService extends LdmService {
                     if (it.credentialType == 'Social Security Number') {
                         if (it?.credentialId.length() > 9) {
                             throw new ApplicationException("PersonCompositeService",
-                                    new BusinessLogicValidationException("credentialId.invalid",["BusinessLogicValidationException"]))
+                                    new BusinessLogicValidationException("credentialId.invalid",[]))
                         }
                         person.put('ssn', it?.credentialId)
                     } else if (it.credentialType == 'Social Insurance Number') {
                         if (it?.credentialId.length() > 9) {
                             throw new ApplicationException("PersonCompositeService",
-                                    new BusinessLogicValidationException("credentialId.invalid",["BusinessLogicValidationException"]))
+                                    new BusinessLogicValidationException("credentialId.invalid",[]))
                         }
                         person.put('ssn', it?.credentialId)
                     } else if( Credential.additionalIdMap.containsValue(it.credentialType) ) {
@@ -349,7 +347,7 @@ class PersonCompositeService extends LdmService {
         try {
             maritalStatus = person.maritalStatusDetail instanceof Map && person.maritalStatusDetail?.guid ? maritalStatusCompositeService.get(person.maritalStatusDetail?.guid) : null
         } catch (ApplicationException e) {
-            throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("maritalStatus.invalid",["BusinessLogicValidationException"]))
+            throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("maritalStatus.invalid",[]))
         }
         person.put('maritalStatus', maritalStatus ? MaritalStatus.findByCode(maritalStatus?.code) : null)
         def ethnicity
@@ -360,7 +358,7 @@ class PersonCompositeService extends LdmService {
         }
         catch (ApplicationException e) {
             if (e.wrappedException instanceof NotFoundException) {
-                throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("ethnicity.invalid",["BusinessLogicValidationException"]))
+                throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("ethnicity.invalid",[]))
                 ethnicity = null
             } else {
                 throw e
@@ -451,7 +449,7 @@ class PersonCompositeService extends LdmService {
                                 activeAddress.put('nation', nation)
                             } else {
                                 log.error "Nation not found for code: ${activeAddress?.nation?.code}"
-                                throw new ApplicationException("Person", new BusinessLogicValidationException("country.not.found.message",["BusinessLogicValidationException"]))
+                                throw new ApplicationException("Person", new BusinessLogicValidationException("country.not.found.message",[]))
                             }
                         } else {
                             activeAddress.put('nation', null)
@@ -464,7 +462,7 @@ class PersonCompositeService extends LdmService {
                                 activeAddress.put('county', country)
                             } else {
                                 log.error "County not found for code: ${activeAddress.county}"
-                                throw new ApplicationException("Person", new BusinessLogicValidationException("county.not.found.message",["BusinessLogicValidationException"]))
+                                throw new ApplicationException("Person", new BusinessLogicValidationException("county.not.found.message",[]))
                             }
                         } else {
                             activeAddress.put('county', null)
@@ -482,9 +480,9 @@ class PersonCompositeService extends LdmService {
     }
 
     void validateAddressRequiredFields(address) {
-        if (!address.addressType) throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("addressType.invalid",["BusinessLogicValidationException"]))
-        else if (!address.streetLine1) throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("streetAddress.invalid",["BusinessLogicValidationException"]))
-        else if (!address.city) throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("city.invalid",["BusinessLogicValidationException"]))
+        if (!address.addressType) throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("addressType.invalid",[]))
+        else if (!address.streetLine1) throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("streetAddress.invalid",[]))
+        else if (!address.city) throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("city.invalid",[]))
     }
 
     List<PersonRace> createRaces(def pidm, Map metadata, List<Map> newRaces) {
@@ -497,7 +495,7 @@ class PersonCompositeService extends LdmService {
                 }
                 catch (ApplicationException e) {
                     if (e.wrappedException instanceof NotFoundException) {
-                        throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("race.invalid",["BusinessLogicValidationException"]))
+                        throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("race.invalid",[]))
                     } else {
                         throw e
                     }
@@ -514,7 +512,7 @@ class PersonCompositeService extends LdmService {
                 }
 
             } else {
-                throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("race.invalid",["BusinessLogicValidationException"]))
+                throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("race.invalid",[]))
             }
         }
         races
@@ -547,8 +545,8 @@ class PersonCompositeService extends LdmService {
     }
 
     void validatePhoneRequiredFields(phone) {
-        if (!phone.telephoneType) throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("phoneType.invalid",["BusinessLogicValidationException"]))
-        if (!phone.phoneNumber) throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("phoneNumber.invalid",["BusinessLogicValidationException"]))
+        if (!phone.telephoneType) throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("phoneType.invalid",[]))
+        if (!phone.phoneNumber) throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("phoneNumber.invalid",[]))
     }
 
     private List<PersonEmail> createPersonEmails(def pidm, Map metadata, List<Map> emailsInRequest) {
@@ -628,8 +626,8 @@ class PersonCompositeService extends LdmService {
 
 
     void validateEmailRequiredFields(email) {
-        if (!email.emailType) throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("emailType.invalid",["BusinessLogicValidationException"]))
-        if (!email.emailAddress) throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("emailAddress.invalid",["BusinessLogicValidationException"]))
+        if (!email.emailType) throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("emailType.invalid",[]))
+        if (!email.emailAddress) throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("emailAddress.invalid",[]))
 
     }
 
@@ -644,7 +642,7 @@ class PersonCompositeService extends LdmService {
         if (pidms.size() < 1) {
             return persons
         } else if (pidms.size() > 1000) {
-            throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("max.results.exceeded",["BusinessLogicValidationException"]))
+            throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("max.results.exceeded",[]))
         }
         List<PersonBasicPersonBase> personBaseList = PersonBasicPersonBase.findAllByPidmInList(pidms)
         List<PersonAddress> personAddressList = PersonAddress.fetchActiveAddressesByPidmInList(pidms)
@@ -928,10 +926,10 @@ class PersonCompositeService extends LdmService {
                 person?.credentials?.each { it ->
                     if (it.credentialType == 'Social Security Number' && personBase.ssn != it?.credentialId) {
                         if (it?.credentialId == null) {
-                            throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("ssn.isNull",["BusinessLogicValidationException"]))
+                            throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("ssn.isNull",[]))
                         }
                         if (it?.credentialId.trim() == '') {
-                            throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("ssn.isEmpty",["BusinessLogicValidationException"]))
+                            throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("ssn.isEmpty",[]))
                         }
                         if (personBase.ssn == null || personBase.ssn != it?.credentialId) {
                             personBase.ssn = it?.credentialId
@@ -958,7 +956,7 @@ class PersonCompositeService extends LdmService {
                     try {
                         maritalStatus = person.maritalStatusDetail instanceof Map && person.maritalStatusDetail?.guid ? maritalStatusCompositeService.get(person.maritalStatusDetail?.guid) : null
                     } catch (ApplicationException e) {
-                        throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("maritalStatus.invalid",["BusinessLogicValidationException"]))
+                        throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("maritalStatus.invalid",[]))
                     }
                     personBase.maritalStatus = maritalStatus ? MaritalStatus.findByCode(maritalStatus?.code) : null
 
@@ -1023,7 +1021,7 @@ class PersonCompositeService extends LdmService {
         try {
             maritalStatus = person.maritalStatusDetail instanceof Map && person.maritalStatusDetail?.guid ? maritalStatusCompositeService.get(person.maritalStatusDetail?.guid) : null
         } catch (ApplicationException e) {
-            throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("maritalStatus.invalid",["BusinessLogicValidationException"]))
+            throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("maritalStatus.invalid",[]))
         }
         person.put('maritalStatus', maritalStatus ? MaritalStatus.findByCode(maritalStatus?.code) : null)
         def ethnicity
@@ -1034,7 +1032,7 @@ class PersonCompositeService extends LdmService {
         }
         catch (ApplicationException e) {
             if (e.wrappedException instanceof NotFoundException) {
-                throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("ethnicity.invalid",["BusinessLogicValidationException"]))
+                throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("ethnicity.invalid",[]))
                 ethnicity = null
             } else {
                 throw e
@@ -1088,7 +1086,7 @@ class PersonCompositeService extends LdmService {
                                         nation = Nation.findByScodIso(activeAddress?.nation?.code)
                                         if (!nation) {
                                             log.error "Nation not found for code: ${activeAddress?.country?.code}"
-                                            throw new ApplicationException("Person", new BusinessLogicValidationException("country.not.found.message",["BusinessLogicValidationException"]))
+                                            throw new ApplicationException("Person", new BusinessLogicValidationException("country.not.found.message",[]))
                                         }
                                     }
                                     if (nation?.code != currentAddress.nation?.code) {
@@ -1103,7 +1101,7 @@ class PersonCompositeService extends LdmService {
                                         county = County.findByDescription(activeAddress.county)
                                         if (!county) {
                                             log.error "County not found for code: ${activeAddress.county}"
-                                            throw new ApplicationException("Person", new BusinessLogicValidationException("county.not.found.message",["BusinessLogicValidationException"]))
+                                            throw new ApplicationException("Person", new BusinessLogicValidationException("county.not.found.message",[]))
                                         }
                                     }
                                     if (county?.code != currentAddress.county?.code) {
@@ -1336,7 +1334,7 @@ class PersonCompositeService extends LdmService {
         catch (Exception e) {
             log.debug e.toString()
             return phoneNumber
-            //throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("phoneNumber.malformed",["BusinessLogicValidationException"]))
+            //throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("phoneNumber.malformed",[]))
 
         }
     }
