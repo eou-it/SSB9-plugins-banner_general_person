@@ -2,8 +2,8 @@
  Copyright 2014 Ellucian Company L.P. and its affiliates.
  *******************************************************************************/
 package net.hedtech.banner.general.person.ldm
-import net.hedtech.banner.exceptions.BusinessLogicValidationException
 
+import net.hedtech.banner.exceptions.BusinessLogicValidationException
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.i18n.phonenumbers.Phonenumber
 import groovy.sql.Sql
