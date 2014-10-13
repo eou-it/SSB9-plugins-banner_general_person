@@ -74,6 +74,18 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
     def i_success_emailType_institution = "Institution"
     def i_success_emailAddress_work = "123@ellucian.com"
     def i_success_emailType_work = "Work"
+    def i_success_first_name = "Mark"
+    def i_success_middle_name = "TR"
+    def i_success_last_name = "Mccallon"
+    def i_success_name_type = "Primary"
+    def i_success_address_type_1 = "Mailing"
+    def i_success_address_type_2 = "Home"
+    def i_success_city = "Pavo"
+    def i_success_state = "GA"
+    def i_success_zip = "31778"
+    def i_success_state_goriccr_data = "UNK"
+    def i_success_zip_goriccr_data = "UNKNOWN"
+    def i_success_street_line1 = "123 Main Line"
 
 
     void setUp() {
@@ -152,6 +164,26 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
         } catch (ApplicationException ae) {
             assertApplicationException ae, 'date.invalid.format.message'
         }
+    }
+
+    //POST- Person Create API
+    void testCreatePersonWithStateAndZipIntegrationSettingValue() {
+        Map content = newPersonWithAddressRequest()
+
+        def o_success_person_create = personCompositeService.create(content)
+
+        assertNotNull o_success_person_create
+        assertNotNull o_success_person_create.guid
+        assertEquals i_success_address_type_1, o_success_person_create.addresses[0].addressType
+        assertEquals i_success_city, o_success_person_create.addresses[0].address.city
+        assertEquals i_success_street_line1, o_success_person_create.addresses[0].address.streetLine1
+        assertEquals i_success_zip, o_success_person_create.addresses[0].address.zip
+        assertEquals i_success_state, o_success_person_create.addresses[0].address.state.code
+        assertEquals i_success_address_type_2, o_success_person_create.addresses[1].addressType
+        assertEquals i_success_city, o_success_person_create.addresses[1].address.city
+        assertEquals i_success_street_line1, o_success_person_create.addresses[1].address.streetLine1
+        assertEquals i_success_zip_goriccr_data, o_success_person_create.addresses[1].address.zip
+        assertEquals i_success_state_goriccr_data, o_success_person_create.addresses[1].address.state.code
     }
 
 
@@ -713,6 +745,15 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
     private Map updatePersonWithEmailAddress(String guid) {
         Map params = [id    : guid,
                       emails: [[emailAddress: i_success_emailAddress_personal, emailType: i_success_emailType_personal], [emailAddress: i_success_emailAddress_institution, emailType: i_success_emailType_institution]]
+        ]
+
+        return params
+    }
+
+
+    private Map newPersonWithAddressRequest() {
+        Map params = [names      : [[lastName: i_success_last_name, middleName: i_success_middle_name, firstName: i_success_first_name, nameType: i_success_name_type, namePrefix: i_success_namePrefix, nameSuffix: i_success_nameSuffix, preferenceFirstName: i_success_preferenceFirstName]],
+                      addresses  : [[addressType: i_success_address_type_1, city: i_success_city, state: i_success_state, streetLine1: i_success_street_line1, zip: i_success_zip], [addressType: i_success_address_type_2, city: i_success_city, streetLine1: i_success_street_line1]]
         ]
 
         return params

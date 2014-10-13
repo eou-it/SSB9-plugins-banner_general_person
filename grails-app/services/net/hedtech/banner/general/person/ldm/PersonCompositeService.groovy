@@ -1026,9 +1026,17 @@ class PersonCompositeService extends LdmService {
         }
         //Copy personBase attributes into person map from Primary names object.
         person.put('dataOrigin', person?.metadata?.dataOrigin)
-        person.put('namePrefix', newPersonIdentification.get('namePrefix'))
-        person.put('nameSuffix', newPersonIdentification.get('nameSuffix'))
-        person.put('preferenceFirstName', newPersonIdentification.get('preferenceFirstName'))
+        if (newPersonIdentification) {
+            if (newPersonIdentification.containsKey('namePrefix')) {
+                person.put('namePrefix', newPersonIdentification.get('namePrefix'))
+            }
+            if (newPersonIdentification.containsKey('nameSuffix')) {
+                person.put('nameSuffix', newPersonIdentification.get('nameSuffix'))
+            }
+            if (newPersonIdentification.containsKey('preferenceFirstName')) {
+                person.put('preferenceFirstName', newPersonIdentification.get('preferenceFirstName'))
+            }
+        }
         //Translate enumerations and defaults
         person.put('sex', person?.sex == 'Male' ? 'M' : (person?.sex == 'Female' ? 'F' : (person?.sex == 'Unknown' ? 'N' : null)))
         def maritalStatus
