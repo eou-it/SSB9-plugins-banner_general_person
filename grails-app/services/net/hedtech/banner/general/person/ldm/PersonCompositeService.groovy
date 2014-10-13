@@ -508,7 +508,7 @@ class PersonCompositeService extends LdmService {
                 if (personRace == null) {
                     races << personRaceService.create(newRace)
                 } else {
-                    throw new ApplicationException('PersonCompositeService', "@@r1:race.exists:${race.guid}::BusinessLogicValidationException@@")
+                    throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException('race.exists',[race.guid]))
                 }
 
             } else {
@@ -971,7 +971,7 @@ class PersonCompositeService extends LdmService {
                     personBase.deadIndicator = person.get('deadDate') != null ? 'Y' : null
                     personBase.deadDate = person.get('deadDate')
                     if (personBase.deadDate != null && personBase.birthDate != null && personBase.deadDate.before(personBase.birthDate)) {
-                        throw new ApplicationException("PersonCompositeService", "@@r1:dateDeceased.invalid:${personBase.deadDate}:BusinessLogicValidationException@@")
+                        throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException('dateDeceased.invalid',[personBase.deadDate]))
                     }
                 }
                 if (person.containsKey('birthDate')) {
@@ -1302,13 +1302,13 @@ class PersonCompositeService extends LdmService {
                     parsedNumber.put('phoneNumber', phoneNumber)
                 }
                 else {
-                    throw new ApplicationException("PersonCompositeService", "@@r1:phoneNumber.malformed:${phoneNumber}:BusinessLogicValidationException@@")
+                    throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("phoneNumber.malformed",[phoneNumber]))
                 }
             }
         }
         catch (Exception e) {
             log.debug e.toString()
-            throw new ApplicationException("PersonCompositeService", "@@r1:phoneNumber.malformed:${phoneNumber}:BusinessLogicValidationException@@")
+            throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("phoneNumber.malformed",[phoneNumber]))
 
         }
         if( parsedResult.getExtension() ) {
@@ -1346,18 +1346,18 @@ class PersonCompositeService extends LdmService {
             state = State.findByCode(activeAddress?.state)
             if (!state) {
                 log.error "State not found for code: ${activeAddress.state}"
-                throw new ApplicationException("Person", "@@r1:state.not.found.message:BusinessLogicValidationException@@")
+                throw new ApplicationException("Person", new BusinessLogicValidationException("state.not.found.message",[]))
             }
             activeAddress.put('state', state)
         } else {
             IntegrationConfiguration intConf
             intConf = IntegrationConfiguration.findByProcessCodeAndSettingName(PROCESS_CODE, PERSON_REGION)
             if (!intConf) {
-                throw new ApplicationException(Person, "@@r1:goriccr.not.found.message:$PERSON_REGION:BusinessLogicValidationException@@")
+                throw new ApplicationException(Person, new BusinessLogicValidationException("goriccr.not.found.message",[PERSON_REGION]))
             }
             state = State.findByCode(intConf?.value)
             if (!state) {
-                throw new ApplicationException(Person, "@@r1:goriccr.invalid.value.message:$PERSON_REGION:BusinessLogicValidationException@@")
+                throw new ApplicationException(Person, new BusinessLogicValidationException("goriccr.invalid.value.message",[PERSON_REGION]))
             }
             activeAddress.put('state', state)
         }
@@ -1373,11 +1373,11 @@ class PersonCompositeService extends LdmService {
             IntegrationConfiguration intConf
             intConf = IntegrationConfiguration.findByProcessCodeAndSettingName(PROCESS_CODE, PERSON_POSTAL_CODE)
             if (!intConf) {
-                throw new ApplicationException(Person, "@@r1:goriccr.not.found.message:$PERSON_POSTAL_CODE:BusinessLogicValidationException@@")
+                throw new ApplicationException(Person, new BusinessLogicValidationException("goriccr.not.found.message",[PERSON_POSTAL_CODE]))
             }
 
             if(intConf.value == "UPDATE_ME") {
-                throw new ApplicationException(Person, "@@r1:goriccr.invalid.value.message:$PERSON_POSTAL_CODE:BusinessLogicValidationException@@")
+                throw new ApplicationException(Person, new BusinessLogicValidationException("goriccr.invalid.value.message",[PERSON_POSTAL_CODE]))
             }
             activeAddress.put('zip', intConf.value)
         }
