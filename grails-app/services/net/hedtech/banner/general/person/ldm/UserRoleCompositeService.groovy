@@ -14,7 +14,7 @@ class UserRoleCompositeService {
  *
  * @param [role:"Student|Faculty",sortAndPaging[sort:"firstName|lastName",...etc]
  * @return List of ordered pidms [12345,12344]
- * We break the rules on this one for performance reasons, using executeQuery, only returning
+ * We are using executeQuery for performance reasons, only returning
  * what we really need, and using our ability to inner join un-related domains in executeQuery.
  */
     List fetchAllByRole( Map params ) {
@@ -30,12 +30,12 @@ class UserRoleCompositeService {
                             " FacultyAppointmentAccessView b" +
                             " where a.pidm = b.pidm" +
                             " and b.activeIndicator = 'A'" +
-                            " and b.termEffective = ( select max(c.termEffective)" +
-                            "                       from FacultyAppointmentAccessView c, Term d" +
+                            " and b.termEffective = ( select min(c.termEffective)" +
+                            "                       from FacultyAppointmentAccessView c, Term e" +
                             "                       where c.pidm = b.pidm" +
-                            "                       and c.termEffective = d.code" +
+                            "                       and c.termEnd = e.code" +
                             "                       and c.activeIndicator = 'A'" +
-                            "                       and d.startDate < current_date)" +
+                            "                       and current_date < e.endDate)" +
                             orderByString
                     results = PersonIdentificationNameCurrent.executeQuery(query,[:],params.sortAndPaging)
                 }
@@ -57,24 +57,32 @@ class UserRoleCompositeService {
 
     Map<Integer,List<RoleDetail>> fetchAllRolesByPidmInList( List pidms) {
         def results = [:]
-        def endTerm = Term.executeQuery("Select min(a.code) from Term a where" +
-                " a.startDate = (Select min(b.startDate) from Term b where " +
-                " b.endDate > current_date)")[0]
-        def allTerms = Term.list()
-        if( endTerm ) {
+        if( pidms.size() ) {
             try {
                 def domainClass = Class.forName("net.hedtech.banner.student.faculty.FacultyAppointmentAccessView",
                         true, Thread.currentThread().getContextClassLoader() )
-                domainClass.fetchAllActiveByMinTermEffectiveAndPidmInList(endTerm, pidms).each { faculty ->
-                    def roles = results.get(faculty.pidm) ?: []
+                def query = "Select a.pidm, d.startDate, f.startDate from PersonIdentificationNameCurrent a," +
+                        " FacultyAppointmentAccessView b, Term d, Term f" +
+                        " where a.pidm = b.pidm" +
+                        " and d.code = b.termEffective " +
+                        " and f.code = b.termEnd" +
+                        " and b.activeIndicator = 'A'" +
+                        " and b.termEffective = ( select min(c.termEffective)" +
+                        "                       from FacultyAppointmentAccessView c, Term e" +
+                        "                       where c.pidm = b.pidm" +
+                        "                       and c.termEnd = e.code" +
+                        "                       and c.activeIndicator = 'A'" +
+                        "                       and current_date < e.endDate) " +
+                        " and b.pidm in (" + pidms.join(',') + ")"
+                PersonIdentificationNameCurrent.executeQuery(query).each { faculty ->
+                    def roles = results.get(faculty[0]) ?: []
                     def newRole = new RoleDetail()
                     newRole.role = 'Faculty'
-                    Term startDate = allTerms.find{ it.code == faculty.termEffective }
-                    Term endDate = allTerms.find{ it.code == faculty.termEnd }
-                    newRole.effectiveStartDate = startDate.startDate
-                    newRole.effectiveEndDate = endDate.startDate
+                    newRole.effectiveStartDate = faculty[1]
+                    newRole.effectiveEndDate = faculty[2]
                     roles << newRole
-                    results.put(faculty.pidm, roles )
+                    results.put(faculty[0], roles )
+
                 }
             }
             catch( ClassNotFoundException e ){

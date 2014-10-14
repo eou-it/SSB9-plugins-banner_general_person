@@ -15,7 +15,6 @@ import net.hedtech.banner.general.person.AdditionalID
 import net.hedtech.banner.general.person.PersonAddress
 import net.hedtech.banner.general.person.PersonBasicPersonBase
 import net.hedtech.banner.general.person.PersonEmail
-import net.hedtech.banner.general.person.PersonIdentificationName
 import net.hedtech.banner.general.person.PersonIdentificationNameAlternate
 import net.hedtech.banner.general.person.PersonIdentificationNameCurrent
 import net.hedtech.banner.general.person.PersonRace
@@ -48,7 +47,6 @@ import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes
 import org.springframework.transaction.annotation.Transactional
 import java.sql.CallableStatement
 import java.sql.SQLException
-import java.text.ParseException
 
 @Transactional
 class PersonCompositeService extends LdmService {
@@ -66,7 +64,7 @@ class PersonCompositeService extends LdmService {
     def userRoleCompositeService
     def additionalIDService
 
-    def static ldmName = 'persons'
+    static final String ldmName = 'persons'
     static final String PERSON_ADDRESS_TYPE = "PERSON.ADDRESSES.ADDRESSTYPE"
     static final String PERSON_REGION = "PERSON.ADDRESSES.REGION"
     static final String PERSON_POSTAL_CODE = "PERSON.ADDRESSES.POSTAL.CODE"
@@ -409,7 +407,7 @@ class PersonCompositeService extends LdmService {
         persons.get(newPersonIdentificationName.pidm)
     }
 
-
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Integer getPidm(String guid) {
         def entity = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(ldmName, guid?.toLowerCase())
         if (!entity)
@@ -479,6 +477,7 @@ class PersonCompositeService extends LdmService {
         addresses
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     void validateAddressRequiredFields(address) {
         if (!address.addressType) throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("addressType.invalid",[]))
         else if (!address.streetLine1) throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("streetAddress.invalid",[]))
@@ -544,6 +543,7 @@ class PersonCompositeService extends LdmService {
         phones
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     void validatePhoneRequiredFields(phone) {
         if (!phone.telephoneType) throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("phoneType.invalid",[]))
         if (!phone.phoneNumber) throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("phoneNumber.invalid",[]))
@@ -624,7 +624,7 @@ class PersonCompositeService extends LdmService {
         return emailDecorators
     }
 
-
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     void validateEmailRequiredFields(email) {
         if (!email.emailType) throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("emailType.invalid",[]))
         if (!email.emailAddress) throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("emailAddress.invalid",[]))
@@ -1255,9 +1255,7 @@ class PersonCompositeService extends LdmService {
         def idCode = Credential.additionalIdMap.find { key, value ->
             value == credential.credentialType
         }?.key
-        log.error "Id Code: ${idCode}"
         def idType = AdditionalIdentificationType.findByCode(idCode)
-        log.error "Id type: ${idType}"
         List<AdditionalID> existingIds = AdditionalID.fetchByPidmInListAndAdditionalIdentificationTypeInList([personIdentification.pidm], [idCode])
         AdditionalID existingId
         if( existingIds.size() > 0 ) {
@@ -1270,10 +1268,10 @@ class PersonCompositeService extends LdmService {
                     additionalId: credential?.credentialId,
                     dataOrigin: metadata?.dataOrigin
             )
-        log.error "Existing ID: ${existingId}"
         additionalIDService.createOrUpdate ( existingId )
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     Map parsePhoneNumber(String phoneNumber) {
         Map parsedNumber = [:]
         List<InstitutionalDescription> institutions = InstitutionalDescription.list()
@@ -1317,6 +1315,7 @@ class PersonCompositeService extends LdmService {
         parsedNumber
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     String formatPhoneNumber(String phoneNumber) {
         List<InstitutionalDescription> institutions = InstitutionalDescription.list()
         def institution = institutions.size() > 0 ? institutions[0] : null
@@ -1339,7 +1338,7 @@ class PersonCompositeService extends LdmService {
         }
     }
 
-
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     private def getAddressRegion(activeAddress) {
         State state
         if (activeAddress.state) {
@@ -1365,7 +1364,7 @@ class PersonCompositeService extends LdmService {
         return activeAddress
     }
 
-
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     private def getAddressPostalCode(activeAddress) {
         if (activeAddress.zip) {
             activeAddress.put('zip', activeAddress.zip)
@@ -1385,6 +1384,7 @@ class PersonCompositeService extends LdmService {
         return activeAddress
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     private def getStateAndZip(activeAddress) {
         getAddressPostalCode(getAddressRegion(activeAddress))
     }
