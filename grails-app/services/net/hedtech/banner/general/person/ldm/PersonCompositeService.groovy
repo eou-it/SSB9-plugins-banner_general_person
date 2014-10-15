@@ -77,7 +77,7 @@ class PersonCompositeService extends LdmService {
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     def list(params) {
         def pidms = []
-        def resultList
+        def resultList = [:]
 
         def sortParams = [:]
         def allowedSortFields = ["firstName", "lastName"]
@@ -115,24 +115,25 @@ class PersonCompositeService extends LdmService {
             } //Add DynamicFinder on PersonIdentificationName in future.
 
         }
-        def pageParams = [:]
-        //Need to provide pre-sorted full lists of pidms for count...
-        if (params.containsKey('max')) pageParams.put('max', params.max)
-        if (params.containsKey('offset')) pageParams.put('offset', params.offset)
-        RestfulApiValidationUtility.correctMaxAndOffset(pageParams, 500, 0)
-        pageParams.offset = pageParams.offset ?: "0"
-        def endCount = (pageParams.max.toInteger() + pageParams.offset.toInteger()) > (pidms.size() - 1) ?
-                pidms.size() - 1 : pageParams.max.toInteger() + pageParams.offset.toInteger() - 1
+        if( pidms.size() ) {
+            def pageParams = [:]
+            //Need to provide pre-sorted full lists of pidms for count...
+            if (params.containsKey('max')) pageParams.put('max', params.max)
+            if (params.containsKey('offset')) pageParams.put('offset', params.offset)
+            RestfulApiValidationUtility.correctMaxAndOffset(pageParams, 500, 0)
+            pageParams.offset = pageParams.offset ?: "0"
+            def endCount = (pageParams.max.toInteger() + pageParams.offset.toInteger()) > (pidms.size() - 1) ?
+                    pidms.size() - 1 : pageParams.max.toInteger() + pageParams.offset.toInteger() - 1
 
-        List<PersonIdentificationNameCurrent> personIdentificationList =
-                PersonIdentificationNameCurrent.findAllByPidmInList( pidms[pageParams.offset.toInteger()..endCount],sortParams)
-        def persons = buildLdmPersonObjects(personIdentificationList)
-
+            List<PersonIdentificationNameCurrent> personIdentificationList =
+                    PersonIdentificationNameCurrent.findAllByPidmInList(pidms[pageParams.offset.toInteger()..endCount], sortParams)
+            resultList = buildLdmPersonObjects(personIdentificationList)
+        }
         try {  // Avoid restful-api plugin dependencies.
-            resultList = this.class.classLoader.loadClass('net.hedtech.restfulapi.PagedResultArrayList').newInstance(persons.values(), pidms?.size())
+            resultList = this.class.classLoader.loadClass('net.hedtech.restfulapi.PagedResultArrayList').newInstance(resultList?.values() ?: [], pidms?.size())
         }
         catch (ClassNotFoundException e) {
-            resultList = persons.values()
+            resultList = resultList.values()
         }
         resultList
     }
