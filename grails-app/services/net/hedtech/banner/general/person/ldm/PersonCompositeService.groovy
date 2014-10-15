@@ -213,7 +213,7 @@ class PersonCompositeService extends LdmService {
         try {
             maritalStatus = person.maritalStatusDetail instanceof Map && person.maritalStatusDetail?.guid ? maritalStatusCompositeService.get(person.maritalStatusDetail?.guid) : null
         } catch (ApplicationException e) {
-            throw new ApplicationException("PersonCompositeService", "@@r1:maritalStatus.invalid:BusinessLogicValidationException@@")
+            throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("maritalStatus.invalid",[]))
         }
         person.put('maritalStatus', maritalStatus ? MaritalStatus.findByCode(maritalStatus?.code) : null)
         def ethnicity
@@ -224,7 +224,7 @@ class PersonCompositeService extends LdmService {
         }
         catch (ApplicationException e) {
             if (e.wrappedException instanceof NotFoundException) {
-                throw new ApplicationException("PersonCompositeService", "@@r1:ethnicity.invalid:BusinessLogicValidationException@@")
+                throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("ethnicity.invalid",[]))
                 ethnicity = null
             } else {
                 throw e
@@ -642,7 +642,7 @@ class PersonCompositeService extends LdmService {
                 IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(
                         PROCESS_CODE, PERSON_ADDRESS_TYPE, activeAddress.addressType)
                 if (!rule) {
-                    throw new ApplicationException('PersonCompositeService', "@@r1:goriccr.not.found.message:$PERSON_ADDRESS_TYPE:BusinessLogicValidationException@@")
+                    throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("goriccr.not.found.message",[PERSON_ADDRESS_TYPE]))
                 }
                 if (rule.translationValue == activeAddress.addressType && !addresses.contains {
                     it.addressType == rule?.value
@@ -728,7 +728,7 @@ class PersonCompositeService extends LdmService {
                 IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_PHONE_TYPE, activePhone.phoneType)
                 if (!rule) {
                     log.error "Rule not found for phone:" + activePhone.toString()
-                    throw new ApplicationException('PersonCompositeService', "@@r1:goriccr.not.found.message:$PERSON_PHONE_TYPE:BusinessLogicValidationException@@")
+                    throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("goriccr.not.found.message",[PERSON_PHONE_TYPE]))
                 }
                 if (rule?.translationValue == activePhone.phoneType &&
                         !phones.contains { activePhone.phoneType == rule?.value }) {
@@ -772,7 +772,7 @@ class PersonCompositeService extends LdmService {
 
         IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_EMAIL_TYPE, emailInRequest.emailType.trim())
         if (!rule) {
-            throw new ApplicationException('PersonCompositeService', "@@r1:goriccr.not.found.message:$PERSON_EMAIL_TYPE:BusinessLogicValidationException@@")
+            throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("goriccr.not.found.message",[PERSON_EMAIL_TYPE]))
         }
         if (rule.value) {
             personEmail = new PersonEmail(pidm: pidm, emailAddress: emailInRequest.emailAddress, statusIndicator: "A", emailType: EmailType.findByCode(rule.value), dataOrigin: metadata?.dataOrigin)
@@ -1394,50 +1394,50 @@ class PersonCompositeService extends LdmService {
 
     def validateAddressRequiredFields(address) {
         if (!address.addressType) {
-            throw new ApplicationException("PersonCompositeService", "@@r1:addressType.invalid:BusinessLogicValidationException@@")
+            throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("addressType.invalid",[]))
         }
         if (!address.streetLine1) {
-            throw new ApplicationException("PersonCompositeService", "@@r1:streetAddress.invalid:BusinessLogicValidationException@@")
+            throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("streetAddress.invalid",[]))
         }
         if (!address.city) {
-            throw new ApplicationException("PersonCompositeService", "@@r1:city.invalid:BusinessLogicValidationException@@")
+            throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("city.invalid",[]))
         }
     }
 
 
     def validatePhoneRequiredFields(phone) {
         if (!phone.telephoneType) {
-            throw new ApplicationException('PersonCompositeService', "@@r1:phoneType.invalid:BusinessLogicValidationException@@")
+            throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("phoneType.invalid",[]))
         }
         if (!phone.phoneNumber) {
-            throw new ApplicationException('PersonCompositeService', "@@r1:phoneNumber.invalid:BusinessLogicValidationException@@")
+            throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("phoneNumber.invalid",[]))
         }
     }
 
 
     def validateEmailRequiredFields(email) {
         if (!email.emailType) {
-            throw new ApplicationException('PersonCompositeService', "@@r1:emailType.invalid:BusinessLogicValidationException@@")
+            throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("emailType.invalid",[]))
         }
         if (!email.emailAddress) {
-            throw new ApplicationException('PersonCompositeService', "@@r1:emailAddress.invalid:BusinessLogicValidationException@@")
+            throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("emailAddress.invalid",[]))
         }
     }
 
 
     private def validateCredentialType(String inputCredentialType, def allowedCredentialTypes, String credentialId) {
         if (!allowedCredentialTypes.contains(inputCredentialType)) {
-            throw new ApplicationException('Person', "@@r1:invalid.code.message:credentialType:BusinessLogicValidationException@@")
+            throw new ApplicationException('Person', new BusinessLogicValidationException("invalid.code.message:credentialType",[]))
         }
         if (inputCredentialType == 'Social Security Number' || inputCredentialType == 'Social Insurance Number') {
             if (credentialId == null) {
-                throw new ApplicationException('Person', "@@r1:ssn.credentialId.null.message:BusinessLogicValidationException@@")
+                throw new ApplicationException('Person', new BusinessLogicValidationException("ssn.credentialId.null.message",[]))
             }
             if (credentialId.trim() == '') {
-                throw new ApplicationException('Person', "@@r1:ssn.credentialId.empty.message:BusinessLogicValidationException@@")
+                throw new ApplicationException('Person', new BusinessLogicValidationException("ssn.credentialId.empty.message",[]))
             }
             if (credentialId.length() > 9) {
-                throw new ApplicationException('Person', "@@r1:credentialId.length.message:BusinessLogicValidationException@@")
+                throw new ApplicationException('Person', new BusinessLogicValidationException("credentialId.length.message",[]))
             }
         }
     }
