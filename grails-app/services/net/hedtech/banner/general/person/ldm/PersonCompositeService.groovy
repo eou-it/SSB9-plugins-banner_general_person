@@ -75,6 +75,19 @@ class PersonCompositeService extends LdmService {
 
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    def get(id) {
+        def entity = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(ldmName, id)
+        if (!entity) {
+            throw new ApplicationException(GlobalUniqueIdentifierService.API, new NotFoundException(id: Person.class.simpleName))
+        }
+        List<PersonIdentificationNameCurrent> personIdentificationList =
+                PersonIdentificationNameCurrent.findAllByPidmInList([entity.domainKey?.toInteger()])
+        def resultList = buildLdmPersonObjects(personIdentificationList)
+        resultList.get(entity.domainKey?.toInteger())
+    }
+
+
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     def list(params) {
         def pidms = []
         def resultList = [:]
@@ -139,8 +152,274 @@ class PersonCompositeService extends LdmService {
     }
 
 
-    private List<Integer> searchPerson(Map params) {
+    def create(Map person) {
+        Map<Integer, Person> persons = [:]
+        def newPersonIdentification
 
+        if (person?.credentials instanceof List) {
+            person?.credentials?.each { it ->
+                if (it instanceof Map) {
+                    def allowedCredentialTypes = ["Social Security Number", "Social Insurance Number", "Banner ID", Credential.additionalIdMap.ELV8]
+                    validateCredentialType(it.credentialType, allowedCredentialTypes, it.credentialId)
+                    person = createSSN(it.credentialType, it.credentialId, person)
+                }
+            }
+        }
+
+        if (person.names instanceof List) {
+            person?.names?.each { it ->
+                if (it instanceof Map) {
+                    if (it.nameType == 'Primary') {
+                        newPersonIdentification = it
+                    }
+                }
+            }
+        }
+        Map metadata = person.metadata
+        newPersonIdentification.put('bannerId', 'GENERATED')
+        newPersonIdentification.put('entityIndicator', 'P')
+        newPersonIdentification.put('changeIndicator', null)
+        newPersonIdentification.put('dataOrigin', metadata?.dataOrigin)
+        newPersonIdentification.remove('nameType') // ID won't generate if this is set.
+        //Create the new PersonIdentification record
+        PersonIdentificationNameCurrent newPersonIdentificationName = personIdentificationNameCurrentService.create(newPersonIdentification)
+        //Fix the GUID if provided as DB will assign one
+        if (person.guid) {
+            updateGuidValue(newPersonIdentificationName.id, person.guid)
+
+        } else {
+            def entity = GlobalUniqueIdentifier.findByLdmNameAndDomainId(ldmName, newPersonIdentificationName.id)
+            person.put('guid', entity?.guid)
+        }
+
+        def additionalIds = []
+        if (person?.credentials instanceof List) {
+            person?.credentials?.each { it ->
+                if (it instanceof Map) {
+                    if (it.credentialType && Credential.additionalIdMap.containsValue(it.credentialType)) {
+                        additionalIds << createOrUpdateAdditionalId(newPersonIdentificationName, it, metadata)
+                    }
+                }
+            }
+        }
+        //Copy personBase attributes into person map from Primary names object.
+        person.put('dataOrigin', metadata?.dataOrigin)
+        person.put('namePrefix', newPersonIdentification.get('namePrefix'))
+        person.put('nameSuffix', newPersonIdentification.get('nameSuffix'))
+        person.put('preferenceFirstName', newPersonIdentification.get('preferenceFirstName'))
+        //Translate enumerations and defaults
+        person.put('sex', person?.sex == 'Male' ? 'M' : (person?.sex == 'Female' ? 'F' : (person?.sex == 'Unknown' ? 'N' : null)))
+        def maritalStatus
+        try {
+            maritalStatus = person.maritalStatusDetail instanceof Map && person.maritalStatusDetail?.guid ? maritalStatusCompositeService.get(person.maritalStatusDetail?.guid) : null
+        } catch (ApplicationException e) {
+            throw new ApplicationException("PersonCompositeService", "@@r1:maritalStatus.invalid:BusinessLogicValidationException@@")
+        }
+        person.put('maritalStatus', maritalStatus ? MaritalStatus.findByCode(maritalStatus?.code) : null)
+        def ethnicity
+        try {
+            if (person.ethnicityDetail instanceof Map) {
+                ethnicity = person.ethnicityDetail?.guid ? ethnicityCompositeService.get(person.ethnicityDetail?.guid) : null
+            }
+        }
+        catch (ApplicationException e) {
+            if (e.wrappedException instanceof NotFoundException) {
+                throw new ApplicationException("PersonCompositeService", "@@r1:ethnicity.invalid:BusinessLogicValidationException@@")
+                ethnicity = null
+            } else {
+                throw e
+            }
+        }
+        person.put('ethnicity', ethnicity ? Ethnicity.findByCode(ethnicity?.code) : null)
+        person.put('ethnic', ethnicity ? ethnicity.ethnic : null)
+        person.put('deadIndicator', person.get('deadDate') ? 'Y' : null)
+        person.put('pidm', newPersonIdentificationName?.pidm)
+        person.put('armedServiceMedalVetIndicator', false)
+        PersonBasicPersonBase newPersonBase = personBasicPersonBaseService.create(person)
+        def currentRecord = new Person(newPersonBase)
+        currentRecord.guid = person.guid
+        currentRecord.maritalStatusDetail = maritalStatus
+        currentRecord.ethnicityDetail = ethnicity
+        def name = new Name(newPersonIdentificationName, newPersonBase)
+        name.setNameType("Primary")
+        currentRecord.names << name
+        //Store the credential we already have
+        currentRecord.credentials = []
+        currentRecord.credentials << new Credential("Banner ID", newPersonIdentificationName.bannerId, null, null)
+        if (newPersonBase.ssn) {
+            currentRecord.credentials << new Credential("Social Security Number",
+                    newPersonBase.ssn,
+                    null,
+                    null)
+        }
+        if (person.addresses instanceof List) {
+            person.addresses.collect { address ->
+                getStateAndZip(address)
+            }
+        }
+        persons.put(newPersonIdentificationName.pidm, currentRecord)
+        def addresses = createAddresses(newPersonIdentificationName.pidm, metadata,
+                person.addresses instanceof List ? person.addresses : [])
+        persons = buildPersonAddresses(addresses, persons)
+        def phones = createPhones(newPersonIdentificationName.pidm, metadata,
+                person.phones instanceof List ? person.phones : [])
+        persons = buildPersonTelephones(phones, persons)
+        def emails = createPersonEmails(newPersonIdentificationName.pidm, metadata,
+                person.emails instanceof List ? person.emails : [])
+        persons = buildPersonEmails(emails, persons)
+        def races = createRaces(newPersonIdentificationName.pidm, metadata,
+                person.races instanceof List ? person.races : [])
+        persons = buildPersonRaces(races, persons)
+        persons = buildPersonRoles(persons)
+        persons = buildPersonAdditionalIds(additionalIds, persons)
+        persons.get(newPersonIdentificationName.pidm)
+    }
+
+    /**
+     * Updates the Person Information like PersonIdentificationNameCurrent, PersonBasicPersonBase, Address
+     * Telephones and Emails
+     * @param person - Map containing the changes person details
+     * @return person
+     */
+    def update(Map person) {
+        String personGuid = person?.id?.trim()?.toLowerCase()
+        GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(ldmName, personGuid)
+
+        if (personGuid) {
+            if (!globalUniqueIdentifier) {
+                if (!person.get('guid'))
+                    person.put('guid', personGuid)
+                //Per strategy when a GUID was provided, the create should happen.
+                return create(person)
+            }
+        } else {
+            throw new ApplicationException(GlobalUniqueIdentifierService.API, new NotFoundException(id: Person.class.simpleName))
+        }
+
+        if (person?.credentials instanceof List) {
+            person?.credentials?.each { it ->
+                if (it instanceof Map) {
+                    def allowedCredentialTypes = ["Social Security Number", "Social Insurance Number", "Banner ID", Credential.additionalIdMap.ELV8]
+                    validateCredentialType(it.credentialType, allowedCredentialTypes, it.credentialId)
+                }
+            }
+        }
+
+        def primaryName
+        person?.names?.each { it ->
+            if (it.nameType == 'Primary') {
+                primaryName = it
+            }
+        }
+        def pidmToUpdate = globalUniqueIdentifier.domainKey?.toInteger()
+        List<PersonIdentificationNameCurrent> personIdentificationList = PersonIdentificationNameCurrent.findAllByPidmInList([pidmToUpdate])
+
+        PersonIdentificationNameCurrent personIdentification
+        personIdentificationList.each { identification ->
+            if (identification.changeIndicator == null) {
+                personIdentification = identification
+            }
+        }
+        //update PersonIdentificationNameCurrent
+        PersonIdentificationNameCurrent newPersonIdentificationName
+        PersonIdentificationNameCurrent oldPersonIdentificationName = new PersonIdentificationNameCurrent(personIdentification.properties)
+        if (primaryName) {
+            personIdentification.firstName = primaryName.firstName
+            personIdentification.lastName = primaryName.lastName
+            personIdentification.middleName = primaryName.middleName
+            personIdentification.surnamePrefix = primaryName.surnamePrefix
+            if (!personIdentification.equals(oldPersonIdentificationName)) {
+                PersonIdentificationNameAlternate.findAllByPidm(oldPersonIdentificationName.pidm).each { oldRecord ->
+                    if (oldPersonIdentificationName.firstName == oldRecord.firstName &&
+                            oldPersonIdentificationName.lastName == oldRecord.lastName &&
+                            oldPersonIdentificationName.middleName == oldRecord.middleName &&
+                            oldPersonIdentificationName.surnamePrefix == oldRecord.surnamePrefix &&
+                            oldPersonIdentificationName.bannerId == oldRecord.bannerId &&
+                            oldPersonIdentificationName.nameType == oldRecord.nameType &&
+                            oldRecord.changeIndicator == 'N'
+                    ) {
+                        //Can't get around this, Hibernate updates before it deletes, triggering table-api errors.
+                        PersonIdentificationNameAlternate.executeUpdate("delete from PersonIdentificationNameAlternate where id = :id", [id: oldRecord.id])
+                    }
+                }
+                newPersonIdentificationName = personIdentificationNameCurrentService.update(personIdentification)
+            }
+        }
+        person?.credentials?.each { it ->
+            if (it.credentialType == 'Banner ID') {
+                personIdentification.bannerId = it?.credentialId
+                newPersonIdentificationName = personIdentificationNameCurrentService.update(personIdentification)
+            } else if (it.credentialType == 'Elevate ID') {
+                createOrUpdateAdditionalId(personIdentification, it, person?.metadata)
+            }
+        }
+        if (!newPersonIdentificationName)
+            newPersonIdentificationName = personIdentification
+        //update PersonBasicPersonBase
+        PersonBasicPersonBase newPersonBase = updatePersonBasicPersonBase(pidmToUpdate, newPersonIdentificationName, person, primaryName)
+        def credentials = []
+        if (newPersonBase && newPersonBase.ssn) {
+            credentials << new Credential("Social Security Number",
+                    newPersonBase.ssn,
+                    null,
+                    null)
+        }
+
+        if (newPersonIdentificationName && newPersonIdentificationName.bannerId) {
+            credentials << new Credential("Banner ID",
+                    newPersonIdentificationName.bannerId,
+                    null,
+                    null)
+        }
+        def names = []
+        def name = new Name(newPersonIdentificationName, newPersonBase)
+        name.setNameType("Primary")
+        names << name
+
+        def ethnicityDetail = newPersonBase.ethnicity ? ethnicityCompositeService.fetchByEthnicityCode(newPersonBase.ethnicity?.code) : null
+        def maritalStatusDetail = newPersonBase.maritalStatus ? maritalStatusCompositeService.fetchByMaritalStatusCode(newPersonBase.maritalStatus?.code) : null
+        //update Address
+        def addresses = []
+
+        if (person.containsKey('addresses') && person.addresses instanceof List)
+            addresses = updateAddresses(pidmToUpdate, person.metadata, person.addresses)
+
+        //update Telephones
+        def phones = []
+        if (person.containsKey('phones') && person.phones instanceof List)
+            phones = updatePhones(pidmToUpdate, person.metadata, person.phones)
+
+        //update Emails
+        def emails = []
+        if (person.containsKey('emails') && person.emails instanceof List) {
+            emails = updatePersonEmails(pidmToUpdate, person.metadata, person.emails)
+        }
+
+        //update races
+        def races = []
+        if (person.containsKey('races') && person.races instanceof List)
+            races = updateRaces(pidmToUpdate, person.metadata, person.races)
+        //Build decorator to return LDM response.
+        def personDecorator = new Person(newPersonBase, personGuid, credentials, addresses, phones, emails, names, maritalStatusDetail, ethnicityDetail, races, [])
+        Map personMap = [:]
+        personMap.put(pidmToUpdate, personDecorator)
+        if (addresses.size() == 0)
+            personMap = buildPersonAddresses(PersonAddress.fetchActiveAddressesByPidmInList([pidmToUpdate]), personMap)
+        if (phones.size() == 0)
+            personMap = buildPersonTelephones(PersonTelephone.fetchActiveTelephoneByPidmInList([pidmToUpdate]), personMap)
+        if (emails.size() == 0) {
+            personMap = buildPersonEmails(PersonEmail.findAllByStatusIndicatorAndPidmInList('A', [pidmToUpdate]), personMap)
+        }
+        if (races.size() == 0)
+            personMap = buildPersonRaces(PersonRace.findAllByPidmInList([pidmToUpdate]), personMap)
+        def additionalIdTypes = Credential.additionalIdMap.keySet().asList()
+        log.error additionalIdTypes
+        personMap = buildPersonAdditionalIds(AdditionalID.fetchByPidmInListAndAdditionalIdentificationTypeInList([pidmToUpdate], additionalIdTypes), personMap)
+        personDecorator = buildPersonRoles(personMap).get(pidmToUpdate)
+    }
+
+
+    private List<Integer> searchPerson(Map params) {
         def ctx = ServletContextHolder.servletContext.getAttribute(GrailsApplicationAttributes.APPLICATION_CONTEXT)
         def sessionFactory = ctx.sessionFactory
 
@@ -270,78 +549,61 @@ class PersonCompositeService extends LdmService {
         return personPidmList
     }
 
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    def get(id) {
-        def entity = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(ldmName, id)
-        if (!entity) {
+
+    public Integer getPidm(String guid) {
+        def entity = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(ldmName, guid?.toLowerCase())
+        if (!entity)
             throw new ApplicationException(GlobalUniqueIdentifierService.API, new NotFoundException(id: Person.class.simpleName))
-        }
-        List<PersonIdentificationNameCurrent> personIdentificationList =
-                PersonIdentificationNameCurrent.findAllByPidmInList([entity.domainKey?.toInteger()])
-        def resultList = buildLdmPersonObjects(personIdentificationList)
-        resultList.get(entity.domainKey?.toInteger())
+        return entity.domainKey?.toInteger()
     }
 
-    def create(Map person) {
-        Map<Integer, Person> persons = [:]
-        def newPersonIdentification
-        if (person.names instanceof List) {
-            person?.names?.each { it ->
-                if (it instanceof Map) {
-                    if (it.nameType == 'Primary') {
-                        newPersonIdentification = it
-                    }
-                }
-            }
+
+    private void updateGuidValue(def id, def guid) {
+        // Update the GUID to the one we received.
+        GlobalUniqueIdentifier newEntity = GlobalUniqueIdentifier.findByLdmNameAndDomainId(ldmName, id)
+        if (!newEntity) {
+            throw new ApplicationException(GlobalUniqueIdentifierService.API, new NotFoundException(id: Person.class.simpleName))
         }
-        Map metadata = person.metadata
-        newPersonIdentification.put('bannerId', 'GENERATED')
-        newPersonIdentification.put('entityIndicator', 'P')
-        newPersonIdentification.put('changeIndicator', null)
-        newPersonIdentification.put('dataOrigin', metadata?.dataOrigin)
-        newPersonIdentification.remove('nameType') // ID won't generate if this is set.
-        //Create the new PersonIdentification record
-        PersonIdentificationNameCurrent newPersonIdentificationName =
-                personIdentificationNameCurrentService.create(newPersonIdentification)
-        //Fix the GUID if provided as DB will assign one
+        if (!newEntity) {
+            throw new ApplicationException(GlobalUniqueIdentifierService.API, new NotFoundException(id: Person.class.simpleName))
+        }
+        newEntity.guid = guid
+        globalUniqueIdentifierService.update(newEntity)
+    }
+
+
+    private PersonBasicPersonBase createPersonBasicPersonBase(person, newPersonIdentificationName, newPersonIdentification) {
+        PersonBasicPersonBase newPersonBase
         if (person.guid) {
             updateGuidValue(newPersonIdentificationName.id, person.guid)
 
         } else {
             def entity = GlobalUniqueIdentifier.findByLdmNameAndDomainId(ldmName, newPersonIdentificationName.id)
-            person.put('guid', entity?.guid)
+            person.put('guid', entity)
         }
-
-        //Copy ssn attribute from credential to person map.
-        def additionalIds = []
         if (person?.credentials instanceof List) {
             person?.credentials?.each { it ->
                 if (it instanceof Map) {
-                    if (it.credentialType == 'Social Security Number') {
-                        if (it?.credentialId.length() > 9) {
-                            throw new ApplicationException("PersonCompositeService",
-                                    new BusinessLogicValidationException("credentialId.invalid",[]))
-                        }
-                        person.put('ssn', it?.credentialId)
-                    } else if (it.credentialType == 'Social Insurance Number') {
-                        if (it?.credentialId.length() > 9) {
-                            throw new ApplicationException("PersonCompositeService",
-                                    new BusinessLogicValidationException("credentialId.invalid",[]))
-                        }
-                        person.put('ssn', it?.credentialId)
-                    } else if( Credential.additionalIdMap.containsValue(it.credentialType) ) {
-                        additionalIds << createOrUpdateAdditionalId(newPersonIdentificationName, it, metadata)
-                    }
+                    person = createSSN(it.credentialType, it.credentialId, person)
                 }
             }
         }
+
         //Copy personBase attributes into person map from Primary names object.
-        person.put('dataOrigin', metadata?.dataOrigin)
-        person.put('namePrefix', newPersonIdentification.get('namePrefix'))
-        person.put('nameSuffix', newPersonIdentification.get('nameSuffix'))
-        person.put('preferenceFirstName', newPersonIdentification.get('preferenceFirstName'))
+        person.put('dataOrigin', person?.metadata?.dataOrigin)
+        if (newPersonIdentification) {
+            if (newPersonIdentification.containsKey('namePrefix')) {
+                person.put('namePrefix', newPersonIdentification.get('namePrefix'))
+            }
+            if (newPersonIdentification.containsKey('nameSuffix')) {
+                person.put('nameSuffix', newPersonIdentification.get('nameSuffix'))
+            }
+            if (newPersonIdentification.containsKey('preferenceFirstName')) {
+                person.put('preferenceFirstName', newPersonIdentification.get('preferenceFirstName'))
+            }
+        }
         //Translate enumerations and defaults
-        person.put('sex', person?.sex == 'Male' ? 'M': (person?.sex == 'Female' ? 'F' : (person?.sex == 'Unknown' ? 'N' : null)))
+        person.put('sex', person?.sex == 'Male' ? 'M' : (person?.sex == 'Female' ? 'F' : (person?.sex == 'Unknown' ? 'N' : null)))
         def maritalStatus
         try {
             maritalStatus = person.maritalStatusDetail instanceof Map && person.maritalStatusDetail?.guid ? maritalStatusCompositeService.get(person.maritalStatusDetail?.guid) : null
@@ -368,67 +630,10 @@ class PersonCompositeService extends LdmService {
         person.put('deadIndicator', person.get('deadDate') ? 'Y' : null)
         person.put('pidm', newPersonIdentificationName?.pidm)
         person.put('armedServiceMedalVetIndicator', false)
-        PersonBasicPersonBase newPersonBase = personBasicPersonBaseService.create(person)
-        def currentRecord = new Person(newPersonBase)
-        currentRecord.guid = person.guid
-        currentRecord.maritalStatusDetail = maritalStatus
-        currentRecord.ethnicityDetail = ethnicity
-        def name = new Name(newPersonIdentificationName, newPersonBase)
-        name.setNameType("Primary")
-        currentRecord.names << name
-        //Store the credential we already have
-        currentRecord.credentials = []
-        currentRecord.credentials << new Credential("Banner ID", newPersonIdentificationName.bannerId, null, null)
-        if (newPersonBase.ssn) {
-            currentRecord.credentials << new Credential("Social Security Number",
-                    newPersonBase.ssn,
-                    null,
-                    null)
-        }
-        if( person.addresses instanceof List ) {
-            person.addresses.collect { address ->
-                getStateAndZip(address)
-            }
-        }
-        persons.put(newPersonIdentificationName.pidm, currentRecord)
-        def addresses = createAddresses(newPersonIdentificationName.pidm, metadata,
-                person.addresses instanceof List ? person.addresses : [])
-        persons = buildPersonAddresses(addresses, persons)
-        def phones = createPhones(newPersonIdentificationName.pidm, metadata,
-                person.phones instanceof List ? person.phones : [])
-        persons = buildPersonTelephones(phones, persons)
-        def emails = createPersonEmails(newPersonIdentificationName.pidm, metadata,
-                person.emails instanceof List ? person.emails : [])
-        persons = buildPersonEmails(emails, persons)
-        def races = createRaces(newPersonIdentificationName.pidm, metadata,
-                person.races instanceof List ? person.races : [])
-        persons = buildPersonRaces(races, persons)
-        persons = buildPersonRoles(persons)
-        persons = buildPersonAdditionalIds(additionalIds, persons)
-        persons.get(newPersonIdentificationName.pidm)
+        newPersonBase = personBasicPersonBaseService.create(person)
+        newPersonBase
     }
 
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    public Integer getPidm(String guid) {
-        def entity = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(ldmName, guid?.toLowerCase())
-        if (!entity)
-            throw new ApplicationException(GlobalUniqueIdentifierService.API, new NotFoundException(id: Person.class.simpleName))
-        return entity.domainKey?.toInteger()
-    }
-
-
-    private void updateGuidValue(def id, def guid) {
-        // Update the GUID to the one we received.
-        GlobalUniqueIdentifier newEntity = GlobalUniqueIdentifier.findByLdmNameAndDomainId(ldmName, id)
-        if (!newEntity) {
-            throw new ApplicationException(GlobalUniqueIdentifierService.API, new NotFoundException(id: Person.class.simpleName))
-        }
-        if (!newEntity) {
-            throw new ApplicationException(GlobalUniqueIdentifierService.API, new NotFoundException(id: Person.class.simpleName))
-        }
-        newEntity.guid = guid
-        globalUniqueIdentifierService.update(newEntity)
-    }
 
     List<PersonAddress> createAddresses(def pidm, Map metadata, List<Map> newAddresses) {
         def addresses = []
@@ -436,7 +641,10 @@ class PersonCompositeService extends LdmService {
             if (activeAddress instanceof Map) {
                 IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(
                         PROCESS_CODE, PERSON_ADDRESS_TYPE, activeAddress.addressType)
-                if (rule?.translationValue == activeAddress.addressType && !addresses.contains {
+                if (!rule) {
+                    throw new ApplicationException('PersonCompositeService', "@@r1:goriccr.not.found.message:$PERSON_ADDRESS_TYPE:BusinessLogicValidationException@@")
+                }
+                if (rule.translationValue == activeAddress.addressType && !addresses.contains {
                     it.addressType == rule?.value
                 }) {
                     activeAddress.put('addressType', AddressType.findByCode(rule?.value))
@@ -478,12 +686,6 @@ class PersonCompositeService extends LdmService {
         addresses
     }
 
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    void validateAddressRequiredFields(address) {
-        if (!address.addressType) throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("addressType.invalid",[]))
-        else if (!address.streetLine1) throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("streetAddress.invalid",[]))
-        else if (!address.city) throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("city.invalid",[]))
-    }
 
     List<PersonRace> createRaces(def pidm, Map metadata, List<Map> newRaces) {
         def races = []
@@ -526,6 +728,7 @@ class PersonCompositeService extends LdmService {
                 IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_PHONE_TYPE, activePhone.phoneType)
                 if (!rule) {
                     log.error "Rule not found for phone:" + activePhone.toString()
+                    throw new ApplicationException('PersonCompositeService', "@@r1:goriccr.not.found.message:$PERSON_PHONE_TYPE:BusinessLogicValidationException@@")
                 }
                 if (rule?.translationValue == activePhone.phoneType &&
                         !phones.contains { activePhone.phoneType == rule?.value }) {
@@ -542,12 +745,6 @@ class PersonCompositeService extends LdmService {
             }
         }
         phones
-    }
-
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    void validatePhoneRequiredFields(phone) {
-        if (!phone.telephoneType) throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("phoneType.invalid",[]))
-        if (!phone.phoneNumber) throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("phoneNumber.invalid",[]))
     }
 
     private List<PersonEmail> createPersonEmails(def pidm, Map metadata, List<Map> emailsInRequest) {
@@ -569,11 +766,15 @@ class PersonCompositeService extends LdmService {
         return personEmails
     }
 
+
     private PersonEmail createPersonEmail(def pidm, Map metadata, def emailInRequest) {
         PersonEmail personEmail
 
         IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_EMAIL_TYPE, emailInRequest.emailType.trim())
-        if (rule?.value) {
+        if (!rule) {
+            throw new ApplicationException('PersonCompositeService', "@@r1:goriccr.not.found.message:$PERSON_EMAIL_TYPE:BusinessLogicValidationException@@")
+        }
+        if (rule.value) {
             personEmail = new PersonEmail(pidm: pidm, emailAddress: emailInRequest.emailAddress, statusIndicator: "A", emailType: EmailType.findByCode(rule.value), dataOrigin: metadata?.dataOrigin)
             personEmail = personEmailService.create([domainModel: personEmail])
         }
@@ -623,13 +824,6 @@ class PersonCompositeService extends LdmService {
         }
 
         return emailDecorators
-    }
-
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    void validateEmailRequiredFields(email) {
-        if (!email.emailType) throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("emailType.invalid",[]))
-        if (!email.emailAddress) throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("emailAddress.invalid",[]))
-
     }
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
@@ -683,6 +877,7 @@ class PersonCompositeService extends LdmService {
         persons // Map of person objects with pidm as index.
     }
 
+
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     def buildPersonEmails(personEmailList, persons) {
         personEmailList.each { PersonEmail activeEmail ->
@@ -718,6 +913,7 @@ class PersonCompositeService extends LdmService {
         persons
     }
 
+
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     def buildPersonAddresses(List<PersonAddress> personAddressList, Map persons) {
         personAddressList.each { activeAddress ->
@@ -734,6 +930,7 @@ class PersonCompositeService extends LdmService {
         persons
     }
 
+
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     def buildPersonGuids(List domainIds, Map persons) {
         GlobalUniqueIdentifier.findAllByLdmNameAndDomainIdInList(ldmName, domainIds).each { guid ->
@@ -743,6 +940,7 @@ class PersonCompositeService extends LdmService {
         }
         persons
     }
+
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     def buildPersonRaces(List<PersonRace> personRacesList, Map persons) {
@@ -755,6 +953,7 @@ class PersonCompositeService extends LdmService {
         }
         persons
     }
+
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     def buildPersonRoles(Map persons) {
@@ -769,148 +968,16 @@ class PersonCompositeService extends LdmService {
         persons
     }
 
+
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     def buildPersonAdditionalIds(List<AdditionalID> additionalIds, Map persons) {
         additionalIds.each { credential ->
             Person currentRecord = persons.get(credential.pidm)
             currentRecord.credentials << new Credential(Credential.additionalIdMap[credential.additionalIdentificationType.code],
-                    credential.additionalId,null,null)
+                    credential.additionalId, null, null)
             persons.put(credential.pidm, currentRecord)
         }
         persons
-    }
-    /**
-     * Updates the Person Information like PersonIdentificationNameCurrent, PersonBasicPersonBase, Address
-     * Telephones and Emails
-     * @param person - Map containing the changes person details
-     * @return person
-     */
-    def update(Map content) {
-        String personGuid = content?.id?.trim()?.toLowerCase()
-        GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(ldmName, personGuid)
-
-        if (personGuid) {
-            if (!globalUniqueIdentifier) {
-                if(!content.get('guid'))
-                    content.put('guid', personGuid)
-                //Per strategy when a GUID was provided, the create should happen.
-                return create(content)
-            }
-        } else {
-            throw new ApplicationException(GlobalUniqueIdentifierService.API, new NotFoundException(id: Person.class.simpleName))
-        }
-
-        def primaryName
-        content?.names?.each { it ->
-            if (it.nameType == 'Primary') {
-                primaryName = it
-            }
-        }
-        def pidmToUpdate = globalUniqueIdentifier.domainKey?.toInteger()
-        List<PersonIdentificationNameCurrent> personIdentificationList = PersonIdentificationNameCurrent.findAllByPidmInList([pidmToUpdate])
-
-        PersonIdentificationNameCurrent personIdentification
-        personIdentificationList.each { identification ->
-            if (identification.changeIndicator == null) {
-                personIdentification = identification
-            }
-        }
-        //update PersonIdentificationNameCurrent
-        PersonIdentificationNameCurrent newPersonIdentificationName
-        PersonIdentificationNameCurrent oldPersonIdentificationName = new PersonIdentificationNameCurrent(personIdentification.properties)
-        if (primaryName) {
-            personIdentification.firstName = primaryName.firstName
-            personIdentification.lastName = primaryName.lastName
-            personIdentification.middleName = primaryName.middleName
-            personIdentification.surnamePrefix = primaryName.surnamePrefix
-            if (!personIdentification.equals(oldPersonIdentificationName)) {
-                PersonIdentificationNameAlternate.findAllByPidm(oldPersonIdentificationName.pidm).each { oldRecord ->
-                    if (oldPersonIdentificationName.firstName == oldRecord.firstName &&
-                            oldPersonIdentificationName.lastName == oldRecord.lastName &&
-                            oldPersonIdentificationName.middleName == oldRecord.middleName &&
-                            oldPersonIdentificationName.surnamePrefix == oldRecord.surnamePrefix &&
-                            oldPersonIdentificationName.bannerId == oldRecord.bannerId &&
-                            oldPersonIdentificationName.nameType == oldRecord.nameType &&
-                            oldRecord.changeIndicator == 'N'
-                    ) {
-                        //Can't get around this, Hibernate updates before it deletes, triggering table-api errors.
-                        PersonIdentificationNameAlternate.executeUpdate("delete from PersonIdentificationNameAlternate where id = :id", [id: oldRecord.id])
-                    }
-                }
-                newPersonIdentificationName = personIdentificationNameCurrentService.update(personIdentification)
-            }
-        }
-        content?.credentials?.each { it ->
-            if (it.credentialType == 'Banner ID') {
-                personIdentification.bannerId = it?.credentialId
-                newPersonIdentificationName = personIdentificationNameCurrentService.update(personIdentification)
-            } else if (it.credentialType == 'Elevate ID') {
-                createOrUpdateAdditionalId(personIdentification, it, content?.metadata)
-            }
-        }
-        if (!newPersonIdentificationName)
-            newPersonIdentificationName = personIdentification
-        //update PersonBasicPersonBase
-        PersonBasicPersonBase newPersonBase = updatePersonBasicPersonBase(pidmToUpdate, newPersonIdentificationName, content, primaryName)
-        def credentials = []
-        if (newPersonBase && newPersonBase.ssn) {
-            credentials << new Credential("Social Security Number",
-                    newPersonBase.ssn,
-                    null,
-                    null)
-        }
-
-        if (newPersonIdentificationName && newPersonIdentificationName.bannerId) {
-            credentials << new Credential("Banner ID",
-                    newPersonIdentificationName.bannerId,
-                    null,
-                    null)
-        }
-        def names = []
-        def name = new Name(newPersonIdentificationName, newPersonBase)
-        name.setNameType("Primary")
-        names << name
-
-        def ethnicityDetail = newPersonBase.ethnicity ? ethnicityCompositeService.fetchByEthnicityCode(newPersonBase.ethnicity?.code) : null
-        def maritalStatusDetail = newPersonBase.maritalStatus ? maritalStatusCompositeService.fetchByMaritalStatusCode(newPersonBase.maritalStatus?.code) : null
-        //update Address
-        def addresses = []
-
-        if (content.containsKey('addresses') && content.addresses instanceof List)
-            addresses = updateAddresses(pidmToUpdate, content.metadata, content.addresses)
-
-        //update Telephones
-        def phones = []
-        if (content.containsKey('phones') && content.phones instanceof List)
-            phones = updatePhones(pidmToUpdate, content.metadata, content.phones)
-
-        //update Emails
-        def emails = []
-        if (content.containsKey('emails') && content.emails instanceof List) {
-            emails = updatePersonEmails(pidmToUpdate, content.metadata, content.emails)
-        }
-
-        //update races
-        def races = []
-        if (content.containsKey('races') && content.races instanceof List)
-            races = updateRaces(pidmToUpdate, content.metadata, content.races)
-        //Build decorator to return LDM response.
-        def person = new Person(newPersonBase, personGuid, credentials, addresses, phones, emails, names, maritalStatusDetail, ethnicityDetail, races, [])
-        Map personMap = [:]
-        personMap.put(pidmToUpdate, person)
-        if (addresses.size() == 0)
-            personMap = buildPersonAddresses(PersonAddress.fetchActiveAddressesByPidmInList([pidmToUpdate]), personMap)
-        if (phones.size() == 0)
-            personMap = buildPersonTelephones(PersonTelephone.fetchActiveTelephoneByPidmInList([pidmToUpdate]), personMap)
-        if (emails.size() == 0) {
-            personMap = buildPersonEmails(PersonEmail.findAllByStatusIndicatorAndPidmInList('A', [pidmToUpdate]), personMap)
-        }
-        if (races.size() == 0)
-            personMap = buildPersonRaces(PersonRace.findAllByPidmInList([pidmToUpdate]), personMap)
-        def additionalIdTypes = Credential.additionalIdMap.keySet().asList()
-        log.error additionalIdTypes
-        personMap = buildPersonAdditionalIds(AdditionalID.fetchByPidmInListAndAdditionalIdentificationTypeInList([pidmToUpdate],additionalIdTypes), personMap)
-        person = buildPersonRoles(personMap).get(pidmToUpdate)
     }
 
 
@@ -924,16 +991,10 @@ class PersonCompositeService extends LdmService {
         } else {
             personBaseList.each { personBase ->
                 //Copy personBase attributes into person map from Primary names object.
-                person?.credentials?.each { it ->
-                    if (it.credentialType == 'Social Security Number' && personBase.ssn != it?.credentialId) {
-                        if (it?.credentialId == null) {
-                            throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("ssn.isNull",[]))
-                        }
-                        if (it?.credentialId.trim() == '') {
-                            throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("ssn.isEmpty",[]))
-                        }
-                        if (personBase.ssn == null || personBase.ssn != it?.credentialId) {
-                            personBase.ssn = it?.credentialId
+                if (person?.credentials instanceof List) {
+                    person?.credentials?.each { it ->
+                        if (it instanceof Map) {
+                            personBase = updateSSN(it.credentialType, it.credentialId, personBase)
                         }
                     }
                 }
@@ -988,66 +1049,6 @@ class PersonCompositeService extends LdmService {
         }
         return newPersonBase
     }
-
-    private PersonBasicPersonBase createPersonBasicPersonBase(person, newPersonIdentificationName, newPersonIdentification) {
-        PersonBasicPersonBase newPersonBase
-        if (person.guid) {
-            updateGuidValue(newPersonIdentificationName.id, person.guid)
-
-        } else {
-            def entity = GlobalUniqueIdentifier.findByLdmNameAndDomainId(ldmName, newPersonIdentificationName.id)
-            person.put('guid', entity)
-        }
-
-        //Copy ssn attribute from credential to person map.
-        if (person?.credentials instanceof List) {
-            person?.credentials?.each { it ->
-                if (it instanceof Map) {
-                    if (it.credentialType == 'Social Security Number') {
-                        person.put('ssn', it?.credentialId)
-                    } else if (it.credentialType == 'Social Insurance Number') {
-                        person.put('ssn', it?.credentialId)
-                    }
-                }
-            }
-        }
-        //Copy personBase attributes into person map from Primary names object.
-        person.put('dataOrigin', person?.metadata?.dataOrigin)
-        person.put('namePrefix', newPersonIdentification.get('namePrefix'))
-        person.put('nameSuffix', newPersonIdentification.get('nameSuffix'))
-        person.put('preferenceFirstName', newPersonIdentification.get('preferenceFirstName'))
-        //Translate enumerations and defaults
-        person.put('sex', person?.sex == 'Male' ? 'M' : (person?.sex == 'Female' ? 'F' : (person?.sex == 'Unknown' ? 'N' : null)))
-        def maritalStatus
-        try {
-            maritalStatus = person.maritalStatusDetail instanceof Map && person.maritalStatusDetail?.guid ? maritalStatusCompositeService.get(person.maritalStatusDetail?.guid) : null
-        } catch (ApplicationException e) {
-            throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("maritalStatus.invalid",[]))
-        }
-        person.put('maritalStatus', maritalStatus ? MaritalStatus.findByCode(maritalStatus?.code) : null)
-        def ethnicity
-        try {
-            if (person.ethnicityDetail instanceof Map) {
-                ethnicity = person.ethnicityDetail?.guid ? ethnicityCompositeService.get(person.ethnicityDetail?.guid) : null
-            }
-        }
-        catch (ApplicationException e) {
-            if (e.wrappedException instanceof NotFoundException) {
-                throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("ethnicity.invalid",[]))
-                ethnicity = null
-            } else {
-                throw e
-            }
-        }
-        person.put('ethnicity', ethnicity ? Ethnicity.findByCode(ethnicity?.code) : null)
-        person.put('ethnic', ethnicity ? ethnicity.ethnic : null)
-        person.put('deadIndicator', person.get('deadDate') ? 'Y' : null)
-        person.put('pidm', newPersonIdentificationName?.pidm)
-        person.put('armedServiceMedalVetIndicator', false)
-        newPersonBase = personBasicPersonBaseService.create(person)
-        newPersonBase
-    }
-
 
     private updateAddresses(def pidm, Map metadata, List<Map> newAddresses) {
         def addresses = []
@@ -1164,6 +1165,7 @@ class PersonCompositeService extends LdmService {
 
     }
 
+
     private updatePhones(def pidm, Map metadata, List<Map> newPhones) {
         def phones = []
         List<PersonTelephone> personTelephoneList = PersonTelephone.fetchActiveTelephoneByPidmInList([pidm]).each { currentPhone ->
@@ -1252,24 +1254,24 @@ class PersonCompositeService extends LdmService {
         races
     }
 
-    def createOrUpdateAdditionalId ( PersonIdentificationNameCurrent personIdentification, Map credential, Map metadata ) {
+    def createOrUpdateAdditionalId(PersonIdentificationNameCurrent personIdentification, Map credential, Map metadata) {
         def idCode = Credential.additionalIdMap.find { key, value ->
             value == credential.credentialType
         }?.key
         def idType = AdditionalIdentificationType.findByCode(idCode)
         List<AdditionalID> existingIds = AdditionalID.fetchByPidmInListAndAdditionalIdentificationTypeInList([personIdentification.pidm], [idCode])
         AdditionalID existingId
-        if( existingIds.size() > 0 ) {
+        if (existingIds.size() > 0) {
             existingId = existingIds.get(0)
             existingId.additionalId = credential?.credentialId
-        }
-        else
+        } else
             existingId = new AdditionalID(pidm: personIdentification.pidm,
                     additionalIdentificationType: idType,
                     additionalId: credential?.credentialId,
                     dataOrigin: metadata?.dataOrigin
             )
-        additionalIDService.createOrUpdate ( existingId )
+        log.error "Existing ID: ${existingId}"
+        additionalIDService.createOrUpdate(existingId)
     }
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
@@ -1285,7 +1287,7 @@ class PersonCompositeService extends LdmService {
         try {
             PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance()
             parsedResult = phoneUtil.parse(phoneNumber, countryLdmCode?.scodIso ?: 'US')
-            if( phoneUtil.isValidNumber(parsedResult)) {
+            if (phoneUtil.isValidNumber(parsedResult)) {
                 String nationalNumber = parsedResult.getNationalNumber()
                 def nationalDestinationCodeLength = phoneUtil.getLengthOfNationalDestinationCode(parsedResult);
                 if (nationalDestinationCodeLength > 0) {
@@ -1295,9 +1297,8 @@ class PersonCompositeService extends LdmService {
                     parsedNumber.put('phoneNumber', nationalNumber)
                 }
                 parsedNumber.put('countryPhone', parsedResult.getCountryCode())
-            }
-            else {
-                if( phoneNumber.length() < 12 ){
+            } else {
+                if (phoneNumber.length() < 12) {
                     parsedNumber.put('phoneNumber', phoneNumber)
                 }
                 else {
@@ -1310,7 +1311,7 @@ class PersonCompositeService extends LdmService {
             throw new ApplicationException("PersonCompositeService", new BusinessLogicValidationException("phoneNumber.malformed",[phoneNumber]))
 
         }
-        if( parsedResult.getExtension() ) {
+        if (parsedResult.getExtension()) {
             parsedNumber.put('phoneExtension', parsedResult.getExtension())
         }
         parsedNumber
@@ -1329,7 +1330,7 @@ class PersonCompositeService extends LdmService {
             PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance()
             parsedResult = phoneUtil.parse(phoneNumber, countryLdmCode?.scodIso ?: 'US')
             log.debug "AfterPhone:" + phoneUtil.format(parsedResult, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL)
-                return phoneUtil.format(parsedResult, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL)
+            return phoneUtil.format(parsedResult, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL)
         }
         catch (Exception e) {
             log.debug e.toString()
@@ -1388,6 +1389,78 @@ class PersonCompositeService extends LdmService {
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     private def getStateAndZip(activeAddress) {
         getAddressPostalCode(getAddressRegion(activeAddress))
+    }
+
+
+    def validateAddressRequiredFields(address) {
+        if (!address.addressType) {
+            throw new ApplicationException("PersonCompositeService", "@@r1:addressType.invalid:BusinessLogicValidationException@@")
+        }
+        if (!address.streetLine1) {
+            throw new ApplicationException("PersonCompositeService", "@@r1:streetAddress.invalid:BusinessLogicValidationException@@")
+        }
+        if (!address.city) {
+            throw new ApplicationException("PersonCompositeService", "@@r1:city.invalid:BusinessLogicValidationException@@")
+        }
+    }
+
+
+    def validatePhoneRequiredFields(phone) {
+        if (!phone.telephoneType) {
+            throw new ApplicationException('PersonCompositeService', "@@r1:phoneType.invalid:BusinessLogicValidationException@@")
+        }
+        if (!phone.phoneNumber) {
+            throw new ApplicationException('PersonCompositeService', "@@r1:phoneNumber.invalid:BusinessLogicValidationException@@")
+        }
+    }
+
+
+    def validateEmailRequiredFields(email) {
+        if (!email.emailType) {
+            throw new ApplicationException('PersonCompositeService', "@@r1:emailType.invalid:BusinessLogicValidationException@@")
+        }
+        if (!email.emailAddress) {
+            throw new ApplicationException('PersonCompositeService', "@@r1:emailAddress.invalid:BusinessLogicValidationException@@")
+        }
+    }
+
+
+    private def validateCredentialType(String inputCredentialType, def allowedCredentialTypes, String credentialId) {
+        if (!allowedCredentialTypes.contains(inputCredentialType)) {
+            throw new ApplicationException('Person', "@@r1:invalid.code.message:credentialType:BusinessLogicValidationException@@")
+        }
+        if (inputCredentialType == 'Social Security Number' || inputCredentialType == 'Social Insurance Number') {
+            if (credentialId == null) {
+                throw new ApplicationException('Person', "@@r1:ssn.credentialId.null.message:BusinessLogicValidationException@@")
+            }
+            if (credentialId.trim() == '') {
+                throw new ApplicationException('Person', "@@r1:ssn.credentialId.empty.message:BusinessLogicValidationException@@")
+            }
+            if (credentialId.length() > 9) {
+                throw new ApplicationException('Person', "@@r1:credentialId.length.message:BusinessLogicValidationException@@")
+            }
+        }
+    }
+
+
+    private def createSSN(String inputCredentialType, String credentialId, Map person) {
+        if (inputCredentialType == 'Social Security Number' || inputCredentialType == 'Social Insurance Number') {
+            //Copy ssn attribute from credential to person map.
+            person.put('ssn', credentialId)
+        }
+
+        return person
+    }
+
+
+    private def updateSSN(String inputCredentialType, String credentialId, def personBase) {
+        if (inputCredentialType == 'Social Security Number' || inputCredentialType == 'Social Security Number') {
+            if (personBase.ssn == null || personBase.ssn != credentialId) {
+                personBase.ssn = credentialId
+            }
+        }
+
+        return personBase
     }
 
 }
