@@ -96,6 +96,7 @@ class PersonCompositeService extends LdmService {
         if (params.containsKey('offset')) sortAndPagingParams.put('offset', params.offset)
         if (params.containsKey('sort')) sortAndPagingParams.put('sort', params.sort)
         if (params.containsKey('order')) sortAndPagingParams.put('order', params.order)
+
         RestfulApiValidationUtility.correctMaxAndOffset(sortAndPagingParams, 500, 0)
 
         if (params.sort) {
@@ -180,8 +181,7 @@ class PersonCompositeService extends LdmService {
         newPersonIdentification.put('dataOrigin', metadata?.dataOrigin)
         newPersonIdentification.remove('nameType') // ID won't generate if this is set.
         //Create the new PersonIdentification record
-        PersonIdentificationNameCurrent newPersonIdentificationName =
-                personIdentificationNameCurrentService.create(newPersonIdentification)
+        PersonIdentificationNameCurrent newPersonIdentificationName = personIdentificationNameCurrentService.create(newPersonIdentification)
         //Fix the GUID if provided as DB will assign one
         if (person.guid) {
             updateGuidValue(newPersonIdentificationName.id, person.guid)
@@ -878,6 +878,7 @@ class PersonCompositeService extends LdmService {
         persons // Map of person objects with pidm as index.
     }
 
+
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     def buildPersonEmails(personEmailList, persons) {
         personEmailList.each { PersonEmail activeEmail ->
@@ -913,6 +914,7 @@ class PersonCompositeService extends LdmService {
         persons
     }
 
+
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     def buildPersonAddresses(List<PersonAddress> personAddressList, Map persons) {
         personAddressList.each { activeAddress ->
@@ -929,6 +931,7 @@ class PersonCompositeService extends LdmService {
         persons
     }
 
+
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     def buildPersonGuids(List domainIds, Map persons) {
         GlobalUniqueIdentifier.findAllByLdmNameAndDomainIdInList(ldmName, domainIds).each { guid ->
@@ -938,6 +941,7 @@ class PersonCompositeService extends LdmService {
         }
         persons
     }
+
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     def buildPersonRaces(List<PersonRace> personRacesList, Map persons) {
@@ -951,6 +955,7 @@ class PersonCompositeService extends LdmService {
         persons
     }
 
+
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     def buildPersonRoles(Map persons) {
         def pidms = []
@@ -963,6 +968,7 @@ class PersonCompositeService extends LdmService {
         }
         persons
     }
+
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     def buildPersonAdditionalIds(List<AdditionalID> additionalIds, Map persons) {
@@ -1160,6 +1166,7 @@ class PersonCompositeService extends LdmService {
         addresses
 
     }
+
 
     private updatePhones(def pidm, Map metadata, List<Map> newPhones) {
         def phones = []
