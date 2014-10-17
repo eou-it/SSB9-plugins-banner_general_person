@@ -807,8 +807,11 @@ class PersonCompositeService extends LdmService {
             validateEmailRequiredFields(it)
             if (!processedEmailTypes.contains(it.emailType.trim())) {
                 IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_EMAIL_TYPE, it.emailType.trim())
-                if (rule?.value) {
-                    PersonEmail existingPersonEmail = existingPersonEmails?.find { existingPersonEmail -> existingPersonEmail.emailType.code == rule?.value && existingPersonEmail.emailAddress == it.emailAddress }
+                if (!rule) {
+                    throw new ApplicationException('PersonCompositeService', "@@r1:goriccr.not.found.message:$PERSON_EMAIL_TYPE:BusinessLogicValidationException@@")
+                }
+                if (rule.value) {
+                    PersonEmail existingPersonEmail = existingPersonEmails?.find { existingPersonEmail -> existingPersonEmail.emailType.code == rule.value && existingPersonEmail.emailAddress == it.emailAddress }
                     if (existingPersonEmail) {
                         existingPersonEmail.statusIndicator = "A"
                         personEmail = personEmailService.update([domainModel: existingPersonEmail])
