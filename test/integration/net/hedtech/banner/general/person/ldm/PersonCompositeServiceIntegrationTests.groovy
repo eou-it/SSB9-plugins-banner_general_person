@@ -616,8 +616,7 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
 
     private Map getPersonWithFirstNameChangeRequest(personIdentificationNameCurrent, guid) {
         Map params = [id         : guid,
-                      names      : [[lastName: personIdentificationNameCurrent.lastName, middleName: personIdentificationNameCurrent.middleName, firstName: 'CCCCCC', nameType: 'Primary']],
-                      credentials: [[credentialType: personIdentificationNameCurrent.bannerId, credentialId: 'MITTERS']]
+                      names      : [[lastName: personIdentificationNameCurrent.lastName, middleName: personIdentificationNameCurrent.middleName, firstName: 'CCCCCC', nameType: 'Primary']]
         ]
         return params
     }
@@ -625,8 +624,7 @@ class PersonCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
 
     private Map getPersonWithLastNameChangeRequest(personIdentificationNameCurrent, guid) {
         Map params = [id         : guid,
-                      names      : [[lastName: 'CCCCCC', middleName: personIdentificationNameCurrent.middleName, firstName: personIdentificationNameCurrent.firstName, nameType: 'Primary']],
-                      credentials: [[credentialType: personIdentificationNameCurrent.bannerId, credentialId: 'MITTERS']]
+                      names      : [[lastName: 'CCCCCC', middleName: personIdentificationNameCurrent.middleName, firstName: personIdentificationNameCurrent.firstName, nameType: 'Primary']]
         ]
         return params
     }

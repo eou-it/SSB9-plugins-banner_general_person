@@ -405,7 +405,7 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
         personTelephone1.unlistIndicator = null
         personTelephone1.save()
 
-        def phone = PersonTelephone.fetchActiveTelephoneByPidmAndTelephoneType(pidm,telephoneType)
+        def phone = PersonTelephone.fetchActiveTelephoneByPidmAndTelephoneType(pidm,telephoneType.code)
 
         def phone1 = PersonTelephone.fetchActiveTelephoneByPidmAndTelephoneType(pidm,telephoneType.code)
 
