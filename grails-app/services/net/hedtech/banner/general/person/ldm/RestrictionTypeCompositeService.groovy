@@ -14,7 +14,6 @@ import net.hedtech.banner.general.person.PersonIdentificationName
 import net.hedtech.banner.general.person.PersonRelatedHold
 import net.hedtech.banner.general.person.PersonUtility
 import net.hedtech.banner.general.person.ldm.v1.Person
-import net.hedtech.banner.general.person.ldm.v1.PersonRestrictionType
 import net.hedtech.banner.general.system.HoldType
 import net.hedtech.banner.general.system.ldm.v1.Metadata
 import net.hedtech.banner.general.system.ldm.v1.RestrictionType
@@ -55,8 +54,7 @@ class RestrictionTypeCompositeService {
                 RestrictionType restrictionType
                 restrictionTypes = PersonRelatedHold.fetchAllDistinctHoldTypeByPidmAndDateCompare(personIdentificationName.pidm, new Date())
                 restrictionTypes?.each { hold ->
-                    restrictionType = fetchByRestrictionTypeCode(hold)
-                    returnLists << new PersonRestrictionType(restrictionType.guid)
+                    returnLists << fetchByRestrictionTypeCode(hold)
                 }
             }
             return returnLists

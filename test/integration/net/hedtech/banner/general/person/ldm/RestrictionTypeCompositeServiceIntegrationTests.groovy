@@ -11,7 +11,6 @@ import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.overall.ldm.GlobalUniqueIdentifier
 import net.hedtech.banner.general.person.PersonRelatedHold
 import net.hedtech.banner.general.person.PersonUtility
-import net.hedtech.banner.general.person.ldm.v1.PersonRestrictionType
 import net.hedtech.banner.general.system.HoldType
 import net.hedtech.banner.general.system.Originator
 import net.hedtech.banner.general.system.ldm.v1.RestrictionType
@@ -98,7 +97,7 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
         assertNotNull(personHoldList1)
         assertEquals 6, personHoldList1.size()
 
-        List<PersonRestrictionType> restrictionTypes = restrictionTypeCompositeService.list([parentPluralizedResourceName: LDM_NAME, parentId: getParentId()])
+        List<RestrictionType> restrictionTypes = restrictionTypeCompositeService.list([parentPluralizedResourceName: LDM_NAME, parentId: getParentId()])
         assertNotNull restrictionTypes
         assertFalse restrictionTypes.isEmpty()
         assertTrue restrictionTypes.size() == 3
@@ -111,7 +110,7 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
     @Test
     void testListForPersonRestrictionTypeInvalidGuid() {
         try {
-            List<PersonRestrictionType> restrictionTypes = restrictionTypeCompositeService.list([parentPluralizedResourceName: LDM_NAME, parentId: 'Invalid-Guid'])
+            List<RestrictionType> restrictionTypes = restrictionTypeCompositeService.list([parentPluralizedResourceName: LDM_NAME, parentId: 'Invalid-Guid'])
         } catch (ApplicationException ae) {
             assertApplicationException ae, "NotFoundException"
         }
@@ -121,7 +120,7 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
     @Test
     void testListForPersonRestrictionTypeNullGuid() {
         try {
-            List<PersonRestrictionType> restrictionTypes = restrictionTypeCompositeService.list([parentPluralizedResourceName: LDM_NAME, parentId: null])
+            List<RestrictionType> restrictionTypes = restrictionTypeCompositeService.list([parentPluralizedResourceName: LDM_NAME, parentId: null])
         } catch (ApplicationException ae) {
             assertApplicationException ae, "NotFoundException"
         }
