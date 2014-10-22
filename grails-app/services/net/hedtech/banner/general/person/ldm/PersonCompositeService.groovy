@@ -413,7 +413,6 @@ class PersonCompositeService extends LdmService {
         if (races.size() == 0)
             personMap = buildPersonRaces(PersonRace.findAllByPidmInList([pidmToUpdate]), personMap)
         def additionalIdTypes = Credential.additionalIdMap.keySet().asList()
-        log.error additionalIdTypes
         personMap = buildPersonAdditionalIds(AdditionalID.fetchByPidmInListAndAdditionalIdentificationTypeInList([pidmToUpdate], additionalIdTypes), personMap)
         personDecorator = buildPersonRoles(personMap).get(pidmToUpdate)
     }
