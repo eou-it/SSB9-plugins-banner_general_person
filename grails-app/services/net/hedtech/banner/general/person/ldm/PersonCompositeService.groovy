@@ -324,10 +324,10 @@ class PersonCompositeService extends LdmService {
         PersonIdentificationNameCurrent newPersonIdentificationName
         PersonIdentificationNameCurrent oldPersonIdentificationName = new PersonIdentificationNameCurrent(personIdentification.properties)
         if (primaryName) {
-            personIdentification.firstName = primaryName.firstName
-            personIdentification.lastName = primaryName.lastName
-            personIdentification.middleName = primaryName.middleName
-            personIdentification.surnamePrefix = primaryName.surnamePrefix
+            if(primaryName.containsKey('firstName')) personIdentification.firstName = primaryName.firstName
+            if(primaryName.containsKey('lastName')) personIdentification.lastName = primaryName.lastName
+            if(primaryName.containsKey('middleName')) personIdentification.middleName = primaryName.middleName
+            if(primaryName.containsKey('surnamePrefix')) personIdentification.surnamePrefix = primaryName.surnamePrefix
             if (!personIdentification.equals(oldPersonIdentificationName)) {
                 PersonIdentificationNameAlternate.findAllByPidm(oldPersonIdentificationName.pidm).each { oldRecord ->
                     if (oldPersonIdentificationName.firstName == oldRecord.firstName &&
