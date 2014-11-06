@@ -53,7 +53,7 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
         assertNotNull personRelatedHold.toDate
         assertEquals false, personRelatedHold.releaseIndicator
         assertEquals "TTTTT", personRelatedHold.reason
-        assertEquals 1, personRelatedHold.amountOwed
+        assertTrue new BigDecimal(1) == personRelatedHold.amountOwed
         assertEquals "grails_user", personRelatedHold.lastModifiedBy
 
         //Update the entity
@@ -76,7 +76,7 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
         assertEquals testDate, personRelatedHold.toDate
         assertEquals false, personRelatedHold.releaseIndicator
         assertEquals "UUUUU", personRelatedHold.reason
-        assertEquals 0, personRelatedHold.amountOwed
+        assertTrue new BigDecimal(0) == personRelatedHold.amountOwed
         //Make sure that last modified by user is not being updated
         assertEquals "grails_user", personRelatedHold.lastModifiedBy
 

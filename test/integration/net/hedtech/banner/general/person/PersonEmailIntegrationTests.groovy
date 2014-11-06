@@ -213,6 +213,178 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+    @Test
+    void testFetchByPidmAndStatusAndWebDisplayAndPreferredIndicator( ) {
+        def results = PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator( PersonUtility.getPerson( "966049236" ).pidm, 'A', 'Y', 'Y' )
+
+        assertTrue results.size() == 1
+
+        def res = results.get( 0 )
+
+
+        assertEquals res.version, 0
+        assertEquals res.pidm, 33784
+        assertEquals res.emailAddress, "einstein2be@verizon.net"
+        assertEquals res.statusIndicator, "A"
+        assertEquals res.preferredIndicator, true
+        assertEquals res.commentData, null
+        assertEquals res.displayWebIndicator, true
+        assertEquals res.dataOrigin, "Banner"
+
+    }
+
+
+    @Test
+    void testFetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicator( ) {
+        def results = PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator( PersonUtility.getPerson( "966049236" ).pidm, 'A', 'Y', 'Y' )
+
+        assertTrue results.size() == 1
+
+        def res = results.get( 0 )
+
+        def email = PersonEmail.fetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicator( PersonUtility.getPerson( "966049236" ).pidm, 'A', 'Y', 'Y' )
+
+        assertEquals res.emailAddress, email
+
+    }
+
+
+    @Test
+    void testFetchFirstByPidmAndStatus( ) {
+        def emails = PersonEmail.findAllByPidm( PersonUtility.getPerson( "HOS00003" ).pidm )
+        assertEquals 2, emails.size()
+        emails.each {
+            assertTrue it.statusIndicator == "A"
+        }
+        assertNotNull emails.find { it.displayWebIndicator }
+        assertNotNull emails.find { !it.displayWebIndicator }
+        def results = PersonEmail.fetchByPidmAndStatus( PersonUtility.getPerson( "HOS00003" ).pidm, 'A' )
+
+        assertEquals 2, results.size()
+    }
+
+
+    @Test
+    void testFetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicatorWhenNoneExists( ) {
+        def pidm = PersonUtility.getPerson( "HOSL0003" ).pidm
+        assertNotNull pidm
+        def results = PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator( PersonUtility.getPerson( "HOSL0003" ).pidm, 'A', 'Y', 'Y' )
+
+        assertTrue results.size() == 0
+
+        def email = PersonEmail.fetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicator( PersonUtility.getPerson( "HOSL0003" ).pidm, 'A', 'Y', 'Y' )
+
+        assertNull email
+
+    }
+
+
+    @Test
+    void testFetchListByPidmAndStatusAndWebDisplay( ) {
+        def pidmList = [PersonUtility.getPerson( "966049236" ).pidm, PersonUtility.getPerson( "HOS00003" ).pidm]
+        def results = PersonEmail.fetchListByPidmAndStatusAndWebDisplay( pidmList, 'A', 'Y' )
+
+        assertEquals 2, results.size()
+        assertTrue results[0] instanceof PersonEmail
+        assertTrue results[1] instanceof PersonEmail
+        
+        def foundCount = 0
+        results.each {
+            if (it.emailType.code == "PERS") {
+                foundCount++
+                assertEquals "einstein2be@verizon.net", it.emailAddress
+                assertTrue it.displayWebIndicator
+            } else if (it.emailType.code == "MA") {
+                foundCount++
+                assertEquals "pamix@charter.net", it.emailAddress
+                assertTrue it.displayWebIndicator
+            }
+        }
+        assertEquals 2, foundCount
+    }
+
+
+    @Test
+    void testFetchListByPidmAndStatus() {
+        def pidmList = [PersonUtility.getPerson("966049236").pidm, PersonUtility.getPerson("HOS00003").pidm]
+        def results = PersonEmail.fetchListByPidmAndStatus(pidmList, 'A')
+
+        assertEquals 3, results.size()
+        assertTrue results[0] instanceof PersonEmail
+        assertTrue results[1] instanceof PersonEmail
+        assertTrue results[2] instanceof PersonEmail
+        
+        def foundCount = 0
+        results.each {
+            if (it.emailType.code == "PERS") {
+                foundCount++
+                assertEquals "einstein2be@verizon.net", it.emailAddress
+                assertTrue it.displayWebIndicator
+            } else if (it.emailType.code == "MA") {
+                foundCount++
+                assertEquals "pamix@charter.net", it.emailAddress
+                assertTrue it.displayWebIndicator
+            } else if (it.emailType.code == "CAMP") {
+                foundCount++
+                assertEquals "pauline.amyx@charter.net", it.emailAddress
+                assertFalse it.displayWebIndicator
+            }
+        }
+        assertEquals 3, foundCount
+    }
+
+
+    @Test
+    void testFetchByEmailAddressAndActiveStatus_ActivePreferred( ) {
+        PersonEmail result = PersonEmail.fetchByEmailAddressAndActiveStatus( "Ben29322@Ellucian.edu" )
+        assertEquals( 29322, result.pidm )
+    }
+
+
+    @Test
+    void testFetchByEmailAddressCaseInsensitive( ) {
+        PersonEmail result = PersonEmail.fetchByEmailAddressAndActiveStatus( "beN29322@Ellucian.edu" )
+        assertEquals( 29322, result.pidm )
+    }
+
+
+    @Test
+    void testFetchByEmailAddressAndActiveStatus_ActiveNotPreferred( ) {
+        def result = PersonEmail.fetchByEmailAddressAndActiveStatus( "Neil29311@Ellucian.edu" )
+        assertTrue result instanceof PersonEmail
+        assertEquals( 29311, result.pidm )
+    }
+
+
+    @Test
+    void testFetchByEmailAddressAndActiveStatus_NoSuchAddress( ) {
+        def result = PersonEmail.fetchByEmailAddressAndActiveStatus( "jksdhfiwjencvwe@Ellucian.edu" )
+        assertNull(result)
+    }
+
+
+    @Test
+    void testFetchByEmailAddressAndActiveStatus_Inactive( ) {
+        def result = PersonEmail.fetchByEmailAddressAndActiveStatus( "Stuart29321@Ellucian.edu" )
+        assertNull(result)
+    }
+
+
+    @Test
+    void testFetchByPidmAndEmailTypeAndStatusAndWebDisplayAndPreferredIndicator() {
+        def res = PersonEmail.fetchByPidmAndEmailTypeAndStatusAndWebDisplayAndPreferredIndicator(PersonUtility.getPerson("966049236").pidm, 'PERS','A', 'Y', 'Y')
+        assertEquals res.version, 0
+        assertEquals res.pidm, 33784
+        assertEquals res.emailAddress, "einstein2be@verizon.net"
+        assertEquals res.statusIndicator, "A"
+        assertEquals res.preferredIndicator, true
+        assertEquals res.commentData, null
+        assertEquals res.displayWebIndicator, true
+        assertEquals res.dataOrigin, "Banner"
+
+    }
+
+
     private def newValidForCreatePersonEmail( ) {
         def sql = new Sql( sessionFactory.getCurrentSession().connection() )
         String idSql = """select gb_common.f_generate_id bannerId, gb_common.f_generate_pidm pidm from dual """
@@ -274,123 +446,5 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
         )
         return personEmail
     }
-
-
-    void testFetchByPidmAndEmailTypeAndStatusAndWebDisplayAndPreferredIndicator() {
-        def res = PersonEmail.fetchByPidmAndEmailTypeAndStatusAndWebDisplayAndPreferredIndicator(PersonUtility.getPerson("966049236").pidm, 'PERS','A', 'Y', 'Y')
-        assertEquals res.version, 0
-        assertEquals res.pidm, 33784
-        assertEquals res.emailAddress, "einstein2be@verizon.net"
-        assertEquals res.statusIndicator, "A"
-        assertEquals res.preferredIndicator, true
-        assertEquals res.commentData, null
-        assertEquals res.displayWebIndicator, true
-        assertEquals res.dataOrigin, "Banner"
-
-    }
-
-
-    void testFetchByPidmAndStatusAndWebDisplayAndPreferredIndicator( ) {
-        def results = PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator( PersonUtility.getPerson( "966049236" ).pidm, 'A', 'Y', 'Y' )
-
-        assertTrue results.size() == 1
-
-        def res = results.get( 0 )
-
-
-        assertEquals res.version, 0
-        assertEquals res.pidm, 33784
-        assertEquals res.emailAddress, "einstein2be@verizon.net"
-        assertEquals res.statusIndicator, "A"
-        assertEquals res.preferredIndicator, true
-        assertEquals res.commentData, null
-        assertEquals res.displayWebIndicator, true
-        assertEquals res.dataOrigin, "Banner"
-
-    }
-
-
-    void testFetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicator( ) {
-        def results = PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator( PersonUtility.getPerson( "966049236" ).pidm, 'A', 'Y', 'Y' )
-
-        assertTrue results.size() == 1
-
-        def res = results.get( 0 )
-
-        def email = PersonEmail.fetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicator( PersonUtility.getPerson( "966049236" ).pidm, 'A', 'Y', 'Y' )
-
-        assertEquals res.emailAddress, email
-
-    }
-
-
-    void testFetchFirstByPidmAndStatus( ) {
-        def emails = PersonEmail.findAllByPidm( PersonUtility.getPerson( "HOS00003" ).pidm )
-        assertEquals 2, emails.size()
-        emails.each {
-            assertTrue it.statusIndicator == "A"
-        }
-        assertNotNull emails.find { it.displayWebIndicator }
-        assertNotNull emails.find { !it.displayWebIndicator }
-        def results = PersonEmail.fetchByPidmAndStatus( PersonUtility.getPerson( "HOS00003" ).pidm, 'A' )
-
-        assertEquals 2, results.size()
-    }
-
-
-    void testFetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicatorWhenNoneExists( ) {
-        def pidm = PersonUtility.getPerson( "HOSL0003" ).pidm
-        assertNotNull pidm
-        def results = PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator( PersonUtility.getPerson( "HOSL0003" ).pidm, 'A', 'Y', 'Y' )
-
-        assertTrue results.size() == 0
-
-        def email = PersonEmail.fetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicator( PersonUtility.getPerson( "HOSL0003" ).pidm, 'A', 'Y', 'Y' )
-
-        assertNull email
-
-    }
-
-
-    void testFetchListByPidmAndStatusAndWebDisplay( ) {
-        def pidmList = [PersonUtility.getPerson( "966049236" ).pidm, PersonUtility.getPerson( "HOS00003" ).pidm]
-        def results = PersonEmail.fetchListByPidmAndStatusAndWebDisplay( pidmList, 'A', 'Y' )
-
-        assertTrue results.size() > 1
-        assertTrue results[0] instanceof PersonEmail
-    }
-
-
-    void testFetchByEmailAddressAndActiveStatus_ActivePreferred( ) {
-        PersonEmail result = PersonEmail.fetchByEmailAddressAndActiveStatus( "Ben29322@Ellucian.edu" )
-        assertEquals( 29322, result.pidm )
-    }
-
-
-    void testFetchByEmailAddressCaseInsensitive( ) {
-        PersonEmail result = PersonEmail.fetchByEmailAddressAndActiveStatus( "beN29322@Ellucian.edu" )
-        assertEquals( 29322, result.pidm )
-    }
-
-
-    void testFetchByEmailAddressAndActiveStatus_ActiveNotPreferred( ) {
-        def result = PersonEmail.fetchByEmailAddressAndActiveStatus( "Neil29311@Ellucian.edu" )
-        assertTrue result instanceof PersonEmail
-        assertEquals( 29311, result.pidm )
-    }
-
-
-    void testFetchByEmailAddressAndActiveStatus_NoSuchAddress( ) {
-        def result = PersonEmail.fetchByEmailAddressAndActiveStatus( "jksdhfiwjencvwe@Ellucian.edu" )
-        assertNull(result)
-    }
-
-
-    void testFetchByEmailAddressAndActiveStatus_Inactive( ) {
-        def result = PersonEmail.fetchByEmailAddressAndActiveStatus( "Stuart29321@Ellucian.edu" )
-        assertNull(result)
-    }
-
-
 }
 

@@ -45,6 +45,10 @@ query = """FROM PersonEmail a
     WHERE a.pidm IN :pidm
     AND a.statusIndicator = :statusIndicator
     AND a.displayWebIndicator = :displayWebIndicator"""),
+@NamedQuery(name = "PersonEmail.fetchListByPidmAndStatus",
+query = """FROM PersonEmail a
+    WHERE a.pidm IN :pidm
+    AND a.statusIndicator = :statusIndicator"""),
 @NamedQuery(name = "PersonEmail.fetchByEmailAddressAndActiveStatus",
 query = """FROM PersonEmail a
     WHERE upper(a.emailAddress) = upper(:emailAddress)
@@ -290,6 +294,17 @@ class PersonEmail implements Serializable {
         }
 
         log.debug "Executing fetchListByPidmAndStatusAndWebDisplay  with pidms = ${pidm} and status = ${statusIndicator} and displayWebIndicator = ${displayWebIndicator}"
+        log.debug "Fetched number of emails ${emails.size()} }"
+        return emails
+    }
+
+
+    public static List fetchListByPidmAndStatus(List pidm, String statusIndicator) {
+        def emails = PersonEmail.withSession {session ->
+            session.getNamedQuery('PersonEmail.fetchListByPidmAndStatus').setParameterList('pidm', pidm).setString('statusIndicator', statusIndicator).list()
+        }
+
+        log.debug "Executing fetchListByPidmAndStatus  with pidms = ${pidm} and status = ${statusIndicator}"
         log.debug "Fetched number of emails ${emails.size()} }"
         return emails
     }

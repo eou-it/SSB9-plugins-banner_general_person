@@ -37,15 +37,15 @@ class PersonAddressUtilityIntegrationTests extends BaseIntegrationTestCase {
         ApplicationContext applicationContext = application.mainContext
         def messageSource = applicationContext.getBean("messageSource")
         def lineFormat = messageSource.getMessage("default.personAddress.line1.format", null, LocaleContextHolder.getLocale())
-        assertEquals "\$houseNumber \$streetLine1", lineFormat
+        assertEquals "\$streetLine1", lineFormat
 
         def formattedAddress = PersonAddressUtility.formatDefaultAddress(personAddressMap)
         //perform the replacement here to compare the results
 
-        assertEquals formattedAddress.addressLine1,"30 Marigold Drive"
+        assertEquals formattedAddress.addressLine1,"Marigold Drive"
         assertEquals formattedAddress.addressLine2, "Off Shasta Main Rd"
-        assertEquals formattedAddress.addressLine7, "PA"
-        assertEquals formattedAddress.addressLine6, ''
+        assertEquals formattedAddress.addressLine3, ''
+        assertEquals formattedAddress.addressLine4, "PA"
     }
 
 

@@ -1,5 +1,5 @@
 /** *******************************************************************************
- Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2014 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 
 
@@ -26,8 +26,8 @@ def locationAdder = ConfigFinder.&addLocation.curry(grails.config.locations)
 [bannerGrailsAppConfig: "${userHome}/.grails/banner_configuration.groovy",
 ].each { envName, defaultFileName -> locationAdder(envName, defaultFileName) }
 
-
 grails.databinding.useSpringBinder=true
+
 grails.project.groupId = "net.hedtech" // used when deploying to a maven repo
 
 grails.mime.file.extensions = true // enables the parsing of file extensions from URLs into the request format
