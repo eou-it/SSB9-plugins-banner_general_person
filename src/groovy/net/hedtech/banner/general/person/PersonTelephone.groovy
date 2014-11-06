@@ -84,7 +84,6 @@ import javax.persistence.*
         query = """FROM PersonTelephone a
                              WHERE  pidm = :pidm
                              AND addressType.code in :addressTypes
-                             AND primaryIndicator = 'Y'
                              AND NVL(statusIndicator,'A') <> 'I'
                              AND NVL(unlistIndicator,'N') <> 'Y'
                     """)
