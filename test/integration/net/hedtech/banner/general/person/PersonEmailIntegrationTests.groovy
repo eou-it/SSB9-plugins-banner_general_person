@@ -370,6 +370,21 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+    @Test
+    void testFetchByPidmAndEmailTypeAndStatusAndWebDisplayAndPreferredIndicator() {
+        def res = PersonEmail.fetchByPidmAndEmailTypeAndStatusAndWebDisplayAndPreferredIndicator(PersonUtility.getPerson("966049236").pidm, 'PERS','A', 'Y', 'Y')
+        assertEquals res.version, 0
+        assertEquals res.pidm, 33784
+        assertEquals res.emailAddress, "einstein2be@verizon.net"
+        assertEquals res.statusIndicator, "A"
+        assertEquals res.preferredIndicator, true
+        assertEquals res.commentData, null
+        assertEquals res.displayWebIndicator, true
+        assertEquals res.dataOrigin, "Banner"
+
+    }
+
+
     private def newValidForCreatePersonEmail( ) {
         def sql = new Sql( sessionFactory.getCurrentSession().connection() )
         String idSql = """select gb_common.f_generate_id bannerId, gb_common.f_generate_pidm pidm from dual """
@@ -432,3 +447,4 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
         return personEmail
     }
 }
+
