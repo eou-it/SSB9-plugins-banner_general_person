@@ -213,69 +213,6 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-    private def newValidForCreatePersonEmail( ) {
-        def sql = new Sql( sessionFactory.getCurrentSession().connection() )
-        String idSql = """select gb_common.f_generate_id bannerId, gb_common.f_generate_pidm pidm from dual """
-        def bannerValues = sql.firstRow( idSql )
-        def ibannerId = bannerValues.bannerId
-        def ipidm = bannerValues.pidm
-        def person = new PersonIdentificationName(
-                pidm: ipidm,
-                bannerId: ibannerId,
-                lastName: "TTTTT",
-                firstName: "TTTTT",
-                middleName: "TTTTT",
-                changeIndicator: null,
-                entityIndicator: "P"
-        )
-        person.save( flush: true, failOnError: true )
-        assert person.id
-
-        def personEmail = new PersonEmail(
-                pidm: ipidm,
-                emailAddress: i_success_emailAddress,
-                statusIndicator: i_success_statusIndicator,
-                preferredIndicator: i_success_preferredIndicator,
-                commentData: i_success_commentData,
-                displayWebIndicator: i_success_displayWebIndicator,
-                emailType: i_success_emailType
-        )
-        return personEmail
-    }
-
-
-    private def newInvalidForCreatePersonEmail( ) {
-        def sql = new Sql( sessionFactory.getCurrentSession().connection() )
-        String idSql = """select gb_common.f_generate_id bannerId, gb_common.f_generate_pidm pidm from dual """
-        def bannerValues = sql.firstRow( idSql )
-        def ibannerId = bannerValues.bannerId
-        def ipidm = bannerValues.pidm
-        def person = new PersonIdentificationName(
-                pidm: ipidm,
-                bannerId: ibannerId,
-                lastName: "TTTTT",
-                firstName: "TTTTT",
-                middleName: "TTTTT",
-                changeIndicator: null,
-                entityIndicator: "P"
-        )
-        person.save( flush: true, failOnError: true )
-        assert person.id
-
-        def personEmail = new PersonEmail(
-                pidm: ipidm,
-                emailAddress: i_failure_emailAddress,
-                statusIndicator: i_failure_statusIndicator,
-                preferredIndicator: i_failure_preferredIndicator,
-                commentData: i_failure_commentData,
-                displayWebIndicator: i_failure_displayWebIndicator,
-
-                emailType: i_failure_emailType
-        )
-        return personEmail
-    }
-
-
     @Test
     void testFetchByPidmAndStatusAndWebDisplayAndPreferredIndicator( ) {
         def results = PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator( PersonUtility.getPerson( "966049236" ).pidm, 'A', 'Y', 'Y' )
@@ -347,8 +284,53 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
         def pidmList = [PersonUtility.getPerson( "966049236" ).pidm, PersonUtility.getPerson( "HOS00003" ).pidm]
         def results = PersonEmail.fetchListByPidmAndStatusAndWebDisplay( pidmList, 'A', 'Y' )
 
-        assertTrue results.size() > 1
+        assertEquals 2, results.size()
         assertTrue results[0] instanceof PersonEmail
+        assertTrue results[1] instanceof PersonEmail
+        
+        def foundCount = 0
+        results.each {
+            if (it.emailType.code == "PERS") {
+                foundCount++
+                assertEquals "einstein2be@verizon.net", it.emailAddress
+                assertTrue it.displayWebIndicator
+            } else if (it.emailType.code == "MA") {
+                foundCount++
+                assertEquals "pamix@charter.net", it.emailAddress
+                assertTrue it.displayWebIndicator
+            }
+        }
+        assertEquals 2, foundCount
+    }
+
+
+    @Test
+    void testFetchListByPidmAndStatus() {
+        def pidmList = [PersonUtility.getPerson("966049236").pidm, PersonUtility.getPerson("HOS00003").pidm]
+        def results = PersonEmail.fetchListByPidmAndStatus(pidmList, 'A')
+
+        assertEquals 3, results.size()
+        assertTrue results[0] instanceof PersonEmail
+        assertTrue results[1] instanceof PersonEmail
+        assertTrue results[2] instanceof PersonEmail
+        
+        def foundCount = 0
+        results.each {
+            if (it.emailType.code == "PERS") {
+                foundCount++
+                assertEquals "einstein2be@verizon.net", it.emailAddress
+                assertTrue it.displayWebIndicator
+            } else if (it.emailType.code == "MA") {
+                foundCount++
+                assertEquals "pamix@charter.net", it.emailAddress
+                assertTrue it.displayWebIndicator
+            } else if (it.emailType.code == "CAMP") {
+                foundCount++
+                assertEquals "pauline.amyx@charter.net", it.emailAddress
+                assertFalse it.displayWebIndicator
+            }
+        }
+        assertEquals 3, foundCount
     }
 
 
@@ -386,4 +368,84 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
         def result = PersonEmail.fetchByEmailAddressAndActiveStatus( "Stuart29321@Ellucian.edu" )
         assertNull(result)
     }
+
+
+    @Test
+    void testFetchByPidmAndEmailTypeAndStatusAndWebDisplayAndPreferredIndicator() {
+        def res = PersonEmail.fetchByPidmAndEmailTypeAndStatusAndWebDisplayAndPreferredIndicator(PersonUtility.getPerson("966049236").pidm, 'PERS','A', 'Y', 'Y')
+        assertEquals res.version, 0
+        assertEquals res.pidm, 33784
+        assertEquals res.emailAddress, "einstein2be@verizon.net"
+        assertEquals res.statusIndicator, "A"
+        assertEquals res.preferredIndicator, true
+        assertEquals res.commentData, null
+        assertEquals res.displayWebIndicator, true
+        assertEquals res.dataOrigin, "Banner"
+
+    }
+
+
+    private def newValidForCreatePersonEmail( ) {
+        def sql = new Sql( sessionFactory.getCurrentSession().connection() )
+        String idSql = """select gb_common.f_generate_id bannerId, gb_common.f_generate_pidm pidm from dual """
+        def bannerValues = sql.firstRow( idSql )
+        def ibannerId = bannerValues.bannerId
+        def ipidm = bannerValues.pidm
+        def person = new PersonIdentificationName(
+                pidm: ipidm,
+                bannerId: ibannerId,
+                lastName: "TTTTT",
+                firstName: "TTTTT",
+                middleName: "TTTTT",
+                changeIndicator: null,
+                entityIndicator: "P"
+        )
+        person.save( flush: true, failOnError: true )
+        assert person.id
+
+        def personEmail = new PersonEmail(
+                pidm: ipidm,
+                emailAddress: i_success_emailAddress,
+                statusIndicator: i_success_statusIndicator,
+                preferredIndicator: i_success_preferredIndicator,
+                commentData: i_success_commentData,
+                displayWebIndicator: i_success_displayWebIndicator,
+                emailType: i_success_emailType
+        )
+        return personEmail
+    }
+
+
+    private def newInvalidForCreatePersonEmail( ) {
+        def sql = new Sql( sessionFactory.getCurrentSession().connection() )
+        String idSql = """select gb_common.f_generate_id bannerId, gb_common.f_generate_pidm pidm from dual """
+        def bannerValues = sql.firstRow( idSql )
+        def ibannerId = bannerValues.bannerId
+        def ipidm = bannerValues.pidm
+        def person = new PersonIdentificationName(
+                pidm: ipidm,
+                bannerId: ibannerId,
+                lastName: "TTTTT",
+                firstName: "TTTTT",
+                middleName: "TTTTT",
+                changeIndicator: null,
+                entityIndicator: "P"
+        )
+        person.save( flush: true, failOnError: true )
+        assert person.id
+
+        def personEmail = new PersonEmail(
+                pidm: ipidm,
+                emailAddress: i_failure_emailAddress,
+                statusIndicator: i_failure_statusIndicator,
+                preferredIndicator: i_failure_preferredIndicator,
+                commentData: i_failure_commentData,
+                displayWebIndicator: i_failure_displayWebIndicator,
+
+                emailType: i_failure_emailType
+        )
+        return personEmail
+    }
+
 }
+
