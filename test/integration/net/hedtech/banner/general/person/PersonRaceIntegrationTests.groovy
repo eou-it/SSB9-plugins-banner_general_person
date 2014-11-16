@@ -35,8 +35,8 @@ class PersonRaceIntegrationTests extends BaseIntegrationTestCase {
     def u_failure_pidm
     def u_failure_race = "MOAN"
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this
         super.setUp()
         initializeTestDataForReferences()
@@ -49,12 +49,12 @@ class PersonRaceIntegrationTests extends BaseIntegrationTestCase {
         u_failure_pidm = i_failure_pidm = PersonIdentificationName.findByBannerId("HOF00716").pidm
     }
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
-	@Test
+    @Test
     void testCreateValidPersonRace() {
         def personRace = newValidForCreatePersonRace()
         personRace.save(failOnError: true, flush: true)
@@ -62,7 +62,7 @@ class PersonRaceIntegrationTests extends BaseIntegrationTestCase {
         assertNotNull personRace.id
     }
 
-	@Test
+    @Test
     void testCreateInvalidPersonRace() {
         def personRace = newInvalidForCreatePersonRace()
         shouldFail(ValidationException) {
@@ -71,7 +71,7 @@ class PersonRaceIntegrationTests extends BaseIntegrationTestCase {
     }
 
     @Ignore
-	@Test
+    @Test
     void testUpdateValidPersonRace() {
         def personRace = newValidForCreatePersonRace()
         personRace.save(failOnError: true, flush: true)
@@ -88,7 +88,7 @@ class PersonRaceIntegrationTests extends BaseIntegrationTestCase {
     }
 
     @Ignore
-	@Test
+    @Test
     void testUpdateInvalidPersonRace() {
         def personRace = newValidForCreatePersonRace()
         personRace.save(failOnError: true, flush: true)
@@ -104,7 +104,7 @@ class PersonRaceIntegrationTests extends BaseIntegrationTestCase {
     }
 
     @Ignore
-	@Test
+    @Test
     void testOptimisticLock() {
         def personRace = newValidForCreatePersonRace()
         personRace.save(failOnError: true, flush: true)
@@ -123,7 +123,7 @@ class PersonRaceIntegrationTests extends BaseIntegrationTestCase {
         }
     }
 
-	@Test
+    @Test
     void testDeletePersonRace() {
         def personRace = newValidForCreatePersonRace()
         personRace.save(failOnError: true, flush: true)
@@ -133,13 +133,13 @@ class PersonRaceIntegrationTests extends BaseIntegrationTestCase {
         assertNull PersonRace.get(id)
     }
 
-	@Test
+    @Test
     void testValidation() {
         def personRace = newInvalidForCreatePersonRace()
         assertFalse "PersonRace could not be validated as expected due to ${personRace.errors}", personRace.validate()
     }
 
-	@Test
+    @Test
     void testNullValidationFailure() {
         def personRace = new PersonRace()
         assertFalse "PersonRace should have failed validation", personRace.validate()
@@ -150,7 +150,7 @@ class PersonRaceIntegrationTests extends BaseIntegrationTestCase {
                 ]
     }
 
-	@Test
+    @Test
     void testFetchByPidm() {
         def personRace = newValidForCreatePersonRace()
         personRace.save(failOnError: true, flush: true)
@@ -183,7 +183,7 @@ class PersonRaceIntegrationTests extends BaseIntegrationTestCase {
         return personRace
     }
 
-	@Test
+    @Test
     void testFetchByPidmAndRaceSuccess() {
         PersonRace personRace = newValidForCreatePersonRace()
         personRace.save(failOnError: true, flush: true)
@@ -201,7 +201,7 @@ class PersonRaceIntegrationTests extends BaseIntegrationTestCase {
         assertNull quiredPersonRace
     }
 
-	@Test
+    @Test
     void testFetchByPidmAndRaceForInvalidValues() {
         PersonRace personRace = newValidForCreatePersonRace()
         personRace.save(failOnError: true, flush: true)
@@ -227,7 +227,7 @@ class PersonRaceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testFetchByPidmList() {
         def people = [newValidForCreatePersonRace()]
         i_success_race = "IND"

@@ -19,20 +19,20 @@ class PersonBiographicalCompositeServiceIntegrationTests extends BaseIntegration
     def personBiographicalCompositeService
 
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
     }
 
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
 
-	@Test
+    @Test
     void testCreateBiographical() {
         def personIdentificationNameCurrent = setupNewPersonIdentificationNameCurrent()
 
@@ -62,7 +62,7 @@ class PersonBiographicalCompositeServiceIntegrationTests extends BaseIntegration
     }
 
 
-	@Test
+    @Test
     void testUpdateBiographical() {
         def personIdentificationNameCurrent = setupNewPersonIdentificationNameCurrent()
 
@@ -119,7 +119,7 @@ class PersonBiographicalCompositeServiceIntegrationTests extends BaseIntegration
     }
 
 
-	@Test
+    @Test
     void testDeleteBiographical() {
         def personIdentificationNameCurrent = setupNewPersonIdentificationNameCurrent()
 

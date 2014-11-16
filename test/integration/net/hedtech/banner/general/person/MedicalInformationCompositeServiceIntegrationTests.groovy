@@ -22,20 +22,20 @@ class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegration
     def medicalInformationCompositeService
 
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU']// Since we are not testing a controller, we need to explicitly set this  (removing GOAMEDI because of GUOBOBS_UI_VERSION = B)
         super.setUp()
     }
 
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
 
-	@Test
+    @Test
     void testCreate() {
 
         def medicalInformations = newMedicalInformation()
@@ -48,7 +48,7 @@ class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegration
     }
 
 
-	@Test
+    @Test
     void testMedicalInformationDelete() {
         def medicalInformations = newMedicalInformation()
         def pidm = medicalInformations[0].pidm
@@ -64,7 +64,7 @@ class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegration
     }
 
 
-	@Test
+    @Test
     void testUpdateOfComment() {
 
         def medicalInformation = newSingleMedicalInformation()
@@ -86,7 +86,7 @@ class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegration
     @Ignore
     // TODO for some reason this fails,  the medical condition is not flagged as being dirty,  i suspect that a domain
     // exists that has incorrect equals and hash causing this
-	@Test
+    @Test
     void testMediCodeUpdateNoPereacc() {
         setHRInstalledFalse()
         // create new medical information record
@@ -128,7 +128,7 @@ class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegration
     //        1728 F10000                   00           4/22/2003            ACTV              HC
 
 
-	@Test
+    @Test
     void testMediCodeUpdateWithPereacc() {
         setHRInstalledTrue()
         // create new medical information record
@@ -166,7 +166,7 @@ class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegration
     }
 
 
-	@Test
+    @Test
     void testMediCodeUpdateWithPereaccWithoutMap() {
         setHRInstalledTrue()
         // create new medical information record

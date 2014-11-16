@@ -13,21 +13,21 @@ import net.hedtech.banner.testing.BaseIntegrationTestCase
 class EmailSearchIntegrationTests extends BaseIntegrationTestCase {
 
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this (removing GEAPART because of GUOBOBS_UI_VERSION = B)
         super.setUp()
     }
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
     /**
      * Tests the list of emails by email filter search and pagination.
      */
-	@Test
+    @Test
     void testEmailSearchByFilterAndPagination() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
@@ -47,7 +47,7 @@ class EmailSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests the list of emails by email filter search.
      */
-	@Test
+    @Test
     void testEmailSearchByFilter() {
 
         def filter = "einstein"
@@ -67,7 +67,7 @@ class EmailSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests the list of emails for inquire page.
      */
-	@Test
+    @Test
     void testDynamicFinder() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
@@ -95,7 +95,7 @@ class EmailSearchIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Tests the list of emails for the pidm list
      */
-	@Test
+    @Test
     void testEmailSearchByFilterAndPidm() {
         def pidmList = []
         pidmList.add(new Integer("33775"))

@@ -14,22 +14,22 @@ class PersonSearchControllerIntegrationTests extends BaseIntegrationTestCase {
     def controller
     def personSearchService
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU'] //(removing GEAPART because of GUOBOBS_UI_VERSION = B)
         controller = new PersonSearchController()
         super.setUp()
     }
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
     /**
      * Test controller by Id.
      */
-	@Test
+    @Test
     void testSearchById() {
         controller.request.contentType = "text/json"
         controller.params.searchFilter = "HOS00001"
@@ -44,7 +44,7 @@ class PersonSearchControllerIntegrationTests extends BaseIntegrationTestCase {
     /**
      * Test controller by Name.
      */
-	@Test
+    @Test
     void testSearchByName() {
         controller.request.contentType = "text/json"
         controller.params.searchFilter = "Lindblom"

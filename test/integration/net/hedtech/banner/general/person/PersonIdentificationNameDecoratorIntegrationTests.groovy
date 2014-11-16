@@ -22,20 +22,20 @@ class PersonIdentificationNameDecoratorIntegrationTests extends BaseIntegrationT
 
     def personIdentificationNameService
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
     }
 
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
 
-	@Test
+    @Test
     void testNullNewPerson() {
         def newPerson = new PersonIdentificationNameDecorator()
         assertNull newPerson.pidm
@@ -43,7 +43,7 @@ class PersonIdentificationNameDecoratorIntegrationTests extends BaseIntegrationT
     }
 
 
-	@Test
+    @Test
     void testNewSectionFromSpriden() {
 
         def newPerson = new PersonIdentificationNameDecorator(PersonUtility.getPerson("HOF00714"))
@@ -54,7 +54,7 @@ class PersonIdentificationNameDecoratorIntegrationTests extends BaseIntegrationT
     }
 
 
-	@Test
+    @Test
     void testNewSectionFromMap() {
         def instructor = PersonUtility.getPerson("HOF00714")
         def newPerson = new PersonIdentificationNameDecorator([pidm: instructor.pidm,
@@ -70,7 +70,7 @@ class PersonIdentificationNameDecoratorIntegrationTests extends BaseIntegrationT
     }
 
 
-	@Test
+    @Test
     void testNewSectionFromMapUsingNameTemplateWithSurnamePrefixOff() {
         //get the name format from General Person Plugin messages.properties
         def application = ApplicationHolder.application
@@ -109,7 +109,7 @@ class PersonIdentificationNameDecoratorIntegrationTests extends BaseIntegrationT
     }
 
 
-	@Test
+    @Test
     void testNameFormatUsingNameTemplateWithSurnamePrefixTurnedOn() {
         //get the name format from General Person Plugin messages.properties
         def application = ApplicationHolder.application

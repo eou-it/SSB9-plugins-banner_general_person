@@ -185,8 +185,8 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     def u_failure_armedServiceMedalVetIndicator = true
 
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
         initializeTestDataForReferences()
@@ -237,13 +237,13 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
 
-	@Test
+    @Test
     void testCreateValidPersonBasicPersonBase() {
         def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()
         personBasicPersonBase.save(failOnError: true, flush: true)
@@ -252,7 +252,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testCalculateAge() {
         def df = new SimpleDateFormat("MM/dd/yyyy");
         def birthDate = new java.sql.Date(df.parse("10/17/1966").getTime());
@@ -275,7 +275,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testCreateInvalidPersonBasicPersonBase() {
         def personBasicPersonBase = newInvalidForCreatePersonBasicPersonBase()
         shouldFail(ValidationException) {
@@ -284,7 +284,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testUpdateValidPersonBasicPersonBase() {
         def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()
         personBasicPersonBase.save(failOnError: true, flush: true)
@@ -406,7 +406,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testUpdateInvalidPersonBasicPersonBase() {
         def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()
         personBasicPersonBase.save(failOnError: true, flush: true)
@@ -488,7 +488,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testDates() {
         def time = new SimpleDateFormat('HHmmss')
         def hour = new SimpleDateFormat('HH')
@@ -522,7 +522,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testOptimisticLock() {
         def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()
         personBasicPersonBase.save(failOnError: true, flush: true)
@@ -571,7 +571,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testDeletePersonBasicPersonBase() {
         def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()
         personBasicPersonBase.save(failOnError: true, flush: true)
@@ -582,14 +582,14 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testValidation() {
         def personBasicPersonBase = newInvalidForCreatePersonBasicPersonBase()
         assertFalse "PersonBasicPersonBase could not be validated as expected due to ${personBasicPersonBase.errors}", personBasicPersonBase.validate()
     }
 
 
-	@Test
+    @Test
     void testNullValidationFailure() {
         def personBasicPersonBase = new PersonBasicPersonBase()
         assertFalse "PersonBasicPersonBase should have failed validation", personBasicPersonBase.validate()
@@ -642,7 +642,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testMaxSizeValidationFailures() {
         def personBasicPersonBase = new PersonBasicPersonBase(
                 ssn: 'XXXXXXXXXXXXXXXXX',
@@ -669,7 +669,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testFindByPidm() {
         def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()
         personBasicPersonBase.save(failOnError: true, flush: true)
@@ -681,7 +681,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testFetchByPidmList() {
         def personList = []
         (0..5).each {
@@ -697,7 +697,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testFetchBySsn() {
         def personBasicPersonBase1 = newValidForCreatePersonBasicPersonBase()
         personBasicPersonBase1.save(failOnError: true, flush: true)
@@ -783,7 +783,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
         return personBasicPersonBase
     }
 
-	@Test
+    @Test
     void testFetchSurveyConfirmedFlagByPidm() {
         def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()
         personBasicPersonBase.save(failOnError: true, flush: true)

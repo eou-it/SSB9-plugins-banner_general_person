@@ -22,14 +22,14 @@ class MedicalInformationIntegrationTests extends BaseIntegrationTestCase {
     def medicalInformationService       // injected via spring
 
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this (removing GOAMEDI because of GUOBOBS_UI_VERSION = B)
         super.setUp()
     }
 
 
-	@Test
+    @Test
     void testCreate() {
         def entity = newMedicalInformation()
         save entity
@@ -37,7 +37,7 @@ class MedicalInformationIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testUpdate() {
         def entity = newMedicalInformation()
         save entity
@@ -55,7 +55,7 @@ class MedicalInformationIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testOptimisticLock() {
         def entity = newMedicalInformation()
         save entity
@@ -73,7 +73,7 @@ class MedicalInformationIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testDelete() {
         def entity = newMedicalInformation()
         save entity
@@ -83,28 +83,28 @@ class MedicalInformationIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testList() {
         def medInfos = MedicalInformation.list()
         assertTrue medInfos.size() > 0
     }
 
 
-	@Test
+    @Test
     void testFindWhere() {
         def entity = MedicalInformation.findWhere(onsetAge: 12)
         assertEquals "FindWhere did not return expected entity", 12, entity.onsetAge
     }
 
 
-	@Test
+    @Test
     void testFindAll() {
         def medInfos = MedicalInformation.findAll()
         assertTrue medInfos.size() >= 10
     }
 
 
-	@Test
+    @Test
     void testFindAllWithHQL() {
         String hql = "from MedicalInformation as m where m.onsetAge != null"
         def medInfos = MedicalInformation.findAll(hql)
@@ -112,7 +112,7 @@ class MedicalInformationIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testFindByOnsetAge() {
         def entity = newMedicalInformation()
         save entity
@@ -123,7 +123,7 @@ class MedicalInformationIntegrationTests extends BaseIntegrationTestCase {
 
 
 
-	@Test
+    @Test
     void testAssociations() {
         def entity = newMedicalInformation()
         save entity
@@ -135,7 +135,7 @@ class MedicalInformationIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testValidation() {
         def medicalInformation = newMedicalInformation()
         medicalInformation.pidm = null
@@ -146,7 +146,7 @@ class MedicalInformationIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testCreateWithAPIError() {
         def entity = newMedicalInformation()
         assertNotNull entity.id

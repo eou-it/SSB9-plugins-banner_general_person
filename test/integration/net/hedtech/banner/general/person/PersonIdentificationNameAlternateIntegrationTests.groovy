@@ -19,20 +19,20 @@ class PersonIdentificationNameAlternateIntegrationTests extends BaseIntegrationT
     def personIdentificationNameAlternate
 
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this
         super.setUp()
     }
 
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
 
-	@Test
+    @Test
     void testCreatePersonIdentificationNameAlternate() {
         def personIdentificationNameCurrent = setupNewPersonIdentificationNameCurrent("P")
 
@@ -65,7 +65,7 @@ class PersonIdentificationNameAlternateIntegrationTests extends BaseIntegrationT
     }
 
 
-	@Test
+    @Test
     void testDeletePersonIdentificationNameAlternate() {
         def personIdentificationNameCurrent = setupNewPersonIdentificationNameCurrent("P")
         def personIdentificationNameAlternate = newIdChange(personIdentificationNameCurrent)
@@ -84,7 +84,7 @@ class PersonIdentificationNameAlternateIntegrationTests extends BaseIntegrationT
     }
 
 
-	@Test
+    @Test
     void testValidation() {
         def personIdentificationNameAlternate = new PersonIdentificationNameAlternate(
                 pidm: 1234,
@@ -102,7 +102,7 @@ class PersonIdentificationNameAlternateIntegrationTests extends BaseIntegrationT
     }
 
 
-	@Test
+    @Test
     void testNullValidationFailure() {
         def personIdentificationNameAlternate = new PersonIdentificationNameAlternate()
         assertFalse "PersonIdentificationNameAlternate should have failed validation", personIdentificationNameAlternate.validate()
@@ -131,7 +131,7 @@ class PersonIdentificationNameAlternateIntegrationTests extends BaseIntegrationT
     }
 
 
-	@Test
+    @Test
     void testInListValidationFailure() {
         def personIdentificationNameAlternate = new PersonIdentificationNameAlternate(
                 pidm: 1234,
@@ -156,7 +156,7 @@ class PersonIdentificationNameAlternateIntegrationTests extends BaseIntegrationT
 
 
 
-	@Test
+    @Test
     void testMaxSizeValidationFailures() {
         def personIdentificationNameAlternate = new PersonIdentificationNameAlternate(
                 firstName: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',

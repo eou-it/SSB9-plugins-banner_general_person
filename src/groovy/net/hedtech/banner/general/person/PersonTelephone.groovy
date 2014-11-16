@@ -78,12 +78,22 @@ import javax.persistence.*
                              AND addressType = :addressType
                              AND primaryIndicator = 'Y'
                              AND NVL(statusIndicator,'A') <> 'I'
-                             AND NVL(unlistIndicator,'N') <> 'Y'
-                    """),
+                             AND NVL(unlistIndicator,'N') <> 'Y' """),
 @NamedQuery(name = "PersonTelephone.fetchActiveTelephonesByPidmAndAddressTypes",
         query = """FROM PersonTelephone a
                              WHERE  pidm = :pidm
                              AND addressType.code in :addressTypes
+                             AND NVL(statusIndicator,'A') <> 'I'
+                             AND NVL(unlistIndicator,'N') <> 'Y' """),
+@NamedQuery(name = "PersonTelephone.fetchActiveTelephoneByPidm",
+                query = """FROM PersonTelephone a
+                             WHERE  pidm = :pidm
+                             AND NVL(statusIndicator,'A') <> 'I'
+                             AND NVL(unlistIndicator,'N') <> 'Y'
+                    """),
+@NamedQuery(name = "PersonTelephone.fetchActiveTelephoneByPidmInList",
+                query = """FROM PersonTelephone a
+                             WHERE  pidm IN :pidms
                              AND NVL(statusIndicator,'A') <> 'I'
                              AND NVL(unlistIndicator,'N') <> 'Y'
                     """)
@@ -481,5 +491,20 @@ class PersonTelephone implements Serializable {
         }
 
         return result
+    }
+
+    static def fetchActiveTelephoneByPidm(Integer pidm){
+        PersonTelephone.withSession { session ->
+            session.getNamedQuery('PersonTelephone.fetchActiveTelephoneByPidm')
+                    .setInteger('pidm', pidm).list()
+        }
+    }
+
+    static List<PersonTelephone> fetchActiveTelephoneByPidmInList(List<Integer> pidms){
+        if( pidms.isEmpty() ) { return [] }
+        PersonTelephone.withSession { session ->
+            session.getNamedQuery('PersonTelephone.fetchActiveTelephoneByPidmInList')
+                    .setParameterList('pidms', pidms).list()
+        }
     }
 }

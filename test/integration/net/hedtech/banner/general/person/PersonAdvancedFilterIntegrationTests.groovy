@@ -13,21 +13,21 @@ import net.hedtech.banner.testing.BaseIntegrationTestCase
 
 class PersonAdvancedFilterIntegrationTests extends BaseIntegrationTestCase {
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this (removing GEAPART because of GUOBOBS_UI_VERSION = B)
         super.setUp()
     }
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
     /**
      * Tests the list of additional ids for inquire page.
      */
-	@Test
+    @Test
     void testDynamicFinder() {
         def searchFilter = 'A00000706'
 

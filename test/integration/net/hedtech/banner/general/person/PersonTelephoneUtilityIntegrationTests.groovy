@@ -35,8 +35,8 @@ class PersonTelephoneUtilityIntegrationTests extends BaseIntegrationTestCase {
     def i_success_countryPhone = "9"
 
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this
         super.setUp()
         initializeTestDataForReferences()
@@ -50,13 +50,13 @@ class PersonTelephoneUtilityIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
 
-	@Test
+    @Test
     void testFormatPhone() {
         def personTelephone = newValidPersonTelephone()
         save personTelephone
@@ -85,7 +85,7 @@ class PersonTelephoneUtilityIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testFormatInternationalPhone() {
         def personTelephone = newValidPersonInternationalTelephone()
         save personTelephone
@@ -113,7 +113,7 @@ class PersonTelephoneUtilityIntegrationTests extends BaseIntegrationTestCase {
     }
 
     //Confirm that if there is international phone info, it will use that format.
-	@Test
+    @Test
     void testFormatInternationalPhoneWhenCountryExists() {
         def personTelephone = newValidPersonTelephoneWithInternationalAndCountry()
         save personTelephone

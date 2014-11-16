@@ -41,7 +41,15 @@ query = """FROM  PersonRelatedHold a
 	  	   WHERE a.pidm IN :pidm
 	  	     AND ( TRUNC(:compareDate) >= TRUNC(a.fromDate)
 	  	           AND TRUNC(:compareDate) < TRUNC(a.toDate) )
-	  	ORDER BY a.fromDate desc, a.toDate desc """)
+	  	ORDER BY a.fromDate desc, a.toDate desc """),
+@NamedQuery(name = "PersonRelatedHold.fetchAllDistinctHoldTypeByPidmAndDateCompare",
+query = """SELECT a.holdType.code
+            FROM PersonRelatedHold a
+            WHERE a.pidm = :pidm
+            AND ( TRUNC(:compareDate) >= TRUNC(a.fromDate)
+            AND TRUNC(:compareDate) <= TRUNC(a.toDate) )
+            GROUP BY a.holdType.code
+            ORDER BY a.holdType.code """)
 ])
 
 @Entity
@@ -151,13 +159,13 @@ class PersonRelatedHold implements Serializable {
 		            id=$id,
 		            version=$version,
 					pidm=$pidm,
-					holdType=$holdType, 
+					holdType=$holdType,
 					fromDate=$fromDate,
-					toDate=$toDate, 
-					releaseIndicator=$releaseIndicator, 
-					reason=$reason, 
+					toDate=$toDate,
+					releaseIndicator=$releaseIndicator,
+					reason=$reason,
 					amountOwed=$amountOwed,
-					originator=$originator, 
+					originator=$originator,
 					lastModified=$lastModified,
 					lastModifiedBy=$lastModifiedBy,
 					dataOrigin=$dataOrigin]"""
@@ -269,6 +277,19 @@ class PersonRelatedHold implements Serializable {
 
         def personRelatedHolds = PersonRelatedHold.withSession {session ->
             session.getNamedQuery('PersonRelatedHold.fetchByPidmAndDateCompare').setInteger('pidm', pidm).setDate('compareDate', compareDate).list()
+        }
+
+        return personRelatedHolds
+    }
+
+
+    /**
+     * Retrieve distinct person related hold records where the date sent in is greater
+     * than or equal to the hold from date and less than equal to the hold to date.
+     */
+    public static List fetchAllDistinctHoldTypeByPidmAndDateCompare(Integer pidm, Date compareDate) {
+        def personRelatedHolds = PersonRelatedHold.withSession {session ->
+            session.getNamedQuery('PersonRelatedHold.fetchAllDistinctHoldTypeByPidmAndDateCompare').setInteger('pidm', pidm).setDate('compareDate', compareDate).list()
         }
 
         return personRelatedHolds

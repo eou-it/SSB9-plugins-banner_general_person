@@ -66,6 +66,36 @@ grails.views.gsp.sitemesh.preprocess = true
 
 seedDataTarget =  ['bgp': ['/src/groovy/net/hedtech/banner/seeddata/Data/banner_general_person.xml']]
 
+log4j = {
+    def String loggingFileDir = "target/logs"
+    def String logAppName = "banner_general_person"
+    def String loggingFileName = "${loggingFileDir}/${logAppName}.log".toString()
+    appenders {
+        rollingFile name: 'appLog', file: loggingFileName, maxFileSize: "${10 * 1024 * 1024}", maxBackupIndex: 10, layout: pattern(conversionPattern: '%d{[EEE, dd-MMM-yyyy @ HH:mm:ss.SSS]} [%t] %-5p %c %x - %m%n')
+    }
+
+    switch (grails.util.Environment.current.name.toString()) {
+        case 'development':
+            root {
+                warn 'appLog'
+                additivity = true
+            }
+            break
+        case 'test':
+            root {
+                error 'appLog'
+                additivity = true
+            }
+            break
+        case 'production':
+            root {
+                error 'appLog'
+                additivity = true
+            }
+            break
+    }
+}
+
 // Uncomment and edit the following lines to start using Grails encoding & escaping improvements
 
 /* remove this line 

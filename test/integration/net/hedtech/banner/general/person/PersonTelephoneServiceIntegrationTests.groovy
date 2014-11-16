@@ -86,7 +86,7 @@ class PersonTelephoneServiceIntegrationTests extends BaseIntegrationTestCase {
     
 
     @Before
-	public void setUp() {
+    public void setUp() {
 		formContext = ['GUAGMNU']
 		super.setUp()
         initializeTestDataForReferences()
@@ -117,7 +117,7 @@ class PersonTelephoneServiceIntegrationTests extends BaseIntegrationTestCase {
 
 
     @After
-	public void tearDown() {
+    public void tearDown() {
 		super.tearDown()
 	}
 

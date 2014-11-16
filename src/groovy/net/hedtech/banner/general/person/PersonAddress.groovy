@@ -88,6 +88,14 @@ query = """ FROM PersonAddress a
                             NVL(SPRADDR_FROM_DATE,sysdate-1) AND
                             NVL(SPRADDR_TO_DATE,sysdate+1)
                 """),
+@NamedQuery(name = "PersonAddress.fetchActiveAddressesByPidmInList",
+query = """ FROM PersonAddress a
+                            WHERE  a.pidm IN :pidms
+                            AND NVL(a.statusIndicator,'Y') <> 'I'
+                            AND  SYSDATE BETWEEN
+                            NVL(SPRADDR_FROM_DATE,sysdate-1) AND
+                            NVL(SPRADDR_TO_DATE,sysdate+1)
+                """),
 @NamedQuery(name = "PersonAddress.fetchSomeActiveAddressesByPidm",
 query = """ FROM PersonAddress a
                             WHERE  a.pidm = :pidm
@@ -559,6 +567,13 @@ class PersonAddress implements Serializable {
             }
         } else {
             return null
+        }
+    }
+
+    static List<PersonAddress> fetchActiveAddressesByPidmInList(List<Integer> pidms)  {
+        if( pidms.isEmpty() ) { return [] }
+        PersonAddress.withSession { session ->
+            session.getNamedQuery('PersonAddress.fetchActiveAddressesByPidmInList').setParameterList('pidms', pidms).list()
         }
     }
 

@@ -35,8 +35,8 @@ class AdditionalIDServiceIntegrationTests extends BaseIntegrationTestCase {
     def u_failure_additionalId = "TTTTT"
 
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
         initializeTestDataForReferences()
@@ -59,13 +59,13 @@ class AdditionalIDServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
 
-	@Test
+    @Test
     void testAdditionalIDValidCreate() {
         def additionalID = newValidForCreateAdditionalID()
         def map = [domainModel: additionalID]
@@ -79,7 +79,7 @@ class AdditionalIDServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testAdditionalIDInvalidCreate() {
         def additionalID = newInvalidForCreateAdditionalID()
         def map = [domainModel: additionalID]
@@ -89,7 +89,7 @@ class AdditionalIDServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testAdditionalIDValidUpdate() {
         def additionalID = newValidForCreateAdditionalID()
         def map = [domainModel: additionalID]
@@ -110,7 +110,7 @@ class AdditionalIDServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testAdditionalIDInvalidUpdate() {
         def additionalID = newValidForCreateAdditionalID()
         def map = [domainModel: additionalID]
@@ -132,6 +132,7 @@ class AdditionalIDServiceIntegrationTests extends BaseIntegrationTestCase {
 
 
 	@Ignore
+    @Test
     void testAdditionalIDDelete() {
         def additionalID = newValidForCreateAdditionalID()
         def map = [domainModel: additionalID]
@@ -146,7 +147,7 @@ class AdditionalIDServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Test
+    @Test
     void testReadOnly() {
         def additionalID = newValidForCreateAdditionalID()
         def map = [domainModel: additionalID]

@@ -17,20 +17,20 @@ class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTes
     def personIdentificationNameService
 
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
     }
 
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
 
-	@Test
+    @Test
     void testCreatePersonIdentificationName() {
         def personIdentificationName = newPersonIdentificationName()
 
@@ -44,7 +44,7 @@ class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTes
      }
 
 
-	@Test
+    @Test
     void testUpdatePersonIdentificationName() {
         def personIdentificationName = newPersonIdentificationName()
         personIdentificationName.save(failOnError: true, flush: true)
@@ -63,7 +63,7 @@ class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTes
     }
 
 
-	@Test
+    @Test
     void testDeletePersonIdentificationName() {
         def personIdentificationName = newPersonIdentificationName()
         personIdentificationName.save(failOnError: true, flush: true)
@@ -79,13 +79,13 @@ class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTes
     }
 
 
-	@Test
+    @Test
     void testSystemGeneratedIdPrefix() {
         assertEquals('A', personIdentificationNameService.getSystemGeneratedIdPrefix())
     }
 
 
-	@Test
+    @Test
     void testGetPrefixDisplayIndForSelfService() {
         def updateSql = """update  gordmsk set gordmsk_display_ind = 'N' where  gordmsk_objs_code   = '**SSB_MASKING'
                And Gordmsk_Block_Name  = 'F_FORMAT_NAME'
@@ -97,7 +97,7 @@ class PersonIdentificationNameServiceIntegrationTests extends BaseIntegrationTes
     }
 
 
-	@Test
+    @Test
     void testGetFormattedNameFL() {
         def fmt
         def pidm

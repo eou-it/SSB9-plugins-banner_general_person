@@ -19,20 +19,20 @@ class PersonEmailCompositeServiceIntegrationTests extends BaseIntegrationTestCas
     def personEmailCompositeService
 
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
     }
 
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
 
-	@Test
+    @Test
     void testCreate() {
 
         def personEmails = newPersonEmails()
@@ -46,7 +46,7 @@ class PersonEmailCompositeServiceIntegrationTests extends BaseIntegrationTestCas
     }
 
 
-	@Test
+    @Test
     void testPersonEmailDelete() {
         def personEmails = newPersonEmails()
         def pidm = personEmails[0].pidm
@@ -62,7 +62,7 @@ class PersonEmailCompositeServiceIntegrationTests extends BaseIntegrationTestCas
     }
 
 
-	@Test
+    @Test
     void testUpdateOfComment() {
 
         def personEmail = newSinglePersonEmail()
@@ -83,7 +83,7 @@ class PersonEmailCompositeServiceIntegrationTests extends BaseIntegrationTestCas
     }
 
 
-	@Test
+    @Test
     void testUpdateOfEmailType() {
 
         def personEmail = newSinglePersonEmail()
@@ -104,7 +104,7 @@ class PersonEmailCompositeServiceIntegrationTests extends BaseIntegrationTestCas
     }
 
 
-	@Test
+    @Test
       void testUpdateOfEmailAddress() {
 
         def personEmail = newSinglePersonEmail()
@@ -125,7 +125,7 @@ class PersonEmailCompositeServiceIntegrationTests extends BaseIntegrationTestCas
     }
 
 
-	@Test
+    @Test
       void testUpdateOfEmailAddressAndType() {
 
         def personEmail = newSinglePersonEmail()
@@ -147,7 +147,7 @@ class PersonEmailCompositeServiceIntegrationTests extends BaseIntegrationTestCas
     }
 
 
-	@Test
+    @Test
      void testUpdateOfEmailAddressAndTypeAndComment() {
 
         def personEmail = newSinglePersonEmail()

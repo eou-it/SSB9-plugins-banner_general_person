@@ -19,21 +19,21 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
 
     def personSearchService
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this (removing GEAPART because of GUOBOBS_UI_VERSION = B)
         super.setUp()
     }
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
     /**
      * Tests Pagination
      */
-	@Test
+    @Test
     void testPagination() {
         def filterData = [:]
         def param = [:]
@@ -51,7 +51,7 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
         37859                  HOS00001   Jamison                                                      Emily                                                        Elizabeth                                                                       P                  07-JAN-11                 SAISUSR                        SPAIDEN                        JAMISON                                                      EMILY                                                        ELIZABETH                                                    J525                      E540                                         BANPROXY                       07-JAN-11                 GRAILS                                                                                                                     10558                  0
      */
 
-	@Test
+    @Test
     void testAdvancedSearchById() {
 
         def filterData = [:]
@@ -77,6 +77,7 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
      */
 	@Ignore
     //HRU- 5512
+    @Test
     void testAdvancedSearchByCurrentId() {
         def institutionalDescription  = InstitutionalDescription.list()[0]
         assertNotNull institutionalDescription
@@ -100,7 +101,7 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
     /**
      * Tests the name search.
      */
-	@Test
+    @Test
     void testAdvancedSearchByName() {
 
         def filterData = [:]
@@ -124,7 +125,7 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
     /**
      * Tests the advanced name search with additional parameters.
      */
-	@Test
+    @Test
     void testAdvancedSearchByNameAndAdditionalParameters() {
 
         def filterData = [:]
@@ -183,7 +184,7 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
     /**
      * Tests the advanced name search with special characters.
      */
-	@Test
+    @Test
     void testAdvancedSearchByNameWithSpecialCharacters() {
 
         def filterData = [:]
@@ -206,7 +207,7 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
     /**
      * Tests name format configuration.
      */
-	@Test
+    @Test
     void testNameFormat() {
         def application = AH.application
         ApplicationContext applicationContext = application.mainContext
@@ -217,7 +218,7 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
     /**
      * Tests the advanced search by SSN
      */
-	@Test
+    @Test
     void testAdvancedSearchBySsn() {
 
         def filterData = [:]
@@ -258,7 +259,7 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
     /**
      * Tests the advanced search by SSN  with additional parameters
      */
-	@Test
+    @Test
     void testAdvancedSearchBySsnAndAdditionalParameters() {
 
         def filterData = [:]
@@ -332,7 +333,7 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
      /**
      * Tests the advanced search for ssn
      */
-	@Test
+    @Test
     void testAllAdvancedSearchForSsnNotAllowed() {
         def filterData = [:]
         def param = [:]
@@ -346,7 +347,7 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
         assertTrue persons.size() == 0
     }
 
-	@Test
+    @Test
    void testFetchNoOfRowsInPageForGUQSRCH() {
          def sql
         try {

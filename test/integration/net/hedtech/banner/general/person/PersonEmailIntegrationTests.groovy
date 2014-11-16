@@ -56,7 +56,7 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
 
 
     @Before
-    public void setUp( ) {
+    public void setUp() {
         formContext = ['GUAGMNU'] // Since we are not testing a controller, we need to explicitly set this (removing GEAPART because of GUOBOBS_UI_VERSION = B)
         super.setUp()
         initializeTestDataForReferences()
@@ -71,7 +71,7 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
 
 
     @After
-    public void tearDown( ) {
+    public void tearDown() {
         super.tearDown()
     }
 
@@ -446,5 +446,6 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
         )
         return personEmail
     }
+
 }
 

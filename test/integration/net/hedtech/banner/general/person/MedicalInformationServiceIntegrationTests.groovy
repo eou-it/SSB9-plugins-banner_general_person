@@ -20,20 +20,20 @@ class MedicalInformationServiceIntegrationTests extends BaseIntegrationTestCase 
     def medicalInformationService
 
 
-	@Before
-	public void setUp() {
+    @Before
+    public void setUp() {
         formContext = ['GUAGMNU']// Since we are not testing a controller, we need to explicitly set this  (removing GOAMEDI because of GUOBOBS_UI_VERSION = B)
         super.setUp()
     }
 
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
         super.tearDown()
     }
 
 
-	@Test
+    @Test
     void testCreate() {
 
         def medicalInformation = newMedicalInformation()
@@ -45,7 +45,7 @@ class MedicalInformationServiceIntegrationTests extends BaseIntegrationTestCase 
     }
 
 
-	@Test
+    @Test
     void testUpdate() {
 
         def medicalInformation = newMedicalInformation()
@@ -66,7 +66,7 @@ class MedicalInformationServiceIntegrationTests extends BaseIntegrationTestCase 
 
 
 
-	@Test
+    @Test
     void testCreateWithAPIError() {
         def entity = newMedicalInformation()
         entity = medicalInformationService.create([domainModel: entity])
@@ -95,7 +95,7 @@ class MedicalInformationServiceIntegrationTests extends BaseIntegrationTestCase 
     }
 
 
-	@Test
+    @Test
     void testUpdateWithAPIError() {
         def entity = newMedicalInformation()
         entity = medicalInformationService.create([domainModel: entity])
@@ -128,7 +128,7 @@ class MedicalInformationServiceIntegrationTests extends BaseIntegrationTestCase 
     }
 
 
-	@Test
+    @Test
     void testReadOnly() {
         def medicalInfo = newMedicalInformation()
         medicalInfo = medicalInformationService.create([domainModel: medicalInfo])
@@ -149,7 +149,7 @@ class MedicalInformationServiceIntegrationTests extends BaseIntegrationTestCase 
     }
 
 
-	@Test
+    @Test
     void testMedicalInformationDelete() {
         def medicalInformation = newMedicalInformation()
 
