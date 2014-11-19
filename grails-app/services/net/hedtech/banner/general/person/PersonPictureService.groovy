@@ -42,7 +42,7 @@ class PersonPictureService {
     File getPictureFileForUserWith(bannerId) {
         // don't let users do directory tree traversal in bannerId, and ensure it's not empty
         if (!(bannerId ==~ '[^/\\\\]+'))
-            throw new RuntimeException("Invalid bannerId ${bannerId}")
+            return null // let the default silhouette load
 
         // Get a list of possibe file names
         def possibleFiles = PictureFileNamesUtil.getImgFileNames(bannerId)
