@@ -35,9 +35,7 @@ class PersonPictureServiceTests  extends GrailsUnitTestCase{
 
     @Test
     void testBadBannerId() {
-        shouldFail(RuntimeException) {
-           personPictureService.getPictureFileForUserWith("/file/JFROST789")
-        }
+           assertNull (personPictureService.getPictureFileForUserWith("/file/JFROST789"))
     }
 
     @Test
