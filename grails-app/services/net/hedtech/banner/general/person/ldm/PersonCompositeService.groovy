@@ -793,12 +793,6 @@ class PersonCompositeService extends LdmService {
         }
 
         List<PersonEmail> existingPersonEmails = PersonEmail.fetchListByPidmAndEmailTypes(pidm, bannerEmailTypes) ?: []
-        if (existingPersonEmails) {
-            existingPersonEmails.each {
-                it.statusIndicator = "I"
-                personEmailService.update([domainModel: it])
-            }
-        }
 
         List<String> processedEmailTypes = []
         PersonEmail personEmail
@@ -824,7 +818,11 @@ class PersonCompositeService extends LdmService {
                 }
             }
         }
-
+        existingPersonEmails.each {
+            it.statusIndicator = "I"
+            it.preferredIndicator = false
+            personEmailService.update([domainModel: it])
+        }
         return emailDecorators
     }
 
