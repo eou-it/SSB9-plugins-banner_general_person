@@ -17,6 +17,11 @@ class Email {
         this.email = email
     }
 
+    def Email(String guid, PersonEmail email) {
+        this.guid = guid
+        this.email = email
+    }
+
     def getEmailType() {
         this.emailType
     }
