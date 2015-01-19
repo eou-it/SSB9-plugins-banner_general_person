@@ -1,5 +1,5 @@
 /*******************************************************************************
- Copyright 2014 Ellucian Company L.P. and its affiliates.
+ Copyright 2014-2015 Ellucian Company L.P. and its affiliates.
  *******************************************************************************/
 package net.hedtech.banner.general.person.ldm
 
@@ -126,9 +126,12 @@ class PersonCompositeService extends LdmService {
                 throw new ApplicationException("Person", new BusinessLogicValidationException("missing.first.last.name",[]))
             }
         } else {
+            //Add DynamicFinder on PersonIdentificationName in future.
             if (params.role) {
                 pidms = userRoleCompositeService.fetchAllByRole([role:params.role, sortAndPaging:sortParams])
-            } //Add DynamicFinder on PersonIdentificationName in future.
+            } else {
+                throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("role.required",[]))
+            }
 
         }
         if( pidms.size() ) {
@@ -750,34 +753,28 @@ class PersonCompositeService extends LdmService {
     }
 
     private def createPersonEmails(def pidm, Map metadata, List<Map> emailsInRequest) {
-        def personEmailsList =[]
+        def personEmailsList = []
         List<String> processedEmailTypes = []
-        PersonEmail personEmail
         def preferredEmail = null
 
-        if("v2".equals(getJSONVersion())) {
+        if ("v2".equals(getRequestedVersion())) {
             preferredEmail = emailsInRequest.findAll { it.get("emailType")?.trim() == PERSON_EMAIL_TYPE_PREFERRED }[0]
             if (preferredEmail) {
                 emailsInRequest.removeAll { it.get("emailType").trim() == PERSON_EMAIL_TYPE_PREFERRED }
             }
         }
-
+        Boolean tempPreferredIndicator = false
         emailsInRequest?.each {
             validateEmailRequiredFields(it)
             if (it instanceof Map) {
                 if (!processedEmailTypes.contains { it.emailType.trim() }) {
                     Boolean preferredIndicator = false
-                    if ("v2".equals(getJSONVersion()) && preferredEmail) {
-                        if (it.emailAddress == preferredEmail.emailAddress) {
-                            preferredIndicator = true
-                        }
+                    if ("v2".equals(getRequestedVersion()) && preferredEmail && it.emailAddress == preferredEmail.emailAddress && !tempPreferredIndicator) {
+                        preferredIndicator = true
+                        tempPreferredIndicator = preferredIndicator
                     }
-                    personEmail = createPersonEmail(pidm, metadata, it, preferredIndicator)
-                    if("v2".equals(getJSONVersion())) {
-                        personEmailsList << [it.guid, personEmail]
-                    } else {
-                        personEmailsList << personEmail
-                    }
+                    PersonEmail personEmail = createPersonEmail(it.guid?.trim()?.toLowerCase(), pidm, metadata, it, preferredIndicator)
+                    personEmailsList << personEmail
                     processedEmailTypes << it.emailType.trim()
                 }
             }
@@ -787,7 +784,7 @@ class PersonCompositeService extends LdmService {
     }
 
 
-    private PersonEmail createPersonEmail(def pidm, Map metadata, def emailInRequest, Boolean preferredIndicator) {
+    private PersonEmail createPersonEmail(String guid, def pidm, Map metadata, def emailInRequest, Boolean preferredIndicator) {
         PersonEmail personEmail
 
         IntegrationConfiguration rule = fetchAllByProcessCodeAndSettingNameAndTranslationValue(PROCESS_CODE, PERSON_EMAIL_TYPE, emailInRequest.emailType.trim())
@@ -797,6 +794,14 @@ class PersonCompositeService extends LdmService {
         if (rule.value) {
             personEmail = new PersonEmail(pidm: pidm, emailAddress: emailInRequest.emailAddress, statusIndicator: "A", emailType: EmailType.findByCode(rule.value), dataOrigin: metadata?.dataOrigin, preferredIndicator: preferredIndicator)
             personEmail = personEmailService.create([domainModel: personEmail])
+
+            String domainKey = "${personEmail.pidm}${DOMAIN_KEY_DELIMITER}${personEmail.emailType}${DOMAIN_KEY_DELIMITER}${personEmail.emailAddress}"
+            if (guid) {
+                // Overwrite the GUID created by DB insert trigger, with the one provided in the request body
+                updateGuidValue(personEmail.id, guid, PERSON_EMAILS_LDM_NAME)
+            }
+
+            log.debug("GUID: ${guid}   DomainKey: ${domainKey}")
         }
 
         return personEmail
@@ -892,9 +897,6 @@ class PersonCompositeService extends LdmService {
         persons = buildPersonGuids(domainIds, persons)
         persons = buildPersonAddresses(personAddressList, persons)
         persons = buildPersonTelephones(personTelephoneList, persons)
-        if("v2".equals(getJSONVersion())) {
-            personEmailList = getPersonEmailListWithGuid(personEmailList)
-        }
         persons = buildPersonEmails(personEmailList, persons)
         persons = buildPersonRaces(personRaceList, persons)
         persons = buildPersonRoles(persons)
@@ -903,48 +905,26 @@ class PersonCompositeService extends LdmService {
 
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    def buildPersonEmails(personEmailsMap, persons) {
-        personEmailsMap?.each { it ->
-            String personEmailGuid
-            PersonEmail activeEmail
-            if ("v2".equals(getJSONVersion())) {
-                personEmailGuid = it[0].trim().toLowerCase()
-                activeEmail = it[1]
-            } else {
-                activeEmail = it
-            }
+    def buildPersonEmails(personEmailList, persons) {
+        personEmailList.each { PersonEmail activeEmail ->
             Person currentRecord = persons.get(activeEmail.pidm)
             IntegrationConfiguration rule = findAllByProcessCodeAndSettingNameAndValue(PROCESS_CODE, PERSON_EMAIL_TYPE, activeEmail?.emailType.code)
-            if (rule?.value == activeEmail?.emailType?.code && !currentRecord.emails.contains { it.emailType == rule?.translationValue }) {
-                def email
-                if ("v2".equals(getJSONVersion())) {
-                    String domainKey = "${activeEmail.pidm}${DOMAIN_KEY_DELIMITER}${activeEmail.emailType}${DOMAIN_KEY_DELIMITER}${activeEmail.emailAddress}"
-                    if (personEmailGuid) {
-                        // Overwrite the GUID created by DB insert trigger, with the one provided in the request body
-                        updateGuidValue(activeEmail.id, personEmailGuid, PERSON_EMAILS_LDM_NAME)
-                    } else {
-                        GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.findByLdmNameAndDomainKey(PERSON_EMAILS_LDM_NAME, domainKey)
-                        personEmailGuid = globalUniqueIdentifier.guid
-                    }
-                    log.debug("GUID: ${personEmailGuid}   DomainKey: ${domainKey}")
-
-                    email = new Email(personEmailGuid, activeEmail)
-                    email.emailType = rule?.translationValue
-                    currentRecord.emails << email
-                    if (activeEmail.preferredIndicator) {
-                        def preferredEmail = new Email(personEmailGuid, activeEmail)
-                        preferredEmail.emailType = PERSON_EMAIL_TYPE_PREFERRED
-                        currentRecord.emails << preferredEmail
-                    }
-                } else {
-                    email = new Email(personEmailGuid, activeEmail)
-                    email.emailType = rule?.translationValue
-                    currentRecord.emails << email
+            if (rule?.value == activeEmail?.emailType?.code && !currentRecord.emails.contains {
+                it.emailType == rule?.translationValue
+            }) {
+                GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.findByLdmNameAndDomainId(PERSON_EMAILS_LDM_NAME, activeEmail.id)
+                String guid = globalUniqueIdentifier.guid
+                def email = new Email(guid, activeEmail)
+                email.emailType = rule?.translationValue
+                currentRecord.emails << email
+                if (activeEmail.preferredIndicator) {
+                    def preferredEmail = new Email(guid, activeEmail)
+                    preferredEmail.emailType = PERSON_EMAIL_TYPE_PREFERRED
+                    currentRecord.emails << preferredEmail
                 }
+                persons.put(activeEmail.pidm, currentRecord)
             }
-            persons.put(activeEmail.pidm, currentRecord)
         }
-
         persons
     }
 
@@ -1469,7 +1449,7 @@ class PersonCompositeService extends LdmService {
 
 
     def validateEmailRequiredFields(email) {
-        if ("v2".equals(getJSONVersion()) && !email.guid) {
+        if ("v2".equals(getRequestedVersion()) && !email.guid) {
             throw new ApplicationException('PersonCompositeService', new BusinessLogicValidationException("emailGuid.invalid",[]))
         }
         if (!email.emailType) {
@@ -1520,7 +1500,7 @@ class PersonCompositeService extends LdmService {
     }
 
 
-    private String getJSONVersion() {
+    private String getRequestedVersion() {
         String representationVersion = LdmService.getRepresentationVersion()
         if (representationVersion == null) {
             // Assume latest (current) version

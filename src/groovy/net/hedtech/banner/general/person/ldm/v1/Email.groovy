@@ -1,5 +1,5 @@
 /*******************************************************************************
- Copyright 2014 Ellucian Company L.P. and its affiliates.
+ Copyright 2014-2015 Ellucian Company L.P. and its affiliates.
  *******************************************************************************/
 package net.hedtech.banner.general.person.ldm.v1
 
@@ -12,10 +12,6 @@ class Email {
     @Delegate private final PersonEmail email
     String guid
     String emailType
-
-    def Email(PersonEmail email) {
-        this.email = email
-    }
 
     def Email(String guid, PersonEmail email) {
         this.guid = guid
