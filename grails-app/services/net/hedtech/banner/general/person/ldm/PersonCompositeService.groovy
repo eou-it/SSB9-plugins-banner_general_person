@@ -395,11 +395,7 @@ class PersonCompositeService extends LdmService {
         if (person.containsKey('phones') && person.phones instanceof List)
             phones = updatePhones(pidmToUpdate, person.metadata, person.phones)
 
-        //update Emails
         def emails = []
-        if (person.containsKey('emails') && person.emails instanceof List) {
-            emails = updatePersonEmails(pidmToUpdate, person.metadata, person.emails)
-        }
 
         //update races
         def races = []
@@ -413,9 +409,12 @@ class PersonCompositeService extends LdmService {
             personMap = buildPersonAddresses(PersonAddress.fetchActiveAddressesByPidmInList([pidmToUpdate]), personMap)
         if (phones.size() == 0)
             personMap = buildPersonTelephones(PersonTelephone.fetchActiveTelephoneByPidmInList([pidmToUpdate]), personMap)
-        if (emails.size() == 0) {
-            personMap = buildPersonEmails(PersonEmail.findAllByStatusIndicatorAndPidmInList('A', [pidmToUpdate]), personMap)
+        //update Emails
+        if (person.containsKey('emails') && person.emails instanceof List) {
+            emails = updatePersonEmails(pidmToUpdate, person.metadata, person.emails)
+            buildPersonEmails(emails, personMap)
         }
+
         if (races.size() == 0)
             personMap = buildPersonRaces(PersonRace.findAllByPidmInList([pidmToUpdate]), personMap)
         def additionalIdTypes = Credential.additionalIdMap.keySet().asList()
@@ -755,14 +754,9 @@ class PersonCompositeService extends LdmService {
     private def createPersonEmails(def pidm, Map metadata, List<Map> emailsInRequest) {
         def personEmailsList = []
         List<String> processedEmailTypes = []
-        def preferredEmail = null
 
-        if ("v2".equals(getRequestedVersion())) {
-            preferredEmail = emailsInRequest.findAll { it.get("emailType")?.trim() == PERSON_EMAIL_TYPE_PREFERRED }[0]
-            if (preferredEmail) {
-                emailsInRequest.removeAll { it.get("emailType").trim() == PERSON_EMAIL_TYPE_PREFERRED }
-            }
-        }
+        def preferredEmail = getPreferredEmail(emailsInRequest)
+
         Boolean tempPreferredIndicator = false
         emailsInRequest?.each {
             validateEmailRequiredFields(it)
@@ -809,9 +803,7 @@ class PersonCompositeService extends LdmService {
 
 
     private def updatePersonEmails(def pidm, Map metadata, def emailsInRequest) {
-        def emailDecorators = []
         List<PersonEmail> personEmails = []
-
         def bannerEmailTypes = []
         def rules = IntegrationConfiguration.findAllByProcessCodeAndSettingName(PROCESS_CODE, PERSON_EMAIL_TYPE)
         rules?.each {
@@ -819,7 +811,15 @@ class PersonCompositeService extends LdmService {
         }
 
         List<PersonEmail> existingPersonEmails = PersonEmail.fetchListByPidmAndEmailTypes(pidm, bannerEmailTypes) ?: []
+        existingPersonEmails.each {
+            it.statusIndicator = "I"
+            it.preferredIndicator = false
+            personEmailService.update([domainModel: it])
+        }
 
+        def preferredEmail = getPreferredEmail(emailsInRequest)
+
+        Boolean tempPreferredIndicator = false
         List<String> processedEmailTypes = []
         PersonEmail personEmail
         emailsInRequest?.each {
@@ -833,23 +833,35 @@ class PersonCompositeService extends LdmService {
                     PersonEmail existingPersonEmail = existingPersonEmails?.find { existingPersonEmail -> existingPersonEmail.emailType.code == rule.value && existingPersonEmail.emailAddress == it.emailAddress }
                     if (existingPersonEmail) {
                         existingPersonEmail.statusIndicator = "A"
+                        if ("v2".equals(getRequestedVersion()) && preferredEmail && it.emailAddress == preferredEmail.emailAddress && !tempPreferredIndicator) {
+                            existingPersonEmail.preferredIndicator = true
+                            tempPreferredIndicator = true
+                        }
                         personEmail = personEmailService.update([domainModel: existingPersonEmail])
+                        String domainKey = "${existingPersonEmail.pidm}${DOMAIN_KEY_DELIMITER}${existingPersonEmail.emailType}${DOMAIN_KEY_DELIMITER}${existingPersonEmail.emailAddress}"
+                        String guid = it?.guid?.trim()?.toLowerCase()
+                        if (guid) {
+                            // Overwrite the GUID created by DB insert trigger, with the one provided in the request body
+                            updateGuidValue(existingPersonEmail.id, guid, PERSON_EMAILS_LDM_NAME)
+                        }
+                        log.debug("GUID: ${guid}   DomainKey: ${domainKey}")
+
                         existingPersonEmails.remove(existingPersonEmail)
                     } else {
-                        personEmail = createPersonEmail(pidm, metadata, it)
+                        Boolean preferredIndicator = false
+                        if ("v2".equals(getRequestedVersion()) && preferredEmail && it.emailAddress == preferredEmail.emailAddress && !tempPreferredIndicator) {
+                            preferredIndicator = true
+                            tempPreferredIndicator = true
+                        }
+                        personEmail = createPersonEmail(it.guid?.trim()?.toLowerCase(), pidm, metadata, it, preferredIndicator)
                     }
                     personEmails << personEmail
                     processedEmailTypes << it.emailType.trim()
-                    emailDecorators << it
                 }
             }
         }
-        existingPersonEmails.each {
-            it.statusIndicator = "I"
-            it.preferredIndicator = false
-            personEmailService.update([domainModel: it])
-        }
-        return emailDecorators
+
+        return personEmails
     }
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
@@ -1510,14 +1522,16 @@ class PersonCompositeService extends LdmService {
     }
 
 
-    private def getPersonEmailListWithGuid(List<PersonEmail> personEmailList) {
-        def personEmailAndGuidList = []
-        personEmailList.each {
-            String personEmailGuid = GlobalUniqueIdentifier.findByLdmNameAndDomainId(PERSON_EMAILS_LDM_NAME, it.id)?.guid
-            personEmailAndGuidList << [personEmailGuid, it]
+    private def getPreferredEmail(List<Map> emailsInRequest) {
+        def preferredEmail = null
+        if ("v2".equals(getRequestedVersion())) {
+            preferredEmail = emailsInRequest.findAll { it.get("emailType")?.trim() == PERSON_EMAIL_TYPE_PREFERRED }[0]
+            if (preferredEmail) {
+                emailsInRequest.removeAll { it.get("emailType").trim() == PERSON_EMAIL_TYPE_PREFERRED }
+            }
         }
 
-        return personEmailAndGuidList
+        return preferredEmail
     }
 
 }
