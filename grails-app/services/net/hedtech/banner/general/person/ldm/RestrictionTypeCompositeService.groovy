@@ -102,12 +102,12 @@ class RestrictionTypeCompositeService {
     RestrictionType get(String guid) {
         GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(RESTRICTION_TYPE_LDM_NAME, guid)
         if (!globalUniqueIdentifier) {
-            throw new ApplicationException(GlobalUniqueIdentifierService.API, new NotFoundException(id: GrailsNameUtils.getNaturalName(RestrictionType.class.simpleName)))
+            throw new ApplicationException("restrictionType", new NotFoundException())
         }
 
         HoldType holdType = HoldType.get(globalUniqueIdentifier.domainId)
         if (!holdType) {
-            throw new ApplicationException(GlobalUniqueIdentifierService.API, new NotFoundException(id: GrailsNameUtils.getNaturalName(RestrictionType.class.simpleName)))
+            throw new ApplicationException("restrictionType", new NotFoundException())
         }
 
         return new RestrictionType(holdType, globalUniqueIdentifier.guid, new Metadata(holdType.dataOrigin));
