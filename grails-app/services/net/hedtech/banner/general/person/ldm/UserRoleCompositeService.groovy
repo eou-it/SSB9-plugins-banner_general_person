@@ -1,5 +1,5 @@
 /*******************************************************************************
- Copyright 2014 Ellucian Company L.P. and its affiliates.
+ Copyright 2014-2015 Ellucian Company L.P. and its affiliates.
  *******************************************************************************/
 package net.hedtech.banner.general.person.ldm
 
@@ -45,9 +45,9 @@ class UserRoleCompositeService {
 
                 break
             case 'student':
-                def query = "Select a.pidm from PersonIdentificationNameCurrent a," +
-                        " UserRole b where a.pidm = b.pidm" +
-                        " and b.studentIndicator = true" +
+                def query = "select a.pidm from PersonIdentificationNameCurrent a where a.pidm in (" +
+                        " select distinct b.pidm from PersonIdentificationNameCurrent b," +
+                        " StudentBaseReadonly c where b.pidm = c.pidm)" +
                         orderByString
                 results = PersonIdentificationNameCurrent.executeQuery(query,[:],params?.sortAndPaging?:[:])
                 break
