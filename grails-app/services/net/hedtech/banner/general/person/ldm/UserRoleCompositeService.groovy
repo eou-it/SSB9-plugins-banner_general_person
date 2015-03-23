@@ -45,9 +45,9 @@ class UserRoleCompositeService {
 
                 break
             case 'student':
-                def query = "select a.pidm from PersonIdentificationNameCurrent a where a.pidm in (" +
-                        " select distinct b.pidm from PersonIdentificationNameCurrent b," +
-                        " StudentBaseReadonly c where b.pidm = c.pidm)" +
+                def query = "select a.pidm from PersonIdentificationNameCurrent a where exists" +
+                        " (select 1 from StudentBaseReadonly b " +
+                        "where a.pidm = b.pidm)" +
                         orderByString
                 results = PersonIdentificationNameCurrent.executeQuery(query,[:],params?.sortAndPaging?:[:])
                 break
