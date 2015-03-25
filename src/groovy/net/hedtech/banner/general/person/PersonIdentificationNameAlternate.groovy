@@ -396,7 +396,7 @@ class PersonIdentificationNameAlternate implements Serializable {
 
     def static fetchByPidmAndNameType(Integer pidm, String nameType) {
         PersonIdentificationNameAlternate personIdentificationNameAlternate = PersonIdentificationNameAlternate.withSession { session ->
-            session.getNamedQuery('PersonIdentificationNameAlternate.fetchByPidmAndNameType').setInteger('pidm', pidm).setString('nameType', nameType).list()[0]
+            session.getNamedQuery('PersonIdentificationNameAlternate.fetchByPidmAndNameType').setInteger('pidm', pidm).setString('nameType', nameType)?.list()[0]
         }
 
         return personIdentificationNameAlternate
