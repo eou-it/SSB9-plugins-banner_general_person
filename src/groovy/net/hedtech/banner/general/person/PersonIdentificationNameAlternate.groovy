@@ -1,5 +1,5 @@
 /*********************************************************************************
- Copyright 2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2013-2015 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
@@ -26,7 +26,13 @@ query = """FROM  PersonIdentificationNameAlternate a
 @NamedQuery(name = "PersonIdentificationNameAlternate.fetchAllIdChangesByBannerId",
 query = """FROM  PersonIdentificationNameAlternate a
 	       WHERE a.bannerId = :bannerId
-	         AND a.changeIndicator = 'I' """)
+	         AND a.changeIndicator = 'I' """),
+@NamedQuery(name = "PersonIdentificationNameAlternate.fetchByPidmAndNameType",
+query = """FROM  PersonIdentificationNameAlternate a
+             WHERE a.pidm = :pidm
+             AND a.nameType.code = :nameType
+	         AND a.changeIndicator = 'N'
+	         order by createDate desc""")
 ])
 @DatabaseModifiesState
 class PersonIdentificationNameAlternate implements Serializable {
@@ -385,6 +391,15 @@ class PersonIdentificationNameAlternate implements Serializable {
         }
 
         return personIdentificationNameAlternates
+    }
+
+
+    def static fetchByPidmAndNameType(Integer pidm, String nameType) {
+        PersonIdentificationNameAlternate personIdentificationNameAlternate = PersonIdentificationNameAlternate.withSession { session ->
+            session.getNamedQuery('PersonIdentificationNameAlternate.fetchByPidmAndNameType').setInteger('pidm', pidm).setString('nameType', nameType).list()[0]
+        }
+
+        return personIdentificationNameAlternate
     }
 
 }
