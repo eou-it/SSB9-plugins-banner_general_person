@@ -29,7 +29,7 @@ query = """FROM  PersonIdentificationNameAlternate a
 	         AND a.changeIndicator = 'I' """),
 @NamedQuery(name = "PersonIdentificationNameAlternate.fetchByPidmAndNameType",
 query = """FROM  PersonIdentificationNameAlternate a
-             WHERE a.pidm = :pidm
+             WHERE a.pidm IN :pidms
              AND a.nameType.code = :nameType
 	         AND a.changeIndicator = 'N'
 	         order by createDate desc""")
@@ -394,12 +394,12 @@ class PersonIdentificationNameAlternate implements Serializable {
     }
 
 
-    def static fetchByPidmAndNameType(Integer pidm, String nameType) {
-        PersonIdentificationNameAlternate personIdentificationNameAlternate = PersonIdentificationNameAlternate.withSession { session ->
-            session.getNamedQuery('PersonIdentificationNameAlternate.fetchByPidmAndNameType').setInteger('pidm', pidm).setString('nameType', nameType)?.list()[0]
+    def static fetchAllByPidmsAndNameType(List pidms, String nameType) {
+        List<PersonIdentificationNameAlternate> personIdentificationNameAlternates = PersonIdentificationNameAlternate.withSession { session ->
+            session.getNamedQuery('PersonIdentificationNameAlternate.fetchByPidmAndNameType').setParameterList('pidms', pidms).setString('nameType', nameType)?.list()
         }
 
-        return personIdentificationNameAlternate
+        return personIdentificationNameAlternates
     }
 
 }
