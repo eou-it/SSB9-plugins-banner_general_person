@@ -60,7 +60,7 @@ class UserRoleCompositeService {
         if( pidms.size() ) {
             try {
                 def domainClass = Class.forName("net.hedtech.banner.student.faculty.FacultyAppointmentAccessView",
-                        true, Thread.currentThread().getContextClassLoader() )
+                        true, Thread.currentThread().getContextClassLoader())
                 def query = "Select a.pidm, d.startDate, f.startDate from PersonIdentificationNameCurrent a," +
                         " FacultyAppointmentAccessView b, Term d, Term f" +
                         " where a.pidm = b.pidm" +
@@ -81,21 +81,26 @@ class UserRoleCompositeService {
                     newRole.effectiveStartDate = faculty[1]
                     newRole.effectiveEndDate = faculty[2]
                     roles << newRole
-                    results.put(faculty[0], roles )
+                    results.put(faculty[0], roles)
 
                 }
             }
-            catch( ClassNotFoundException e ){
+            catch (ClassNotFoundException e) {
                 log.debug "Student faculty plugin not present, unable to process Faculty roles"
             }
-        }
-        UserRole.findAllByStudentIndicatorAndPidmInList(true, pidms).each { it ->
-            def roles = results.get(it.pidm) ?: []
-            def newRole = new RoleDetail()
-            newRole.role = 'Student'
-            roles << newRole
-            results.put(it.pidm, roles )
+            def query = "Select a.pidm from PersonIdentificationNameCurrent a where exists" +
+                    " (select 1 from StudentBaseReadonly b " +
+                    "where a.pidm = b.pidm)" +
+                    " and a.pidm in (" + pidms.join(',') + ")"
+            PersonIdentificationNameCurrent.executeQuery(query).each { it ->
+                def roles = results.get(it) ?: []
+                def newRole = new RoleDetail()
+                newRole.role = 'Student'
+                roles << newRole
+                results.put(it, roles)
+            }
         }
         results
     }
+
 }
