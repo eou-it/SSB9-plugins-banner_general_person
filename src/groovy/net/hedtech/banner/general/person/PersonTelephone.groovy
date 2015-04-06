@@ -3,6 +3,7 @@
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
+import grails.async.Promise
 import net.hedtech.banner.general.system.AddressType
 import net.hedtech.banner.general.system.TelephoneType
 import net.hedtech.banner.query.DynamicFinder
@@ -505,6 +506,12 @@ class PersonTelephone implements Serializable {
         PersonTelephone.withSession { session ->
             session.getNamedQuery('PersonTelephone.fetchActiveTelephoneByPidmInList')
                     .setParameterList('pidms', pidms).list()
+        }
+    }
+
+    static Promise fetchActiveTelephoneByPidmInListAsync(List<Integer> pidms){
+        PersonTelephone.async.task {
+            fetchActiveTelephoneByPidmInList( pidms )
         }
     }
 }

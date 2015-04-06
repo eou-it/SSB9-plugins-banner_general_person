@@ -3,6 +3,7 @@
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
+import grails.async.Promise
 import net.hedtech.banner.general.system.*
 import net.hedtech.banner.service.DatabaseModifiesState
 
@@ -574,6 +575,12 @@ class PersonAddress implements Serializable {
         if( pidms.isEmpty() ) { return [] }
         PersonAddress.withSession { session ->
             session.getNamedQuery('PersonAddress.fetchActiveAddressesByPidmInList').setParameterList('pidms', pidms).list()
+        }
+    }
+
+    static Promise fetchActiveAddressesByPidmInListAsync(List<Integer> pidms)  {
+        PersonAddress.async.task {
+            fetchActiveAddressesByPidmInList( pidms )
         }
     }
 
