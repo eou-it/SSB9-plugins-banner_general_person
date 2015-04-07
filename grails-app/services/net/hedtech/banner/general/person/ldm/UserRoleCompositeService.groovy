@@ -3,10 +3,8 @@
  *******************************************************************************/
 package net.hedtech.banner.general.person.ldm
 
-import net.hedtech.banner.general.overall.UserRole
 import net.hedtech.banner.general.person.PersonIdentificationNameCurrent
 import net.hedtech.banner.general.person.ldm.v1.RoleDetail
-import net.hedtech.banner.general.system.Term
 
 
 class UserRoleCompositeService {
@@ -45,11 +43,17 @@ class UserRoleCompositeService {
 
                 break
             case 'student':
-                def query = "select a.pidm from PersonIdentificationNameCurrent a where exists" +
-                        " (select 1 from StudentBaseReadonly b " +
-                        "where a.pidm = b.pidm)" +
-                        orderByString
-                results = PersonIdentificationNameCurrent.executeQuery(query,[:],params?.sortAndPaging?:[:])
+                try {
+                    def domainClass = Class.forName("net.hedtech.banner.student.generalstudent.StudentBaseReadonly",
+                            true, Thread.currentThread().getContextClassLoader())
+                    def query = "select a.pidm from PersonIdentificationNameCurrent a where exists" +
+                            " (select 1 from StudentBaseReadonly b " +
+                            "where a.pidm = b.pidm)" +
+                            orderByString
+                    results = PersonIdentificationNameCurrent.executeQuery(query, [:], params?.sortAndPaging ?: [:])
+                } catch (ClassNotFoundException e) {
+                    log.debug "Student common plugin not present, unable to process student roles"
+                }
                 break
         }
         results
@@ -88,16 +92,22 @@ class UserRoleCompositeService {
             catch (ClassNotFoundException e) {
                 log.debug "Student faculty plugin not present, unable to process Faculty roles"
             }
-            def query = "Select a.pidm from PersonIdentificationNameCurrent a where exists" +
-                    " (select 1 from StudentBaseReadonly b " +
-                    "where a.pidm = b.pidm)" +
-                    " and a.pidm in (" + pidms.join(',') + ")"
-            PersonIdentificationNameCurrent.executeQuery(query).each { it ->
-                def roles = results.get(it) ?: []
-                def newRole = new RoleDetail()
-                newRole.role = 'Student'
-                roles << newRole
-                results.put(it, roles)
+            try {
+                def domainClass = Class.forName("net.hedtech.banner.student.generalstudent.StudentBaseReadonly",
+                        true, Thread.currentThread().getContextClassLoader())
+                def query = "Select a.pidm from PersonIdentificationNameCurrent a where exists" +
+                        " (select 1 from StudentBaseReadonly b " +
+                        "where a.pidm = b.pidm)" +
+                        " and a.pidm in (" + pidms.join(',') + ")"
+                PersonIdentificationNameCurrent.executeQuery(query).each { it ->
+                    def roles = results.get(it) ?: []
+                    def newRole = new RoleDetail()
+                    newRole.role = 'Student'
+                    roles << newRole
+                    results.put(it, roles)
+                }
+            } catch (ClassNotFoundException e) {
+                log.debug "Student common plugin not present, unable to process student roles"
             }
         }
         results
