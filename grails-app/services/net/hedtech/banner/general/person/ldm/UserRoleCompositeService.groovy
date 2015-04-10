@@ -28,14 +28,16 @@ class UserRoleCompositeService {
                             " FacultyAppointmentAccessView b" +
                             " where a.pidm = b.pidm" +
                             " and b.activeIndicator = 'A'" +
+                            " and b.instructorIndicator = 'Y'" +
                             " and b.termEffective = ( select min(c.termEffective)" +
                             "                       from FacultyAppointmentAccessView c, Term e" +
                             "                       where c.pidm = b.pidm" +
                             "                       and c.termEnd = e.code" +
                             "                       and c.activeIndicator = 'A'" +
+                            "                       and c.instructorIndicator = 'Y'" +
                             "                       and current_date < e.endDate)" +
                             orderByString
-                    results = PersonIdentificationNameCurrent.executeQuery(query,[:],params.sortAndPaging)
+                    results = PersonIdentificationNameCurrent.executeQuery(query)
                 }
                 catch( ClassNotFoundException e ){
                     log.debug "Student faculty plugin not present, unable to process Faculty roles"
@@ -43,11 +45,17 @@ class UserRoleCompositeService {
 
                 break
             case 'student':
-                def query = "select a.pidm from PersonIdentificationNameCurrent a where exists" +
-                        " (select 1 from StudentBaseReadonly b " +
-                        "where a.pidm = b.pidm)" +
-                        orderByString
-                results = PersonIdentificationNameCurrent.executeQuery(query,[:],params?.sortAndPaging?:[:])
+                try {
+                    def domainClass = Class.forName("net.hedtech.banner.student.generalstudent.StudentBaseReadonly",
+                            true, Thread.currentThread().getContextClassLoader())
+                    def query = "select a.pidm from PersonIdentificationNameCurrent a where exists" +
+                            " (select 1 from StudentBaseReadonly b " +
+                            "where a.pidm = b.pidm)" +
+                            orderByString
+                    results = PersonIdentificationNameCurrent.executeQuery(query)
+                } catch (ClassNotFoundException e) {
+                    log.debug "Student common plugin not present, unable to process student roles"
+                }
                 break
         }
         results
@@ -65,11 +73,13 @@ class UserRoleCompositeService {
                         " and d.code = b.termEffective " +
                         " and f.code = b.termEnd" +
                         " and b.activeIndicator = 'A'" +
+                        " and b.instructorIndicator = 'Y'" +
                         " and b.termEffective = ( select min(c.termEffective)" +
                         "                       from FacultyAppointmentAccessView c, Term e" +
                         "                       where c.pidm = b.pidm" +
                         "                       and c.termEnd = e.code" +
                         "                       and c.activeIndicator = 'A'" +
+                        "                       and c.instructorIndicator = 'Y'" +
                         "                       and current_date < e.endDate) " +
                         " and b.pidm in (" + pidms.join(',') + ")"
                 PersonIdentificationNameCurrent.executeQuery(query).each { faculty ->
