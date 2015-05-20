@@ -4,13 +4,14 @@
 package net.hedtech.banner.general.person.ldm
 
 import net.hedtech.banner.general.person.PersonIdentificationNameCurrent
-import net.hedtech.banner.general.person.StudentRole
 import net.hedtech.banner.general.person.ldm.v1.RoleDetail
-import net.hedtech.banner.query.DynamicFinder
-import net.hedtech.banner.query.QueryBuilder
 
 
 class UserRoleCompositeService {
+
+    def personWebStudentRoleService
+
+
 /**
  *
  * @param [role :"Student|Faculty",sortAndPaging[sort:"firstName|lastName",...etc]
@@ -48,14 +49,12 @@ class UserRoleCompositeService {
 
                 break
             case 'student':
-                def query = """from StudentRole a"""
-                DynamicFinder dynamicFinder = new DynamicFinder(StudentRole.class, query, "a")
-
-                if (count) {
-                    results = dynamicFinder.count([params: [:], criteria: []])
-                } else {
-                    def filterMap = QueryBuilder.getFilterData(params)
-                    results = dynamicFinder.find([params: filterMap.params, criteria: filterMap.criteria], filterMap.pagingAndSortParams)
+                if(personWebStudentRoleService) {
+                    if (count) {
+                        results = personWebStudentRoleService.count(params)
+                    } else {
+                        results = personWebStudentRoleService.list(params)
+                    }
                 }
 
                 break
@@ -99,10 +98,13 @@ class UserRoleCompositeService {
             catch (ClassNotFoundException e) {
                 log.debug "Student faculty plugin not present, unable to process Faculty roles"
             }
-            //Building Student role details
-            if(!studentRole) {
-                students = StudentRole.fetchByPidms(pidms)
+
+            if (personWebStudentRoleService) {
+                if (!studentRole) {
+                    students = personWebStudentRoleService.fetchByPidms(pidms)
+                }
             }
+
             students.each { it ->
                 def roles = results.get(it.pidm) ?: []
                 def newRole = new RoleDetail()
