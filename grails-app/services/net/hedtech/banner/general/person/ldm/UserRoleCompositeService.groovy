@@ -99,8 +99,8 @@ class UserRoleCompositeService {
                 log.debug "Student faculty plugin not present, unable to process Faculty roles"
             }
 
-            if (personWebStudentRoleService) {
-                if (!studentRole) {
+            if (!studentRole) {
+                if (personWebStudentRoleService) {
                     students = personWebStudentRoleService.fetchByPidms(pidms)
                 }
             }
