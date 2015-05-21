@@ -9,7 +9,7 @@ import net.hedtech.banner.general.person.ldm.v1.RoleDetail
 
 class UserRoleCompositeService {
 
-    def personWebStudentRoleService
+    def personStudentService
 
 
 /**
@@ -49,11 +49,11 @@ class UserRoleCompositeService {
 
                 break
             case 'student':
-                if(personWebStudentRoleService) {
+                if(personStudentService) {
                     if (count) {
-                        results = personWebStudentRoleService.count(params)
+                        results = personStudentService.count(params)
                     } else {
-                        results = personWebStudentRoleService.list(params)
+                        results = personStudentService.list(params)
                     }
                 }
 
@@ -100,8 +100,8 @@ class UserRoleCompositeService {
             }
 
             if (!studentRole) {
-                if (personWebStudentRoleService) {
-                    students = personWebStudentRoleService.fetchByPidms(pidms)
+                if (personStudentService) {
+                    students = personStudentService.fetchByPidms(pidms)
                 }
             }
 
