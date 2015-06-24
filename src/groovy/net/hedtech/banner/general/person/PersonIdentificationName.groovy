@@ -1,5 +1,5 @@
 /*********************************************************************************
- Copyright 2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2013 - 2015 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
@@ -13,6 +13,7 @@ import javax.persistence.*
  * Person Identification/Name model.
  */
 @Entity
+@Cacheable
 @Table(name = "SV_SPRIDEN")
 @NamedQueries(value = [
 @NamedQuery(name = "PersonIdentificationName.fetchByBannerId",
@@ -34,7 +35,7 @@ import javax.persistence.*
 	  	                and a.entityIndicator = 'P'
 	  	                and a.changeIndicator is null    """),
 @NamedQuery(name = "PersonIdentificationName.fetchPersonByPidm",
-query = """FROM  PersonIdentificationName a
+        query = """FROM  PersonIdentificationName a
 	  	                WHERE a.pidm = :filter
 	  	                and a.entityIndicator = 'P'
 	  	                and a.changeIndicator is null    """),
@@ -115,31 +116,35 @@ query = """FROM  PersonIdentificationName a
                         and a.entityIndicator = 'P'
                         and a.changeIndicator = 'I' """),
 @NamedQuery(name = "PersonIdentificationName.fetchPersonBySoundexName",
-query = """FROM PersonIdentificationName a
+        query = """FROM PersonIdentificationName a
                         WHERE (:lastName is null OR a.soundexLastName = SOUNDEX(:lastName))
                         and (:firstName is null OR a.soundexFirstName = SOUNDEX(:firstName))
                         and a.entityIndicator = 'P' """),
 @NamedQuery(name = "PersonIdentificationName.fetchNonPersonBySoundexName",
-query = """FROM PersonIdentificationName a
+        query = """FROM PersonIdentificationName a
                         WHERE (:lastName is null OR a.soundexLastName = SOUNDEX(:lastName))
                         and a.entityIndicator = 'C' """),
 @NamedQuery(name = "PersonIdentificationName.fetchPersonCurrentRecord",
-query = """FROM PersonIdentificationName a
+        query = """FROM PersonIdentificationName a
                         WHERE a.entityIndicator = 'P'
                         and a.changeIndicator is null
                         and a.pidm in (select pidm from PersonIdentificationName where bannerId = :bannerId and entityIndicator = 'P') """),
 @NamedQuery(name = "PersonIdentificationName.fetchByPidmAndBannerIdAndName",
-query = """FROM  PersonIdentificationName a
-	       WHERE a.pidm = :pidm
-	         AND a.bannerId = :bannerId
-	         AND a.lastName = :lastName
-	         AND COALESCE(a.firstName, '@') = COALESCE(:firstName, '@')
-	         AND COALESCE(a.middleName, '@') = COALESCE(:middleName, '@')
-	         AND COALESCE(a.nameType.code, '@') = COALESCE(:nameTypeCode, '@')
-	         AND COALESCE(a.surnamePrefix, '@') = COALESCE(:surnamePrefix, '@') """)
+        query = """FROM  PersonIdentificationName a
+	                    WHERE a.pidm = :pidm
+	                    AND a.bannerId = :bannerId
+	                    AND a.lastName = :lastName
+	                    AND COALESCE(a.firstName, '@') = COALESCE(:firstName, '@')
+	                    AND COALESCE(a.middleName, '@') = COALESCE(:middleName, '@')
+	                    AND COALESCE(a.nameType.code, '@') = COALESCE(:nameTypeCode, '@')
+	                    AND COALESCE(a.surnamePrefix, '@') = COALESCE(:surnamePrefix, '@') """)
 ])
 @DatabaseModifiesState
 class PersonIdentificationName implements Serializable {
+
+    static mapping = {
+        cache true
+    }
 
     /**
      * Surrogate ID for SPRIDEN
@@ -444,7 +449,7 @@ class PersonIdentificationName implements Serializable {
         if (filter) queryCriteria = "%" + filter.toUpperCase() + "%"
         else queryCriteria = "%"
         def names = PersonIdentificationName.withSession { session ->
-            session.getNamedQuery('PersonIdentificationName.fetchByBannerId').setString('filter', queryCriteria).list()
+            session.getNamedQuery('PersonIdentificationName.fetchByBannerId').setCacheable(true).setString('filter', queryCriteria).list()
         }
         return names
     }
@@ -456,7 +461,7 @@ class PersonIdentificationName implements Serializable {
         if (filter) queryCriteria = "%" + filter.toUpperCase() + "%"
         else queryCriteria = "%"
         def names = PersonIdentificationName.withSession { session ->
-            session.getNamedQuery('PersonIdentificationName.fetchByName').setString('filter', queryCriteria).list()
+            session.getNamedQuery('PersonIdentificationName.fetchByName').setCacheable(true).setString('filter', queryCriteria).list()
         }
         return names
     }
@@ -501,14 +506,14 @@ class PersonIdentificationName implements Serializable {
     // Method used in utils to validate and return the name
     public static PersonIdentificationName fetchBannerPerson(String bannerId) {
         PersonIdentificationName object = PersonIdentificationName.withSession { session ->
-            def list = session.getNamedQuery('PersonIdentificationName.fetchPersonByBannerId').setString('filter', bannerId).list()[0]
+            def list = session.getNamedQuery('PersonIdentificationName.fetchPersonByBannerId').setCacheable(true).setString('filter', bannerId).list()[0]
         }
         return object
     }
     //Used to fetch the Banner Alternate ID
     public static PersonIdentificationName fetchPersonByAlternativeBannerId(String bannerId) {
         PersonIdentificationName object = PersonIdentificationName.withSession { session ->
-            def list = session.getNamedQuery('PersonIdentificationName.fetchPersonByAlternativeBannerId').setString('filter', bannerId).list()[0]
+            def list = session.getNamedQuery('PersonIdentificationName.fetchPersonByAlternativeBannerId').setCacheable(true).setString('filter', bannerId).list()[0]
         }
         return object
     }
@@ -516,7 +521,7 @@ class PersonIdentificationName implements Serializable {
 
     public static PersonIdentificationName fetchBannerPerson(Integer pidm) {
         PersonIdentificationName object = PersonIdentificationName.withSession { session ->
-            session.getNamedQuery('PersonIdentificationName.fetchPersonByPidm').setInteger('filter', pidm).list()[0]
+            session.getNamedQuery('PersonIdentificationName.fetchPersonByPidm').setCacheable(true).setInteger('filter', pidm).list()[0]
         }
         return object
     }
@@ -524,7 +529,7 @@ class PersonIdentificationName implements Serializable {
 
     public static List fetchBannerPersonList(List pidm) {
         def object = PersonIdentificationName.withSession { session ->
-            session.getNamedQuery('PersonIdentificationName.fetchPersonByPidmList').setParameterList('filter', pidm).list()
+            session.getNamedQuery('PersonIdentificationName.fetchPersonByPidmList').setCacheable(true).setParameterList('filter', pidm).list()
         }
         return object
     }
@@ -709,7 +714,7 @@ class PersonIdentificationName implements Serializable {
         PersonIdentificationName object
         if (bannerId) {
             object = PersonIdentificationName.withSession { session ->
-                session.getNamedQuery('PersonIdentificationName.fetchPersonCurrentRecord').setString('bannerId', bannerId).list()[0]
+                session.getNamedQuery('PersonIdentificationName.fetchPersonCurrentRecord').setCacheable(true).setString('bannerId', bannerId).list()[0]
             }
         }
         return object
