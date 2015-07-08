@@ -1,5 +1,5 @@
 /*********************************************************************************
- Copyright 2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2013-2015 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
@@ -26,7 +26,13 @@ query = """FROM  PersonIdentificationNameAlternate a
 @NamedQuery(name = "PersonIdentificationNameAlternate.fetchAllIdChangesByBannerId",
 query = """FROM  PersonIdentificationNameAlternate a
 	       WHERE a.bannerId = :bannerId
-	         AND a.changeIndicator = 'I' """)
+	         AND a.changeIndicator = 'I' """),
+@NamedQuery(name = "PersonIdentificationNameAlternate.fetchByPidmAndNameType",
+query = """FROM  PersonIdentificationNameAlternate a
+             WHERE a.pidm IN :pidms
+             AND a.nameType.code = :nameType
+	         AND a.changeIndicator = 'N'
+	         order by createDate desc""")
 ])
 @DatabaseModifiesState
 class PersonIdentificationNameAlternate implements Serializable {
@@ -382,6 +388,15 @@ class PersonIdentificationNameAlternate implements Serializable {
             personIdentificationNameAlternates = PersonIdentificationNameAlternate.withSession { session ->
                 def list = session.getNamedQuery('PersonIdentificationNameAlternate.fetchAllIdChangesByBannerId').setString('bannerId', bannerId).list()
             }
+        }
+
+        return personIdentificationNameAlternates
+    }
+
+
+    def static fetchAllByPidmsAndNameType(List pidms, String nameType) {
+        List<PersonIdentificationNameAlternate> personIdentificationNameAlternates = PersonIdentificationNameAlternate.withSession { session ->
+            session.getNamedQuery('PersonIdentificationNameAlternate.fetchByPidmAndNameType').setParameterList('pidms', pidms).setString('nameType', nameType)?.list()
         }
 
         return personIdentificationNameAlternates

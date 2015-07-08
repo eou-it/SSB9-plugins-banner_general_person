@@ -1,5 +1,5 @@
 /*******************************************************************************
- Copyright 2014 Ellucian Company L.P. and its affiliates.
+ Copyright 2014-2015 Ellucian Company L.P. and its affiliates.
  *******************************************************************************/
 package net.hedtech.banner.general.person.ldm.v1
 
@@ -10,13 +10,14 @@ import net.hedtech.banner.general.person.PersonIdentificationNameCurrent
  */
 public class Name {
 
-    @Delegate private final PersonIdentificationNameCurrent personName
+    @Delegate
+    private final PersonIdentificationNameCurrent personName
     String nameType
     String title
     String pedigree
     String preferredName
 
-    def Name(PersonIdentificationNameCurrent personName, def person ) {
+    def Name(PersonIdentificationNameCurrent personName, def person) {
         this.personName = personName
         this.title = person?.namePrefix
         this.pedigree = person?.nameSuffix
