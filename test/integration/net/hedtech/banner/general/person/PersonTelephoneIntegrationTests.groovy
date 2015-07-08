@@ -565,6 +565,7 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
 	}
 
 
+    @Test
     void testFetchActiveTelephonesByPidmAndAddressTypes() {
         def pidm = PersonUtility.getPerson("HOF00714").pidm
         def results = PersonTelephone.fetchActiveTelephonesByPidmAndAddressTypes(pidm, [AddressType.findByCode("MA"), TelephoneType.findByCode("PR")])
@@ -572,7 +573,17 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
         assertTrue results.size() > 1
         assertTrue results[0] instanceof PersonTelephone
     }
-	
+
+
+    @Test
+    void testFetchListActiveTelephoneByPidmAndTelephoneTypeWithPrimaryPrefered() {
+        def pidmList = [PersonUtility.getPerson("HOF00714").pidm, PersonUtility.getPerson("HOF00716").pidm]
+        def results = PersonTelephone.fetchListActiveTelephoneByPidmAndTelephoneTypeWithPrimaryPrefered(pidmList, [TelephoneType.findByCode("MA"), TelephoneType.findByCode("PR")])
+
+        assertTrue results.size() > 1
+        assertTrue results[0] instanceof PersonTelephone
+    }
+
 
     private def newValidForCreatePersonTelephone() {
         def personTelephone = new PersonTelephone(

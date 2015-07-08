@@ -72,6 +72,22 @@ import javax.persistence.*
                              AND NVL(statusIndicator,'A') <> 'I'
                              AND NVL(unlistIndicator,'N') <> 'Y'
                     """),
+@NamedQuery(name = "PersonTelephone.fetchListActiveTelephoneByPidmAndTelephoneTypeWithPrimaryPrefered",
+        query = """FROM PersonTelephone a
+                             WHERE  pidm IN :pidm
+                             AND telephoneType IN :telephoneType
+                             AND (primaryIndicator = 'Y'
+                                OR (primaryIndicator IS NULL
+                                        AND NOT EXISTS
+                                            (SELECT 'X' FROM PersonTelephone b
+                                              WHERE b.pidm = a.pidm
+                                                AND b.telephoneType = a.telephoneType
+                                                AND b.primaryIndicator = 'Y'
+                                                AND NVL(statusIndicator,'A') <> 'I'
+                                                AND NVL(unlistIndicator,'N') <> 'Y')))
+                             AND NVL(statusIndicator,'A') <> 'I'
+                             AND NVL(unlistIndicator,'N') <> 'Y'
+                    """),
 @NamedQuery(name = "PersonTelephone.fetchActiveTelephoneByPidmAndAddressType",
         query = """FROM PersonTelephone a
                              WHERE  pidm = :pidm
@@ -461,7 +477,18 @@ class PersonTelephone implements Serializable {
 			return personTelephone
 		}
 	}
-	
+
+
+    static List fetchListActiveTelephoneByPidmAndTelephoneTypeWithPrimaryPrefered(List pidm, List telephoneType){
+        if (pidm.isEmpty() || telephoneType.isEmpty()) return []
+        PersonTelephone.withSession { session ->
+            List personTelephone = session.getNamedQuery('PersonTelephone.fetchListActiveTelephoneByPidmAndTelephoneTypeWithPrimaryPrefered')
+                    .setParameterList('pidm', pidm)
+                    .setParameterList('telephoneType', telephoneType).list()
+            return personTelephone
+        }
+    }
+
 
     public static PersonTelephone fetchActiveTelephoneByPidmAndTelephoneType(Integer pidm, TelephoneType telephoneType){
         PersonTelephone.withSession { session ->
