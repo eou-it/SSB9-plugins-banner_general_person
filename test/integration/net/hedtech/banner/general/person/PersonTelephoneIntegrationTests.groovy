@@ -565,7 +565,7 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
 	}
 
 
-    @Test
+    @Ignore
     void testFetchActiveTelephonesByPidmAndAddressTypes() {
         def pidm = PersonUtility.getPerson("HOF00714").pidm
         def results = PersonTelephone.fetchActiveTelephonesByPidmAndAddressTypes(pidm, [AddressType.findByCode("MA"), TelephoneType.findByCode("PR")])
