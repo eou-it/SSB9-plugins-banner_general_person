@@ -18,7 +18,7 @@ grails.project.dependency.resolution = {
     inherits("global") {
 
     }
-    log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
+    log "error" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
 
     repositories {
         if (System.properties['PROXY_SERVER_NAME']) {
