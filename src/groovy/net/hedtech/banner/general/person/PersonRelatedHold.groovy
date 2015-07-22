@@ -14,42 +14,45 @@ import net.hedtech.banner.query.DynamicFinder
  * Person Related Holds model.
  */
 @NamedQueries(value = [
-@NamedQuery(name = "PersonRelatedHold.fetchByPidm",
-query = """FROM PersonRelatedHold a
+        @NamedQuery(name = "PersonRelatedHold.fetchByPidm",
+                query = """FROM PersonRelatedHold a
 	  	   WHERE a.pidm = :pidm
 	  	ORDER BY a.fromDate desc, a.toDate desc """),
-@NamedQuery(name = "PersonRelatedHold.fetchByPidmAndDateBetween",
-query = """FROM PersonRelatedHold a
+        @NamedQuery(name = "PersonRelatedHold.fetchByPidmAndDateBetween",
+                query = """FROM PersonRelatedHold a
 	  	   WHERE a.pidm = :pidm
 	  	     AND TRUNC(:compareDate) BETWEEN TRUNC(a.fromDate) AND TRUNC(a.toDate)
 	  	ORDER BY a.fromDate desc, a.toDate desc """),
-@NamedQuery(name = "PersonRelatedHold.fetchByPidmDateAndHoldType",
-query = """FROM  PersonRelatedHold a
+        @NamedQuery(name = "PersonRelatedHold.fetchByPidmDateAndHoldType",
+                query = """FROM  PersonRelatedHold a
 	  	   WHERE a.pidm = :pidm
 	  	     AND a.holdType.code = :holdType
 	  	     AND ( TRUNC(:compareDate) >= TRUNC(a.fromDate)
 	  	           AND TRUNC(:compareDate) < TRUNC(a.toDate) )
 	  	ORDER BY a.fromDate desc, a.toDate desc """),
-@NamedQuery(name = "PersonRelatedHold.fetchByPidmAndDateCompare",
-query = """FROM  PersonRelatedHold a
+        @NamedQuery(name = "PersonRelatedHold.fetchByPidmAndDateCompare",
+                query = """FROM  PersonRelatedHold a
 	  	   WHERE a.pidm = :pidm
 	  	     AND ( TRUNC(:compareDate) >= TRUNC(a.fromDate)
 	  	           AND TRUNC(:compareDate) < TRUNC(a.toDate) )
 	  	ORDER BY a.fromDate desc, a.toDate desc """),
-@NamedQuery(name = "PersonRelatedHold.fetchByPidmListAndDateCompare",
-query = """FROM  PersonRelatedHold a
+        @NamedQuery(name = "PersonRelatedHold.fetchByPidmListAndDateCompare",
+                query = """FROM  PersonRelatedHold a
 	  	   WHERE a.pidm IN :pidm
 	  	     AND ( TRUNC(:compareDate) >= TRUNC(a.fromDate)
 	  	           AND TRUNC(:compareDate) < TRUNC(a.toDate) )
 	  	ORDER BY a.fromDate desc, a.toDate desc """),
-@NamedQuery(name = "PersonRelatedHold.fetchAllDistinctHoldTypeByPidmAndDateCompare",
-query = """SELECT a.holdType.code
+        @NamedQuery(name = "PersonRelatedHold.fetchAllDistinctHoldTypeByPidmAndDateCompare",
+                query = """SELECT a.holdType.code
             FROM PersonRelatedHold a
             WHERE a.pidm = :pidm
             AND ( TRUNC(:compareDate) >= TRUNC(a.fromDate)
             AND TRUNC(:compareDate) <= TRUNC(a.toDate) )
             GROUP BY a.holdType.code
-            ORDER BY a.holdType.code """)
+            ORDER BY a.holdType.code """),
+        @NamedQuery(name = "PersonRelatedHold.fetchById",
+                query = """FROM PersonRelatedHold a
+                    WHERE a.id = :id """)
 ])
 
 @Entity
@@ -228,6 +231,15 @@ class PersonRelatedHold implements Serializable {
         result = 31 * result + (lastModifiedBy != null ? lastModifiedBy.hashCode() : 0)
         result = 31 * result + (dataOrigin != null ? dataOrigin.hashCode() : 0)
         return result
+    }
+
+    public static List fetchById(Integer id) {
+
+        def personRelatedHolds = PersonRelatedHold.withSession { session ->
+            session.getNamedQuery( 'PersonRelatedHold.fetchById' ).setInteger( 'id', id ).list()
+        }
+
+        return personRelatedHolds
     }
 
 
