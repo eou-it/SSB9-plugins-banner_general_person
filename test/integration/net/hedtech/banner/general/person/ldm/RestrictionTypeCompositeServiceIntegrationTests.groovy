@@ -1,11 +1,7 @@
 /** *******************************************************************************
- Copyright 2014 Ellucian Company L.P. and its affiliates.
+ Copyright 2014-2015 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person.ldm
-import org.junit.Before
-import org.junit.Test
-import org.junit.After
-
 
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.overall.ldm.GlobalUniqueIdentifier
@@ -15,10 +11,12 @@ import net.hedtech.banner.general.person.ldm.v1.PersonRestrictionType
 import net.hedtech.banner.general.system.HoldType
 import net.hedtech.banner.general.system.Originator
 import net.hedtech.banner.general.system.ldm.v1.RestrictionType
+import net.hedtech.banner.restfulapi.RestfulApiValidationException
 import net.hedtech.banner.testing.BaseIntegrationTestCase
+import org.junit.Before
+import org.junit.Test
 
 import java.text.SimpleDateFormat
-
 
 class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTestCase{
 
@@ -34,6 +32,7 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
 
     Map guids = [:]
     private static final String LDM_NAME = "persons"
+    private String invalid_sort_orderErrorMessage = 'RestfulApiValidationUtility.invalidSortField'
     def restrictionTypeCompositeService
 
 
@@ -216,6 +215,87 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
         assertEquals i_success_holdType.dataOrigin, restrictionType.metadata.dataOrigin
     }
 
+    /**
+     * Test to check the RestrictionTypeCompositeService list method with valid sort and order field and supported version
+     * If No "Accept" header is provided, by default it takes the latest supported version
+     */
+    @Test
+    void testListWithValidSortAndOrderFieldWithSupportedVersion() {
+        def params = [order: 'ASC', sort: 'code']
+        def restrictionTypeList = restrictionTypeCompositeService.list(params)
+        assertNotNull restrictionTypeList
+        assertFalse restrictionTypeList.isEmpty()
+        assertNotNull restrictionTypeList.code
+        assertEquals HoldType.count(), restrictionTypeList.size()
+        assertNotNull i_success_holdType
+        assertTrue restrictionTypeList.id.contains(i_success_holdType.id)
+        assertTrue restrictionTypeList.code.contains( i_success_holdType.code)
+        assertTrue restrictionTypeList.description.contains(i_success_holdType.description)
+        assertTrue restrictionTypeList.dataOrigin.contains(i_success_holdType.dataOrigin)
+    }
+
+    /**
+     * Test to check the sort by code on RestrictionTypeCompositeService
+     * */
+    @Test
+    public void testSortByCode(){
+        params.order='ASC'
+        params.sort='code'
+        List list = restrictionTypeCompositeService.list(params)
+        assertNotNull list
+        def tempParam=null
+        list.each{
+            restrictionType->
+                String code=restrictionType.code
+                if(!tempParam){
+                    tempParam=code
+                }
+                assertTrue tempParam.compareTo(code)<0 || tempParam.compareTo(code)==0
+                tempParam=code
+        }
+
+        params.clear()
+        params.order='DESC'
+        params.sort='code'
+        list = restrictionTypeCompositeService.list(params)
+        assertNotNull list
+        tempParam=null
+        list.each{
+            restrictionType->
+                String code=restrictionType.code
+                if(!tempParam){
+                    tempParam=code
+                }
+                assertTrue tempParam.compareTo(code)>0 || tempParam.compareTo(code)==0
+                tempParam=code
+        }
+    }
+
+    /**
+     * Test to check the RestrictionTypeCompositeService list method with invalid sort field
+     */
+    @Test
+    void testListWithInvalidSortField() {
+        try {
+            def map = [sort: 'test']
+            restrictionTypeCompositeService.list(map)
+            fail()
+        } catch (RestfulApiValidationException e) {
+            assertEquals 400, e.getHttpStatusCode()
+            assertEquals invalid_sort_orderErrorMessage , e.messageCode.toString()
+        }
+    }
+
+    /**
+     * Test to check the RestrictionTypeCompositeService list method with invalid order field
+     */
+    @Test
+    void testListWithInvalidOrderField() {
+        shouldFail(RestfulApiValidationException) {
+            def map = [order: 'test']
+            restrictionTypeCompositeService.list(map)
+        }
+    }
 
     private def newHoldType(String code) {
 

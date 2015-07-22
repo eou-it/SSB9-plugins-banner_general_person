@@ -1,10 +1,8 @@
 /*********************************************************************************
- Copyright 2014 Ellucian Company L.P. and its affiliates.
+ Copyright 2014-2015 Ellucian Company L.P. and its affiliates.
  **********************************************************************************/
 package net.hedtech.banner.general.person.ldm
 
-
-import grails.util.GrailsNameUtils
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.exceptions.NotFoundException
 import net.hedtech.banner.general.overall.ldm.GlobalUniqueIdentifier
@@ -22,8 +20,6 @@ import net.hedtech.banner.restfulapi.RestfulApiValidationUtility
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 
-
-
 /**
  * Service used to support "restriction-types" resource for CDM
  */
@@ -34,6 +30,7 @@ class RestrictionTypeCompositeService {
     def
     private static final String RESTRICTION_TYPE_LDM_NAME = 'restriction-types'
     private static final String PERSONS_LDM_NAME = "persons"
+    private static final List<String> VERSIONS = ["v1","v2","v3","v4"]
 
 
     List<RestrictionType> list(Map params) {
@@ -64,7 +61,7 @@ class RestrictionTypeCompositeService {
         else
         {
             List restrictionTypes = []
-            List allowedSortFields = ['abbreviation', 'title']
+            List allowedSortFields = ("v4".equals(LdmService.getAcceptVersion(VERSIONS))? ['code', 'title']:['abbreviation', 'title'])
 
             RestfulApiValidationUtility.correctMaxAndOffset(params, RestfulApiValidationUtility.MAX_DEFAULT, RestfulApiValidationUtility.MAX_UPPER_LIMIT)
             RestfulApiValidationUtility.validateSortField(params.sort, allowedSortFields)
