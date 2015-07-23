@@ -1,5 +1,5 @@
 /*********************************************************************************
- Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2015 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
@@ -57,7 +57,7 @@ class PersonUtility {
         def sessionFactory = ctx.sessionFactory
         def session = sessionFactory.currentSession
         def sql = new Sql(session.connection())
-        def bio = sql.firstRow(bioSql, [pidm])
+        def bio = sql.rows(bioSql, [pidm])[0]
         return bio?.dead == 'Y'
     }
 
@@ -69,7 +69,7 @@ class PersonUtility {
         def sessionFactory = ctx.sessionFactory
         def session = sessionFactory.currentSession
         def sql = new Sql(session.connection())
-        def conf = sql.firstRow(confSql, [pidm])
+        def conf = sql.rows(confSql, [pidm])[0]
         return conf?.confidential == 'Y'
     }
 
@@ -81,7 +81,7 @@ class PersonUtility {
         def sessionFactory = ctx.sessionFactory
         def session = sessionFactory.currentSession
         def sql = new Sql(session.connection())
-        def conf = sql.firstRow(sqlQuery, [pidm])
+        def conf = sql.rows(sqlQuery, [pidm])[0]
         return [confidential: conf?.confidential == 'Y', deceased: conf?.dead == 'Y']
     }
 
@@ -95,7 +95,7 @@ class PersonUtility {
         def sessionFactory = ctx.sessionFactory
         def session = sessionFactory.currentSession
         def sql = new Sql(session.connection())
-        def conf = sql.firstRow(emailQuery, [pidm, 'A', 'Y'])
+        def conf = sql.rows(emailQuery, [pidm, 'A', 'Y'])[0]
         return conf?.email
     }
 
