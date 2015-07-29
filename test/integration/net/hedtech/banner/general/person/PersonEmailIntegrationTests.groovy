@@ -384,6 +384,23 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
 
     }
 
+    @Test
+    void testFetchPidmsAndActiveStatus(){
+
+        def persons = PersonEmail.findAllByStatusIndicator("A")
+        assertTrue persons.size() > 0
+        def pidms = []
+        persons.each{ pidms << it.pidm }
+        assertTrue pidms.size() > 0
+        assertTrue pidms[0] instanceof Integer
+
+        def emails = PersonEmail.fetchByPidmsAndActvieStatus(pidms)
+        assertEquals emails.size(), pidms.size()
+        emails.each {
+            assertNotNull PersonUtility.getPerson(it.pidm)
+        }
+    }
+
 
     private def newValidForCreatePersonEmail( ) {
         def sql = new Sql( sessionFactory.getCurrentSession().connection() )
