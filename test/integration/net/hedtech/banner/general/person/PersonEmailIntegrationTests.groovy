@@ -1,5 +1,5 @@
 /*********************************************************************************
- Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2015 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 import org.junit.Before
@@ -390,15 +390,14 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
         def persons = PersonEmail.findAllByStatusIndicator("A")
         assertTrue persons.size() > 0
         def pidms = []
-        persons.each{ pidms << it.pidm }
+        persons.groupBy{it.pidm}.each{ pidms << it.key }
         assertTrue pidms.size() > 0
         assertTrue pidms[0] instanceof Integer
 
         def emails = PersonEmail.fetchByPidmsAndActvieStatus(pidms)
-        assertEquals emails.size(), pidms.size()
-        emails.each {
-            assertNotNull PersonUtility.getPerson(it.pidm)
-        }
+
+        assertEquals emails.size(), persons.size()
+
     }
 
 

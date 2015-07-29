@@ -64,7 +64,6 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
         // Client submits a search query as Lindblom
         //Returned Result for the Advanced Search UI Component
         def result = personSearchService.personIdSearch("HOS00001", filterData, pagingAndSortParams)
-        println result
         assertNotNull result
         assertTrue result.size() >= 0
         assertNotNull result.find { it.bannerId == "HOS00001"}
@@ -93,7 +92,6 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
         // Client submits a search query as Lindblom
         //Returned Result for the Advanced Search UI Component
         def result = personSearchService.personIdSearch("HOSWEB001", filterData, pagingAndSortParams)
-        println result
         assertNotNull result
         assertTrue result.size() >= 1
     }
@@ -114,7 +112,6 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
         // Client submits a search query as Lindblom
         //Returned Result for the Advanced Search UI Component
         def result = personSearchService.personNameSearch("Lindblom", filterData, pagingAndSortParams)
-        println result
         assertNotNull result
         assertTrue result.size() <= 8
         result[0].changeIndicator = ""
@@ -138,7 +135,6 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
         // Client submits a search query
         //Returned Result for the Advanced Search UI Component
         def result = personSearchService.personNameSearch("10 STUDENT", filterData, pagingAndSortParams)
-        println result
         assertNotNull result
         assertTrue result.size() > 0
 
@@ -230,7 +226,6 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
 
         def sql
         def url = CH.config.bannerDataSource.url
-        println url
         try {
 
             sql = Sql.newInstance(url,   //  db =  new Sql( connectInfo.url,
@@ -271,7 +266,6 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
 
         def sql
         def url = CH.config.bannerDataSource.url
-        println url
         try {
 
             sql = Sql.newInstance(url,   //  db =  new Sql( connectInfo.url,

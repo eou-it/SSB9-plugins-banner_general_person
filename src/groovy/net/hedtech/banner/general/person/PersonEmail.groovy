@@ -1,9 +1,10 @@
 /*********************************************************************************
- Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2015 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
 import net.hedtech.banner.general.system.EmailType
+import net.hedtech.banner.general.system.SystemUtility
 import net.hedtech.banner.query.DynamicFinder
 import org.apache.log4j.Logger
 import org.hibernate.annotations.Type
@@ -353,9 +354,13 @@ class PersonEmail implements Serializable {
 
 
     public static List fetchByPidmsAndActvieStatus(List pidm) {
-
-        def emails = PersonEmail.withSession { session ->
-            session.getNamedQuery('PersonEmail.fetchByPidmsAndActiveStatus').setParameterList('pidms', pidm).list()
+        def partitionList = SystemUtility.splitList(pidm, 1000)
+        def emails = []
+        partitionList.each { pidmList ->
+            def emailList = PersonEmail.withSession { session ->
+                session.getNamedQuery('PersonEmail.fetchByPidmsAndActiveStatus').setParameterList('pidms', pidmList).list()
+            }
+            emails.addAll(emailList)
         }
         log.debug "Executing fetchByPidmsAndActiveStatus with pidms = ${pidm} "
         log.debug "Fetched number of emails ${emails.size()} }"
