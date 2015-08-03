@@ -4,6 +4,7 @@
 package net.hedtech.banner.general.person.ldm
 
 import net.hedtech.banner.exceptions.ApplicationException
+import net.hedtech.banner.exceptions.BusinessLogicValidationException
 import net.hedtech.banner.exceptions.NotFoundException
 import net.hedtech.banner.general.overall.ldm.GlobalUniqueIdentifier
 import net.hedtech.banner.general.overall.ldm.GlobalUniqueIdentifierService
@@ -24,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional
  * Service used to support "restriction-types" resource for CDM
  */
 @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-class RestrictionTypeCompositeService {
+class RestrictionTypeCompositeService extends LdmService {
 
     def holdTypeService
     def
@@ -70,7 +71,7 @@ class RestrictionTypeCompositeService {
             params.sort = LdmService.fetchBannerDomainPropertyForLdmField(params.sort)
             List<HoldType> holdTypes = holdTypeService.list(params) as List
             holdTypes.each { holdType ->
-                restrictionTypes << new RestrictionType(holdType, GlobalUniqueIdentifier.findByLdmNameAndDomainId(RESTRICTION_TYPE_LDM_NAME, holdType.id)?.guid, new Metadata(holdType.dataOrigin))
+                restrictionTypes << getDecorator(holdType)
             }
             return restrictionTypes
 
@@ -107,10 +108,52 @@ class RestrictionTypeCompositeService {
             throw new ApplicationException("restrictionType", new NotFoundException())
         }
 
-        return new RestrictionType(holdType, globalUniqueIdentifier.guid, new Metadata(holdType.dataOrigin));
+        return getDecorator(holdType, globalUniqueIdentifier?.guid)
     }
 
+/**
+ * POST /api/restriction-types
+ *
+ * @param content Request body
+ */
+    def create(Map content) {
+        validateRequest(content)
+        HoldType holdType = bindRestrictionType(new HoldType(), content)
+        String restrictionTypeGuid = content?.guid?.trim()?.toLowerCase()
+        if (restrictionTypeGuid) {
+            // Overwrite the GUID created by DB insert trigger, with the one provided in the request body
+            restrictionTypeGuid = updateGuidValue(holdType.id, restrictionTypeGuid, RESTRICTION_TYPE_LDM_NAME)?.guid
+        } else {
+            restrictionTypeGuid = GlobalUniqueIdentifier.findByLdmNameAndDomainId(RESTRICTION_TYPE_LDM_NAME, holdType?.id)?.guid
+        }
+        return getDecorator(holdType, restrictionTypeGuid)
+    }
 
+    private void validateRequest(content) {
+     if (HoldType.findByCode(content?.code)) {
+            throw new ApplicationException('restriction.type', new BusinessLogicValidationException('code.exists.message', ['abbreviation']))
+        }
+    }
+
+    private def bindRestrictionType(HoldType holdType, Map content) {
+        bindData(holdType, content)
+        holdTypeService.createOrUpdate(holdType)
+    }
+
+    private void bindData(domainModel, content) {
+        super.setDataOrigin(domainModel,content)
+        super.bindData(domainModel,content,[:])
+    }
+
+    private def getDecorator(HoldType holdType, String holdTypeGuid = null) {
+        if (holdType) {
+            if (!holdTypeGuid) {
+                holdTypeGuid = GlobalUniqueIdentifier.findByLdmNameAndDomainId(RESTRICTION_TYPE_LDM_NAME, holdType?.id)?.guid
+            }
+                new RestrictionType(holdType, holdTypeGuid, new Metadata(holdType?.dataOrigin))
+        }
+    }
+    
     RestrictionType fetchByRestrictionTypeId(Long holdTypeId) {
         if (null == holdTypeId) {
             return null

@@ -34,7 +34,7 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
     private static final String LDM_NAME = "persons"
     private String invalid_sort_orderErrorMessage = 'RestfulApiValidationUtility.invalidSortField'
     def restrictionTypeCompositeService
-
+    def i_success_content
 
     @Before
     public void setUp() {
@@ -69,6 +69,7 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
         newPersonRelatedHold(i_success_holdType_1)
         newPersonRelatedHold(i_success_holdType_2)
         newPersonRelatedHold(i_success_holdType_3)
+        i_success_content = [code: 'SV',description:'Test Title', metadata: [dataOrigin: 'Banner']]
     }
 
 
@@ -297,6 +298,33 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
         }
     }
 
+    /**
+     * Test to check the RestrictionTypeCompositeService create method with valid in request content
+     */
+    @Test
+    void testCreate() {
+        def restrictionType = restrictionTypeCompositeService.create(i_success_content)
+        assertNotNull restrictionType
+        assertNotNull restrictionType.guid
+        assertEquals i_success_content.code, restrictionType.code
+        assertEquals i_success_content.description, restrictionType.description
+    }
+
+    /**
+     * Test to check the RestrictionTypeCompositeService create method with exists code in request content
+     */
+    @Test
+    void testCreateExistsCode(){
+        i_success_content.code='TT'
+        try{
+            restrictionTypeCompositeService.create(i_success_content)
+        }catch (ApplicationException ae){
+            assertApplicationException ae, "code.exists.message"
+        }
+    }
+
+
+
     private def newHoldType(String code) {
 
         def holdType = new HoldType(
@@ -318,7 +346,6 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
         )
         holdType.save(failOnError: true, flush: true)
     }
-
 
     private def newPersonRelatedHold(def iholdType) {
 
