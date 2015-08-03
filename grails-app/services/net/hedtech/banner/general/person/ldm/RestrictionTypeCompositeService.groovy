@@ -131,7 +131,7 @@ class RestrictionTypeCompositeService extends LdmService {
 
     private void validateRequest(content) {
      if (HoldType.findByCode(content?.code)) {
-            throw new ApplicationException('restriction.type', new BusinessLogicValidationException('code.exists.message', ['abbreviation']))
+            throw new ApplicationException('restriction.type', new BusinessLogicValidationException('code.exists.message', ["v4".equals(LdmService.getAcceptVersion(VERSIONS)) ? 'code' : 'abbreviation']))
         }
     }
 
