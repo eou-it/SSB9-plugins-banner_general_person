@@ -31,13 +31,13 @@ class RestrictionTypeCompositeService extends LdmService {
     def
     private static final String RESTRICTION_TYPE_LDM_NAME = 'restriction-types'
     private static final String PERSONS_LDM_NAME = "persons"
-    private static final List<String> VERSIONS = ["v1","v2","v3","v4"]
+    private static final List<String> VERSIONS = ["v1", "v4"]
 
 
     List<RestrictionType> list(Map params) {
         if (params?.parentPluralizedResourceName == "persons") {
             def returnLists = []
-            if(params?.parentId){
+            if (params?.parentId) {
                 String guid = params.parentId?.trim()?.toLowerCase()
                 GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(PERSONS_LDM_NAME, guid)
                 if (!globalUniqueIdentifier) {
@@ -58,11 +58,9 @@ class RestrictionTypeCompositeService extends LdmService {
                 }
             }
             return returnLists
-        }
-        else
-        {
+        } else {
             List restrictionTypes = []
-            List allowedSortFields = ("v4".equals(LdmService.getAcceptVersion(VERSIONS))? ['code', 'title']:['abbreviation', 'title'])
+            List allowedSortFields = ("v4".equals(LdmService.getAcceptVersion(VERSIONS)) ? ['code', 'title'] : ['abbreviation', 'title'])
 
             RestfulApiValidationUtility.correctMaxAndOffset(params, RestfulApiValidationUtility.MAX_DEFAULT, RestfulApiValidationUtility.MAX_UPPER_LIMIT)
             RestfulApiValidationUtility.validateSortField(params.sort, allowedSortFields)
@@ -88,9 +86,7 @@ class RestrictionTypeCompositeService extends LdmService {
             List<PersonRelatedHold> restrictionTypes = []
             restrictionTypes = PersonRelatedHold.fetchByPidmAndDateCompare(personIdentificationName.pidm, new Date())
             count = restrictionTypes.size()
-        }
-        else
-        {
+        } else {
             count = HoldType.count()
         }
         return count
@@ -130,8 +126,14 @@ class RestrictionTypeCompositeService extends LdmService {
     }
 
     private void validateRequest(content) {
-     if (HoldType.findByCode(content?.code)) {
-            throw new ApplicationException('restriction.type', new BusinessLogicValidationException('code.exists.message', ["v4".equals(LdmService.getAcceptVersion(VERSIONS)) ? 'code' : 'abbreviation']))
+        if (HoldType.findByCode(content?.code)) {
+            def parameterValue
+            if ("v4".equals(LdmService.getAcceptVersion(VERSIONS))) {
+                parameterValue = 'code'
+            } else if ("v1".equals(LdmService.getAcceptVersion(VERSIONS))) {
+                parameterValue = 'abbreviation'
+            }
+            throw new ApplicationException('restriction.type', new BusinessLogicValidationException('code.exists.message', [parameterValue]))
         }
     }
 
@@ -141,8 +143,8 @@ class RestrictionTypeCompositeService extends LdmService {
     }
 
     private void bindData(domainModel, content) {
-        super.setDataOrigin(domainModel,content)
-        super.bindData(domainModel,content,[:])
+        super.setDataOrigin(domainModel, content)
+        super.bindData(domainModel, content, [:])
     }
 
     private def getDecorator(HoldType holdType, String holdTypeGuid = null) {
@@ -150,10 +152,10 @@ class RestrictionTypeCompositeService extends LdmService {
             if (!holdTypeGuid) {
                 holdTypeGuid = GlobalUniqueIdentifier.findByLdmNameAndDomainId(RESTRICTION_TYPE_LDM_NAME, holdType?.id)?.guid
             }
-                new RestrictionType(holdType, holdTypeGuid, new Metadata(holdType?.dataOrigin))
+            new RestrictionType(holdType, holdTypeGuid, new Metadata(holdType?.dataOrigin))
         }
     }
-    
+
     RestrictionType fetchByRestrictionTypeId(Long holdTypeId) {
         if (null == holdTypeId) {
             return null
