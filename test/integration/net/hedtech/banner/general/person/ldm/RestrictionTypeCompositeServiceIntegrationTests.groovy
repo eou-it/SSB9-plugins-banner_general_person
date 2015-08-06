@@ -323,6 +323,47 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
         }
     }
 
+    /**
+     * Test to check the RestrictionTypeCompositeService update method with valid guid in request content
+     */
+    @Test
+    void testUpdate() {
+        i_success_content.put('id', holdType_guid_1)
+        def restrictionType = restrictionTypeCompositeService.update(i_success_content)
+        assertNotNull restrictionType
+        assertNotNull restrictionType.guid
+        assertEquals i_success_content.code, restrictionType.code
+        assertEquals i_success_content.description, restrictionType.description
+    }
+
+    /**
+     * Test to check the RestrictionTypeCompositeService update method with invalid guid in request content
+     */
+    @Test
+    void testUpdateNullGuid() {
+        i_success_content.put('id', null)
+        try{
+           restrictionTypeCompositeService.update(i_success_content)
+        }
+        catch (ApplicationException ae) {
+            assertApplicationException ae, "NotFoundException"
+        }
+    }
+
+
+    /**
+     * Test to check the RestrictionTypeCompositeService update method with non exists guid in request content
+     */
+    @Test
+    void testUpdateNonExistsGuid() {
+        i_success_content.put('id', 'TEST')
+        def restrictionType = restrictionTypeCompositeService.update(i_success_content)
+        assertNotNull restrictionType
+        assertNotNull restrictionType.guid
+        assertEquals i_success_content.id?.trim()?.toLowerCase(), restrictionType.guid
+        assertEquals i_success_content.code, restrictionType.code
+        assertEquals i_success_content.description, restrictionType.description
+    }
 
 
     private def newHoldType(String code) {

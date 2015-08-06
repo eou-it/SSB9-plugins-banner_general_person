@@ -17,6 +17,7 @@ import net.hedtech.banner.general.person.ldm.v1.PersonRestrictionType
 import net.hedtech.banner.general.system.HoldType
 import net.hedtech.banner.general.system.ldm.v1.Metadata
 import net.hedtech.banner.general.system.ldm.v1.RestrictionType
+import net.hedtech.banner.general.system.ldm.v4.MetadataV4
 import net.hedtech.banner.restfulapi.RestfulApiValidationUtility
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -24,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional
 /**
  * Service used to support "restriction-types" resource for CDM
  */
-@Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+@Transactional
 class RestrictionTypeCompositeService extends LdmService {
 
     def holdTypeService
@@ -33,7 +34,7 @@ class RestrictionTypeCompositeService extends LdmService {
     private static final String PERSONS_LDM_NAME = "persons"
     private static final List<String> VERSIONS = ["v1", "v4"]
 
-
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     List<RestrictionType> list(Map params) {
         if (params?.parentPluralizedResourceName == "persons") {
             def returnLists = []
@@ -76,7 +77,7 @@ class RestrictionTypeCompositeService extends LdmService {
         }
     }
 
-
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     Long count(params) {
         Integer count
         if (params?.parentPluralizedResourceName) {
@@ -92,7 +93,7 @@ class RestrictionTypeCompositeService extends LdmService {
         return count
     }
 
-
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     RestrictionType get(String guid) {
         GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(RESTRICTION_TYPE_LDM_NAME, guid)
         if (!globalUniqueIdentifier) {
@@ -111,10 +112,20 @@ class RestrictionTypeCompositeService extends LdmService {
  * POST /api/restriction-types
  *
  * @param content Request body
+ * @return
  */
     def create(Map content) {
-        validateRequest(content)
-        HoldType holdType = bindRestrictionType(new HoldType(), content)
+        HoldType holdType = HoldType.findByCode(content?.code)
+        if (holdType) {
+            def parameterValue
+            if ("v4".equals(LdmService.getAcceptVersion(VERSIONS))) {
+                parameterValue = 'code'
+            } else if ("v1".equals(LdmService.getAcceptVersion(VERSIONS))) {
+                parameterValue = 'abbreviation'
+            }
+            throw new ApplicationException('restriction.type', new BusinessLogicValidationException('code.exists.message', [parameterValue]))
+        }
+        holdType = bindRestrictionType(new HoldType(), content)
         String restrictionTypeGuid = content?.guid?.trim()?.toLowerCase()
         if (restrictionTypeGuid) {
             // Overwrite the GUID created by DB insert trigger, with the one provided in the request body
@@ -125,17 +136,40 @@ class RestrictionTypeCompositeService extends LdmService {
         return getDecorator(holdType, restrictionTypeGuid)
     }
 
-    private void validateRequest(content) {
-        if (HoldType.findByCode(content?.code)) {
-            def parameterValue
-            if ("v4".equals(LdmService.getAcceptVersion(VERSIONS))) {
-                parameterValue = 'code'
-            } else if ("v1".equals(LdmService.getAcceptVersion(VERSIONS))) {
-                parameterValue = 'abbreviation'
+    /**
+     * PUT /api/restriction-types/<guid>
+     *
+     * @param content Request body
+     * @return
+     */
+    def update(Map content) {
+        String holdTypeGuid = content?.id?.trim()?.toLowerCase()
+        GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(RESTRICTION_TYPE_LDM_NAME, holdTypeGuid)
+        if (holdTypeGuid) {
+            if (!globalUniqueIdentifier) {
+                if (!content?.guid) {
+                    content.put('guid', holdTypeGuid)
+                }
+                //Per strategy when a GUID was provided, the create should happen.
+                return create(content)
             }
-            throw new ApplicationException('restriction.type', new BusinessLogicValidationException('code.exists.message', [parameterValue]))
+        } else {
+            throw new ApplicationException("restrictionType", new NotFoundException())
         }
+
+        HoldType holdType = HoldType.findById(globalUniqueIdentifier?.domainId)
+        if (!holdType) {
+            throw new ApplicationException("restrictionType", new NotFoundException())
+        }
+
+        // Should not allow to update holdType.code as it is read-only
+        if (holdType.code != content?.code?.trim()) {
+            content.put("code", holdType.code)
+        }
+        holdType = bindRestrictionType(holdType, content)
+        return getDecorator(holdType, holdTypeGuid)
     }
+
 
     private def bindRestrictionType(HoldType holdType, Map content) {
         bindData(holdType, content)
@@ -149,13 +183,19 @@ class RestrictionTypeCompositeService extends LdmService {
 
     private def getDecorator(HoldType holdType, String holdTypeGuid = null) {
         if (holdType) {
+            def metaData
             if (!holdTypeGuid) {
                 holdTypeGuid = GlobalUniqueIdentifier.findByLdmNameAndDomainId(RESTRICTION_TYPE_LDM_NAME, holdType?.id)?.guid
             }
-            new RestrictionType(holdType, holdTypeGuid, new Metadata(holdType?.dataOrigin))
+            if ("v4".equals(LdmService.getAcceptVersion(VERSIONS))) {
+                metaData = new MetadataV4(holdType?.dataOrigin,null,null,holdType?.lastModifiedBy)
+            } else if ("v1".equals(LdmService.getAcceptVersion(VERSIONS))) {
+                metaData = new Metadata(holdType?.dataOrigin)
+            }
+            new RestrictionType(holdType, holdTypeGuid, metaData)
         }
     }
-
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     RestrictionType fetchByRestrictionTypeId(Long holdTypeId) {
         if (null == holdTypeId) {
             return null
@@ -167,7 +207,7 @@ class RestrictionTypeCompositeService extends LdmService {
         return new RestrictionType(holdType, GlobalUniqueIdentifier.findByLdmNameAndDomainId(RESTRICTION_TYPE_LDM_NAME, holdTypeId)?.guid, new Metadata(holdType.dataOrigin))
     }
 
-
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     RestrictionType fetchByRestrictionTypeCode(String holdTypeCode) {
         RestrictionType restrictionType = null
         if (holdTypeCode) {
