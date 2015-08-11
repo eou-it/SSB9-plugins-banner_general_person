@@ -188,7 +188,7 @@ class RestrictionTypeCompositeService extends LdmService {
                 holdTypeGuid = GlobalUniqueIdentifier.findByLdmNameAndDomainId(RESTRICTION_TYPE_LDM_NAME, holdType?.id)?.guid
             }
             if ("v4".equals(LdmService.getAcceptVersion(VERSIONS))) {
-                metaData = new MetadataV4(holdType?.dataOrigin,null,null,holdType?.lastModifiedBy)
+                metaData = new MetadataV4(holdType?.lastModifiedBy)
             } else if ("v1".equals(LdmService.getAcceptVersion(VERSIONS))) {
                 metaData = new Metadata(holdType?.dataOrigin)
             }
