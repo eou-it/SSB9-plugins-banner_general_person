@@ -22,6 +22,8 @@ class Person {
     List names = []
     List races = []
     List roles = []
+    def birthDate
+    def deadDate
 
     def Person(PersonBasicPersonBase person,
              def guid,
@@ -54,6 +56,22 @@ class Person {
         // PersonBasicPersonBase is optional, create blank unpersisted object if none exists.
         this.person = person ?: new PersonBasicPersonBase()
         this.metadata = new Metadata (this.person.dataOrigin)
+    }
+
+    def Person(PersonBasicPersonBase person,def birthDate,def deadDate) {
+        // PersonBasicPersonBase is optional, create blank unpersisted object if none exists.
+        this.person = person ?: new PersonBasicPersonBase()
+        this.metadata = new Metadata (this.person.dataOrigin)
+        this.birthDate = birthDate
+        this.deadDate = deadDate
+    }
+
+    def getBirthDate() {
+        return birthDate
+    }
+
+    def getDeadDate() {
+        return deadDate
     }
 
     def getSex() {
