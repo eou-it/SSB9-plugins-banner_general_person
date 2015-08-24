@@ -554,7 +554,7 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         assertNotNull result
 
-        assert result.size() > 1
+        assert result.size() >= 1
         //the below assert is commented because new seed data records added with 'Van Der' for surname prefix with different last name.
         //assertEquals "Bunte", result[0].lastName
     }
