@@ -4,9 +4,9 @@
 
 package net.hedtech.banner.general.person
 
+import grails.util.Holders
 import net.hedtech.banner.general.system.TelephoneType
 import net.hedtech.banner.testing.BaseIntegrationTestCase
-import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.springframework.context.ApplicationContext
 import org.springframework.context.i18n.LocaleContextHolder
 import org.junit.Before
@@ -33,7 +33,7 @@ class PersonAddressUtilityIntegrationTests extends BaseIntegrationTestCase {
     void testFormatAddress() {
         def personAddressMap = [houseNumber:"30",streetLine1:"Marigold Drive",streetLine2:"Off Shasta Main Rd",state:"PA",displayHouseNumber:true]
 
-        def application = ApplicationHolder.application
+        def application = Holders.getGrailsApplication()
         ApplicationContext applicationContext = application.mainContext
         def messageSource = applicationContext.getBean("messageSource")
         def lineFormat = messageSource.getMessage("default.personAddress.line1.format", null, LocaleContextHolder.getLocale())

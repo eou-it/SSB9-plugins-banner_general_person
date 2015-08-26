@@ -2,6 +2,8 @@
   Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
+
+import grails.util.Holders
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
@@ -9,8 +11,6 @@ import org.junit.After
 
 import groovy.sql.Sql
 import net.hedtech.banner.testing.BaseIntegrationTestCase
-import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
-import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
 import org.springframework.context.ApplicationContext
 import org.springframework.context.i18n.LocaleContextHolder as LCH
 import net.hedtech.banner.general.system.InstitutionalDescription
@@ -209,7 +209,7 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
      */
     @Test
     void testNameFormat() {
-        def application = AH.application
+        def application = Holders.getGrailsApplication()
         ApplicationContext applicationContext = application.mainContext
         def messageSource = applicationContext.getBean("messageSource")
         assertNotNull messageSource.getMessage("default.name.format", null, LCH.getLocale())
@@ -229,7 +229,7 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
         filterData.params = param
 
         def sql
-        def url = CH.config.bannerDataSource.url
+        def url = Holders.config.bannerDataSource.url
         println url
         try {
 
@@ -270,7 +270,7 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
         filterData.params = param
 
         def sql
-        def url = CH.config.bannerDataSource.url
+        def url = Holders.config.bannerDataSource.url
         println url
         try {
 

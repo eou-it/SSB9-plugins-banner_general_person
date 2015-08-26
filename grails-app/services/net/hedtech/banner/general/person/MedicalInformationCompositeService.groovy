@@ -7,6 +7,7 @@ import groovy.sql.Sql
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.system.MedicalCondition
 import net.hedtech.banner.service.ServiceBase
+import org.codehaus.groovy.runtime.InvokerHelper
 
 class MedicalInformationCompositeService {
 
@@ -81,7 +82,9 @@ class MedicalInformationCompositeService {
 
         def content = ServiceBase.extractParams(MedicalInformation, domain)
         def domainObject = MedicalInformation.get(content?.id) //  ServiceBase.fetch(MedicalInformation, content?.id, log)
-        domainObject.properties = content
+        use(InvokerHelper) {
+            domainObject.setProperties(content)
+        }
         domainObject.version = content.version
         def changedNames = domainObject.dirtyPropertyNames
 

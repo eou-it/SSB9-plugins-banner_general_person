@@ -4,6 +4,7 @@ Copyright 2012 Ellucian Company L.P. and its affiliates.
  package net.hedtech.banner.general.person
 
 import net.hedtech.banner.service.ServiceBase
+import org.codehaus.groovy.runtime.InvokerHelper
 
 class PersonEmailCompositeService {
 
@@ -61,7 +62,9 @@ class PersonEmailCompositeService {
 
         def content = ServiceBase.extractParams(PersonEmail, domain)
         def domainObject = PersonEmail.get(content?.id) //  ServiceBase.fetch(PersonEmail, content?.id, log)
-        domainObject.properties = content
+        use(InvokerHelper) {
+            domainObject.setProperties(content)
+        }
         domainObject.version = content.version
         def changedNames = domainObject.dirtyPropertyNames
 

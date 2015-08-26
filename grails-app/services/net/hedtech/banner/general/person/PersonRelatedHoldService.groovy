@@ -5,6 +5,7 @@ package net.hedtech.banner.general.person
 
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.service.ServiceBase
+import org.codehaus.groovy.runtime.InvokerHelper
 import org.springframework.security.core.context.SecurityContextHolder
 
 class PersonRelatedHoldService extends ServiceBase {
@@ -76,7 +77,9 @@ class PersonRelatedHoldService extends ServiceBase {
     private findDirty(hold, String field) {
         def content = ServiceBase.extractParams(PersonRelatedHold, hold)
         def domainObject = PersonRelatedHold.get(content?.id)
-        domainObject.properties = content
+        use(InvokerHelper) {
+            domainObject.setProperties(content)
+        }
         def changedNames = domainObject.dirtyPropertyNames
         def changed = changedNames.find { it == field}
         return changed
