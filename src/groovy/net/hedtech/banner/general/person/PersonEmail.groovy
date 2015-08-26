@@ -353,18 +353,11 @@ class PersonEmail implements Serializable {
     }
 
 
-    public static List fetchByPidmsAndActvieStatus(List pidm) {
-        def partitionList = SystemUtility.splitList(pidm, 1000)
-        def emails = []
-        partitionList.each { pidmList ->
-            def emailList = PersonEmail.withSession { session ->
-                session.getNamedQuery('PersonEmail.fetchByPidmsAndActiveStatus').setParameterList('pidms', pidmList).list()
-            }
-            emails.addAll(emailList)
+    public static List<PersonEmail> fetchByPidmsAndActiveStatus(List pidms) {
+        List<PersonEmail> personEmails = PersonEmail.withSession { session ->
+            session.getNamedQuery('PersonEmail.fetchByPidmsAndActiveStatus').setParameterList('pidms', pidms).list()
         }
-        log.debug "Executing fetchByPidmsAndActiveStatus with pidms = ${pidm} "
-        log.debug "Fetched number of emails ${emails.size()} }"
-        return emails
+        return personEmails
     }
 
 }

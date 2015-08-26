@@ -394,7 +394,7 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
         assertTrue pidms.size() > 0
         assertTrue pidms[0] instanceof Integer
 
-        def emails = PersonEmail.fetchByPidmsAndActvieStatus(pidms)
+        def emails = PersonEmail.fetchByPidmsAndActiveStatus(pidms)
 
         assertEquals emails.size(), persons.size()
 
