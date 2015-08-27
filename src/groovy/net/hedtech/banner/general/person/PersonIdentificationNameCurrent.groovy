@@ -1,10 +1,11 @@
 /*********************************************************************************
- Copyright 2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2015 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
 import net.hedtech.banner.general.system.FgacDomain
 import net.hedtech.banner.general.system.NameType
+import net.hedtech.banner.general.system.SystemUtility
 import net.hedtech.banner.query.DynamicFinder
 import net.hedtech.banner.service.DatabaseModifiesState
 
@@ -20,12 +21,15 @@ import javax.persistence.*
 @Entity
 @Table(name = "SV_SPRIDEN_CUR")
 @NamedQueries(value = [
-@NamedQuery(name = "PersonIdentificationNameCurrent.fetchByBannerId",
-query = """FROM  PersonIdentificationNameCurrent a
+        @NamedQuery(name = "PersonIdentificationNameCurrent.fetchByBannerId",
+                query = """FROM  PersonIdentificationNameCurrent a
 	       WHERE a.bannerId = :bannerId """),
-@NamedQuery(name = "PersonIdentificationNameCurrent.fetchByPidm",
-query = """FROM  PersonIdentificationNameCurrent a
-	       WHERE a.pidm = :pidm """)
+        @NamedQuery(name = "PersonIdentificationNameCurrent.fetchByPidm",
+                query = """FROM  PersonIdentificationNameCurrent a
+	       WHERE a.pidm = :pidm """),
+        @NamedQuery(name = "PersonIdentificationNameCurrent.fetchByPidms",
+                query = """from PersonIdentificationNameCurrent a
+           where a.pidm in (:pidms)""")
 ])
 @DatabaseModifiesState
 class PersonIdentificationNameCurrent implements Serializable {
@@ -175,7 +179,7 @@ class PersonIdentificationNameCurrent implements Serializable {
      */
     @ManyToOne
     @JoinColumns([
-    @JoinColumn(name = "SPRIDEN_NTYP_CODE", referencedColumnName = "GTVNTYP_CODE")
+            @JoinColumn(name = "SPRIDEN_NTYP_CODE", referencedColumnName = "GTVNTYP_CODE")
     ])
     NameType nameType
 
@@ -184,7 +188,7 @@ class PersonIdentificationNameCurrent implements Serializable {
      */
     @ManyToOne
     @JoinColumns([
-    @JoinColumn(name = "SPRIDEN_CREATE_FDMN_CODE", referencedColumnName = "GTVFDMN_CODE")
+            @JoinColumn(name = "SPRIDEN_CREATE_FDMN_CODE", referencedColumnName = "GTVFDMN_CODE")
     ])
     FgacDomain fgacDomain
 
@@ -238,7 +242,6 @@ class PersonIdentificationNameCurrent implements Serializable {
                     personRowid=$personRowid,
 					fgacDomain=$fgacDomain]"""
     }
-
 
 
     boolean equals(o) {
@@ -392,4 +395,43 @@ class PersonIdentificationNameCurrent implements Serializable {
         return personIdentificationNameCurrent
     }
 
+
+    public static def fetchByPidms(List pidms, def params = [:]) {
+        def pidmList = SystemUtility.splitList(pidms, 1000)
+        def returnList = []
+        pidmList.each { pidmPartition ->
+            def pidmsres = []
+            pidmsres = PersonIdentificationNameCurrent.withSession
+                    { session ->
+                        org.hibernate.Query query1 = session.getNamedQuery('PersonIdentificationNameCurrent.fetchByPidms')
+                        def orderBy
+                        if (params.sort) {
+                            orderBy = " order by a." + params.sort
+                        } else {
+                            orderBy = " order by a.lastName, a.firstName, a.middleName, a.bannerId"
+                        }
+                        org.hibernate.Query query = session.createQuery(query1.getQueryString() + orderBy)
+
+                        query.setParameterList('pidms', pidmPartition)
+                        def max
+                        def offset
+                        if (params.max) {
+                            if (params.max instanceof String) max = params.max.toInteger()
+                            else max = params.max
+                            query.setMaxResults(max)
+                        }
+                        if (params.offset) {
+                            if (params.offset instanceof String) offset = params.offset.toInteger()
+                            else offset = params.offset
+                            query.setFirstResult(offset)
+                        }
+                        query.list()
+                    }
+            returnList.addAll(pidmsres)
+        }
+        return returnList
+    }
+
 }
+
+
