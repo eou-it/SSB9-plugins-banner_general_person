@@ -216,6 +216,9 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
      */
     @Test
     void testAdvancedSearchBySsn() {
+        // HOSP0001                                      000277832
+        def list = PersonBasicPersonBase.findAllBySsn("000277832")
+        assertTrue list.size() >= 1
 
         def filterData = [:]
         def param = [:]
@@ -240,7 +243,7 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
             //Step 1.
             // Client submits a search query to find an exact match
             // Search by SSN
-            def persons = personSearchService.personIdSearch("543-54-5432", filterData, pagingAndSortParams)
+            def persons = personSearchService.personIdSearch("000277832", filterData, pagingAndSortParams)
             assertNotNull persons
             assertTrue persons.size() >= 1
 
