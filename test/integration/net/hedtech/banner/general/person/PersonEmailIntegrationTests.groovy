@@ -1,5 +1,5 @@
 /*********************************************************************************
- Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2015 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 import org.junit.Before
@@ -381,6 +381,22 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
         assertEquals res.commentData, null
         assertEquals res.displayWebIndicator, true
         assertEquals res.dataOrigin, "Banner"
+
+    }
+
+    @Test
+    void testFetchPidmsAndActiveStatus(){
+
+        def persons = PersonEmail.findAllByStatusIndicator("A")
+        assertTrue persons.size() > 0
+        def pidms = []
+        persons.groupBy{it.pidm}.each{ pidms << it.key }
+        assertTrue pidms.size() > 0
+        assertTrue pidms[0] instanceof Integer
+
+        def emails = PersonEmail.fetchByPidmsAndActiveStatus(pidms)
+
+        assertEquals emails.size(), persons.size()
 
     }
 

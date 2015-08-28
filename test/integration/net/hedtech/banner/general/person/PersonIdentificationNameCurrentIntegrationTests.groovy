@@ -1,18 +1,19 @@
 /*********************************************************************************
-Copyright 2012 Ellucian Company L.P. and its affiliates.
-**********************************************************************************/
+ Copyright 2012 Ellucian Company L.P. and its affiliates.
+ **********************************************************************************/
 /*********************************************************************************
  Copyright 2013 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
-import org.junit.Before
-import org.junit.Test
-import org.junit.After
 
 import groovy.sql.Sql
 import net.hedtech.banner.general.system.NameType
+import net.hedtech.banner.general.system.SystemUtility
 import net.hedtech.banner.testing.BaseIntegrationTestCase
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
 
 class PersonIdentificationNameCurrentIntegrationTests extends BaseIntegrationTestCase {
 
@@ -90,6 +91,44 @@ class PersonIdentificationNameCurrentIntegrationTests extends BaseIntegrationTes
 
 
     @Test
+    void testFetchByPidms() {
+        def pidmList = []
+        ["HOS00001", "HOSWEB001", "HOSWEB002", "HOSWEB003", "HOSWEB004", "HOSWEB005", "HOSWEB006"].each {
+            def person = PersonUtility.getPerson(it)
+            pidmList << person.pidm
+        }
+        assertEquals 7, pidmList.size()
+        assertTrue pidmList instanceof List
+
+        def persons = PersonIdentificationNameCurrent.fetchByPidms(pidmList, [max: 10, offset: 0])
+        assertEquals 7, persons.size()
+        persons.each { pers ->
+            assertNotNull pidmList.find { it == pers.pidm }
+        }
+
+        def persons2 = PersonIdentificationNameCurrent.fetchByPidms(pidmList)
+        assertEquals 7, persons2.size()
+    }
+
+    @Test
+    void testFetchByPidmslargeList() {
+        def pidmList = []
+        PersonIdentificationNameCurrent.findAll().each { person ->
+            pidmList << person.pidm
+        }
+
+        assertTrue pidmList.size() > 1000
+        assertTrue pidmList instanceof List
+        def pidmPartitions = SystemUtility.splitList(pidmList, 1000)
+        assertTrue pidmPartitions.size() > 1
+
+        def persons = PersonIdentificationNameCurrent.fetchByPidms(pidmList)
+        assertEquals pidmList.size(), persons.size()
+
+    }
+
+
+    @Test
     void testNullChangeIndicatorValidationFailure() {
         def personIdentificationNameCurrent = newPersonIdentificationNameCurrent("P")
         personIdentificationNameCurrent.changeIndicator = "I"
@@ -97,7 +136,6 @@ class PersonIdentificationNameCurrentIntegrationTests extends BaseIntegrationTes
         assertFalse personIdentificationNameCurrent.validate()
         assert personIdentificationNameCurrent.errors.getFieldErrors('changeIndicator').code == ['changeIndicatorMustBeNull']
     }
-
 
 
     @Test

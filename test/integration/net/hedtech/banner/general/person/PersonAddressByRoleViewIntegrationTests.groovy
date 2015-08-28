@@ -67,21 +67,8 @@ class PersonAddressByRoleViewIntegrationTests extends BaseIntegrationTestCase {
         assertTrue employeeAddresses.size() == 1
 
         employeeAddresses = PersonAddressByRoleView.fetchAddressesByPidmAndRoles([pidm:pidm,roles:['EMPLOYEE','ALUMNI']])
-        println employeeAddresses
-        assertTrue employeeAddresses.size() == 3
+         assertTrue employeeAddresses.size() == 3
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
 	private def newPersonAddress(pidm) {
 		def personAddress = new PersonAddressByRoleView(
