@@ -38,7 +38,7 @@ class PersonRelatedHoldService extends ServiceBase {
     //Check view
     private validateHoldForUpdate(PersonRelatedHold hold) {
 
-        if (!(hold.lastModifiedBy == SecurityContextHolder.context?.authentication?.principal?.username)) {
+        if (!(hold.createdBy == SecurityContextHolder.context?.authentication?.principal?.username)) {
             if (findDirty(hold, 'holdType'))
                 throw new ApplicationException(PersonRelatedHold, "@@r1:holdCodeUpdateNotAllowed@@")
             if (findDirty(hold, 'releaseIndicator'))
@@ -65,7 +65,7 @@ class PersonRelatedHoldService extends ServiceBase {
      * @return
      */
     private validateHoldForDelete(PersonRelatedHold hold) {
-        if (!(hold.lastModifiedBy == SecurityContextHolder.context?.authentication?.principal?.username)) {
+        if (!(hold.createdBy == SecurityContextHolder.context?.authentication?.principal?.username)) {
             if (hold.releaseIndicator) {
                 throw new ApplicationException(PersonRelatedHold, "@@r1:deleteNotAllowedByAnotherUser@@")
             }
