@@ -64,7 +64,6 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
         // Client submits a search query as Lindblom
         //Returned Result for the Advanced Search UI Component
         def result = personSearchService.personIdSearch("HOS00001", filterData, pagingAndSortParams)
-        println result
         assertNotNull result
         assertTrue result.size() >= 0
         assertNotNull result.find { it.bannerId == "HOS00001"}
@@ -93,7 +92,6 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
         // Client submits a search query as Lindblom
         //Returned Result for the Advanced Search UI Component
         def result = personSearchService.personIdSearch("HOSWEB001", filterData, pagingAndSortParams)
-        println result
         assertNotNull result
         assertTrue result.size() >= 1
     }
@@ -114,7 +112,6 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
         // Client submits a search query as Lindblom
         //Returned Result for the Advanced Search UI Component
         def result = personSearchService.personNameSearch("Lindblom", filterData, pagingAndSortParams)
-        println result
         assertNotNull result
         assertTrue result.size() <= 8
         result[0].changeIndicator = ""
@@ -138,7 +135,6 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
         // Client submits a search query
         //Returned Result for the Advanced Search UI Component
         def result = personSearchService.personNameSearch("10 STUDENT", filterData, pagingAndSortParams)
-        println result
         assertNotNull result
         assertTrue result.size() > 0
 
@@ -220,6 +216,9 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
      */
     @Test
     void testAdvancedSearchBySsn() {
+        // HOSP0001                                      000277832
+        def list = PersonBasicPersonBase.findAllBySsn("000277832")
+        assertTrue list.size() >= 1
 
         def filterData = [:]
         def param = [:]
@@ -230,7 +229,6 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
 
         def sql
         def url = CH.config.bannerDataSource.url
-        println url
         try {
 
             sql = Sql.newInstance(url,   //  db =  new Sql( connectInfo.url,
@@ -245,7 +243,7 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
             //Step 1.
             // Client submits a search query to find an exact match
             // Search by SSN
-            def persons = personSearchService.personIdSearch("543-54-5432", filterData, pagingAndSortParams)
+            def persons = personSearchService.personIdSearch("000277832", filterData, pagingAndSortParams)
             assertNotNull persons
             assertTrue persons.size() >= 1
 
@@ -271,7 +269,6 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
 
         def sql
         def url = CH.config.bannerDataSource.url
-        println url
         try {
 
             sql = Sql.newInstance(url,   //  db =  new Sql( connectInfo.url,
