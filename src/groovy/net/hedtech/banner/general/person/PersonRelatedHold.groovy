@@ -53,7 +53,7 @@ import net.hedtech.banner.query.DynamicFinder
 ])
 
 @Entity
-@Table(name = "SV_SPRHOLDV2")
+@Table(name = "SV_SPRHOLD")
 @DatabaseModifiesState
 class PersonRelatedHold implements Serializable {
 
