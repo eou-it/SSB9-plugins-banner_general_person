@@ -8,8 +8,6 @@ import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.service.ServiceBase
 import groovy.sql.Sql
 
-import java.sql.DatabaseMetaData
-
 // NOTE:
 // This service is only used for readonly/query operations on SPRIDEN.  Any CUD operation must be done through the
 // PersonIdentificationNameCurrentService or PersonIdentificationNameAlternateService.
@@ -106,10 +104,6 @@ class PersonIdentificationNameService extends ServiceBase {
         def sql
         def formattedName
         try {
-            DatabaseMetaData dmd = sessionFactory.getCurrentSession().connection().getMetaData()
-            String url = dmd.getURL()
-            println 'Database URL ====> '+ url
-            println 'Database UserName ====>' + dmd.getUserName()
             sql = new Sql(sessionFactory.getCurrentSession().connection())
             sql.call("{? = call f_format_name(?,?)}",
                     [Sql.VARCHAR, pidm, fmt]) { result -> formattedName = result }
@@ -117,9 +111,6 @@ class PersonIdentificationNameService extends ServiceBase {
         finally {
             sql?.close()
         }
-        println 'fromat ===> ' +fmt
-        println 'pidm ===>  ' +pidm
-        println 'formattedName ===> ' +formattedName
         return formattedName
     }
 
