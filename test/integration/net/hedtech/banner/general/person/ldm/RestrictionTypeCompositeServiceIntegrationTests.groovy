@@ -1,11 +1,7 @@
 /** *******************************************************************************
- Copyright 2014 Ellucian Company L.P. and its affiliates.
+ Copyright 2014-2015 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person.ldm
-import org.junit.Before
-import org.junit.Test
-import org.junit.After
-
 
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.overall.ldm.GlobalUniqueIdentifier
@@ -15,10 +11,12 @@ import net.hedtech.banner.general.person.ldm.v1.PersonRestrictionType
 import net.hedtech.banner.general.system.HoldType
 import net.hedtech.banner.general.system.Originator
 import net.hedtech.banner.general.system.ldm.v1.RestrictionType
+import net.hedtech.banner.restfulapi.RestfulApiValidationException
 import net.hedtech.banner.testing.BaseIntegrationTestCase
+import org.junit.Before
+import org.junit.Test
 
 import java.text.SimpleDateFormat
-
 
 class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTestCase{
 
@@ -34,8 +32,9 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
 
     Map guids = [:]
     private static final String LDM_NAME = "persons"
+    private String invalid_sort_orderErrorMessage = 'RestfulApiValidationUtility.invalidSortField'
     def restrictionTypeCompositeService
-
+    def i_success_content
 
     @Before
     public void setUp() {
@@ -70,6 +69,7 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
         newPersonRelatedHold(i_success_holdType_1)
         newPersonRelatedHold(i_success_holdType_2)
         newPersonRelatedHold(i_success_holdType_3)
+        i_success_content = [code: 'SV',description:'Test Title', metadata: [dataOrigin: 'Banner']]
     }
 
 
@@ -216,6 +216,155 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
         assertEquals i_success_holdType.dataOrigin, restrictionType.metadata.dataOrigin
     }
 
+    /**
+     * Test to check the RestrictionTypeCompositeService list method with valid sort and order field and supported version
+     * If No "Accept" header is provided, by default it takes the latest supported version
+     */
+    @Test
+    void testListWithValidSortAndOrderFieldWithSupportedVersion() {
+        def params = [order: 'ASC', sort: 'code']
+        def restrictionTypeList = restrictionTypeCompositeService.list(params)
+        assertNotNull restrictionTypeList
+        assertFalse restrictionTypeList.isEmpty()
+        assertNotNull restrictionTypeList.code
+        assertEquals HoldType.count(), restrictionTypeList.size()
+        assertNotNull i_success_holdType
+        assertTrue restrictionTypeList.id.contains(i_success_holdType.id)
+        assertTrue restrictionTypeList.code.contains( i_success_holdType.code)
+        assertTrue restrictionTypeList.description.contains(i_success_holdType.description)
+        assertTrue restrictionTypeList.dataOrigin.contains(i_success_holdType.dataOrigin)
+    }
+
+    /**
+     * Test to check the sort by code on RestrictionTypeCompositeService
+     * */
+    @Test
+    public void testSortByCode(){
+        params.order='ASC'
+        params.sort='code'
+        List list = restrictionTypeCompositeService.list(params)
+        assertNotNull list
+        def tempParam=null
+        list.each{
+            restrictionType->
+                String code=restrictionType.code
+                if(!tempParam){
+                    tempParam=code
+                }
+                assertTrue tempParam.compareTo(code)<0 || tempParam.compareTo(code)==0
+                tempParam=code
+        }
+
+        params.clear()
+        params.order='DESC'
+        params.sort='code'
+        list = restrictionTypeCompositeService.list(params)
+        assertNotNull list
+        tempParam=null
+        list.each{
+            restrictionType->
+                String code=restrictionType.code
+                if(!tempParam){
+                    tempParam=code
+                }
+                assertTrue tempParam.compareTo(code)>0 || tempParam.compareTo(code)==0
+                tempParam=code
+        }
+    }
+
+    /**
+     * Test to check the RestrictionTypeCompositeService list method with invalid sort field
+     */
+    @Test
+    void testListWithInvalidSortField() {
+        try {
+            def map = [sort: 'test']
+            restrictionTypeCompositeService.list(map)
+            fail()
+        } catch (RestfulApiValidationException e) {
+            assertEquals 400, e.getHttpStatusCode()
+            assertEquals invalid_sort_orderErrorMessage , e.messageCode.toString()
+        }
+    }
+
+    /**
+     * Test to check the RestrictionTypeCompositeService list method with invalid order field
+     */
+    @Test
+    void testListWithInvalidOrderField() {
+        shouldFail(RestfulApiValidationException) {
+            def map = [order: 'test']
+            restrictionTypeCompositeService.list(map)
+        }
+    }
+
+    /**
+     * Test to check the RestrictionTypeCompositeService create method with valid in request content
+     */
+    @Test
+    void testCreate() {
+        def restrictionType = restrictionTypeCompositeService.create(i_success_content)
+        assertNotNull restrictionType
+        assertNotNull restrictionType.guid
+        assertEquals i_success_content.code, restrictionType.code
+        assertEquals i_success_content.description, restrictionType.description
+    }
+
+    /**
+     * Test to check the RestrictionTypeCompositeService create method with exists code in request content
+     */
+    @Test
+    void testCreateExistsCode(){
+        i_success_content.code='TT'
+        try{
+            restrictionTypeCompositeService.create(i_success_content)
+        }catch (ApplicationException ae){
+            assertApplicationException ae, "code.exists.message"
+        }
+    }
+
+    /**
+     * Test to check the RestrictionTypeCompositeService update method with valid guid in request content
+     */
+    @Test
+    void testUpdate() {
+        i_success_content.put('id', holdType_guid_1)
+        def restrictionType = restrictionTypeCompositeService.update(i_success_content)
+        assertNotNull restrictionType
+        assertNotNull restrictionType.guid
+        assertEquals i_success_content.code, restrictionType.code
+        assertEquals i_success_content.description, restrictionType.description
+    }
+
+    /**
+     * Test to check the RestrictionTypeCompositeService update method with invalid guid in request content
+     */
+    @Test
+    void testUpdateNullGuid() {
+        i_success_content.put('id', null)
+        try{
+           restrictionTypeCompositeService.update(i_success_content)
+        }
+        catch (ApplicationException ae) {
+            assertApplicationException ae, "NotFoundException"
+        }
+    }
+
+
+    /**
+     * Test to check the RestrictionTypeCompositeService update method with non exists guid in request content
+     */
+    @Test
+    void testUpdateNonExistsGuid() {
+        i_success_content.put('id', 'TEST')
+        def restrictionType = restrictionTypeCompositeService.update(i_success_content)
+        assertNotNull restrictionType
+        assertNotNull restrictionType.guid
+        assertEquals i_success_content.id?.trim()?.toLowerCase(), restrictionType.guid
+        assertEquals i_success_content.code, restrictionType.code
+        assertEquals i_success_content.description, restrictionType.description
+    }
+
 
     private def newHoldType(String code) {
 
@@ -238,7 +387,6 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
         )
         holdType.save(failOnError: true, flush: true)
     }
-
 
     private def newPersonRelatedHold(def iholdType) {
 
