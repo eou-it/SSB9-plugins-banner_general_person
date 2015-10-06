@@ -4,25 +4,25 @@
 package net.hedtech.banner.general.person
 
 import grails.test.GrailsUnitTestCase
+import grails.test.mixin.TestFor
 import grails.util.Holders
 import org.junit.Test
 
-class PersonPictureServiceTests  extends GrailsUnitTestCase{
+@TestFor(PersonPictureService)
+class PersonPictureServiceTests {
 
-    def personPictureService = new PersonPictureService()
+    def personPictureService
     def testResourcePath = System.getProperty('base.dir') + File.separator + "test" + File.separator + "resources" +
             File.separator + "images" + File.separator + "resources"
 
     public void setUp() {
-        super.setUp()
-
+        personPictureService = service
         // Setup our configuration path to our test location
         Holders.config.banner.picturesPath = System.getProperty('base.dir') + File.separator + "test" + File.separator +
                 "resources" + File.separator + "images"
     }
 
     public void tearDown() {
-        super.tearDown()
     }
 
     @Test
