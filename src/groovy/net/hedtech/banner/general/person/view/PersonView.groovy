@@ -1,12 +1,13 @@
 package net.hedtech.banner.general.person.view
 
+import grails.util.Holders
+
 /*********************************************************************************
  Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 
 import javax.persistence.*
 import org.springframework.context.ApplicationContext
-import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
 import org.springframework.context.i18n.LocaleContextHolder as LCH
 import net.hedtech.banner.person.dsl.NameTemplate
 
@@ -130,7 +131,7 @@ abstract class PersonView implements Serializable {
     }
 
     public def getNameFormat() {
-        def application = AH.application
+        def application = Holders.getGrailsApplication()
         ApplicationContext applicationContext = application.mainContext
         def messageSource = applicationContext.getBean("messageSource")
         messageSource.getMessage("default.name.format", null, LCH.getLocale())

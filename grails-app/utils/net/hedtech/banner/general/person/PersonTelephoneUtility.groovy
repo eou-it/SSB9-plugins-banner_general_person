@@ -3,7 +3,7 @@
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import grails.util.Holders
 import org.springframework.context.ApplicationContext
 import org.springframework.context.i18n.LocaleContextHolder
 
@@ -37,7 +37,7 @@ class PersonTelephoneUtility {
     public static String getPhoneFormat() {
         def message = ''
         try {
-            def application = ApplicationHolder.application
+            def application = Holders.getGrailsApplication()
             ApplicationContext applicationContext = application.mainContext
             def messageSource = applicationContext.getBean("messageSource")
             messageSource.getMessage("default.personTelephone.format", null, LocaleContextHolder.getLocale())
@@ -52,7 +52,7 @@ class PersonTelephoneUtility {
     public static String getInternationalPhoneFormat() {
         def message = ''
         try {
-            def application = ApplicationHolder.application
+            def application = Holders.getGrailsApplication()
             ApplicationContext applicationContext = application.mainContext
             def messageSource = applicationContext.getBean("messageSource")
             messageSource.getMessage("default.personTelephone.international.format", null, LocaleContextHolder.getLocale())

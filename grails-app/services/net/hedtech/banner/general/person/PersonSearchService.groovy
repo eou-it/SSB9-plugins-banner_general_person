@@ -8,7 +8,7 @@ import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.person.view.*
 import net.hedtech.banner.general.system.SdaCrosswalkConversion
 import net.hedtech.banner.security.FormContext
-import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
+import grails.util.Holders
 import org.springframework.context.ApplicationContext
 import org.springframework.context.i18n.LocaleContextHolder as LCH
 import org.springframework.security.core.context.SecurityContextHolder
@@ -324,7 +324,7 @@ class PersonSearchService {
 
     private String getNameFormat() {
         if (!_nameFormat) {
-            def application = AH.application
+            def application = Holders.getGrailsApplication()
             ApplicationContext applicationContext = application.mainContext
             def messageSource = applicationContext.getBean("messageSource")
             messageSource.getMessage("default.name.format", null, LCH.getLocale())
