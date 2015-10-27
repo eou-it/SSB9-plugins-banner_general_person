@@ -40,7 +40,8 @@ class PersonRelatedHoldService extends ServiceBase {
     private validateHoldForUpdate(PersonRelatedHold hold) {
         log.debug "Compare hold.createdBy: " + hold.createdBy + " to SecurityContextHolder.context?.authentication?.principal: " +
                 SecurityContextHolder.context?.authentication?.principal
-        if (!(hold.createdBy == SecurityContextHolder.context?.authentication?.principal?.username)) {
+        if (!(hold.createdBy == SecurityContextHolder.context?.authentication?.principal?.username ||
+                hold.createdBy == SecurityContextHolder.context?.authentication?.principal?.oracleUserName)) {
             if (findDirty(hold, 'holdType'))
                 throw new ApplicationException(PersonRelatedHold, "@@r1:holdCodeUpdateNotAllowed@@")
             if (findDirty(hold, 'releaseIndicator'))
