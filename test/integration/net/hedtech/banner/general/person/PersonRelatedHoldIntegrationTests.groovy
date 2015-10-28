@@ -66,6 +66,7 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
         personRelatedHold.amountOwed = 0
         personRelatedHold.lastModified = testDate
         personRelatedHold.lastModifiedBy = "test"
+        personRelatedHold.createdBy = "test"
         personRelatedHold.dataOrigin = "Banner"
         save personRelatedHold
 
@@ -104,6 +105,7 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
         personRelatedHold.amountOwed = 0
         personRelatedHold.lastModified = new Date()
         personRelatedHold.lastModifiedBy = "test"
+        personRelatedHold.createdBy = "test"
         personRelatedHold.dataOrigin = "Banner"
         shouldFail(HibernateOptimisticLockingFailureException) {
             personRelatedHold.save(flush: true)
@@ -325,6 +327,7 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
                 originator: ioriginator,
                 lastModified: new Date(),
                 lastModifiedBy: "test",
+                createdBy: "test",
                 dataOrigin: "Banner"
         )
         return personRelatedHold

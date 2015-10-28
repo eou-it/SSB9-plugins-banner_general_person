@@ -1,5 +1,5 @@
 /*********************************************************************************
- Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2015 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
@@ -93,11 +93,17 @@ class PersonRelatedHold implements Serializable {
     HoldType holdType
 
     /**
+     * This field identifies the person who created the hold. It might be an Oracle ID
+     */
+    @Column(name = "SPRHOLD_USER")
+    String createdBy
+
+    /**
      * This field identifies the system user signon id initiating hold.
      * **lastModifiedBy User is always set back to the original user by API
      */
 
-    @Column(name = "SPRHOLD_USER")
+    @Column(name = "SPRHOLD_USER_ID")
     String lastModifiedBy
 
     /**
@@ -179,6 +185,7 @@ class PersonRelatedHold implements Serializable {
 					reason=$reason,
 					amountOwed=$amountOwed,
 					originator=$originator,
+                    createdBy=$createdBy,
 					lastModified=$lastModified,
 					lastModifiedBy=$lastModifiedBy,
 					dataOrigin=$dataOrigin]"""
