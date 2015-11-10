@@ -5,11 +5,10 @@ package net.hedtech.banner.general.person
 
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.service.ServiceBase
-import org.apache.log4j.Logger
 import org.springframework.security.core.context.SecurityContextHolder
 
 class PersonRelatedHoldService extends ServiceBase {
-    def log = Logger.getLogger( this.getClass() )
+
     boolean transactional = true
 
     def sessionFactory
@@ -38,10 +37,8 @@ class PersonRelatedHoldService extends ServiceBase {
      */
     //Check view
     private validateHoldForUpdate(PersonRelatedHold hold) {
-        log.debug "Compare hold.createdBy: " + hold.createdBy + " to SecurityContextHolder.context?.authentication?.principal: " +
-                SecurityContextHolder.context?.authentication?.principal
-        if (!(hold.createdBy == SecurityContextHolder.context?.authentication?.principal?.username ||
-                hold.createdBy == SecurityContextHolder.context?.authentication?.principal?.oracleUserName)) {
+
+        if (!(hold.lastModifiedBy == SecurityContextHolder.context?.authentication?.principal?.username)) {
             if (findDirty(hold, 'holdType'))
                 throw new ApplicationException(PersonRelatedHold, "@@r1:holdCodeUpdateNotAllowed@@")
             if (findDirty(hold, 'releaseIndicator'))
@@ -68,7 +65,7 @@ class PersonRelatedHoldService extends ServiceBase {
      * @return
      */
     private validateHoldForDelete(PersonRelatedHold hold) {
-        if (!(hold.createdBy == SecurityContextHolder.context?.authentication?.principal?.username)) {
+        if (!(hold.lastModifiedBy == SecurityContextHolder.context?.authentication?.principal?.username)) {
             if (hold.releaseIndicator) {
                 throw new ApplicationException(PersonRelatedHold, "@@r1:deleteNotAllowedByAnotherUser@@")
             }
