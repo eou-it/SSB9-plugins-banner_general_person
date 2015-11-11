@@ -50,7 +50,7 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
         personRelatedHold.reason = "YYYY"
         personRelatedHold = personRelatedHoldService.update([domainModel: personRelatedHold])
         assertEquals "Reason not as expected", "YYYY", personRelatedHold.reason
-        //println(' the version before is ' + personRelatedHold.version)
+        println(' the version before is ' + personRelatedHold.version)
         assertEquals "grails_user", personRelatedHold.lastModifiedBy
 
         def sql

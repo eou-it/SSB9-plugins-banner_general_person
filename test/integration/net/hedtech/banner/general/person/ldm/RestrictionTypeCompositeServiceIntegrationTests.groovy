@@ -234,6 +234,7 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
                 complianceHoldIndicator: true,
                 lastModified: new Date(),
                 lastModifiedBy: "test",
+                createdBy: "test",
                 dataOrigin: "Banner"
         )
         holdType.save(failOnError: true, flush: true)
@@ -259,6 +260,7 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
                 originator: ioriginator,
                 lastModified: new Date(),
                 lastModifiedBy: "test",
+                createdBy: "test",
                 dataOrigin: "Banner"
         )
         personRelatedHold.save(failOnError: true, flush: true)
