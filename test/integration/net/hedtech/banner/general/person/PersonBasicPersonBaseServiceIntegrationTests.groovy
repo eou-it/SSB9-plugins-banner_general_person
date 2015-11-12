@@ -5,6 +5,8 @@ Copyright 2012 Ellucian Company L.P. and its affiliates.
  Copyright 2013 Ellucian Company L.P. and its affiliates.
  ****************************************************************************** */
 package net.hedtech.banner.general.person
+
+import org.codehaus.groovy.runtime.InvokerHelper
 import org.junit.Before
 import org.junit.Test
 import org.junit.After
@@ -337,8 +339,8 @@ class PersonBasicPersonBaseServiceIntegrationTests extends BaseIntegrationTestCa
         personBasicPersonBase.confirmedRe = u_success_confirmedRe
         personBasicPersonBase.confirmedReDate = u_success_confirmedReDate
         personBasicPersonBase.armedServiceMedalVetIndicator = u_success_armedServiceMedalVetIndicator
-
         map.domainModel = personBasicPersonBase
+
         personBasicPersonBase = personBasicPersonBaseService.update(map)
 
         // test the values

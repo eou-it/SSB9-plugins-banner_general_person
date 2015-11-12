@@ -3,9 +3,9 @@
  ********************************************************************************* */
 package net.hedtech.banner.general.person.view
 
+import grails.util.Holders
 import net.hedtech.banner.general.person.PersonUtility
 import net.hedtech.banner.person.dsl.NameTemplate
-import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.springframework.context.ApplicationContext
 import org.springframework.context.i18n.LocaleContextHolder
 
@@ -221,7 +221,7 @@ class ExtendedWindowSsnIdSearchView {
     }
 
     public def getNameFormat() {
-        def application = ApplicationHolder.application
+        def application = Holders.getGrailsApplication()
         ApplicationContext applicationContext = application.mainContext
         def messageSource = applicationContext.getBean("messageSource")
         messageSource.getMessage("default.name.format", null, LocaleContextHolder.getLocale())

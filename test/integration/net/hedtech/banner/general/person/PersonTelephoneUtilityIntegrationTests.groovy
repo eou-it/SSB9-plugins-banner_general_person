@@ -3,6 +3,8 @@
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
+
+import grails.util.Holders
 import org.junit.Before
 import org.junit.Test
 import org.junit.After
@@ -10,7 +12,7 @@ import org.junit.After
 import net.hedtech.banner.general.system.TelephoneType
 import net.hedtech.banner.person.dsl.NameTemplate
 import net.hedtech.banner.testing.BaseIntegrationTestCase
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+
 import org.junit.Ignore
 import org.springframework.context.ApplicationContext
 import org.springframework.context.i18n.LocaleContextHolder
@@ -64,7 +66,7 @@ class PersonTelephoneUtilityIntegrationTests extends BaseIntegrationTestCase {
         assertNotNull personTelephone.id
 
         //get the phone format from General Person Plugin messages.properties
-        def application = ApplicationHolder.application
+        def application = Holders.getGrailsApplication()
         ApplicationContext applicationContext = application.mainContext
         def messageSource = applicationContext.getBean("messageSource")
         def phoneFormat = messageSource.getMessage("default.personTelephone.format", null, LocaleContextHolder.getLocale())
@@ -93,7 +95,7 @@ class PersonTelephoneUtilityIntegrationTests extends BaseIntegrationTestCase {
         assertNotNull personTelephone.id
 
         //get the phone format from General Person Plugin messages.properties
-        def application = ApplicationHolder.application
+        def application = Holders.getGrailsApplication()
         ApplicationContext applicationContext = application.mainContext
         def messageSource = applicationContext.getBean("messageSource")
         def phoneFormat = messageSource.getMessage("default.personTelephone.international.format", null, LocaleContextHolder.getLocale())
@@ -121,7 +123,7 @@ class PersonTelephoneUtilityIntegrationTests extends BaseIntegrationTestCase {
         assertNotNull personTelephone.id
 
         //get the phone format from General Person Plugin messages.properties
-        def application = ApplicationHolder.application
+        def application = Holders.getGrailsApplication()
         ApplicationContext applicationContext = application.mainContext
         def messageSource = applicationContext.getBean("messageSource")
         def phoneFormat = messageSource.getMessage("default.personTelephone.international.format", null, LocaleContextHolder.getLocale())
