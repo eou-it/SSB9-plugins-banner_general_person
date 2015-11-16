@@ -15,7 +15,6 @@ import javax.persistence.*
  * Represents a person's email address
  */
 @Entity
-@Cacheable
 @Table(name = "GV_GOREMAL")
 @NamedQueries(value = [
 @NamedQuery(name = "PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator",
@@ -72,10 +71,6 @@ query = """FROM PersonEmail a
     and a.statusIndicator = 'A' """)
 ])
 class PersonEmail implements Serializable {
-
-    static mapping = {
-        cache true
-    }
 
     static def log = Logger.getLogger('net.hedtech.banner.general.person.PersonEmail')
 
@@ -261,7 +256,7 @@ class PersonEmail implements Serializable {
                                                                               String displayWebIndicator, String preferredIndicator) {
 
         def email = PersonEmail.withSession { session ->
-            session.getNamedQuery('PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator').setCacheable(true).setInteger('pidm', pidm).setString('statusIndicator', statusIndicator).setString('displayWebIndicator', displayWebIndicator).setString('preferredIndicator', preferredIndicator).list()
+            session.getNamedQuery('PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator').setInteger('pidm', pidm).setString('statusIndicator', statusIndicator).setString('displayWebIndicator', displayWebIndicator).setString('preferredIndicator', preferredIndicator).list()
         }
         log.debug "Executing fetchByPidmAndStatusAndWebDisplayAndPreferredIndiator  with pidm = ${pidm} and status = ${statusIndicator} and displayWebIndicator = ${displayWebIndicator} and preferredIndicator = {$preferredIndicator}"
         log.debug "Fetched number of emails ${email.size()}"
@@ -272,7 +267,7 @@ class PersonEmail implements Serializable {
     public static List fetchByPidmAndStatus(Integer pidm, String statusIndicator) {
 
         def email = PersonEmail.withSession { session ->
-            session.getNamedQuery('PersonEmail.fetchByPidmAndStatus').setCacheable(true).setInteger('pidm', pidm).setString('statusIndicator', statusIndicator).list()
+            session.getNamedQuery('PersonEmail.fetchByPidmAndStatus').setInteger('pidm', pidm).setString('statusIndicator', statusIndicator).list()
         }
         log.debug "Executing fetchByPidmAndStatus  with pidm = ${pidm} and status = ${statusIndicator}  "
         log.debug "Fetched number of emails ${email.size()}"
@@ -284,7 +279,7 @@ class PersonEmail implements Serializable {
                                                                               String displayWebIndicator, String preferredIndicator) {
 
         def email = PersonEmail.withSession { session ->
-            session.getNamedQuery('PersonEmail.fetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicator').setCacheable(true).setInteger('pidm', pidm).setString('statusIndicator', statusIndicator).setString('displayWebIndicator', displayWebIndicator).setString('preferredIndicator', preferredIndicator).list()[0]
+            session.getNamedQuery('PersonEmail.fetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicator').setInteger('pidm', pidm).setString('statusIndicator', statusIndicator).setString('displayWebIndicator', displayWebIndicator).setString('preferredIndicator', preferredIndicator).list()[0]
         }
         log.debug "Executing fetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndiator  with pidm = ${pidm} and status = ${statusIndicator} and displayWebIndicator = ${displayWebIndicator} and preferredIndicator = {$preferredIndicator}"
         log.debug "Fetched number of emails ${email} }"
@@ -296,7 +291,7 @@ class PersonEmail implements Serializable {
                                                                                           String displayWebIndicator, String preferredIndicator) {
 
         def email = PersonEmail.withSession {session ->
-            session.getNamedQuery('PersonEmail.fetchByPidmAndEmailTypeAndStatusAndWebDisplayAndPreferredIndicator').setCacheable(true).setInteger('pidm', pidm).setString('emailType',emailType).setString('statusIndicator', statusIndicator).setString('displayWebIndicator', displayWebIndicator).setString('preferredIndicator', preferredIndicator).list()
+            session.getNamedQuery('PersonEmail.fetchByPidmAndEmailTypeAndStatusAndWebDisplayAndPreferredIndicator').setInteger('pidm', pidm).setString('emailType',emailType).setString('statusIndicator', statusIndicator).setString('displayWebIndicator', displayWebIndicator).setString('preferredIndicator', preferredIndicator).list()
         }
         log.debug "Executing fetchByPidmAndEmailTypeAndStatusAndWebDisplayAndPreferredIndicator  with pidm = ${pidm} and status = ${statusIndicator} and displayWebIndicator = ${displayWebIndicator} and preferredIndicator = {$preferredIndicator}"
         log.debug "Fetched number of emails ${email.size()}"
@@ -306,7 +301,7 @@ class PersonEmail implements Serializable {
 
     public static List fetchListByPidmAndStatusAndWebDisplay(List pidm, String statusIndicator, String displayWebIndicator) {
         def emails = PersonEmail.withSession { session ->
-            session.getNamedQuery('PersonEmail.fetchListByPidmAndStatusAndWebDisplay').setCacheable(true).setParameterList('pidm', pidm).setString('statusIndicator', statusIndicator).setString('displayWebIndicator', displayWebIndicator).list()
+            session.getNamedQuery('PersonEmail.fetchListByPidmAndStatusAndWebDisplay').setParameterList('pidm', pidm).setString('statusIndicator', statusIndicator).setString('displayWebIndicator', displayWebIndicator).list()
         }
 
         log.debug "Executing fetchListByPidmAndStatusAndWebDisplay  with pidms = ${pidm} and status = ${statusIndicator} and displayWebIndicator = ${displayWebIndicator}"
@@ -317,7 +312,7 @@ class PersonEmail implements Serializable {
 
     public static List fetchListByPidmAndStatus(List pidm, String statusIndicator) {
         def emails = PersonEmail.withSession { session ->
-            session.getNamedQuery('PersonEmail.fetchListByPidmAndStatus').setCacheable(true).setParameterList('pidm', pidm).setString('statusIndicator', statusIndicator).list()
+            session.getNamedQuery('PersonEmail.fetchListByPidmAndStatus').setParameterList('pidm', pidm).setString('statusIndicator', statusIndicator).list()
         }
 
         log.debug "Executing fetchListByPidmAndStatus  with pidms = ${pidm} and status = ${statusIndicator}"
@@ -328,7 +323,7 @@ class PersonEmail implements Serializable {
 
     public static PersonEmail fetchByEmailAddressAndActiveStatus(String address) {
         PersonEmail personEmail = PersonEmail.withSession { session ->
-            session.getNamedQuery( 'PersonEmail.fetchByEmailAddressAndActiveStatus' ).setCacheable(true).setString( 'emailAddress',
+            session.getNamedQuery( 'PersonEmail.fetchByEmailAddressAndActiveStatus' ).setString( 'emailAddress',
                     address ).setString( 'statusIndicator', 'A' ).list()[0]
         }
         return personEmail
@@ -339,7 +334,7 @@ class PersonEmail implements Serializable {
                                                          String displayWebIndicator) {
 
         def emails = PersonEmail.withSession { session ->
-            session.getNamedQuery('PersonEmail.fetchByPidmAndStatusAndWebDisplay').setCacheable(true).setInteger('pidm', pidm).setString('statusIndicator', statusIndicator).setString('displayWebIndicator', displayWebIndicator).list()
+            session.getNamedQuery('PersonEmail.fetchByPidmAndStatusAndWebDisplay').setInteger('pidm', pidm).setString('statusIndicator', statusIndicator).setString('displayWebIndicator', displayWebIndicator).list()
         }
         log.debug "Executing fetchByPidmAndStatusAndWebDisplayAndPreferredIndiator  with pidm = ${pidm} and status = ${statusIndicator} and displayWebIndicator = ${displayWebIndicator}"
         log.debug "Fetched number of emails ${emails.size()}"
@@ -349,7 +344,7 @@ class PersonEmail implements Serializable {
 
     public static List fetchListByPidmAndEmailTypes(Integer pidm, def emailTypes) {
         def emails = PersonEmail.withSession { session ->
-            session.getNamedQuery('PersonEmail.fetchListByPidmAndEmailTypes').setCacheable(true).setInteger('pidm', pidm).setParameterList('emailTypes', emailTypes).list()
+            session.getNamedQuery('PersonEmail.fetchListByPidmAndEmailTypes').setInteger('pidm', pidm).setParameterList('emailTypes', emailTypes).list()
         }
 
         return emails
