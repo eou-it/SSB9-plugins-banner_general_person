@@ -3,6 +3,7 @@
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
+import grails.util.Holders
 import groovy.sql.Sql
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.person.view.*
@@ -17,9 +18,9 @@ class PersonSearchService {
 
     static transactional = false
     def sessionFactory
-
+    def config = Holders.getConfig()
     def institutionalDescriptionService
-
+    def extendedLikesSearch = config.extendedLikesSearch || true
     private _nameFormat
     public static final String AUTO_COMPLETE_GROUP_NAME = 'IDNAMESEARCH'
     public static final String AUTO_COMPLETE_ID_CODE = 'ID_AUTO'
@@ -49,14 +50,13 @@ class PersonSearchService {
         def search = Arrays.asList(searchFilter?.replaceAll('[^a-zA-Z0-9%\\s]+', '').toUpperCase().split()).join("|")
         Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
         def name1, name2, name3
-        (name1, name2, name3) = formatNameSearchFilterData(searchFilter)
-
         try {
-            setFilterData(sql, name1, name2, name3)
-            list = ExtendedWindowNameSearchView.findAll().each {
-                it -> it.formattedName = net.hedtech.banner.general.person.PersonUtility.formatName(it)
-            }
-            return list
+                (name1, name2, name3) = formatNameSearchFilterData(searchFilter)
+                setFilterData(sql, name1, name2, name3)
+                list = ExtendedWindowNameSearchView.findAll().each {
+                    it -> it.formattedName = net.hedtech.banner.general.person.PersonUtility.formatName(it)
+                }
+        return list
 
         } finally {
             sql?.close()
@@ -65,22 +65,21 @@ class PersonSearchService {
 
     private List formatNameSearchFilterData(searchFilter) {
         def name1, name3, name2
+        //sets the search filter per search request
+        if(searchFilter.count('%') && !extendedLikesSearch){
+            searchFilter = searchFilter.replaceAll("%","");
+        }
         (name1, name2, name3) = Arrays.asList(searchFilter?.replaceAll('[^a-zA-Z0-9%\\s]+', '').toUpperCase().split())
         name1 = setSearchName(name1)
         name2 = setSearchName(name2)
         name3 = setSearchName(name3)
+
         [name1, name2, name3]
     }
 
     private String setSearchName(name) {
         if (!name || name.count("%") == name.size()) {
             name = "%"
-        }
-        else if (name.size() == 1 && name.count("%") == 0) {
-            name = name + "%"
-        }
-        else {
-            name = "%" + name + "%"
         }
         name
     }
@@ -113,7 +112,6 @@ class PersonSearchService {
         sql.call("{call soknsut.p_set_name2(${name2})}")
         sql.call("{call soknsut.p_set_name3(${name3})}")
     }
-
     def setPageSizeForFetch(pageSize) {
         Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
         sql.call("{call soknsut.p_set_page_size(${pageSize})}")
@@ -127,8 +125,10 @@ class PersonSearchService {
         Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
         searchFilter = addEscapeCharacter(searchFilter)
         try {
-            searchFilter = "%" + searchFilter + "%"
             //sets the search filter per search request
+            if(searchFilter.count('%') && !extendedLikesSearch){
+                searchFilter = searchFilter.replaceAll("%","");
+            }
             sql.call("{call soknsut.p_set_search_filter(${searchFilter})}")
             if (ssnSearchEnabledIndicator) {
                 def userName = SecurityContextHolder.context?.authentication?.principal?.username?.toUpperCase()
@@ -158,6 +158,8 @@ class PersonSearchService {
     private String addEscapeCharacter(String searchFilter) {
         searchFilter.replaceAll('[-.\'\"_$:,;*#@\\/]', {'\\' + it})
     }
+
+
 
 
     private List extendedSearchComponent(ssn, filterData, pagingAndSortParams) {
@@ -191,8 +193,10 @@ class PersonSearchService {
         Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
         searchFilter = addEscapeCharacter(searchFilter)
         try {
-            searchFilter = "%" + searchFilter + "%"
             //sets the search filter per search request
+            if(searchFilter.count('%') && !extendedLikesSearch){
+                searchFilter = searchFilter.replaceAll("%","");
+            }
             sql.call("{call soknsut.p_set_search_filter(${searchFilter})}")
             if (ssnSearchEnabledIndicator) {
                 def userName = SecurityContextHolder.context?.authentication?.principal?.username?.toUpperCase()
