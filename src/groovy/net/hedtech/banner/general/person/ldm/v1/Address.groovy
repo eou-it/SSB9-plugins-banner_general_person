@@ -40,13 +40,8 @@ class Address {
     }
 
     def getState() {
-        IntegrationConfiguration regionRule = IntegrationConfiguration.findByProcessCodeAndSettingNameAndValue(PROCESS_CODE, PERSON_REGION, this.address?.state?.code)
-        if (regionRule && regionRule.value == this.address?.state?.code) {
-            return null
-        } else {
             this.address?.state?.code
         }
-    }
 
     def getZip() {
         IntegrationConfiguration postalCodeRule = IntegrationConfiguration.findByProcessCodeAndSettingNameAndValue(PROCESS_CODE, PERSON_POSTAL_CODE, this.address?.zip)
