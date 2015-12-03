@@ -19,7 +19,9 @@ class PersonSearchService {
     static transactional = false
     def sessionFactory
     def config = Holders.getConfig()
-    def extendedLikesSearch = (config.extendedLikesSearch != null) ? config.extendedLikesSearch : true
+    def extendedLikesSearch =
+          (config.extendedLikesSearch in [true, false]?config.extendedLikesSearch:true)
+
     def institutionalDescriptionService
     private _nameFormat
     public static final String AUTO_COMPLETE_GROUP_NAME = 'IDNAMESEARCH'
