@@ -52,8 +52,8 @@ class PersonSearchService {
         def search = Arrays.asList(searchFilter?.replaceAll('[^a-zA-Z0-9%\\s]+', '').toUpperCase().split()).join("|")
         Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
         def name1, name2, name3
+        (name1, name2, name3) = formatNameSearchFilterData(searchFilter)
         try {
-                (name1, name2, name3) = formatNameSearchFilterData(searchFilter)
                 setFilterData(sql, name1, name2, name3)
                 list = ExtendedWindowNameSearchView.findAll().each {
                     it -> it.formattedName = net.hedtech.banner.general.person.PersonUtility.formatName(it)
