@@ -12,7 +12,8 @@ import net.hedtech.banner.general.person.PersonAddress
  */
 class Address {
 
-    @Delegate private final PersonAddress address
+    @Delegate
+    private final PersonAddress address
     String guid
     String addressType
     def country
@@ -20,7 +21,7 @@ class Address {
     static final String PERSON_REGION = "PERSON.ADDRESSES.REGION"
     static final String PERSON_POSTAL_CODE = "PERSON.ADDRESSES.POSTAL.CODE"
 
-    def Address( PersonAddress address ) {
+    def Address(PersonAddress address) {
         this.address = address
         this.addressType = null
         this.country = address.nation
@@ -31,6 +32,7 @@ class Address {
         this.address?.county?.description
     }
 
+
     def getAddressType() {
         this.addressType
     }
@@ -40,16 +42,11 @@ class Address {
     }
 
     def getState() {
-            this.address?.state?.code
-        }
+        this.address?.state?.code
+    }
 
     def getZip() {
-        IntegrationConfiguration postalCodeRule = IntegrationConfiguration.findByProcessCodeAndSettingNameAndValue(PROCESS_CODE, PERSON_POSTAL_CODE, this.address?.zip)
-        if (postalCodeRule && postalCodeRule.value == this.address?.zip) {
-            return null
-        } else {
-            this.address?.zip
-        }
+        this.address?.zip
     }
 
 }
