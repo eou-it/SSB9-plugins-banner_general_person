@@ -3,11 +3,12 @@
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
+import grails.util.Holders
 import groovy.sql.Sql
 import net.hedtech.banner.service.ServiceBase
-import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.codehaus.groovy.grails.web.context.ServletContextHolder as SCH
+import grails.util.Holders as SCH
 import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes as GA
+import org.codehaus.groovy.runtime.InvokerHelper
 import org.springframework.context.ApplicationContext
 import org.springframework.context.i18n.LocaleContextHolder
 
@@ -116,7 +117,7 @@ class PersonUtility {
     public static String getNameFormat() {
         def message = ''
         try {
-            def application = ApplicationHolder.application
+            def application = Holders.getGrailsApplication()
             ApplicationContext applicationContext = application.mainContext
             def messageSource = applicationContext.getBean("messageSource")
             messageSource.getMessage("default.name.format", null, LocaleContextHolder.getLocale())
@@ -131,8 +132,9 @@ class PersonUtility {
     public static def boolean isDirtyProperty(domainClass, domainObject, String property) {
         def content = ServiceBase.extractParams(domainClass, domainObject)
         def oldDomainObject = domainClass.get(content?.id)
-        oldDomainObject.properties = content
-
+        use(InvokerHelper) {
+            oldDomainObject.setProperties(content)
+        }
         return (property in oldDomainObject.dirtyPropertyNames)
     }
 

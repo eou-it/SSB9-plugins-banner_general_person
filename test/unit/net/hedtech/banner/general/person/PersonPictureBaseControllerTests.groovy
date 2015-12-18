@@ -1,12 +1,12 @@
 /*******************************************************************************
- Copyright 2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2015 Ellucian Company L.P. and its affiliates.
  ****************************************************************************** */
 package net.hedtech.banner.general.person
 
 import grails.test.mixin.TestFor
 import grails.util.Holders
 import org.codehaus.groovy.grails.support.MockApplicationContext
-import org.codehaus.groovy.grails.web.context.ServletContextHolder
+import grails.util.Holders
 import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes
 import org.springframework.mock.web.MockServletContext
 /**
@@ -60,7 +60,7 @@ class PersonPictureBaseControllerTests {
         mockServletContext.setAttribute(GrailsApplicationAttributes.APPLICATION_CONTEXT, applicationContext)
 
         applicationContext.registerMockResource("images", "doesnotmatter")
-        ServletContextHolder.servletContext = mockServletContext
+        Holders?.servletContext = mockServletContext
 
         controller.params.bannerId = "NOTME"
         controller.picture()
@@ -87,7 +87,7 @@ class PersonPictureBaseControllerTests {
         mockServletContext.setAttribute(GrailsApplicationAttributes.APPLICATION_CONTEXT, applicationContext)
 
         applicationContext.registerMockResource("images", "doesnotmatter")
-        ServletContextHolder.servletContext = mockServletContext
+        Holders?.servletContext = mockServletContext
 
         controller.params.bannerId = "NOTME"
         controller.picture()
@@ -110,7 +110,7 @@ class PersonPictureBaseControllerTests {
         mockServletContext.setAttribute(GrailsApplicationAttributes.APPLICATION_CONTEXT, applicationContext)
 
         applicationContext.registerMockResource("images", "doesnotmatter")
-        ServletContextHolder.servletContext = mockServletContext
+        Holders?.servletContext = mockServletContext
 
         controller.params.bannerId = "NOTME"
         controller.picture()

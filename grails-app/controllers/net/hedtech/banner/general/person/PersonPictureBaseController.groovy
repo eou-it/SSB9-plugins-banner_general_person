@@ -1,10 +1,9 @@
 /*******************************************************************************
- Copyright 2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2015 Ellucian Company L.P. and its affiliates.
  ****************************************************************************** */
 package net.hedtech.banner.general.person
 
 import grails.util.Holders
-import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes
 import org.springframework.context.ApplicationContext
 
@@ -107,6 +106,6 @@ class PersonPictureBaseController {
 
 
     private ApplicationContext getApplicationContext() {
-        return (ApplicationContext) ServletContextHolder.getServletContext().getAttribute(GrailsApplicationAttributes.APPLICATION_CONTEXT)
+        return (ApplicationContext) Holders?.getServletContext().getAttribute(GrailsApplicationAttributes.APPLICATION_CONTEXT)
     }
 }
