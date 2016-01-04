@@ -3,6 +3,7 @@
  ********************************************************************************* */
 package net.hedtech.banner.general.person.view
 
+import net.hedtech.banner.general.person.PersonAddress
 import net.hedtech.banner.general.person.PersonUtility
 import net.hedtech.banner.query.DynamicFinder
 import net.hedtech.banner.query.QueryBuilder
@@ -186,7 +187,7 @@ class PersonAdvancedSearchView extends PersonView {
             }
             if (!addressfilterData.isEmpty()) {
                 def addressQuery = QueryBuilder.buildQuery("""select distinct addr.pidm from PersonAddress addr
-                                   """, "addr", addressfilterData, [:])
+                                   """, "addr", addressfilterData, [:], PersonAddress)
                 query += """ and data.pidm in (${addressQuery})"""
                 filterData.criteria = criteriaWithOutAddr
             }
