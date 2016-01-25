@@ -108,7 +108,7 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
         }
 
         //current loggedin user is grails_user, can updated Release indicator and Hold Type.
-        loginIfNecessary()
+        loginIfNecessary("grails_user","u_pick_it")
         personRelatedHold.discard()
         personRelatedHold = PersonRelatedHold.findById(personRelatedHold.id)
         assertEquals "grails_user", personRelatedHold.createdBy
