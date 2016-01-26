@@ -108,6 +108,7 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
         }
 
         //current loggedin user is grails_user, can updated Release indicator and Hold Type.
+
         logout()
         login("grails_user","u_pick_it")
         personRelatedHold.discard()
