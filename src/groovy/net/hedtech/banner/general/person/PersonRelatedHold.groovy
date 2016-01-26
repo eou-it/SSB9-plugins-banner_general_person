@@ -1,5 +1,5 @@
 /*********************************************************************************
- Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2015 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
@@ -14,36 +14,36 @@ import net.hedtech.banner.query.DynamicFinder
  * Person Related Holds model.
  */
 @NamedQueries(value = [
-@NamedQuery(name = "PersonRelatedHold.fetchByPidm",
-query = """FROM PersonRelatedHold a
-	  	   WHERE a.pidm = :pidm
-	  	ORDER BY a.fromDate desc, a.toDate desc """),
-@NamedQuery(name = "PersonRelatedHold.fetchByPidmAndDateBetween",
-query = """FROM PersonRelatedHold a
-	  	   WHERE a.pidm = :pidm
-	  	     AND TRUNC(:compareDate) BETWEEN TRUNC(a.fromDate) AND TRUNC(a.toDate)
-	  	ORDER BY a.fromDate desc, a.toDate desc """),
-@NamedQuery(name = "PersonRelatedHold.fetchByPidmDateAndHoldType",
-query = """FROM  PersonRelatedHold a
-	  	   WHERE a.pidm = :pidm
-	  	     AND a.holdType.code = :holdType
-	  	     AND ( TRUNC(:compareDate) >= TRUNC(a.fromDate)
-	  	           AND TRUNC(:compareDate) < TRUNC(a.toDate) )
-	  	ORDER BY a.fromDate desc, a.toDate desc """),
-@NamedQuery(name = "PersonRelatedHold.fetchByPidmAndDateCompare",
-query = """FROM  PersonRelatedHold a
-	  	   WHERE a.pidm = :pidm
-	  	     AND ( TRUNC(:compareDate) >= TRUNC(a.fromDate)
-	  	           AND TRUNC(:compareDate) < TRUNC(a.toDate) )
-	  	ORDER BY a.fromDate desc, a.toDate desc """),
-@NamedQuery(name = "PersonRelatedHold.fetchByPidmListAndDateCompare",
-query = """FROM  PersonRelatedHold a
-	  	   WHERE a.pidm IN :pidm
-	  	     AND ( TRUNC(:compareDate) >= TRUNC(a.fromDate)
-	  	           AND TRUNC(:compareDate) < TRUNC(a.toDate) )
-	  	ORDER BY a.fromDate desc, a.toDate desc """),
-@NamedQuery(name = "PersonRelatedHold.fetchAllDistinctHoldTypeByPidmAndDateCompare",
-query = """SELECT a.holdType.code
+        @NamedQuery(name = "PersonRelatedHold.fetchByPidm",
+                query = """FROM PersonRelatedHold a
+             WHERE a.pidm = :pidm
+          ORDER BY a.fromDate desc, a.toDate desc """),
+        @NamedQuery(name = "PersonRelatedHold.fetchByPidmAndDateBetween",
+                query = """FROM PersonRelatedHold a
+             WHERE a.pidm = :pidm
+               AND TRUNC(:compareDate) BETWEEN TRUNC(a.fromDate) AND TRUNC(a.toDate)
+          ORDER BY a.fromDate desc, a.toDate desc """),
+        @NamedQuery(name = "PersonRelatedHold.fetchByPidmDateAndHoldType",
+                query = """FROM  PersonRelatedHold a
+             WHERE a.pidm = :pidm
+               AND a.holdType.code = :holdType
+               AND ( TRUNC(:compareDate) >= TRUNC(a.fromDate)
+                     AND TRUNC(:compareDate) < TRUNC(a.toDate) )
+          ORDER BY a.fromDate desc, a.toDate desc """),
+        @NamedQuery(name = "PersonRelatedHold.fetchByPidmAndDateCompare",
+                query = """FROM  PersonRelatedHold a
+             WHERE a.pidm = :pidm
+               AND ( TRUNC(:compareDate) >= TRUNC(a.fromDate)
+                     AND TRUNC(:compareDate) < TRUNC(a.toDate) )
+          ORDER BY a.fromDate desc, a.toDate desc """),
+        @NamedQuery(name = "PersonRelatedHold.fetchByPidmListAndDateCompare",
+                query = """FROM  PersonRelatedHold a
+             WHERE a.pidm IN :pidm
+               AND ( TRUNC(:compareDate) >= TRUNC(a.fromDate)
+                     AND TRUNC(:compareDate) < TRUNC(a.toDate) )
+          ORDER BY a.fromDate desc, a.toDate desc """),
+        @NamedQuery(name = "PersonRelatedHold.fetchAllDistinctHoldTypeByPidmAndDateCompare",
+                query = """SELECT a.holdType.code
             FROM PersonRelatedHold a
             WHERE a.pidm = :pidm
             AND ( TRUNC(:compareDate) >= TRUNC(a.fromDate)
@@ -60,6 +60,7 @@ class PersonRelatedHold implements Serializable {
     /**
      * Surrogate ID for SPRHOLD
      */
+
     @Id
     @Column(name = "SPRHOLD_SURROGATE_ID")
     @SequenceGenerator(name = "SPRHOLD_SEQ_GEN", allocationSize = 1, sequenceName = "SPRHOLD_SURROGATE_ID_SEQUENCE")
@@ -69,6 +70,7 @@ class PersonRelatedHold implements Serializable {
     /**
      * Optimistic lock token for SPRHOLD
      */
+
     @Version
     @Column(name = "SPRHOLD_VERSION")
     Integer version
@@ -76,28 +78,38 @@ class PersonRelatedHold implements Serializable {
     /**
      * Internal identification number of the person.
      */
+
     @Column(name = "SPRHOLD_PIDM")
     Integer pidm
 
     /**
      * Foreign Key : FK1_SPRHOLD_INV_STVHLDD_CODE
      */
+
     @ManyToOne
     @JoinColumns([
-    @JoinColumn(name = "SPRHOLD_HLDD_CODE", referencedColumnName = "STVHLDD_CODE")
+            @JoinColumn(name = "SPRHOLD_HLDD_CODE", referencedColumnName = "STVHLDD_CODE")
     ])
     HoldType holdType
+
+    /**
+     * This field identifies the person who created the hold. It might be an Oracle ID
+     */
+    @Column(name = "SPRHOLD_USER")
+    String createdBy
 
     /**
      * This field identifies the system user signon id initiating hold.
      * **lastModifiedBy User is always set back to the original user by API
      */
-    @Column(name = "SPRHOLD_USER")
+
+    @Column(name = "SPRHOLD_USER_ID")
     String lastModifiedBy
 
     /**
      * This field identifies the effective begin date of hold.
      */
+
     @Column(name = "SPRHOLD_FROM_DATE")
     @Temporal(TemporalType.DATE)
     Date fromDate
@@ -105,6 +117,7 @@ class PersonRelatedHold implements Serializable {
     /**
      * This field identifies the end date hold expires.
      */
+
     @Column(name = "SPRHOLD_TO_DATE")
     @Temporal(TemporalType.DATE)
     Date toDate
@@ -112,6 +125,7 @@ class PersonRelatedHold implements Serializable {
     /**
      * This field indicates that only the system user who entered the hold may release the hold.  Valid value is:  Y - allow only system user to release       hold.
      */
+
     @Type(type = "yes_no")
     @Column(name = "SPRHOLD_RELEASE_IND")
     Boolean releaseIndicator = false
@@ -119,27 +133,31 @@ class PersonRelatedHold implements Serializable {
     /**
      * Free format field which identifies the reason hold was placed.
      */
+
     @Column(name = "SPRHOLD_REASON")
     String reason
 
     /**
      * This field identifies a dollar amount associated with hold.
      */
+
     @Column(name = "SPRHOLD_AMOUNT_OWED")
     BigDecimal amountOwed
 
     /**
      * Foreign Key : FK1_SPRHOLD_INV_STVORIG_CODE
      */
+
     @ManyToOne
     @JoinColumns([
-    @JoinColumn(name = "SPRHOLD_ORIG_CODE", referencedColumnName = "STVORIG_CODE")
+            @JoinColumn(name = "SPRHOLD_ORIG_CODE", referencedColumnName = "STVORIG_CODE")
     ])
     Originator originator
 
     /**
      * This field defines most current date record is created or changed.
      */
+
     @Column(name = "SPRHOLD_ACTIVITY_DATE")
     @Temporal(TemporalType.TIMESTAMP)
     Date lastModified
@@ -147,6 +165,7 @@ class PersonRelatedHold implements Serializable {
     /**
      * DATA SOURCE: Source system that created or updated the row
      */
+
     @Column(name = "SPRHOLD_DATA_ORIGIN")
     String dataOrigin
 
@@ -156,43 +175,44 @@ class PersonRelatedHold implements Serializable {
 
     public String toString() {
         """PersonRelatedHold[
-		            id=$id,
-		            version=$version,
-					pidm=$pidm,
-					holdType=$holdType,
-					fromDate=$fromDate,
-					toDate=$toDate,
-					releaseIndicator=$releaseIndicator,
-					reason=$reason,
-					amountOwed=$amountOwed,
-					originator=$originator,
-					lastModified=$lastModified,
-					lastModifiedBy=$lastModifiedBy,
-					dataOrigin=$dataOrigin]"""
+                    id=$id,
+                    version=$version,
+                    pidm=$pidm,
+                    holdType=$holdType,
+                    fromDate=$fromDate,
+                    toDate=$toDate,
+                    releaseIndicator=$releaseIndicator,
+                    reason=$reason,
+                    amountOwed=$amountOwed,
+                    originator=$originator,
+                    createdBy=$createdBy,
+                    lastModified=$lastModified,
+                    lastModifiedBy=$lastModifiedBy,
+                    dataOrigin=$dataOrigin]"""
     }
 
 
     static constraints = {
-        pidm(nullable: false, maxsize: 22)
-        holdType(nullable: false)
-        fromDate(nullable: false, validator: {val, obj ->
+        pidm( nullable: false, maxsize: 22 )
+        holdType( nullable: false )
+        fromDate( nullable: false, validator: { val, obj ->
             if ((val != null) && (val > obj.toDate)) {
                 return 'invalid.fromDateGreaterThanToDate'
             }
-        })
-        toDate(nullable: false)
-        releaseIndicator(nullable: false)
-        reason(nullable: true, maxSize: 30)
-        amountOwed(nullable: true, max: 99999.99, min: 00000.00, scale: 2)
-        originator(nullable: true)
-        lastModified(nullable: true)
-        lastModifiedBy(nullable: true, maxSize: 30)
-        dataOrigin(nullable: true, maxSize: 30)
+        } )
+        toDate( nullable: false )
+        releaseIndicator( nullable: false )
+        reason( nullable: true, maxSize: 30 )
+        amountOwed( nullable: true, max: 99999.99, min: 00000.00, scale: 2 )
+        originator( nullable: true )
+        lastModified( nullable: true )
+        lastModifiedBy( nullable: true, maxSize: 30 )
+        dataOrigin( nullable: true, maxSize: 30 )
     }
 
 
-    boolean equals(o) {
-        if (this.is(o)) return true
+    boolean equals( o ) {
+        if (this.is( o )) return true
         if (!(o instanceof PersonRelatedHold)) return false
         PersonRelatedHold that = (PersonRelatedHold) o
         if (id != that.id) return false
@@ -231,10 +251,10 @@ class PersonRelatedHold implements Serializable {
     }
 
 
-    public static List fetchByPidm(Integer pidm) {
+    public static List fetchByPidm( Integer pidm ) {
 
-        def personRelatedHolds = PersonRelatedHold.withSession {session ->
-            session.getNamedQuery('PersonRelatedHold.fetchByPidm').setInteger('pidm', pidm).list()
+        def personRelatedHolds = PersonRelatedHold.withSession { session ->
+            session.getNamedQuery( 'PersonRelatedHold.fetchByPidm' ).setInteger( 'pidm', pidm ).list()
         }
 
         return personRelatedHolds
@@ -245,10 +265,10 @@ class PersonRelatedHold implements Serializable {
      * the hold from date and the hold to date.
      */
 
-    public static List fetchByPidmAndDateBetween(Integer pidm, Date compareDate) {
+    public static List fetchByPidmAndDateBetween( Integer pidm, Date compareDate ) {
 
-        def personRelatedHolds = PersonRelatedHold.withSession {session ->
-            session.getNamedQuery('PersonRelatedHold.fetchByPidmAndDateBetween').setInteger('pidm', pidm).setDate('compareDate', compareDate).list()
+        def personRelatedHolds = PersonRelatedHold.withSession { session ->
+            session.getNamedQuery( 'PersonRelatedHold.fetchByPidmAndDateBetween' ).setInteger( 'pidm', pidm ).setDate( 'compareDate', compareDate ).list()
         }
 
         return personRelatedHolds
@@ -259,10 +279,10 @@ class PersonRelatedHold implements Serializable {
      * than or equal to the hold from date and less than the hold to date.
      */
 
-    public static List fetchByPidmDateAndHoldType(Integer pidm, Date compareDate, String holdType) {
+    public static List fetchByPidmDateAndHoldType( Integer pidm, Date compareDate, String holdType ) {
 
-        def personRelatedHolds = PersonRelatedHold.withSession {session ->
-            session.getNamedQuery('PersonRelatedHold.fetchByPidmDateAndHoldType').setInteger('pidm', pidm).setDate('compareDate', compareDate).setString('holdType', holdType).list()
+        def personRelatedHolds = PersonRelatedHold.withSession { session ->
+            session.getNamedQuery( 'PersonRelatedHold.fetchByPidmDateAndHoldType' ).setInteger( 'pidm', pidm ).setDate( 'compareDate', compareDate ).setString( 'holdType', holdType ).list()
         }
 
         return personRelatedHolds
@@ -273,57 +293,54 @@ class PersonRelatedHold implements Serializable {
      * than or equal to the hold from date and less than the hold to date.
      */
 
-    public static List fetchByPidmAndDateCompare(Integer pidm, Date compareDate) {
+    public static List fetchByPidmAndDateCompare( Integer pidm, Date compareDate ) {
 
-        def personRelatedHolds = PersonRelatedHold.withSession {session ->
-            session.getNamedQuery('PersonRelatedHold.fetchByPidmAndDateCompare').setInteger('pidm', pidm).setDate('compareDate', compareDate).list()
+        def personRelatedHolds = PersonRelatedHold.withSession { session ->
+            session.getNamedQuery( 'PersonRelatedHold.fetchByPidmAndDateCompare' ).setInteger( 'pidm', pidm ).setDate( 'compareDate', compareDate ).list()
         }
 
         return personRelatedHolds
     }
-
 
     /**
      * Retrieve distinct person related hold records where the date sent in is greater
      * than or equal to the hold from date and less than equal to the hold to date.
      */
-    public static List fetchAllDistinctHoldTypeByPidmAndDateCompare(Integer pidm, Date compareDate) {
-        def personRelatedHolds = PersonRelatedHold.withSession {session ->
-            session.getNamedQuery('PersonRelatedHold.fetchAllDistinctHoldTypeByPidmAndDateCompare').setInteger('pidm', pidm).setDate('compareDate', compareDate).list()
+    public static List fetchAllDistinctHoldTypeByPidmAndDateCompare( Integer pidm, Date compareDate ) {
+        def personRelatedHolds = PersonRelatedHold.withSession { session ->
+            session.getNamedQuery( 'PersonRelatedHold.fetchAllDistinctHoldTypeByPidmAndDateCompare' ).setInteger( 'pidm', pidm ).setDate( 'compareDate', compareDate ).list()
         }
 
         return personRelatedHolds
     }
-
 
     /**
      * Retrieve person related hold records where the date sent in is greater
      * than or equal to the hold from date and less than the hold to date, for a list of pidms.
      */
 
-    public static List fetchByPidmListAndDateCompare(List pidm, Date compareDate) {
-        def personRelatedHolds = PersonRelatedHold.withSession {session ->
-            session.getNamedQuery('PersonRelatedHold.fetchByPidmListAndDateCompare').setParameterList('pidm', pidm).setDate('compareDate', compareDate).list()
+    public static List fetchByPidmListAndDateCompare( List pidm, Date compareDate ) {
+        def personRelatedHolds = PersonRelatedHold.withSession { session ->
+            session.getNamedQuery( 'PersonRelatedHold.fetchByPidmListAndDateCompare' ).setParameterList( 'pidm', pidm ).setDate( 'compareDate', compareDate ).list()
         }
 
         return personRelatedHolds
     }
-
 
     /**
      * Check for the existence of a person related registration hold record where the date sent in is greater
      * than or equal to the hold from date and less than the hold to date.  The person related hold type
      * must be defined as a registration hold on the STVHLDD record.
      */
-    public static Boolean registrationHoldsExist(Integer pidm, Date compareDate) {
+    public static Boolean registrationHoldsExist( Integer pidm, Date compareDate ) {
         def registrationHoldsExist = false
         def personRelatedHolds
         def registrationHoldType
 
-        personRelatedHolds = fetchByPidmAndDateCompare(pidm, compareDate)
+        personRelatedHolds = fetchByPidmAndDateCompare( pidm, compareDate )
         if (!registrationHoldsExist) {
             personRelatedHolds.each {
-                registrationHoldType = HoldType.findByCodeAndRegistrationHoldIndicator(  it.holdType.code, true)
+                registrationHoldType = HoldType.findByCodeAndRegistrationHoldIndicator( it.holdType.code, true )
                 if (registrationHoldType != null)
                     registrationHoldsExist = true
             }
@@ -332,13 +349,13 @@ class PersonRelatedHold implements Serializable {
     }
 
 
-    def static countAll(filterData) {
-        finderByAll().count(filterData)
+    def static countAll( filterData ) {
+        finderByAll().count( filterData )
     }
 
 
-    def static fetchSearch(filterData, pagingAndSortParams) {
-        def personRelatedHolds = finderByAll().find(filterData, pagingAndSortParams)
+    def static fetchSearch( filterData, pagingAndSortParams ) {
+        def personRelatedHolds = finderByAll().find( filterData, pagingAndSortParams )
         return personRelatedHolds
     }
 
@@ -346,6 +363,6 @@ class PersonRelatedHold implements Serializable {
     def private static finderByAll = {
         def query = """FROM  PersonRelatedHold a
                        WHERE a.pidm = :pidm """
-        return new DynamicFinder(PersonRelatedHold.class, query, "a")
+        return new DynamicFinder( PersonRelatedHold.class, query, "a" )
     }
 }
