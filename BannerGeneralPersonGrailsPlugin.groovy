@@ -21,7 +21,7 @@ class BannerGeneralPersonGrailsPlugin {
     // more control on 'when' a grails app is updated to use a newer plugin version, and therefore 'could' allow delayed testing within those apps
     // independent of deploying a new plugin build to Nexus.
     //
-    String version = "2.4.0"
+    String version = "9.13.1-zk-patch1"
 
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.3.7 > *"
