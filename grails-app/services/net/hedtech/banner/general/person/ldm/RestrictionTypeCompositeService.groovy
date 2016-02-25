@@ -113,13 +113,13 @@ class RestrictionTypeCompositeService extends LdmService {
     def create(Map content) {
         HoldType holdType = HoldType.findByCode(content?.code)
         if (holdType) {
-            def parameterValue
+          /*  def parameterValue
             if (GeneralValidationCommonConstants.VERSION_V4.equals(LdmService.getAcceptVersion(GeneralValidationCommonConstants.VERSIONS_V1_V4))) {
                 parameterValue = GeneralValidationCommonConstants.CODE
             } else if (GeneralValidationCommonConstants.VERSION_V1.equals(LdmService.getAcceptVersion(GeneralValidationCommonConstants.VERSIONS_V1_V4))) {
                 parameterValue = GeneralValidationCommonConstants.ABBREVIATION
-            }
-            throw new ApplicationException('restriction.type', new BusinessLogicValidationException(GeneralValidationCommonConstants.ERROR_MSG_CODE_EXISTS, [parameterValue]))
+            }*/
+            throw new ApplicationException('restriction.type', new BusinessLogicValidationException(GeneralValidationCommonConstants.ERROR_MSG_CODE_EXISTS, [GeneralValidationCommonConstants.ABBREVIATION]))
         }
         holdType = bindRestrictionType(new HoldType(), content)
         String restrictionTypeGuid = content?.guid?.trim()?.toLowerCase()
