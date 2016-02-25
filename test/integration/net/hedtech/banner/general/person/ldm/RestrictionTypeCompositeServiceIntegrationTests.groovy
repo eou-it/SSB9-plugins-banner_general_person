@@ -47,8 +47,8 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
     private void initiializeDataReferences() {
         bannerId = "HOSADV001"
         pidm = PersonUtility.getPerson(bannerId).pidm
-        newHoldType("TT")
-        i_success_holdType = HoldType.findByCode('TT')
+        newHoldType("T6")
+        i_success_holdType = HoldType.findByCode('T6')
         i_success_holdType_1 = HoldType.findByCode('AR')
         i_success_holdType_2 = HoldType.findByCode('AP')
         i_success_holdType_3 = HoldType.findByCode('AL')
@@ -222,7 +222,7 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
      */
     @Test
     void testListWithValidSortAndOrderFieldWithSupportedVersion() {
-        def params = [order: 'ASC', sort: 'code']
+        def params = [order: 'ASC', sort: 'abbreviation']
         def restrictionTypeList = restrictionTypeCompositeService.list(params)
         assertNotNull restrictionTypeList
         assertFalse restrictionTypeList.isEmpty()
@@ -241,7 +241,7 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
     @Test
     public void testSortByCode(){
         params.order='ASC'
-        params.sort='code'
+        params.sort='abbreviation'
         List list = restrictionTypeCompositeService.list(params)
         assertNotNull list
         def tempParam=null
@@ -257,7 +257,7 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
 
         params.clear()
         params.order='DESC'
-        params.sort='code'
+        params.sort='abbreviation'
         list = restrictionTypeCompositeService.list(params)
         assertNotNull list
         tempParam=null

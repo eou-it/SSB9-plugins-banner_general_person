@@ -1,11 +1,12 @@
 /*********************************************************************************
- Copyright 2014-2015 Ellucian Company L.P. and its affiliates.
+ Copyright 2014-2016 Ellucian Company L.P. and its affiliates.
  **********************************************************************************/
 package net.hedtech.banner.general.person.ldm
 
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.exceptions.BusinessLogicValidationException
 import net.hedtech.banner.exceptions.NotFoundException
+import net.hedtech.banner.general.common.GeneralValidationCommonConstants
 import net.hedtech.banner.general.overall.ldm.GlobalUniqueIdentifier
 import net.hedtech.banner.general.overall.ldm.GlobalUniqueIdentifierService
 import net.hedtech.banner.general.overall.ldm.LdmService
@@ -17,7 +18,6 @@ import net.hedtech.banner.general.person.ldm.v1.PersonRestrictionType
 import net.hedtech.banner.general.system.HoldType
 import net.hedtech.banner.general.system.ldm.v1.Metadata
 import net.hedtech.banner.general.system.ldm.v1.RestrictionType
-import net.hedtech.banner.general.system.ldm.v4.MetadataV4
 import net.hedtech.banner.restfulapi.RestfulApiValidationUtility
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -29,18 +29,14 @@ import org.springframework.transaction.annotation.Transactional
 class RestrictionTypeCompositeService extends LdmService {
 
     def holdTypeService
-    def
-    private static final String RESTRICTION_TYPE_LDM_NAME = 'restriction-types'
-    private static final String PERSONS_LDM_NAME = "persons"
-    private static final List<String> VERSIONS = ["v1", "v4"]
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     List<RestrictionType> list(Map params) {
-        if (params?.parentPluralizedResourceName == "persons") {
+        if (params?.parentPluralizedResourceName == GeneralValidationCommonConstants.PERSONS_ENDPOINT) {
             def returnLists = []
             if (params?.parentId) {
                 String guid = params.parentId?.trim()?.toLowerCase()
-                GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(PERSONS_LDM_NAME, guid)
+                GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(GeneralValidationCommonConstants.PERSONS_LDM_NAME, guid)
                 if (!globalUniqueIdentifier) {
                     throw new ApplicationException(GlobalUniqueIdentifierService.API, new NotFoundException(id: Person.class.simpleName))
                 }
@@ -61,8 +57,8 @@ class RestrictionTypeCompositeService extends LdmService {
             return returnLists
         } else {
             List restrictionTypes = []
-            List allowedSortFields = ("v4".equals(LdmService.getAcceptVersion(VERSIONS)) ? ['code', 'title'] : ['abbreviation', 'title'])
-
+           // List allowedSortFields = ("v4".equals(LdmService.getAcceptVersion(GeneralValidationCommonConstants.VERSIONS_V1_V4)) ? ['code', 'title'] : ['abbreviation', 'title'])
+            List allowedSortFields = [GeneralValidationCommonConstants.ABBREVIATION, GeneralValidationCommonConstants.TITLE]
             RestfulApiValidationUtility.correctMaxAndOffset(params, RestfulApiValidationUtility.MAX_DEFAULT, RestfulApiValidationUtility.MAX_UPPER_LIMIT)
             RestfulApiValidationUtility.validateSortField(params.sort, allowedSortFields)
             RestfulApiValidationUtility.validateSortOrder(params.order)
@@ -82,7 +78,7 @@ class RestrictionTypeCompositeService extends LdmService {
         Integer count
         if (params?.parentPluralizedResourceName) {
             String guid = params.parentId?.trim()?.toLowerCase()
-            GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(PERSONS_LDM_NAME, guid)
+            GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(GeneralValidationCommonConstants.PERSONS_LDM_NAME, guid)
             PersonIdentificationName personIdentificationName = PersonUtility.getPerson(globalUniqueIdentifier.domainKey.toInteger())
             List<PersonRelatedHold> restrictionTypes = []
             restrictionTypes = PersonRelatedHold.fetchByPidmAndDateCompare(personIdentificationName.pidm, new Date())
@@ -95,7 +91,7 @@ class RestrictionTypeCompositeService extends LdmService {
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     RestrictionType get(String guid) {
-        GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(RESTRICTION_TYPE_LDM_NAME, guid)
+        GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(GeneralValidationCommonConstants.RESTRICTION_TYPE_LDM_NAME, guid)
         if (!globalUniqueIdentifier) {
             throw new ApplicationException("restrictionType", new NotFoundException())
         }
@@ -118,20 +114,20 @@ class RestrictionTypeCompositeService extends LdmService {
         HoldType holdType = HoldType.findByCode(content?.code)
         if (holdType) {
             def parameterValue
-            if ("v4".equals(LdmService.getAcceptVersion(VERSIONS))) {
-                parameterValue = 'code'
-            } else if ("v1".equals(LdmService.getAcceptVersion(VERSIONS))) {
-                parameterValue = 'abbreviation'
+            if (GeneralValidationCommonConstants.VERSION_V4.equals(LdmService.getAcceptVersion(GeneralValidationCommonConstants.VERSIONS_V1_V4))) {
+                parameterValue = GeneralValidationCommonConstants.CODE
+            } else if (GeneralValidationCommonConstants.VERSION_V1.equals(LdmService.getAcceptVersion(GeneralValidationCommonConstants.VERSIONS_V1_V4))) {
+                parameterValue = GeneralValidationCommonConstants.ABBREVIATION
             }
-            throw new ApplicationException('restriction.type', new BusinessLogicValidationException('code.exists.message', [parameterValue]))
+            throw new ApplicationException('restriction.type', new BusinessLogicValidationException(GeneralValidationCommonConstants.ERROR_MSG_CODE_EXISTS, [parameterValue]))
         }
         holdType = bindRestrictionType(new HoldType(), content)
         String restrictionTypeGuid = content?.guid?.trim()?.toLowerCase()
         if (restrictionTypeGuid) {
             // Overwrite the GUID created by DB insert trigger, with the one provided in the request body
-            restrictionTypeGuid = updateGuidValue(holdType.id, restrictionTypeGuid, RESTRICTION_TYPE_LDM_NAME)?.guid
+            restrictionTypeGuid = updateGuidValue(holdType.id, restrictionTypeGuid, GeneralValidationCommonConstants.RESTRICTION_TYPE_LDM_NAME)?.guid
         } else {
-            restrictionTypeGuid = GlobalUniqueIdentifier.findByLdmNameAndDomainId(RESTRICTION_TYPE_LDM_NAME, holdType?.id)?.guid
+            restrictionTypeGuid = GlobalUniqueIdentifier.findByLdmNameAndDomainId(GeneralValidationCommonConstants.RESTRICTION_TYPE_LDM_NAME, holdType?.id)?.guid
         }
         return getDecorator(holdType, restrictionTypeGuid)
     }
@@ -144,7 +140,7 @@ class RestrictionTypeCompositeService extends LdmService {
      */
     def update(Map content) {
         String holdTypeGuid = content?.id?.trim()?.toLowerCase()
-        GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(RESTRICTION_TYPE_LDM_NAME, holdTypeGuid)
+        GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(GeneralValidationCommonConstants.RESTRICTION_TYPE_LDM_NAME, holdTypeGuid)
         if (holdTypeGuid) {
             if (!globalUniqueIdentifier) {
                 if (!content?.guid) {
@@ -183,16 +179,10 @@ class RestrictionTypeCompositeService extends LdmService {
 
     private def getDecorator(HoldType holdType, String holdTypeGuid = null) {
         if (holdType) {
-            def metaData
             if (!holdTypeGuid) {
-                holdTypeGuid = GlobalUniqueIdentifier.findByLdmNameAndDomainId(RESTRICTION_TYPE_LDM_NAME, holdType?.id)?.guid
+                holdTypeGuid = GlobalUniqueIdentifier.findByLdmNameAndDomainId(GeneralValidationCommonConstants.RESTRICTION_TYPE_LDM_NAME, holdType?.id)?.guid
             }
-            if ("v4".equals(LdmService.getAcceptVersion(VERSIONS))) {
-                metaData = new MetadataV4(holdType?.lastModifiedBy)
-            } else if ("v1".equals(LdmService.getAcceptVersion(VERSIONS))) {
-                metaData = new Metadata(holdType?.dataOrigin)
-            }
-            new RestrictionType(holdType, holdTypeGuid, metaData)
+            new RestrictionType(holdType, holdTypeGuid, new Metadata(holdType?.dataOrigin))
         }
     }
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
@@ -204,7 +194,7 @@ class RestrictionTypeCompositeService extends LdmService {
         if (!holdType) {
             return null
         }
-        return new RestrictionType(holdType, GlobalUniqueIdentifier.findByLdmNameAndDomainId(RESTRICTION_TYPE_LDM_NAME, holdTypeId)?.guid, new Metadata(holdType.dataOrigin))
+        return new RestrictionType(holdType, GlobalUniqueIdentifier.findByLdmNameAndDomainId(GeneralValidationCommonConstants.RESTRICTION_TYPE_LDM_NAME, holdTypeId)?.guid, new Metadata(holdType.dataOrigin))
     }
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
@@ -215,7 +205,7 @@ class RestrictionTypeCompositeService extends LdmService {
             if (!holdType) {
                 return restrictionType
             }
-            restrictionType = new RestrictionType(holdType, GlobalUniqueIdentifier.findByLdmNameAndDomainId(RESTRICTION_TYPE_LDM_NAME, holdType.id)?.guid, new Metadata(holdType.dataOrigin))
+            restrictionType = new RestrictionType(holdType, GlobalUniqueIdentifier.findByLdmNameAndDomainId(GeneralValidationCommonConstants.RESTRICTION_TYPE_LDM_NAME, holdType.id)?.guid, new Metadata(holdType.dataOrigin))
         }
         return restrictionType
     }
