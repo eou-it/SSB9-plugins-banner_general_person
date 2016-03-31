@@ -1,8 +1,11 @@
 /*********************************************************************************
- Copyright 2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2013-2016 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
+import net.hedtech.banner.exceptions.ApplicationException
+import net.hedtech.banner.exceptions.NotFoundException
+import net.hedtech.banner.general.overall.ldm.GlobalUniqueIdentifier
 import net.hedtech.banner.general.system.FgacDomain
 import net.hedtech.banner.general.system.NameType
 import net.hedtech.banner.service.DatabaseModifiesState
@@ -804,5 +807,20 @@ class PersonIdentificationName implements Serializable {
 
         return !personIdentificationNames?.isEmpty()
     }
+
+
+    public static PersonIdentificationName getPersonIdentificationNameCurrentByGUID(String guid) {
+        def entity = GlobalUniqueIdentifier.fetchByLdmNameAndGuid('persons', guid)
+        if (!entity) {
+            throw new ApplicationException("Person", new NotFoundException())
+        }
+        PersonIdentificationName personIdentificationNameCurrent = fetchBannerPerson(entity.domainKey?.toInteger())
+        if(!personIdentificationNameCurrent) {
+            throw new ApplicationException("Person", new NotFoundException())
+        }
+
+        return personIdentificationNameCurrent
+    }
+
 
 }
