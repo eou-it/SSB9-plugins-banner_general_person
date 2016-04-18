@@ -3,6 +3,9 @@
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
+
+import net.hedtech.banner.exceptions.ApplicationException
+import net.hedtech.banner.general.overall.ldm.GlobalUniqueIdentifier
 import org.junit.Before
 import org.junit.Test
 import org.junit.After
@@ -966,4 +969,21 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
         assertTrue persons[0] instanceof PersonIdentificationName
     }
 
+
+    @Test
+    void testFetchPIDNameByValidGuid(){
+        def person=GlobalUniqueIdentifier.fetchByLdmName('persons')[0]
+        assertNotNull person
+        def guid=person.guid
+        assertNotNull guid
+        def pid=PersonIdentificationName.getPersonIdentificationNameCurrentByGUID(guid)
+        assertNotNull pid
+    }
+
+    @Test
+    void testFetchPIDNameByInvalidGuid(){
+        shouldFail(ApplicationException) {
+            PersonIdentificationName.getPersonIdentificationNameCurrentByGUID("Invalid-Guid")
+        }
+    }
 }
