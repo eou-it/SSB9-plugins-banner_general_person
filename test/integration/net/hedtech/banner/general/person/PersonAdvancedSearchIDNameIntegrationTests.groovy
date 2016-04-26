@@ -4,16 +4,16 @@
 package net.hedtech.banner.general.person
 
 import grails.util.Holders
+import groovy.sql.Sql
+import net.hedtech.banner.general.system.InstitutionalDescription
+import net.hedtech.banner.testing.BaseIntegrationTestCase
+import org.junit.After
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
-import org.junit.After
-
-import groovy.sql.Sql
-import net.hedtech.banner.testing.BaseIntegrationTestCase
 import org.springframework.context.ApplicationContext
 import org.springframework.context.i18n.LocaleContextHolder as LCH
-import net.hedtech.banner.general.system.InstitutionalDescription
+
 
 class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase {
 
@@ -216,9 +216,14 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
      */
     @Test
     void testAdvancedSearchBySsn() {
-        // HOSP0001                                      000277832
-        def list = PersonBasicPersonBase.findAllBySsn("000277832")
-        assertTrue list.size() >= 1
+        def userId = 'HOSP0001' //000277832
+        def person = PersonUtility.getPerson( userId )
+        assertNotNull( person )
+        def personBase = PersonBasicPersonBase.fetchByPidm(person.pidm)
+        def list = PersonBasicPersonBase.findAllBySsn(personBase.ssn)
+        assertEquals 3, list.size() // three with same ssn?
+        assertEquals "Asian Pacific Islander", list[0].ethnicity.description
+        assertEquals "American Indian/Alaska Native", list[1].ethnicity.description
 
         def filterData = [:]
         def param = [:]
@@ -229,7 +234,7 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
 
         def sql
         def url = Holders.config.bannerDataSource.url
-        println url
+
         try {
 
             sql = Sql.newInstance(url,   //  db =  new Sql( connectInfo.url,
