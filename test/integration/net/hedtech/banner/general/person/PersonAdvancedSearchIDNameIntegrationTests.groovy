@@ -249,7 +249,7 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
             //Step 1.
             // Client submits a search query to find an exact match
             // Search by SSN
-            def persons = personSearchService.personIdSearch("543-54-5432", filterData, pagingAndSortParams)
+            def persons = personSearchService.personIdSearch(personBase.ssn, filterData, pagingAndSortParams)
             assertNotNull persons
             assertTrue persons.size() >= 1
 
