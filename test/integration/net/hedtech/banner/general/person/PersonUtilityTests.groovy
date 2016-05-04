@@ -5,6 +5,7 @@
 package net.hedtech.banner.general.person
 
 import grails.util.Holders
+import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes
 import org.junit.Before
 import org.junit.Test
 import org.junit.After
@@ -143,4 +144,30 @@ class PersonUtilityTests extends BaseIntegrationTestCase {
         assertNotNull emailId
         assertEquals emailId, "Marita.Herwig@sungarduniv.edu"
     }
+
+
+    @Test
+    void testGetPreferredName() {
+        def application = Holders.getGrailsApplication()
+        def ctx = Holders.servletContext.getAttribute(GrailsApplicationAttributes.APPLICATION_CONTEXT)
+        def preferredNameService = ctx.preferredNameService
+        application.config.productName = 'Student'
+        application.config.banner.applicationName = 'Student Self-Service'
+
+        def pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("HOF00714", null).pidm
+        assertNotNull pidm
+
+        def params=[:]
+        params.put("pidm",pidm)
+        String usage = preferredNameService.getUsage("Student","Student Self-Service")
+        String preferredName1 = PersonUtility.getPreferredName(params)
+        assertNotNull preferredName1
+
+        params.put("usage",usage)
+        String preferredName2 = preferredNameService.getName(params)
+        assertNotNull preferredName2
+
+        assertEquals preferredName1, preferredName2
+    }
+
 }
