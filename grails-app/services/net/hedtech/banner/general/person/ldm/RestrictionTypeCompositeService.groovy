@@ -1,5 +1,5 @@
 /*********************************************************************************
- Copyright 2014-2016 Ellucian Company L.P. and its affiliates.
+ Copyright 2015-2016 Ellucian Company L.P. and its affiliates.
  **********************************************************************************/
 package net.hedtech.banner.general.person.ldm
 
@@ -28,8 +28,12 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class RestrictionTypeCompositeService extends LdmService {
 
+    public static final String PERSON_HOLD_TYPES = "person-hold-types"
     def holdTypeService
-
+    private static final List<String> VERSIONS = [GeneralValidationCommonConstants.VERSION_V1
+                                                  ,GeneralValidationCommonConstants.VERSION_V4
+                                                  ,GeneralValidationCommonConstants.VERSION_V6
+    ]
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     List<RestrictionType> list(Map params) {
         if (params?.parentPluralizedResourceName == GeneralValidationCommonConstants.PERSONS_ENDPOINT) {
@@ -55,9 +59,24 @@ class RestrictionTypeCompositeService extends LdmService {
                 }
             }
             return returnLists
-        } else {
+        }
+        //start-for Version 6 Schema support -PERSON-HOLD-TYPES
+        else if (params?.pluralizedResourceName?.equals(PERSON_HOLD_TYPES)){
             List restrictionTypes = []
-           // List allowedSortFields = ("v4".equals(LdmService.getAcceptVersion(GeneralValidationCommonConstants.VERSIONS_V1_V4)) ? ['code', 'title'] : ['abbreviation', 'title'])
+            RestfulApiValidationUtility.correctMaxAndOffset(params, RestfulApiValidationUtility.MAX_DEFAULT, RestfulApiValidationUtility.MAX_UPPER_LIMIT)
+            params.offset = params?.offset?:0
+            List<HoldType> holdTypes = holdTypeService.list(params) as List
+            holdTypes.each { holdType ->
+                restrictionTypes << getDecorator(holdType)
+            }
+            return restrictionTypes
+
+        }
+        //end-for Version 6 Schema support -PERSON-HOLD-TYPES
+        else {
+            List restrictionTypes = []
+            // List allowedSortFields = ("v4".equals(LdmService.getAcceptVersion(GeneralValidationCommonConstants.VERSIONS_V1_V4)) ? ['code', 'title'] : ['abbreviation', 'title'])
+            // List allowedSortFields = ("v4".equals(LdmService.getAcceptVersion(GeneralValidationCommonConstants.VERSIONS_V1_V4)) ? ['code', 'title'] : ['abbreviation', 'title'])
             List allowedSortFields = [GeneralValidationCommonConstants.ABBREVIATION, GeneralValidationCommonConstants.TITLE]
             RestfulApiValidationUtility.correctMaxAndOffset(params, RestfulApiValidationUtility.MAX_DEFAULT, RestfulApiValidationUtility.MAX_UPPER_LIMIT)
             RestfulApiValidationUtility.validateSortField(params.sort, allowedSortFields)
@@ -92,14 +111,18 @@ class RestrictionTypeCompositeService extends LdmService {
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     RestrictionType get(String guid) {
         GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(GeneralValidationCommonConstants.RESTRICTION_TYPE_LDM_NAME, guid)
-        if (!globalUniqueIdentifier) {
+           if(!globalUniqueIdentifier && GeneralValidationCommonConstants.VERSION_V6.equals(getAcceptVersion(VERSIONS))){
+             throw new ApplicationException(GeneralValidationCommonConstants.PERSON_HOLD_TYPES, new NotFoundException())
+            }else if(!globalUniqueIdentifier && !GeneralValidationCommonConstants.VERSION_V6.equals(getAcceptVersion(VERSIONS))){
             throw new ApplicationException("restrictionType", new NotFoundException())
-        }
+            }
 
         HoldType holdType = HoldType.get(globalUniqueIdentifier.domainId)
-        if (!holdType) {
-            throw new ApplicationException("restrictionType", new NotFoundException())
-        }
+            if(!holdType && GeneralValidationCommonConstants.VERSION_V6.equals(getAcceptVersion(VERSIONS))){
+                throw new ApplicationException(GeneralValidationCommonConstants.PERSON_HOLD_TYPES, new NotFoundException())
+            }else if(!holdType && !GeneralValidationCommonConstants.VERSION_V6.equals(getAcceptVersion(VERSIONS))){
+                throw new ApplicationException("restrictionType", new NotFoundException())
+            }
 
         return getDecorator(holdType, globalUniqueIdentifier?.guid)
     }
@@ -113,12 +136,12 @@ class RestrictionTypeCompositeService extends LdmService {
     def create(Map content) {
         HoldType holdType = HoldType.findByCode(content?.code)
         if (holdType) {
-          /*  def parameterValue
-            if (GeneralValidationCommonConstants.VERSION_V4.equals(LdmService.getAcceptVersion(GeneralValidationCommonConstants.VERSIONS_V1_V4))) {
-                parameterValue = GeneralValidationCommonConstants.CODE
-            } else if (GeneralValidationCommonConstants.VERSION_V1.equals(LdmService.getAcceptVersion(GeneralValidationCommonConstants.VERSIONS_V1_V4))) {
-                parameterValue = GeneralValidationCommonConstants.ABBREVIATION
-            }*/
+            /*  def parameterValue
+              if (GeneralValidationCommonConstants.VERSION_V4.equals(LdmService.getAcceptVersion(GeneralValidationCommonConstants.VERSIONS_V1_V4))) {
+                  parameterValue = GeneralValidationCommonConstants.CODE
+              } else if (GeneralValidationCommonConstants.VERSION_V1.equals(LdmService.getAcceptVersion(GeneralValidationCommonConstants.VERSIONS_V1_V4))) {
+                  parameterValue = GeneralValidationCommonConstants.ABBREVIATION
+              }*/
             throw new ApplicationException('restriction.type', new BusinessLogicValidationException(GeneralValidationCommonConstants.ERROR_MSG_CODE_EXISTS, [GeneralValidationCommonConstants.ABBREVIATION]))
         }
         holdType = bindRestrictionType(new HoldType(), content)
