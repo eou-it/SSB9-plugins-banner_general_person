@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <!-- *******************************************************************************
-     Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+     Copyright 2009-2016 Ellucian Company L.P. and its affiliates.
      *********************************************************************************
  -->
 
@@ -43,6 +43,7 @@ there is no concept of an 'entity manager' within this project.
         <mapping class="net.hedtech.banner.general.person.view.PersonPersonView"/>
         <mapping class="net.hedtech.banner.general.person.view.PersonPhoneView"/>
         <mapping class="net.hedtech.banner.general.person.view.PersonAddressByRoleView"/>
+        <mapping class="net.hedtech.banner.general.person.VisaInformation"/>
     </session-factory>
 </hibernate-configuration>
    
