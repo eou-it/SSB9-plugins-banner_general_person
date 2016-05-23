@@ -1,8 +1,10 @@
 /*********************************************************************************
- Copyright 2009-2015 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2016 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
+import groovy.transform.EqualsAndHashCode
+import groovy.transform.ToString
 import net.hedtech.banner.general.system.HoldType
 import net.hedtech.banner.general.system.Originator
 import net.hedtech.banner.service.DatabaseModifiesState
@@ -49,11 +51,43 @@ import net.hedtech.banner.query.DynamicFinder
             AND ( TRUNC(:compareDate) >= TRUNC(a.fromDate)
             AND TRUNC(:compareDate) <= TRUNC(a.toDate) )
             GROUP BY a.holdType.code
-            ORDER BY a.holdType.code """)
+            ORDER BY a.holdType.code """),
+        @NamedQuery(name = "PersonRelatedHold.fetchAll",
+                query = """FROM PersonRelatedHold p,GlobalUniqueIdentifier g1,GlobalUniqueIdentifier g2,GlobalUniqueIdentifier g3
+            WHERE (TRUNC(:compareDate) <= TRUNC(p.toDate))
+            AND g1.ldmName = 'person-holds' AND g1.domainId = p.id
+            AND g2.ldmName = 'persons' AND g2.domainKey = TO_CHAR(p.pidm)
+            AND g3.ldmName = 'restriction-types' AND g3.domainKey= p.holdType.code"""),
+        @NamedQuery(name = "PersonRelatedHold.countRecord",
+                query = """SELECT count(*) FROM PersonRelatedHold p,GlobalUniqueIdentifier g1,GlobalUniqueIdentifier g2,GlobalUniqueIdentifier g3
+            WHERE (TRUNC(:compareDate) <= TRUNC(p.toDate))
+            AND g1.ldmName = 'person-holds' AND g1.domainId = p.id
+            AND g2.ldmName = 'persons' AND g2.domainKey = TO_CHAR(p.pidm)
+            AND g3.ldmName = 'restriction-types' AND g3.domainKey= p.holdType.code"""),
+        @NamedQuery(name = "PersonRelatedHold.fetchByPersonHoldGuid",
+                query = """FROM PersonRelatedHold p,GlobalUniqueIdentifier g1,GlobalUniqueIdentifier g2,GlobalUniqueIdentifier g3
+            WHERE (TRUNC(:compareDate) <= TRUNC(p.toDate))
+            AND g1.ldmName = 'person-holds' AND g1.domainId = p.id AND g1.guid = :guid
+            AND g2.ldmName = 'persons' AND g2.domainKey = TO_CHAR(p.pidm)
+            AND g3.ldmName = 'restriction-types' AND g3.domainKey= p.holdType.code"""),
+        @NamedQuery(name = "PersonRelatedHold.fetchCountByPersonGuid",
+                query = """SELECT count(*) FROM PersonRelatedHold p,GlobalUniqueIdentifier g1,GlobalUniqueIdentifier g2,GlobalUniqueIdentifier g3
+            WHERE (TRUNC(:compareDate) <= TRUNC(p.toDate))
+            AND g1.ldmName = 'person-holds' AND g1.domainId = p.id
+            AND g2.ldmName = 'persons' AND g2.domainKey = TO_CHAR(p.pidm) AND g2.guid = :guid
+            AND g3.ldmName = 'restriction-types' AND g3.domainKey= p.holdType.code"""),
+        @NamedQuery(name = "PersonRelatedHold.fetchByPersonsGuid",
+                query = """FROM PersonRelatedHold p,GlobalUniqueIdentifier g1,GlobalUniqueIdentifier g2,GlobalUniqueIdentifier g3
+            WHERE (TRUNC(:compareDate) <= TRUNC(p.toDate))
+            AND g1.ldmName = 'person-holds' AND g1.domainId = p.id
+            AND g2.ldmName = 'persons' AND g2.domainKey = TO_CHAR(p.pidm) AND g2.guid = :guid
+            AND g3.ldmName = 'restriction-types' AND g3.domainKey= p.holdType.code""")
 ])
 
 @Entity
 @Table(name = "SV_SPRHOLD")
+@EqualsAndHashCode(includeFields = true)
+@ToString(includeNames = true, includeFields = true)
 @DatabaseModifiesState
 class PersonRelatedHold implements Serializable {
 
@@ -173,23 +207,6 @@ class PersonRelatedHold implements Serializable {
     public static readonlyProperties = ['pidm']
 
 
-    public String toString() {
-        """PersonRelatedHold[
-                    id=$id,
-                    version=$version,
-                    pidm=$pidm,
-                    holdType=$holdType,
-                    fromDate=$fromDate,
-                    toDate=$toDate,
-                    releaseIndicator=$releaseIndicator,
-                    reason=$reason,
-                    amountOwed=$amountOwed,
-                    originator=$originator,
-                    createdBy=$createdBy,
-                    lastModified=$lastModified,
-                    lastModifiedBy=$lastModifiedBy,
-                    dataOrigin=$dataOrigin]"""
-    }
 
 
     static constraints = {
@@ -208,46 +225,6 @@ class PersonRelatedHold implements Serializable {
         lastModified( nullable: true )
         lastModifiedBy( nullable: true, maxSize: 30 )
         dataOrigin( nullable: true, maxSize: 30 )
-    }
-
-
-    boolean equals( o ) {
-        if (this.is( o )) return true
-        if (!(o instanceof PersonRelatedHold)) return false
-        PersonRelatedHold that = (PersonRelatedHold) o
-        if (id != that.id) return false
-        if (version != that.version) return false
-        if (pidm != that.pidm) return false
-        if (holdType != that.holdType) return false
-        if (fromDate != that.fromDate) return false
-        if (toDate != that.toDate) return false
-        if (releaseIndicator != that.releaseIndicator) return false
-        if (reason != that.reason) return false
-        if (amountOwed != that.amountOwed) return false
-        if (originator != that.originator) return false
-        if (lastModified != that.lastModified) return false
-        if (lastModifiedBy != that.lastModifiedBy) return false
-        if (dataOrigin != that.dataOrigin) return false
-        return true
-    }
-
-
-    int hashCode() {
-        int result
-        result = (id != null ? id.hashCode() : 0)
-        result = 31 * result + (version != null ? version.hashCode() : 0)
-        result = 31 * result + (pidm != null ? pidm.hashCode() : 0)
-        result = 31 * result + (holdType != null ? holdType.hashCode() : 0)
-        result = 31 * result + (fromDate != null ? fromDate.hashCode() : 0)
-        result = 31 * result + (toDate != null ? toDate.hashCode() : 0)
-        result = 31 * result + (releaseIndicator != null ? releaseIndicator.hashCode() : 0)
-        result = 31 * result + (reason != null ? reason.hashCode() : 0)
-        result = 31 * result + (amountOwed != null ? amountOwed.hashCode() : 0)
-        result = 31 * result + (originator != null ? originator.hashCode() : 0)
-        result = 31 * result + (lastModified != null ? lastModified.hashCode() : 0)
-        result = 31 * result + (lastModifiedBy != null ? lastModifiedBy.hashCode() : 0)
-        result = 31 * result + (dataOrigin != null ? dataOrigin.hashCode() : 0)
-        return result
     }
 
 
@@ -364,5 +341,70 @@ class PersonRelatedHold implements Serializable {
         def query = """FROM  PersonRelatedHold a
                        WHERE a.pidm = :pidm """
         return new DynamicFinder( PersonRelatedHold.class, query, "a" )
+    }
+
+
+
+
+    /**
+     * Retrieve person related hold records where the date sent in is
+     * less than the hold to date, for a list of pidms.
+     */
+    public static List fetchAll(params,compareDate){
+        return PersonRelatedHold.withSession {session ->
+            session.getNamedQuery('PersonRelatedHold.fetchAll')
+                    .setDate( 'compareDate', compareDate )
+                    .setMaxResults(params.max as Integer)
+                    .setFirstResult(params.offset as Integer).list()
+        }
+    }
+
+
+    /**
+     * @param compareDate
+     * @return count
+     */
+    public static Long countRecord(compareDate){
+        return PersonRelatedHold.withSession { session ->
+            session.getNamedQuery('PersonRelatedHold.countRecord').setDate( 'compareDate', compareDate ).uniqueResult()
+        }
+    }
+
+
+    /**
+     * @param params,compareDate
+     * @return count for holds on a persons
+     */
+    public static Long countRecordWithFilter(params,compareDate) {
+        return PersonRelatedHold.withSession { session ->
+            session.getNamedQuery('PersonRelatedHold.fetchCountByPersonGuid').setDate( 'compareDate', compareDate ).setString('guid', params.person ).uniqueResult()
+        }
+    }
+
+
+
+    /**
+     * @param guid,compareDate
+     * @return personHolds
+     */
+    public static def fetchByPersonHoldGuid(String guid,Date compareDate) {
+        return PersonRelatedHold.withSession {
+            session -> session.getNamedQuery( 'PersonRelatedHold.fetchByPersonHoldGuid' ).setDate('compareDate', compareDate ).setString( 'guid', guid ).uniqueResult()
+        }
+    }
+
+
+    /**
+     * @param params,compareDate
+     * @return personHolds
+     */
+    public static List fetchByPersonsGuid(params,Date compareDate) {
+        return PersonRelatedHold.withSession {
+            session -> session.getNamedQuery( 'PersonRelatedHold.fetchByPersonsGuid' )
+                    .setDate( 'compareDate', compareDate )
+                    .setString( 'guid', params?.person)
+                    .setMaxResults(params.max as Integer)
+                    .setFirstResult(params.offset as Integer).list()
+        }
     }
 }
