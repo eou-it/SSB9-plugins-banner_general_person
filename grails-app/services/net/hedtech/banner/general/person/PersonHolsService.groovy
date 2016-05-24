@@ -1,8 +1,9 @@
+/*******************************************************************************
+ Copyright 2016 Ellucian Company L.P. and its affiliates.
+ *******************************************************************************/
 package net.hedtech.banner.general.person
 
-/**
- * Created by inasingh025 on 5/18/2016.
- */
+
 class PersonHolsService {
 
     /**
