@@ -199,10 +199,10 @@ class PersonUtility {
         def applicationName=Holders?.config?.banner.applicationName ?: null
 
         if(productName)
-            params.put("productname",productName)
+            params.put("productname", productName)
         if(applicationName)
-            params.put("appname",applicationName)
+            params.put("appname", applicationName)
 
-        return preferredNameService.getName(params)
+        return preferredNameService.getPreferredName(params)
     }
 }
