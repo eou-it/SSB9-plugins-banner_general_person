@@ -164,7 +164,7 @@ class PersonUtilityTests extends BaseIntegrationTestCase {
         assertNotNull preferredName1
 
         params.put("usage",usage)
-        String preferredName2 = preferredNameService.getName(params)
+        String preferredName2 = preferredNameService.getPreferredName(params)
         assertNotNull preferredName2
 
         assertEquals preferredName1, preferredName2
