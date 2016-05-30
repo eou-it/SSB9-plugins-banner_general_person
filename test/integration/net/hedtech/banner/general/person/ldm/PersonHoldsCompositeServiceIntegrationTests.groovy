@@ -35,13 +35,13 @@ class PersonHoldsCompositeServiceIntegrationTests extends BaseIntegrationTestCas
      * <p> Test to lists the person hold Records from PersonHolsCompositeService</p>
      * */
     @Test
-    public void testListPersonHols(){
-        List academicHonorList = personHoldsCompositeService.list(params)
-        assertNotNull academicHonorList
-        assertFalse academicHonorList.isEmpty()
-        def totalCount = PersonRelatedHold.countRecord(new Date())
-        assertNotNull totalCount
-        assertEquals totalCount, academicHonorList.size()
+    public void testListPersonHolds(){
+        List personhldList = personHoldsCompositeService.list(params)
+        assertNotNull personhldList
+        assertFalse personhldList.isEmpty()
+        List personHoldList = PersonRelatedHold.findAllByToDateGreaterThanEquals(new Date(),[max: 500])
+        assertNotNull personHoldList
+        assertEquals personHoldList.size(), personhldList.size()
     }
 
 
