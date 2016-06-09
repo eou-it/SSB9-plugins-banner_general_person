@@ -1,8 +1,10 @@
 /*********************************************************************************
- Copyright 2009-2015 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2016 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
+import groovy.transform.EqualsAndHashCode
+import groovy.transform.ToString
 import net.hedtech.banner.general.system.EmailType
 import net.hedtech.banner.general.system.SystemUtility
 import net.hedtech.banner.query.DynamicFinder
@@ -14,6 +16,8 @@ import javax.persistence.*
 /**
  * Represents a person's email address
  */
+@EqualsAndHashCode(includeFields = true)
+@ToString(includeNames = true, includeFields = true)
 @Entity
 @Table(name = "GV_GOREMAL")
 @NamedQueries(value = [
@@ -68,7 +72,11 @@ import javax.persistence.*
         @NamedQuery(name = "PersonEmail.fetchByPidmsAndActiveStatus",
                 query = """FROM PersonEmail a
     WHERE a.pidm in (:pidms)
-    and a.statusIndicator = 'A' """)
+    and a.statusIndicator = 'A' """),
+        @NamedQuery(name = "PersonEmail.fetchListByActiveStatusPidmsAndEmailTypes",
+                query = """FROM PersonEmail a
+    WHERE a.pidm IN (:pidms)  AND a.statusIndicator = 'A'
+    AND a.emailType.code IN (:emailTypes)""")
 ])
 class PersonEmail implements Serializable {
     static def log = Logger.getLogger('net.hedtech.banner.general.person.PersonEmail')
@@ -154,62 +162,6 @@ class PersonEmail implements Serializable {
             @JoinColumn(name = "GOREMAL_EMAL_CODE", referencedColumnName = "GTVEMAL_CODE")
     ])
     EmailType emailType
-
-
-    public String toString() {
-        """PersonEmail[
-					id=$id,
-					version=$version,
-					pidm=$pidm,
-					emailAddress=$emailAddress,
-					statusIndicator=$statusIndicator,
-					preferredIndicator=$preferredIndicator,
-					commentData=$commentData,
-					displayWebIndicator=$displayWebIndicator,
-					lastModified=$lastModified,
-					lastModifiedBy=$lastModifiedBy,
-					dataOrigin=$dataOrigin,
-					emailType=$emailType]"""
-    }
-
-
-    boolean equals(o) {
-        if (this.is(o)) return true
-        if (!(o instanceof PersonEmail)) return false
-        PersonEmail that = (PersonEmail) o
-        if (id != that.id) return false
-        if (version != that.version) return false
-        if (pidm != that.pidm) return false
-        if (emailAddress != that.emailAddress) return false
-        if (statusIndicator != that.statusIndicator) return false
-        if (preferredIndicator != that.preferredIndicator) return false
-        if (commentData != that.commentData) return false
-        if (displayWebIndicator != that.displayWebIndicator) return false
-        if (lastModified != that.lastModified) return false
-        if (lastModifiedBy != that.lastModifiedBy) return false
-        if (dataOrigin != that.dataOrigin) return false
-        if (emailType != that.emailType) return false
-        return true
-    }
-
-
-    int hashCode() {
-        int result
-        result = (id != null ? id.hashCode() : 0)
-        result = 31 * result + (version != null ? version.hashCode() : 0)
-        result = 31 * result + (pidm != null ? pidm.hashCode() : 0)
-        result = 31 * result + (emailAddress != null ? emailAddress.hashCode() : 0)
-        result = 31 * result + (statusIndicator != null ? statusIndicator.hashCode() : 0)
-        result = 31 * result + (preferredIndicator != null ? preferredIndicator.hashCode() : 0)
-        result = 31 * result + (commentData != null ? commentData.hashCode() : 0)
-        result = 31 * result + (displayWebIndicator != null ? displayWebIndicator.hashCode() : 0)
-        result = 31 * result + (lastModified != null ? lastModified.hashCode() : 0)
-        result = 31 * result + (lastModifiedBy != null ? lastModifiedBy.hashCode() : 0)
-        result = 31 * result + (dataOrigin != null ? dataOrigin.hashCode() : 0)
-        result = 31 * result + (emailType != null ? emailType.hashCode() : 0)
-        return result
-    }
-
 
     static constraints = {
         pidm(nullable: false, min: -99999999, max: 99999999)
@@ -365,6 +317,18 @@ class PersonEmail implements Serializable {
         log.debug "Executing fetchByPidmsAndActiveStatus with pidms = ${pidm} "
         log.debug "Fetched number of emails ${emails.size()} }"
         return emails
+    }
+
+    /**
+     * fetch Active Person Email Informaton based on list on pidms and list of emailtype codes
+     * @param pidm
+     * @param emailTypes
+     * @return List<PersonEmail>
+     */
+    public static List<PersonEmail> fetchListByActiveStatusPidmsAndEmailTypes(List<Integer> pidms, Set<String> emailTypes) {
+       return PersonEmail.withSession { session ->
+           session.getNamedQuery('PersonEmail.fetchListByActiveStatusPidmsAndEmailTypes').setParameterList('pidms', pidms).setParameterList('emailTypes', emailTypes).list()
+        }
     }
 
 }
