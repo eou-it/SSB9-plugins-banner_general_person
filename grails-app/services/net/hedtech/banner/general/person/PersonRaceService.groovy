@@ -47,4 +47,10 @@ class PersonRaceService extends ServiceBase {
         }
     }
 
+
+
+    public static List<PersonRace> fetchRaceByPidmList(List<Integer> pidmList) {
+        return PersonRace.fetchByPidmList(pidmList)
+    }
+
 }
