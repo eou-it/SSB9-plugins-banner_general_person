@@ -11,7 +11,12 @@ class NameV6 {
 
     def type
     String fullName
+    String preference = "preferred"
     String firstName
+    String middleName
     String lastName
+    String lastNamePrefix
+    String title
+    String pedigree
 
 }
