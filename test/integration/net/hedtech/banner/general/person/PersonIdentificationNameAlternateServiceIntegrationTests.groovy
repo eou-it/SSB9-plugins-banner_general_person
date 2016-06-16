@@ -1,19 +1,15 @@
 /*********************************************************************************
- Copyright 2012 Ellucian Company L.P. and its affiliates.
+ Copyright 2012-2016 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
-/*********************************************************************************
- Copyright 2013 Ellucian Company L.P. and its affiliates.
- ********************************************************************************* */
-
 package net.hedtech.banner.general.person
-import org.junit.Before
-import org.junit.Test
-import org.junit.After
 
 import groovy.sql.Sql
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.system.NameType
 import net.hedtech.banner.testing.BaseIntegrationTestCase
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
 
 class PersonIdentificationNameAlternateServiceIntegrationTests extends BaseIntegrationTestCase {
 
@@ -186,9 +182,39 @@ class PersonIdentificationNameAlternateServiceIntegrationTests extends BaseInteg
         assertEquals 0, personList.size()
     }
 
+
+    @Test
+    void testFetchAllMostRecentlyCreated() {
+        PersonIdentificationNameCurrent personCurrent = setupNewPersonIdentificationNameCurrent()
+
+        String altLastName = "ALTERNATE_LAST_NAME"
+        String altFirstName = "ALTERNATE_FIRST_NAME"
+        String altMiddleName = "ALTERNATE_MIDDLE_NAME"
+
+        PersonIdentificationNameAlternate personAlternate = newPersonIdentificationNameAlternate(personCurrent)
+        personAlternate.lastName = altLastName
+        personAlternate.firstName = altFirstName
+        personAlternate.middleName = altMiddleName
+        personAlternate.changeIndicator = "N"
+        personIdentificationNameAlternateService.create([domainModel: personAlternate])
+
+        def alternatePersons = personIdentificationNameAlternateService.fetchAllMostRecentlyCreated([personCurrent.pidm], [personCurrent.nameType.code])
+        assertEquals 1, alternatePersons.size()
+
+        personAlternate = alternatePersons.get(0)
+        assertNotNull personAlternate
+        assertEquals personCurrent.pidm, personAlternate.pidm
+        assertEquals personCurrent.bannerId, personAlternate.bannerId
+        assertEquals altLastName, personAlternate.lastName
+        assertEquals altFirstName, personAlternate.firstName
+        assertEquals altMiddleName, personAlternate.middleName
+        assertEquals "N", personAlternate.changeIndicator
+    }
+
     // *************************************************************************************************************
     //  End tests.
     // *************************************************************************************************************
+
     /**
      * Setup a new PersonIdentificationNameCurrent for testing.
      */
