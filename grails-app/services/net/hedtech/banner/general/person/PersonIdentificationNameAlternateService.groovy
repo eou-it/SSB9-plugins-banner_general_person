@@ -91,21 +91,23 @@ class PersonIdentificationNameAlternateService extends ServiceBase {
 
     List<PersonIdentificationNameAlternate> fetchAllMostRecentlyCreated(List<Integer> pidms, List<String> nameTypeCodes) {
         List<PersonIdentificationNameAlternate> entities = []
-        String hql = """ from PersonIdentificationNameAlternate a
-                         where a.pidm in :pidms
-                         and a.nameType.code in :nameTypes
-                         and a.entityIndicator = 'P'
-                         and a.changeIndicator = 'N'
-                         and (a.pidm, a.nameType.code, a.createDate) in (select b.pidm, b.nameType.code, max(b.createDate)
-                                                                         from PersonIdentificationNameAlternate b
-                                                                         where b.entityIndicator = 'P'
-                                                                         and b.changeIndicator = 'N'
-                                                                         group by b.pidm, b.nameType.code)) """
-        PersonIdentificationNameAlternate.withSession { session ->
-            def query = session.createQuery(hql)
-            query.setParameterList('pidms', pidms)
-            query.setParameterList('nameTypes', nameTypeCodes)
-            entities = query.list()
+        if (pidms && nameTypeCodes) {
+            String hql = """ from PersonIdentificationNameAlternate a
+                             where a.pidm in :pidms
+                             and a.nameType.code in :nameTypes
+                             and a.entityIndicator = 'P'
+                             and a.changeIndicator = 'N'
+                             and (a.pidm, a.nameType.code, a.createDate) in (select b.pidm, b.nameType.code, max(b.createDate)
+                                                                             from PersonIdentificationNameAlternate b
+                                                                             where b.entityIndicator = 'P'
+                                                                             and b.changeIndicator = 'N'
+                                                                             group by b.pidm, b.nameType.code)) """
+            PersonIdentificationNameAlternate.withSession { session ->
+                def query = session.createQuery(hql)
+                query.setParameterList('pidms', pidms)
+                query.setParameterList('nameTypes', nameTypeCodes)
+                entities = query.list()
+            }
         }
         return entities
     }
