@@ -1,6 +1,6 @@
 /*********************************************************************************
-Copyright 2012 Ellucian Company L.P. and its affiliates.
-**********************************************************************************/
+ Copyright 2012-2016 Ellucian Company L.P. and its affiliates.
+ **********************************************************************************/
 package net.hedtech.banner.general.person
 
 import com.google.i18n.phonenumbers.PhoneNumberUtil
@@ -21,6 +21,21 @@ class PersonTelephoneService extends ServiceBase {
 
     boolean transactional = true
 
+    /**
+     * fetch Active Person Phone Informaton based on list on pidms and list of phonetype codes
+     * @param pidm
+     * @param phoneTypes
+     * @return List < PersonTelephone >
+     */
+    List<PersonTelephone> fetchListByActiveStatusPidmsAndPhoneTypes(Collection<Integer> pidms, Collection<String> phoneTypes) {
+        List<PersonTelephone> entities = []
+        if (pidms && phoneTypes) {
+            entities = PersonTelephone.withSession { session ->
+                session.getNamedQuery('PersonTelephone.fetchListByActiveStatusPidmsAndTelephoneTypes').setParameterList('pidms', pidms).setParameterList('telephoneTypes', phoneTypes).list()
+            }
+        }
+        return entities
+    }
 
 
 }

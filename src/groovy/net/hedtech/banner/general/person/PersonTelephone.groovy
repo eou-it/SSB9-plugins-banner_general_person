@@ -113,7 +113,14 @@ import javax.persistence.*
                              WHERE  pidm IN :pidms
                              AND NVL(statusIndicator,'A') <> 'I'
                              AND NVL(unlistIndicator,'N') <> 'Y'
-                    """)
+                    """),
+@NamedQuery(name = "PersonTelephone.fetchListByActiveStatusPidmsAndTelephoneTypes",
+                query = """FROM PersonTelephone
+                           WHERE pidm IN :pidms
+                           AND NVL(statusIndicator,'A') <> 'I'
+                           AND NVL(unlistIndicator,'N') <> 'Y'
+                           AND phoneArea is not null AND phoneNumber is not null
+                           AND telephoneType.code IN :telephoneTypes""")
 ])
 @DatabaseModifiesState
 class PersonTelephone implements Serializable {
@@ -541,4 +548,5 @@ class PersonTelephone implements Serializable {
             fetchActiveTelephoneByPidmInList( pidms )
         }
     }
+
 }
