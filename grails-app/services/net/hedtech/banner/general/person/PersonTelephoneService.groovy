@@ -3,10 +3,6 @@
  **********************************************************************************/
 package net.hedtech.banner.general.person
 
-import com.google.i18n.phonenumbers.PhoneNumberUtil
-import com.google.i18n.phonenumbers.Phonenumber
-import net.hedtech.banner.general.system.InstitutionalDescription
-import net.hedtech.banner.general.system.Nation
 import net.hedtech.banner.service.ServiceBase
 
 // NOTE:
@@ -22,16 +18,21 @@ class PersonTelephoneService extends ServiceBase {
     boolean transactional = true
 
     /**
-     * fetch Active Person Phone Informaton based on list on pidms and list of phonetype codes
+     * fetch Active Person Phone information based on list on pidms and list of phone type codes
      * @param pidm
      * @param phoneTypes
      * @return List < PersonTelephone >
      */
-    List<PersonTelephone> fetchListByActiveStatusPidmsAndPhoneTypes(Collection<Integer> pidms, Collection<String> phoneTypes) {
+    List<PersonTelephone> fetchAllActiveByPidmInListAndTelephoneTypeCodeInList(Collection<Integer> pidms, Collection<String> phoneTypes) {
         List<PersonTelephone> entities = []
         if (pidms && phoneTypes) {
             entities = PersonTelephone.withSession { session ->
-                session.getNamedQuery('PersonTelephone.fetchListByActiveStatusPidmsAndTelephoneTypes').setParameterList('pidms', pidms).setParameterList('telephoneTypes', phoneTypes).list()
+                def namedQuery = session.getNamedQuery('PersonTelephone.fetchAllActiveByPidmInListAndTelephoneTypeCodeInList')
+                namedQuery.with {
+                    setParameterList('pidms', pidms)
+                    setParameterList('telephoneTypes', phoneTypes)
+                    list()
+                }
             }
         }
         return entities

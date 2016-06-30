@@ -1,5 +1,5 @@
 /*********************************************************************************
- Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2016 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
@@ -114,7 +114,7 @@ import javax.persistence.*
                              AND NVL(statusIndicator,'A') <> 'I'
                              AND NVL(unlistIndicator,'N') <> 'Y'
                     """),
-@NamedQuery(name = "PersonTelephone.fetchListByActiveStatusPidmsAndTelephoneTypes",
+@NamedQuery(name = "PersonTelephone.fetchAllActiveByPidmInListAndTelephoneTypeCodeInList",
                 query = """FROM PersonTelephone
                            WHERE pidm IN :pidms
                            AND NVL(statusIndicator,'A') <> 'I'
