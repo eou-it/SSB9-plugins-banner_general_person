@@ -119,7 +119,7 @@ import javax.persistence.*
                            WHERE pidm IN :pidms
                            AND NVL(statusIndicator,'A') <> 'I'
                            AND NVL(unlistIndicator,'N') <> 'Y'
-                           AND phoneArea is not null AND phoneNumber is not null
+                           AND concat(phoneArea, phoneNumber) is not null
                            AND telephoneType.code IN :telephoneTypes""")
 ])
 @DatabaseModifiesState
