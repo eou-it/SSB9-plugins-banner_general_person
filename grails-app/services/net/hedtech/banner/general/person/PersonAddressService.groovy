@@ -17,7 +17,6 @@ import net.hedtech.banner.service.ServiceBase
 class PersonAddressService extends ServiceBase {
     boolean transactional = true
 
-
     void preUpdate(domainModelOrMap) {
         def domain = domainModelOrMap instanceof Map ? domainModelOrMap?.domainModel : domainModelOrMap
 
@@ -29,6 +28,12 @@ class PersonAddressService extends ServiceBase {
                 throw new RuntimeException("@@r1:primaryKeyFieldsCannotBeModified@@")
             }
         }
+    }
+
+    def getActiveAddresses(map) {
+        def activeAddresses = PersonAddress.fetchActiveAddressesByPidm(map)
+
+        return activeAddresses
     }
 
 }

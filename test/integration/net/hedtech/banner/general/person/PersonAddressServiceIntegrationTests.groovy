@@ -390,6 +390,15 @@ class PersonAddressServiceIntegrationTests extends BaseIntegrationTestCase {
 		assertNull "PersonAddress should have been deleted", personAddress.get(id)
   	}
 
+    @Test
+    void testGetActiveAddresses() {
+        def person = [pidm: u_success_pidm]
+        def activeAddresses = personAddressService.getActiveAddresses(person)
+
+        assertNotNull activeAddresses
+        assertEquals 'Incorrect number of addresses.', 1, activeAddresses.size()
+    }
+
 
 	private def newValidForCreatePersonAddress() {
         def personAddress = new PersonAddress(
