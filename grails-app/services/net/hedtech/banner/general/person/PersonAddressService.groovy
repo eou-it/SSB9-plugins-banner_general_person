@@ -17,6 +17,7 @@ import net.hedtech.banner.service.ServiceBase
 class PersonAddressService extends ServiceBase {
     boolean transactional = true
 
+
     void preUpdate(domainModelOrMap) {
         def domain = domainModelOrMap instanceof Map ? domainModelOrMap?.domainModel : domainModelOrMap
 
