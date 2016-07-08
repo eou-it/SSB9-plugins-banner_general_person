@@ -31,4 +31,10 @@ class PersonAddressService extends ServiceBase {
         }
     }
 
+    def getActiveAddresses(map) {
+        def activeAddresses = PersonAddress.fetchActiveAddressesByPidm(map)
+
+        return activeAddresses
+    }
+
 }
