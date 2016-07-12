@@ -71,10 +71,10 @@ class PersonAddressCompositeService {
         def addressCriteria = [pidm:domain.pidm,addressType:domain.addressType,fromDate:domain.fromDate,toDate:domain.toDate]
         if (domain.fromDate == null && domain.toDate == null)   {
           if (PersonAddress.fetchNotInactiveAddressByPidmAndAddressType(addressCriteria).list.size() > 0)
-            throw new ApplicationException(PersonAddress,"@@r1:multipleAddressesExist")
+            throw new ApplicationException(PersonAddress,"@@r1:multipleAddressesExist@@")
         } else {
          if (PersonAddress.fetchActiveAddressByPidmAndAddressTypeAndDates(addressCriteria).list.size() > 0)
-            throw new ApplicationException(PersonAddress,"@@r1:multipleAddressesExist")
+            throw new ApplicationException(PersonAddress,"@@r1:multipleAddressesExist@@")
         }
     }
 
@@ -83,17 +83,17 @@ class PersonAddressCompositeService {
         def addressCriteria = [pidm:domain.pidm,addressType:domain.addressType,fromDate:domain.fromDate,toDate:domain.toDate,id:domain.id]
          if (domain.fromDate == null && domain.toDate == null)   {
           if (PersonAddress.fetchNotInactiveAddressByPidmAndAddressTypeExcludingId(pidm:domain.pidm,addressType:domain.addressType,fromDate:domain.fromDate,toDate:domain.toDate,id:domain.id).list.size() > 0)
-            throw new ApplicationException(PersonAddress,"@@r1:multipleAddressesExist")
+            throw new ApplicationException(PersonAddress,"@@r1:multipleAddressesExist@@")
         } else {
         if (PersonAddress.fetchActiveAddressByPidmAndAddressTypeAndDatesExcludingId(addressCriteria).list.size() > 0)
-            throw new ApplicationException(PersonAddress,"@@r1:multipleAddressesExist")
+            throw new ApplicationException(PersonAddress,"@@r1:multipleAddressesExist@@")
          }
     }
 
 
     private boolean checkPhone(domain) {
         if (((domain.countryPhone) || (domain.phoneArea)) && !(domain.phoneNumber))  {
-            throw new ApplicationException(PersonAddress,"@@r1:phoneNumberNeededWithAncillaryPhoneInfo")
+            throw new ApplicationException(PersonAddress,"@@r1:phoneNumberNeededWithAncillaryPhoneInfo@@")
         }
     }
 
