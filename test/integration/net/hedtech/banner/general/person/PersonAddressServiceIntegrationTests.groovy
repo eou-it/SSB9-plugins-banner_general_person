@@ -399,6 +399,28 @@ class PersonAddressServiceIntegrationTests extends BaseIntegrationTestCase {
         assertEquals 'Incorrect number of addresses.', 1, activeAddresses.size()
     }
 
+    @Test
+    void testCheckAddressFieldsValidDateFail() {
+        def address = [fromDate: null, streetLine1: "123 Fake Street"]
+        try {
+            personAddressService.checkAddressFieldsValid(address)
+        }
+        catch(ApplicationException ae) {
+            assertApplicationException ae, "fromDateRequired"
+        }
+    }
+
+    @Test
+    void testCheckAddressFieldsValidLine1Fail() {
+        def address = [fromDate: i_success_fromDate, streetLine1: null]
+        try {
+            personAddressService.checkAddressFieldsValid(address)
+        }
+        catch(ApplicationException ae) {
+            assertApplicationException ae, "streetLine1Required"
+        }
+    }
+
 
 	private def newValidForCreatePersonAddress() {
         def personAddress = new PersonAddress(
