@@ -1,5 +1,5 @@
 /*********************************************************************************
- Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2016 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
@@ -13,19 +13,19 @@ import javax.persistence.*
  * Address Repeating Table
  */
 @NamedQueries(value = [
-@NamedQuery(name = "PersonAddress.fetchNotInactiveAddressByPidmAndAddressType",
-query = """FROM PersonAddress a
+        @NamedQuery(name = "PersonAddress.fetchNotInactiveAddressByPidmAndAddressType",
+                query = """FROM PersonAddress a
           WHERE a.pidm = :pidm
             AND a.addressType.code = :addressType
             AND a.statusIndicator is null"""),
-@NamedQuery(name = "PersonAddress.fetchNotInactiveAddressByPidmAndAddressTypeExcludingId",
-query = """FROM PersonAddress a
+        @NamedQuery(name = "PersonAddress.fetchNotInactiveAddressByPidmAndAddressTypeExcludingId",
+                query = """FROM PersonAddress a
           WHERE a.id <> :id
             AND a.pidm = :pidm
             AND a.addressType.code = :addressType
             AND a.statusIndicator is null"""),
-@NamedQuery(name = "PersonAddress.fetchActiveAddressByPidmAndAddressTypeAndDates",
-query = """ FROM PersonAddress a
+        @NamedQuery(name = "PersonAddress.fetchActiveAddressByPidmAndAddressTypeAndDates",
+                query = """ FROM PersonAddress a
      WHERE a.pidm = :pidm
        AND a.addressType.code = :addressType
        AND  a.statusIndicator IS NULL
@@ -43,8 +43,8 @@ query = """ FROM PersonAddress a
         OR    (NVL(a.toDate, TO_DATE('31-12-2099', 'DD-MM-YYYY'))
                BETWEEN NVL(:fromDate, TO_DATE('01-01-1900', 'DD-MM-YYYY'))
                    AND NVL(:toDate, TO_DATE('31-12-2099', 'DD-MM-YYYY')))))"""),
-@NamedQuery(name = "PersonAddress.fetchActiveAddressByPidmAndAddressTypeAndDatesExcludingId",
-query = """ FROM PersonAddress a
+        @NamedQuery(name = "PersonAddress.fetchActiveAddressByPidmAndAddressTypeAndDatesExcludingId",
+                query = """ FROM PersonAddress a
      WHERE a.id <> :id
        AND a.pidm = :pidm
        AND a.addressType.code = :addressType
@@ -63,8 +63,8 @@ query = """ FROM PersonAddress a
         OR    (NVL(a.toDate, TO_DATE('31-12-2099', 'DD-MM-YYYY'))
                BETWEEN NVL(:fromDate, TO_DATE('01-01-1900', 'DD-MM-YYYY'))
                    AND NVL(:toDate, TO_DATE('31-12-2099', 'DD-MM-YYYY')))))"""),
-@NamedQuery(name = "PersonAddress.fetchActiveAddressByPidmAndAddressType",
-query = """ FROM PersonAddress a
+        @NamedQuery(name = "PersonAddress.fetchActiveAddressByPidmAndAddressType",
+                query = """ FROM PersonAddress a
                             WHERE  a.pidm = :pidm
                             AND  a.addressType = :addressType
                             AND NVL(a.statusIndicator,'Y') <> 'I'
@@ -72,8 +72,8 @@ query = """ FROM PersonAddress a
                             NVL(SPRADDR_FROM_DATE,sysdate-1) AND
                             NVL(SPRADDR_TO_DATE,sysdate+1)
                 """),
-@NamedQuery(name = "PersonAddress.fetchListActiveAddressByPidmAndAddressType",
-query = """ FROM PersonAddress a
+        @NamedQuery(name = "PersonAddress.fetchListActiveAddressByPidmAndAddressType",
+                query = """ FROM PersonAddress a
                             WHERE  a.pidm IN :pidm
                             AND  a.addressType IN :addressType
                             AND NVL(a.statusIndicator,'Y') <> 'I'
@@ -81,24 +81,24 @@ query = """ FROM PersonAddress a
                             NVL(SPRADDR_FROM_DATE,sysdate-1) AND
                             NVL(SPRADDR_TO_DATE,sysdate+1)
                 """),
-@NamedQuery(name = "PersonAddress.fetchActiveAddressesByPidm",
-query = """ FROM PersonAddress a
+        @NamedQuery(name = "PersonAddress.fetchActiveAddressesByPidm",
+                query = """ FROM PersonAddress a
                             WHERE  a.pidm = :pidm
                             AND NVL(a.statusIndicator,'Y') <> 'I'
                             AND  SYSDATE BETWEEN
                             NVL(SPRADDR_FROM_DATE,sysdate-1) AND
                             NVL(SPRADDR_TO_DATE,sysdate+1)
                 """),
-@NamedQuery(name = "PersonAddress.fetchActiveAddressesByPidmInList",
-query = """ FROM PersonAddress a
+        @NamedQuery(name = "PersonAddress.fetchActiveAddressesByPidmInList",
+                query = """ FROM PersonAddress a
                             WHERE  a.pidm IN :pidms
                             AND NVL(a.statusIndicator,'Y') <> 'I'
                             AND  SYSDATE BETWEEN
                             NVL(SPRADDR_FROM_DATE,sysdate-1) AND
                             NVL(SPRADDR_TO_DATE,sysdate+1)
                 """),
-@NamedQuery(name = "PersonAddress.fetchSomeActiveAddressesByPidm",
-query = """ FROM PersonAddress a
+        @NamedQuery(name = "PersonAddress.fetchSomeActiveAddressesByPidm",
+                query = """ FROM PersonAddress a
                             WHERE  a.pidm = :pidm
                             AND NVL(a.statusIndicator,'Y') <> 'I'
                             AND a.addressType.code LIKE upper(:filter)
@@ -106,8 +106,8 @@ query = """ FROM PersonAddress a
                             NVL(SPRADDR_FROM_DATE,sysdate-1) AND
                             NVL(SPRADDR_TO_DATE,sysdate+1)
                 """),
-@NamedQuery(name = "PersonAddress.fetchAllByPidmAddressTypeAndStateOrderByStatusIndAddressTypeToDateFromDateAndSeqNo",
-query = """ FROM PersonAddress a
+        @NamedQuery(name = "PersonAddress.fetchAllByPidmAddressTypeAndStateOrderByStatusIndAddressTypeToDateFromDateAndSeqNo",
+                query = """ FROM PersonAddress a
                             WHERE a.pidm = :pidm
                             AND ( a.addressType LIKE :filter
                             OR a.state LIKE :filter )
@@ -153,8 +153,15 @@ query = """ FROM PersonAddress a
                                      a.toDate DESC,
                                      a.fromDate DESC,
                                      a.sequenceNumber
-                """)
-
+                """),
+        @NamedQuery(name = "PersonAddress.fetchAllByActiveStatusPidmsAndAddressTypes",
+                query = """ FROM PersonAddress a
+                            WHERE a.pidm IN (:pidms)
+                            AND a.addressType.code IN (:addressTypes)
+                            AND NVL(a.statusIndicator,'Y') <> 'I'
+                            AND SYSDATE BETWEEN
+                            NVL(SPRADDR_FROM_DATE,sysdate-1) AND
+                            NVL(SPRADDR_TO_DATE,sysdate+1) """)
 ])
 
 @Entity
@@ -343,7 +350,7 @@ class PersonAddress implements Serializable {
      */
     @ManyToOne
     @JoinColumns([
-        @JoinColumn(name = "SPRADDR_ATYP_CODE", referencedColumnName = "STVATYP_CODE")
+            @JoinColumn(name = "SPRADDR_ATYP_CODE", referencedColumnName = "STVATYP_CODE")
     ])
     AddressType addressType
 
@@ -352,7 +359,7 @@ class PersonAddress implements Serializable {
      */
     @ManyToOne
     @JoinColumns([
-        @JoinColumn(name = "SPRADDR_STAT_CODE", referencedColumnName = "STVSTAT_CODE")
+            @JoinColumn(name = "SPRADDR_STAT_CODE", referencedColumnName = "STVSTAT_CODE")
     ])
     State state
 
@@ -361,7 +368,7 @@ class PersonAddress implements Serializable {
      */
     @ManyToOne
     @JoinColumns([
-        @JoinColumn(name = "SPRADDR_CNTY_CODE", referencedColumnName = "STVCNTY_CODE")
+            @JoinColumn(name = "SPRADDR_CNTY_CODE", referencedColumnName = "STVCNTY_CODE")
     ])
     County county
 
@@ -370,7 +377,7 @@ class PersonAddress implements Serializable {
      */
     @ManyToOne
     @JoinColumns([
-        @JoinColumn(name = "SPRADDR_NATN_CODE", referencedColumnName = "STVNATN_CODE")
+            @JoinColumn(name = "SPRADDR_NATN_CODE", referencedColumnName = "STVNATN_CODE")
     ])
     Nation nation
 
@@ -379,7 +386,7 @@ class PersonAddress implements Serializable {
      */
     @ManyToOne
     @JoinColumns([
-        @JoinColumn(name = "SPRADDR_ASRC_CODE", referencedColumnName = "STVASRC_CODE")
+            @JoinColumn(name = "SPRADDR_ASRC_CODE", referencedColumnName = "STVASRC_CODE")
     ])
     AddressSource addressSource
 
@@ -521,7 +528,7 @@ class PersonAddress implements Serializable {
         correctionDigit(nullable: true, min: -9, max: 9)
         carrierRoute(nullable: true, maxSize: 4)
         reviewedIndicator(nullable: true, maxSize: 1, inList: ["Y", "N"])
-        goodsAndServiceTaxTaxId(nullable:true, maxSize:15)
+        goodsAndServiceTaxTaxId(nullable: true, maxSize: 15)
         reviewedUser(nullable: true, maxSize: 30)
         countryPhone(nullable: true, maxSize: 4)
         houseNumber(nullable: true, maxSize: 10)
@@ -549,47 +556,49 @@ class PersonAddress implements Serializable {
     }
 
 
-	static def fetchListActiveAddressByPidmAndAddressType(List pidm, List addressType) {
-		if (pidm.isEmpty() || addressType.isEmpty()) return []
-		PersonAddress.withSession { session ->
-			List personAddressList = session.getNamedQuery('PersonAddress.fetchListActiveAddressByPidmAndAddressType')
-				.setParameterList('pidm', pidm)
-				.setParameterList('addressType', addressType).list()
-			return personAddressList
-		}
-	}
-	
+    static def fetchListActiveAddressByPidmAndAddressType(List pidm, List addressType) {
+        if (pidm.isEmpty() || addressType.isEmpty()) return []
+        PersonAddress.withSession { session ->
+            List personAddressList = session.getNamedQuery('PersonAddress.fetchListActiveAddressByPidmAndAddressType')
+                    .setParameterList('pidm', pidm)
+                    .setParameterList('addressType', addressType).list()
+            return personAddressList
+        }
+    }
 
-    static def fetchActiveAddressesByPidm(map)  {
-         if (map.pidm) {
+
+    static def fetchActiveAddressesByPidm(map) {
+        if (map.pidm) {
             PersonAddress.withSession { session ->
                 List personAddressList = session.getNamedQuery('PersonAddress.fetchActiveAddressesByPidm').setInteger('pidm', map?.pidm).list()
-                return [list:personAddressList]
+                return [list: personAddressList]
             }
         } else {
             return null
         }
     }
 
-    static List<PersonAddress> fetchActiveAddressesByPidmInList(List<Integer> pidms)  {
-        if( pidms.isEmpty() ) { return [] }
+    static List<PersonAddress> fetchActiveAddressesByPidmInList(List<Integer> pidms) {
+        if (pidms.isEmpty()) {
+            return []
+        }
         PersonAddress.withSession { session ->
             session.getNamedQuery('PersonAddress.fetchActiveAddressesByPidmInList').setParameterList('pidms', pidms).list()
         }
     }
 
-    static Promise fetchActiveAddressesByPidmInListAsync(List<Integer> pidms)  {
+    static Promise fetchActiveAddressesByPidmInListAsync(List<Integer> pidms) {
         PersonAddress.async.task {
-            fetchActiveAddressesByPidmInList( pidms )
+            fetchActiveAddressesByPidmInList(pidms)
         }
     }
 
 
-     static def fetchActiveAddressesByPidm(String filter, map)  {
-         if (map.pidm) {
+    static def fetchActiveAddressesByPidm(String filter, map) {
+        if (map.pidm) {
             PersonAddress.withSession { session ->
                 List personAddressList = session.getNamedQuery('PersonAddress.fetchSomeActiveAddressesByPidm').setInteger('pidm', map?.pidm).setString('filter', filter + "%").list()
-                return [list:personAddressList]
+                return [list: personAddressList]
             }
         } else {
             return null
@@ -620,7 +629,7 @@ class PersonAddress implements Serializable {
 
 
     public static Object fetchActiveAddressByPidmAndAddressType(String filter, Map params) {
-         if (params?.pidm && params?.addressType) {
+        if (params?.pidm && params?.addressType) {
             PersonAddress.withSession { session ->
                 List personAddressList = session.getNamedQuery('PersonAddress.fetchActiveAddressByPidmAndAddressType').setInteger('pidm', pidm).setString('addressType', filter.toUpperCase()).list()
                 return personAddressList[0]
@@ -632,11 +641,11 @@ class PersonAddress implements Serializable {
     }
 
 
-     static def fetchNotInactiveAddressByPidmAndAddressType(Map map)  {
-         if (map.pidm) {
+    static def fetchNotInactiveAddressByPidmAndAddressType(Map map) {
+        if (map.pidm) {
             PersonAddress.withSession { session ->
-                List personAddressList = session.getNamedQuery('PersonAddress.fetchNotInactiveAddressByPidmAndAddressType').setInteger('pidm', map?.pidm).setString('addressType',map?.addressType.code).list()
-                return [list:personAddressList]
+                List personAddressList = session.getNamedQuery('PersonAddress.fetchNotInactiveAddressByPidmAndAddressType').setInteger('pidm', map?.pidm).setString('addressType', map?.addressType.code).list()
+                return [list: personAddressList]
             }
         } else {
             return null
@@ -644,11 +653,11 @@ class PersonAddress implements Serializable {
     }
 
 
-     static def fetchNotInactiveAddressByPidmAndAddressTypeExcludingId(Map map)  {
-         if (map.pidm) {
+    static def fetchNotInactiveAddressByPidmAndAddressTypeExcludingId(Map map) {
+        if (map.pidm) {
             PersonAddress.withSession { session ->
-                List personAddressList = session.getNamedQuery('PersonAddress.fetchActiveAddressesByPidm').setInteger('pidm', map?.pidm).setString('addressType',map?.addressType.code).setString('id',map?.id).list()
-                return [list:personAddressList]
+                List personAddressList = session.getNamedQuery('PersonAddress.fetchActiveAddressesByPidm').setInteger('pidm', map?.pidm).setString('addressType', map?.addressType.code).setString('id', map?.id).list()
+                return [list: personAddressList]
             }
         } else {
             return null
@@ -656,11 +665,11 @@ class PersonAddress implements Serializable {
     }
 
 
-     static def fetchActiveAddressByPidmAndAddressTypeAndDates(Map map)  {
-         if (map.pidm) {
+    static def fetchActiveAddressByPidmAndAddressTypeAndDates(Map map) {
+        if (map.pidm) {
             PersonAddress.withSession { session ->
-                List personAddressList = session.getNamedQuery('PersonAddress.fetchActiveAddressByPidmAndAddressTypeAndDates').setInteger('pidm', map?.pidm).setString('addressType',map?.addressType.code).setDate('fromDate',map?.fromDate).setDate('toDate',map?.toDate).list()
-                return [list:personAddressList]
+                List personAddressList = session.getNamedQuery('PersonAddress.fetchActiveAddressByPidmAndAddressTypeAndDates').setInteger('pidm', map?.pidm).setString('addressType', map?.addressType.code).setDate('fromDate', map?.fromDate).setDate('toDate', map?.toDate).list()
+                return [list: personAddressList]
             }
         } else {
             return null
@@ -668,11 +677,11 @@ class PersonAddress implements Serializable {
     }
 
 
-     static def fetchActiveAddressByPidmAndAddressTypeAndDatesExcludingId(Map map)  {
-         if (map.pidm) {
+    static def fetchActiveAddressByPidmAndAddressTypeAndDatesExcludingId(Map map) {
+        if (map.pidm) {
             PersonAddress.withSession { session ->
-                List personAddressList = session.getNamedQuery('PersonAddress.fetchActiveAddressByPidmAndAddressTypeAndDatesExcludingId').setInteger('pidm', map?.pidm).setString('addressType',map?.addressType.code).setDate('fromDate',map?.fromDate).setDate('toDate',map?.toDate).setLong('id',map?.id).list()
-                return [list:personAddressList]
+                List personAddressList = session.getNamedQuery('PersonAddress.fetchActiveAddressByPidmAndAddressTypeAndDatesExcludingId').setInteger('pidm', map?.pidm).setString('addressType', map?.addressType.code).setDate('fromDate', map?.fromDate).setDate('toDate', map?.toDate).setLong('id', map?.id).list()
+                return [list: personAddressList]
             }
         } else {
             return null
@@ -689,4 +698,5 @@ class PersonAddress implements Serializable {
             return null
         }
     }
+
 }

@@ -13,7 +13,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-class PersonAddressAttributesIntegrationTests extends BaseIntegrationTestCase {
+class PersonAddressExtendedPropertiesIntegrationTests extends BaseIntegrationTestCase {
 
     def i_success_addressType
     def i_success_state
@@ -57,23 +57,23 @@ class PersonAddressAttributesIntegrationTests extends BaseIntegrationTestCase {
     }
 
     @Test
-    void testGetPersonAddressAttributes() {
-        def personAddress=newPersonAddress()
+    void testGetPersonAddressExtendedProperties() {
+        def personAddress = newPersonAddress()
         personAddress.save(failOnError: true, flush: true)
-        //Test if the generated personAddressAttributes now has an id assigned
+        //Test if the generated personAddressExtendedProperties now has an id assigned
         assertNotNull personAddress.id
-        def personAddAtt = PersonAddressAttributes.get(personAddress.id)
-        assertNotNull personAddAtt
-        assertNotNull personAddAtt.addressGuid
+        def personAddExtendedProperties = PersonAddressExtendedProperties.get(personAddress.id)
+        assertNotNull personAddExtendedProperties
+        assertNotNull personAddExtendedProperties.addressGuid
     }
 
     private def newPersonAddress() {
         i_success_pidm = PersonIdentificationName.findByBannerId("HOF00714").pidm
-        i_success_addressType = AddressType.findWhere(code:"PO")
-        i_success_state = State.findWhere(code:"MER")
-        i_success_county = County.findWhere(code:"044")
-        i_success_nation = Nation.findWhere(code:"157")
-        i_success_addressSource = AddressSource.findWhere(code:"BRD")
+        i_success_addressType = AddressType.findWhere(code: "PO")
+        i_success_state = State.findWhere(code: "MER")
+        i_success_county = County.findWhere(code: "044")
+        i_success_nation = Nation.findWhere(code: "157")
+        i_success_addressSource = AddressSource.findWhere(code: "BRD")
         def personAddress = new PersonAddress(
                 pidm: i_success_pidm,
                 fromDate: i_success_fromDate,

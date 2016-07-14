@@ -1,6 +1,5 @@
-
 /*******************************************************************************
- Copyright 2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2013-2016 Ellucian Company L.P. and its affiliates.
  ****************************************************************************** */
 package net.hedtech.banner.general.person
 
@@ -29,6 +28,22 @@ class PersonAddressService extends ServiceBase {
                 throw new RuntimeException("@@r1:primaryKeyFieldsCannotBeModified@@")
             }
         }
+    }
+
+
+    List<PersonAddress> fetchAllByActiveStatusPidmsAndAddressTypes(Collection<Integer> pidms, Collection<String> addressTypeCodes) {
+        def entities = []
+        if (pidms && addressTypeCodes) {
+            PersonAddress.withSession { session ->
+                def query = session.getNamedQuery('PersonAddress.fetchAllByActiveStatusPidmsAndAddressTypes')
+                query.with {
+                    setParameterList('pidms', pidms)
+                    setParameterList('addressTypes', addressTypeCodes)
+                    entities = list()
+                }
+            }
+        }
+        return entities
     }
 
 }

@@ -11,7 +11,11 @@ import javax.persistence.*
 @Table(name = "SPRADDR")
 @ToString
 @EqualsAndHashCode
-class PersonAddressAttributes implements Serializable{
+@NamedQueries(value = [
+        @NamedQuery(name = "PersonAddressExtendedProperties.fetchAllBySurrogateIds",
+                query = """FROM PersonAddressExtendedProperties where id in (:surrogateIds) """)
+])
+class PersonAddressExtendedProperties implements Serializable {
 
     /**
      * Surrogate ID for SPRADDR
@@ -32,7 +36,7 @@ class PersonAddressAttributes implements Serializable{
     /**
      * Global Unique Identifier for SPRADDR
      */
-    @Column(name= "SPRADDR_GUID")
+    @Column(name = "SPRADDR_GUID")
     String addressGuid
 
     static constraints = {
