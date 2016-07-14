@@ -6,6 +6,9 @@ Copyright 2012 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
+
+import net.hedtech.banner.general.common.GeneralValidationCommonConstants
+import net.hedtech.banner.general.overall.ldm.GlobalUniqueIdentifier
 import org.junit.Before
 import org.junit.Test
 import org.junit.After
@@ -489,6 +492,42 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
         assertEquals "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL", nonPerson2.fullName
     }
 
+    @Test
+    void testFetchByGuid() {
+        PersonIdentificationNameCurrent personIdentificationNameCurrent = setupNewPersonIdentificationNameCurrent()
+        assertNotNull personIdentificationNameCurrent
+        assertNotNull personIdentificationNameCurrent.id
+        GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.fetchByLdmNameAndDomainId(GeneralValidationCommonConstants.PERSONS_LDM_NAME, personIdentificationNameCurrent.id)
+        assertNotNull globalUniqueIdentifier
+        assertNotNull globalUniqueIdentifier.guid
+
+        Map entitiesMap = personIdentificationNameCurrentService.fetchByGuid(globalUniqueIdentifier.guid)
+        assertNotNull entitiesMap
+        assertFalse entitiesMap.isEmpty()
+        assertEquals globalUniqueIdentifier, entitiesMap.globalUniqueIdentifier
+        assertEquals personIdentificationNameCurrent, entitiesMap.personIdentificationNameCurrent
+
+    }
+
+    @Test
+    void testFetchAllWithGuidByCriteria() {
+        PersonIdentificationNameCurrent personIdentificationNameCurrent = setupNewPersonIdentificationNameCurrent()
+        assertNotNull personIdentificationNameCurrent
+        assertNotNull personIdentificationNameCurrent.id
+        GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.fetchByLdmNameAndDomainId(GeneralValidationCommonConstants.PERSONS_LDM_NAME, personIdentificationNameCurrent.id)
+        assertNotNull globalUniqueIdentifier
+        assertNotNull globalUniqueIdentifier.guid
+
+        List entities = personIdentificationNameCurrentService.fetchAllWithGuidByPidmInList([personIdentificationNameCurrent.pidm])
+        assertFalse entities.isEmpty()
+        entities.each {
+            Map entitiesMap = it
+            assertNotNull entitiesMap
+            assertFalse entitiesMap.isEmpty()
+            assertEquals globalUniqueIdentifier, entitiesMap.globalUniqueIdentifier
+            assertEquals personIdentificationNameCurrent, entitiesMap.personIdentificationNameCurrent
+        }
+    }
 
     // *************************************************************************************************************
     //  End tests.
