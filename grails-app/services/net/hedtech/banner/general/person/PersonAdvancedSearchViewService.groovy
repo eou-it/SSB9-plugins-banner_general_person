@@ -76,32 +76,32 @@ class PersonAdvancedSearchViewService extends ServiceBase {
         }
 
         if (content.middleName) {
-            params.put("middleName", content.middleName?.trim().toLowerCase())
+            params.put("middleName", content.middleName?.trim())
             criteria.add([key: "middleName", binding: "middleName", operator: Operators.CONTAINS])
         }
 
         if (content.lastName) {
-            params.put("lastName", content.lastName?.trim().toLowerCase())
+            params.put("lastName", content.lastName?.trim())
             criteria.add([key: "lastName", binding: "lastName", operator: Operators.CONTAINS])
         }
 
         if (content.surnamePrefix) {
-            params.put("surnamePrefix", content.surnamePrefix?.trim().toLowerCase())
+            params.put("surnamePrefix", content.surnamePrefix?.trim())
             criteria.add([key: "surnamePrefix", binding: "surnamePrefix", operator: Operators.CONTAINS])
         }
 
         if (content.bannerId) {
-            params.put("bannerId", content.bannerId?.trim().toLowerCase())
+            params.put("bannerId", content.bannerId?.trim())
             criteria.add([key: "bannerId", binding: "bannerId", operator: Operators.EQUALS_IGNORE_CASE])
         }
 
         if (content.namePrefix) {
-            params.put("namePrefix", content.namePrefix?.trim().toLowerCase())
+            params.put("namePrefix", content.namePrefix?.trim())
             criteria.add([key: "namePrefix", binding: "namePrefix", operator: Operators.CONTAINS])
         }
 
         if (content.nameSuffix) {
-            params.put("nameSuffix", content.nameSuffix?.trim().toLowerCase())
+            params.put("nameSuffix", content.nameSuffix?.trim())
             criteria.add([key: "nameSuffix", binding: "nameSuffix", operator: Operators.CONTAINS])
         }
     }
