@@ -1,7 +1,7 @@
 /*********************************************************************************
  Copyright 2016 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
-package net.hedtech.banner.general.person
+package net.hedtech.banner.general.person.view
 
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.common.GeneralValidationCommonConstants
