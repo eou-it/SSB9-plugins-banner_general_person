@@ -1,5 +1,5 @@
 /*********************************************************************************
- Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2016 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
@@ -127,7 +127,7 @@ class PersonIdentificationNameCurrentService extends ServiceBase {
     def fetchByGuid(String guid) {
         Map row = [:]
         if (guid) {
-            List entitiesList = PersonIdentificationNameCurrent.withSession { session ->
+            def entitiesList = PersonIdentificationNameCurrent.withSession { session ->
                 String query = getGuidJoinHQL() + " and b.guid = :guid"
                 def hqlQuery = session.createQuery(query)
                 hqlQuery.with {
@@ -136,8 +136,10 @@ class PersonIdentificationNameCurrentService extends ServiceBase {
                     uniqueResult()
                 }
             }
-            row.personIdentificationNameCurrent = entitiesList[0]
-            row.globalUniqueIdentifier = entitiesList[1]
+            if (entitiesList) {
+                row.personIdentificationNameCurrent = entitiesList[0]
+                row.globalUniqueIdentifier = entitiesList[1]
+            }
         }
         return row
     }

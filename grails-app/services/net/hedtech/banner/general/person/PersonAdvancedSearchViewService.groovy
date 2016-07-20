@@ -71,7 +71,7 @@ class PersonAdvancedSearchViewService extends ServiceBase {
     private void buildCriteria(Map content, LinkedHashMap params, ArrayList criteria) {
 
         if (content.firstName) {
-            params.put("firstName", content.firstName?.trim().toLowerCase())
+            params.put("firstName", content.firstName?.trim())
             criteria.add([key: "firstName", binding: "firstName", operator: Operators.CONTAINS])
         }
 
