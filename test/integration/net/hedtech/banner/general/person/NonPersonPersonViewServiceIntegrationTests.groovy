@@ -150,5 +150,20 @@ class NonPersonPersonViewServiceIntegrationTests extends BaseIntegrationTestCase
         assertTrue entitiesMap.isEmpty()
     }
 
+    @Test
+    void testCountByCriteria(){
+        List rows = nonPersonPersonViewService.fetchAllWithGuidByCriteria(params, 1, 0)
+        assertNotNull rows
+        assertFalse rows.isEmpty()
+        String bannerId = rows.nonPersonPersonView.bannerId[0]+"Test"
+        assertNotNull bannerId
+        List entitiesList = nonPersonPersonViewService.fetchAllWithGuidByCriteria([bannerId: bannerId])
+        assertNotNull entitiesList
+
+        int actualCount = nonPersonPersonViewService.countByCriteria([bannerId: bannerId])
+        assertNotNull actualCount
+        assertEquals actualCount, entitiesList.size()
+    }
+
 }
 

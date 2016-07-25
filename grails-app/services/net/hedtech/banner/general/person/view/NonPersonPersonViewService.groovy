@@ -54,13 +54,13 @@ class NonPersonPersonViewService extends ServiceBase {
         List rows = []
         List entitiesList = NonPersonPersonView.withSession { session ->
             String query = getGuidJoinHQL()
-            if(params){
+            if(params.bannerId){
                 query += " and a.bannerId = :bannerId "
             }
             def hqlQuery = session.createQuery(query)
             hqlQuery.with {
                 setString('ldmName', GeneralValidationCommonConstants.NON_PERSONS_LDM_NAME)
-                if(params) {
+                if(params.bannerId) {
                     setString('bannerId', params.bannerId.trim())
                 }
                 if (max > 0) {
@@ -82,13 +82,13 @@ class NonPersonPersonViewService extends ServiceBase {
     def countByCriteria(Map params) {
         return NonPersonPersonView.withSession { session ->
             String query = " select count(*) " + getGuidJoinHQL()
-            if (params) {
+            if (params.bannerId) {
                 query += " and a.bannerId = :bannerId "
             }
             def hqlQuery = session.createQuery(query)
             hqlQuery.with {
                 setString('ldmName', GeneralValidationCommonConstants.NON_PERSONS_LDM_NAME)
-                if (params) {
+                if (params.bannerId) {
                     setString('bannerId', params.bannerId.trim())
                 }
                 uniqueResult()
