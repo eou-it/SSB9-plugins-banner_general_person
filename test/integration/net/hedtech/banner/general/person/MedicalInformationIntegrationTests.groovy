@@ -92,15 +92,15 @@ class MedicalInformationIntegrationTests extends BaseIntegrationTestCase {
 
     @Test
     void testFindWhere() {
-        def entity = MedicalInformation.findWhere(onsetAge: 12)
-        assertEquals "FindWhere did not return expected entity", 12, entity.onsetAge
+        def entity = MedicalInformation.findWhere(onsetAge: 39)
+        assertEquals "FindWhere did not return expected entity", 39, entity.onsetAge
     }
 
 
     @Test
     void testFindAll() {
         def medInfos = MedicalInformation.findAll()
-        assertTrue medInfos.size() >= 10
+        assertTrue medInfos.size() >= 9
     }
 
 
@@ -108,7 +108,7 @@ class MedicalInformationIntegrationTests extends BaseIntegrationTestCase {
     void testFindAllWithHQL() {
         String hql = "from MedicalInformation as m where m.onsetAge != null"
         def medInfos = MedicalInformation.findAll(hql)
-        assertTrue medInfos.size() >= 10
+        assertTrue medInfos.size() >= 1
     }
 
 
