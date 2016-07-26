@@ -31,7 +31,7 @@ class EmailSearchIntegrationTests extends BaseIntegrationTestCase {
     void testEmailSearchByFilterAndPagination() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
-        def filter = "einstein"
+        def filter = "Andersen"
         def results = PersonEmailView.fetchPersonEmailAddress(filter, pagingAndSortParams)
 
         assertNotNull results.list
@@ -50,7 +50,7 @@ class EmailSearchIntegrationTests extends BaseIntegrationTestCase {
     @Test
     void testEmailSearchByFilter() {
 
-        def filter = "einstein"
+        def filter = "Andersen"
         def results = PersonEmailView.fetchByEmailAddress(filter)
 
         assertNotNull results
@@ -98,9 +98,9 @@ class EmailSearchIntegrationTests extends BaseIntegrationTestCase {
     @Test
     void testEmailSearchByFilterAndPidm() {
         def pidmList = []
-        pidmList.add(new Integer("33775"))
+        pidmList.add(new Integer("50163"))
 
-        def filter = "einstein"
+        def filter = "ray"
         def results = PersonEmailView.fetchByEmailAddressAndPidm(pidmList, filter)
 
         assertNotNull results

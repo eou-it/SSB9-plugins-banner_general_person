@@ -138,7 +138,7 @@ class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegration
         // create the pereacc record
         String insertPereacc = "insert into pereacc (pereacc_pidm, pereacc_posn, pereacc_suff, pereacc_request_date," +
                 " pereacc_rqst_code, pereacc_medi_code, pereacc_verify_ind, pereacc_user_id,   pereacc_activity_date," +
-                "  pereacc_mdeq_code) values (${medicalInformation.pidm}, 'F10000', '00', sysdate, 'ACTV', 'ZZ', 'Y', 'grails',sysdate, 'zz')"
+                "  pereacc_mdeq_code) values (${medicalInformation.pidm}, 'F10000', '00', sysdate, 'ACC', 'ZZ', 'Y', 'grails',sysdate, 'zz')"
         Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
         def rowsIns = sql.executeUpdate(insertPereacc)
         assertEquals "One record should have been inserted", 1, rowsIns
@@ -177,7 +177,7 @@ class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegration
         String insertPereacc = "insert into pereacc (pereacc_pidm, pereacc_posn, pereacc_suff, pereacc_request_date," +
                 " pereacc_rqst_code, pereacc_medi_code, pereacc_verify_ind, pereacc_user_id,   pereacc_activity_date, " +
                 " pereacc_mdeq_code) values (   " +
-                "  ${medicalInformation.pidm}, 'F10000', '00', sysdate, 'ACTV', 'ZZ', 'Y', 'grails',sysdate, 'zz')"
+                "  ${medicalInformation.pidm}, 'F10000', '00', sysdate, 'ACC', 'ZZ', 'Y', 'grails',sysdate, 'zz')"
         Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
         def rowsIns = sql.executeUpdate(insertPereacc)
         assertEquals "One record should have been inserted", 1, rowsIns
