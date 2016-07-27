@@ -33,17 +33,17 @@ class NonPersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
         def id
-        def lastName = "Thompson"
+        def lastName = "First"
         def soundexLastName
         def changeIndicator
         def nameType = ""
 
         //search by last name
         def results = NonPersonPersonView.fetchPerson(id, lastName, soundexLastName, changeIndicator, nameType, pagingAndSortParams)
-        assert results.size() == 6
+        assert results.size() >= 4
 
         //search by change indicator
-        soundexLastName = "Tompson"
+        soundexLastName = "First"
         nameType = NameType.findWhere(code: "LEGL").code
         results = NonPersonPersonView.fetchPerson(id, lastName, soundexLastName, changeIndicator, nameType, pagingAndSortParams)
         assertTrue results.size() == 1
@@ -57,7 +57,7 @@ class NonPersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
         def id
-        def lastName = "Thompson"
+        def lastName = "First"
         def soundexLastName
         def changeIndicator
         def nameType = ""
@@ -84,7 +84,7 @@ class NonPersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def filterData = [:]
         def param = [:]
-        param."searchLastName" = "%thompson%"
+        param."searchLastName" = "%First%"
         filterData.params = param
 
         def m = [:]
@@ -102,7 +102,7 @@ class NonPersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         assertNotNull result
 
-        assert result.size() == 6
+        assert result.size() >= 4
     }
 
     /**
@@ -116,7 +116,7 @@ class NonPersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def filterData = [:]
         def param = [:]
-        param."bannerId" = "%A00010216%"
+        param."bannerId" = "%300000016%"
 
         filterData.params = param
 
@@ -237,13 +237,13 @@ class NonPersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def filterData = [:]
         def param = [:]
-        param."soundexLastName" = "Tompson" //Thompson is the actual name
+        param."soundexLastName" = "First" //Thompson is the actual name
         filterData.params = param
 
         def result = NonPersonPersonView.fetchSearchSoundexEntityList(filterData, pagingAndSortParams)
 
         assertNotNull result
 
-        assert result.size() == 6
+        assert result.size() >= 4
     }
 }
