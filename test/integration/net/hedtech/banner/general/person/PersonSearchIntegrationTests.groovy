@@ -35,7 +35,7 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
         def id
-        def lastName = "Duck"
+        def lastName = "Macca"
         def firstName
         def midName
         def soundexLastName
@@ -45,27 +45,27 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         //search by last name
         def results = PersonPersonView.fetchPerson(id, lastName, firstName, midName, soundexLastName, soundexFirstName, changeIndicator, nameType, pagingAndSortParams)
-        assert results.size() == 4
+        assert results.size() == 1
 
-        lastName = "Duc" //Ducey
+        lastName = "Clark" //Ducey
 
         results = PersonPersonView.fetchPerson(id, lastName, firstName, midName, soundexLastName, soundexFirstName, changeIndicator, nameType, pagingAndSortParams)
-        assert results.size() == 5
+        assert results.size() == 8
 
         //search by soundex   [Duck,Dog,Ducey,Diaz,Dawg]
-        soundexLastName = "Duck"
+        soundexLastName = "Onofrio"
         results = PersonPersonView.fetchPerson(id, lastName, firstName, midName, soundexLastName, soundexFirstName, changeIndicator, nameType, pagingAndSortParams)
         assertTrue results.size() == 8
 
         //search by change indicator
-        soundexLastName = "Duck"
+        soundexLastName = "Onofrio"
         changeIndicator = "N"
         results = PersonPersonView.fetchPerson(id, lastName, firstName, midName, soundexLastName, soundexFirstName, changeIndicator, nameType, pagingAndSortParams)
-        assertTrue results.size() == 3
+        assertTrue results.size() == 4
 
         //search by name type
         nameType = NameType.findWhere(code: "LEGL").code
-        lastName = "Sam"
+        lastName = "Macca"
         soundexLastName = ""
         changeIndicator = ""
         results = PersonPersonView.fetchPerson(id, lastName, firstName, midName, soundexLastName, soundexFirstName, changeIndicator, nameType, pagingAndSortParams)
@@ -86,7 +86,7 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
         def id
-        def lastName = "Duck"
+        def lastName = "Thomas"
         def firstName
         def midName
         def soundexLastName
@@ -117,7 +117,7 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def filterData = [:]
         def param = [:]
-        param."searchLastName" = "duck%"
+        param."searchLastName" = "Clark%"
 
         def m = [:]
         m."key" = "searchLastName"
@@ -134,7 +134,7 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         assertNotNull result
 
-        assert result.size() == 4
+        assert result.size() >= 4
     }
 
     /**
@@ -148,7 +148,7 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def filterData = [:]
         def param = [:]
-        param."searchLastName" = "W'est%".replaceAll('[^a-zA-Z0-9]+', '')
+        param."searchLastName" = "M'acca%".replaceAll('[^a-zA-Z0-9]+', '')
 
         def m = [:]
         m."key" = "searchLastName"
@@ -166,7 +166,7 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
         assertNotNull result
 
         assertNotNull result.find {
-            it.lastName == "W'est"
+            it.lastName == "Macca"
         }
     }
 
@@ -182,8 +182,8 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
         def filterData = [:]
         def param = [:]
 
-        param."searchLastName" = "beaulac%"
-        param."searchFirstName" = "carl%"
+        param."searchLastName" = "Macca%"
+        param."searchFirstName" = "Moul%"
 
         def m = [:]
         m."key" = "changeIndicator"
@@ -225,8 +225,8 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def filterData = [:]
         def param = [:]
-        param."searchLastName" = "duck%"
-        param."birthDate" = Date.parse("yyyy-MM-dd", "2012-03-07")
+        param."searchLastName" = "Thomas%"
+        param."birthDate" = Date.parse("yyyy-MM-dd", "1994-01-16")
 
         filterData.params = param
 
@@ -249,7 +249,7 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         assertNotNull result
 
-        assert result.size() == 3
+        assert result.size() == 6
     }
 
     /**
@@ -263,10 +263,10 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def filterData = [:]
         def param = [:]
-        param."searchLastName" = "duck%"
+        param."searchLastName" = "Thomas%"
         String strDateFrom = "1975/12/15";
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
-        Date t = Date.parse("yyyy-MM-dd", "1975-12-15")
+        Date t = Date.parse("yyyy-MM-dd", "1965-02-27")
         param."birthDate" = t
         filterData.params = param
 
@@ -304,8 +304,8 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
         def filterData = [:]
         def param = [:]
 
-        param."searchLastName" = "duck%"
-        param."searchFirstName" = "don%"
+        param."searchLastName" = "CLARK%"
+        param."searchFirstName" = "DONNIE%"
 
         filterData.params = param
 
@@ -328,7 +328,7 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         assertNotNull result
 
-        assert result.size() == 1
+        assert result.size() >= 1
     }
 
     /**
@@ -342,7 +342,7 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def filterData = [:]
         def param = [:]
-        param."bannerId" = "%A00000654%"
+        param."bannerId" = "%210009501%"
 
         def m = [:]
         m."key" = "bannerId"
@@ -359,7 +359,7 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         assertNotNull result
 
-        assert result.size() == 1
+        assert result.size() == 2
     }
 
     /**
@@ -373,7 +373,7 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def filterData = [:]
         def param = [:]
-        param."soundexLastName" = "duck"
+        param."soundexLastName" = "Clark"
         param."soundexFirstName" = ""
         filterData.params = param
 
@@ -395,8 +395,8 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def filterData = [:]
         def param = [:]
-        param."soundexLastName" = "duck"
-        param."soundexFirstName" = "dayzy"
+        param."soundexLastName" = "Naples"
+        param."soundexFirstName" = "Ogden"
         filterData.params = param
 
         def result = PersonPersonView.fetchSearchSoundexEntityList(filterData, pagingAndSortParams)
@@ -418,7 +418,7 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
         def filterData = [:]
         def param = [:]
 
-        param."searchLastName" = "McAnderson"
+        param."searchLastName" = "Macca"
         param."nameType" = "LEGL"
 
         filterData.params = param
@@ -488,12 +488,12 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
     @Test
     void testSearchPersonByPidm() {
         def pidmList = []
-        pidmList.add(new Integer("1358"))
-        pidmList.add(new Integer("1355"))
+        pidmList.add(new Integer("20"))
+        pidmList.add(new Integer("87"))
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
         def id
-        def lastName = "Duck"
+        def lastName = "Adams"
         def firstName
         def midName
         def soundexLastName
@@ -571,7 +571,7 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
         def filterData = [:]
         def param = [:]
 
-        param."nameSuffix" = "PhD"
+        param."nameSuffix" = "Jr."
 
         filterData.params = param
 
@@ -589,7 +589,7 @@ class PersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         assertNotNull result
         assertNotNull result.find {
-            it.nameSuffix == "PhD"
+            it.nameSuffix == "Jr."
         }
     }
 

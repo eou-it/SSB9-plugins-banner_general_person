@@ -31,7 +31,7 @@ class PersonAlternateIdSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
         def id
-        def lastName = "Duck"
+        def lastName = "Clark"
         def firstName
         def midName
         def ssn = ""
@@ -39,15 +39,15 @@ class PersonAlternateIdSearchIntegrationTests extends BaseIntegrationTestCase {
 
         //search by last name
         def results = PersonAlternateIdView.fetchPerson(id, lastName, firstName, midName, changeIndicator, ssn, pagingAndSortParams)
-        assert results.size() == 4
+        assert results.size() == 8
 
-        lastName = "Duc" //Ducey
+        lastName = "McWilliams" //Ducey
 
         results = PersonAlternateIdView.fetchPerson(id, lastName, firstName, midName, changeIndicator, ssn, pagingAndSortParams)
-        assert results.size() == 5
+        assert results.size() == 2
 
         //search by ssn
-        ssn = "439590585"
+        ssn = "610009617"
         lastName = ""
         results = PersonAlternateIdView.fetchPerson(id, lastName, firstName, midName, changeIndicator, ssn, pagingAndSortParams)
         assertNotNull results
@@ -67,7 +67,7 @@ class PersonAlternateIdSearchIntegrationTests extends BaseIntegrationTestCase {
         def filterData = [:]
         def param = [:]
 
-        param."preferredFirstName" = "Trouble"
+        param."preferredFirstName" = "Barb"
 
         filterData.params = param
 

@@ -166,8 +166,8 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
         def bio = setupNewPersonBasicPersonBase(person1)
 
         try {
-            person2.bannerId = bio.ssn
-            personIdentificationNameCurrentService.update([domainModel: person2])
+            person1.bannerId = bio.ssn
+            personIdentificationNameCurrentService.update([domainModel: person1])
             fail "Should have failed because you cannot update a banner id with an existing ssn."
         }
         catch (ApplicationException ae) {

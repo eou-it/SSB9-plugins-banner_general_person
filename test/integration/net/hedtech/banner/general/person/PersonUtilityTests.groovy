@@ -104,7 +104,7 @@ class PersonUtilityTests extends BaseIntegrationTestCase {
 
     @Test
     void testIsPersonDeceased() {
-        def pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("JCSYS0001", null).pidm
+        def pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("HOF00718", null).pidm
         assertNotNull pidm
         def testPidm = PersonUtility.isPersonDeceased(pidm)
         assertTrue testPidm
@@ -138,11 +138,11 @@ class PersonUtilityTests extends BaseIntegrationTestCase {
 
     @Test
     void testGetEmailId() {
-        def pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("HOF00714", null).pidm
+        def pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("STUAFR152", null).pidm
         assertNotNull pidm
         def emailId = PersonUtility.getEmailId(pidm)
         assertNotNull emailId
-        assertEquals emailId, "Marita.Herwig@sungarduniv.edu"
+        assertEquals emailId, "Zayne152@college.edu"
     }
 
 
