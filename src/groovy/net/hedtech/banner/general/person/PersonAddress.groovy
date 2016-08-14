@@ -159,9 +159,9 @@ import javax.persistence.*
                             WHERE a.pidm IN (:pidms)
                             AND a.addressType.code IN (:addressTypes)
                             AND NVL(a.statusIndicator,'Y') <> 'I'
-                            AND SYSDATE BETWEEN
-                            NVL(SPRADDR_FROM_DATE,sysdate-1) AND
-                            NVL(SPRADDR_TO_DATE,sysdate+1) """)
+                            AND TRUNC(SYSDATE) BETWEEN
+                            TRUNC(NVL(a.fromDate,SYSDATE-1)) AND
+                            TRUNC(NVL(a.toDate,SYSDATE+1)) """)
 ])
 
 @Entity

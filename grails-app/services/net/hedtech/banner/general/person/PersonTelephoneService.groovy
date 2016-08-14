@@ -38,5 +38,20 @@ class PersonTelephoneService extends ServiceBase {
         return entities
     }
 
+    List<PersonTelephone> fetchAllByIdInListAndTelephoneTypeCodeInList(Collection<Long> ids, Collection<String> phoneTypes) {
+        List<PersonTelephone> entities = []
+        if (ids && phoneTypes) {
+            entities = PersonTelephone.withSession { session ->
+                def namedQuery = session.getNamedQuery('PersonTelephone.fetchAllByIdInListAndTelephoneTypeCodeInList')
+                namedQuery.with {
+                    setParameterList('ids', ids)
+                    setParameterList('telephoneTypes', phoneTypes)
+                    list()
+                }
+            }
+        }
+        return entities
+    }
+
 
 }

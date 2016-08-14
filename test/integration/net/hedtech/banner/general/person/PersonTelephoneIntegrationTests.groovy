@@ -1,5 +1,5 @@
 /*********************************************************************************
-  Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+  Copyright 2009-2016 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
@@ -563,16 +563,6 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
 		assertTrue results.size() > 1
 		assertTrue results[0] instanceof PersonTelephone
 	}
-
-
-    @Ignore
-    void testFetchActiveTelephonesByPidmAndAddressTypes() {
-        def pidm = PersonUtility.getPerson("HOF00714").pidm
-        def results = PersonTelephone.fetchActiveTelephonesByPidmAndAddressTypes(pidm, [AddressType.findByCode("MA"), TelephoneType.findByCode("PR")])
-
-        assertTrue results.size() > 1
-        assertTrue results[0] instanceof PersonTelephone
-    }
 
 
     @Test
