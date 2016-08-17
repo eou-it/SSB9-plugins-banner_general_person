@@ -31,7 +31,7 @@ class PersonAdvancedSearchViewService extends ServiceBase {
     }
 
     def throwUnsupportedException() {
-        throw new ApplicationException(PersonSearchView, "@@r1:unsupported.operation@@")
+        throw new ApplicationException(PersonAdvancedSearchView.class, "@@r1:unsupported.operation@@")
     }
 
     def fetchAllByCriteria(Map content, String sortField = null, String sortOrder = null, int max = 0, int offset = -1) {
@@ -43,9 +43,9 @@ class PersonAdvancedSearchViewService extends ServiceBase {
         buildCriteria(content, params, criteria)
 
         if (sortField) {
-            pagingAndSortParams.sort = sortField
+            pagingAndSortParams.sortColumn = sortField
             if (["asc", "desc"].contains(sortOrder?.trim()?.toLowerCase())) {
-                pagingAndSortParams.order = sortOrder
+                pagingAndSortParams.sortDirection = sortOrder
             }
         }
 

@@ -189,31 +189,31 @@ class PersonAdvancedSearchViewServiceIntegrationTests extends BaseIntegrationTes
             PersonAdvancedSearchView personSearchView = it
             assertNotNull personSearchView
             if (params.bannerId) {
-                params.bannerId.contains(personSearchView.bannerId)
+              assertEquals params.bannerId ,personSearchView.bannerId
             }
 
             if (params.firstName) {
-                params.firstName.contains(personSearchView.firstName)
+                assertEquals params.firstName.toLowerCase(), personSearchView.firstName.toLowerCase()
             }
 
             if (params.middleName) {
-                params.middleName.contains(personSearchView.middleName)
+                assertEquals params.middleName.toLowerCase(), personSearchView.middleName.toLowerCase()
             }
 
             if (params.lastName) {
-                params.lastName.contains(personSearchView.lastName)
+                assertEquals  params.lastName.toLowerCase(), personSearchView.lastName.toLowerCase()
             }
 
             if (params.surnamePrefix) {
-                params.surnamePrefix.contains(personSearchView.surnamePrefix)
+                assertEquals params.surnamePrefix.toLowerCase(), personSearchView.surnamePrefix.toLowerCase()
             }
 
             if (params.namePrefix) {
-                params.namePrefix.contains(personSearchView.namePrefix)
+                assertEquals params.namePrefix.toLowerCase(), personSearchView.namePrefix.toLowerCase()
             }
 
             if (params.nameSuffix) {
-                params.nameSuffix.contains(personSearchView.nameSuffix)
+                assertEquals params.nameSuffix.toLowerCase(), personSearchView.nameSuffix.toLowerCase()
             }
 
         }
