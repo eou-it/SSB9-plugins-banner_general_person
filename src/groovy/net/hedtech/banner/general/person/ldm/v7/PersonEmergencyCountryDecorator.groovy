@@ -60,7 +60,7 @@ class PersonEmergencyCountryDecorator {
 
     private String getPostalCodePattern(String iso3CountryCode) {
         String pattern
-        HedmPersonEmergencyCountry hedmCountry = HedmPersonEmergencyCountry.valueOf(iso3CountryCode)
+        HedmPersonEmergencyCountry hedmCountry = HedmPersonEmergencyCountry.getByString(iso3CountryCode)
         if (hedmCountry) {
             pattern = hedmCountry.postalCodePattern
         }
@@ -70,7 +70,7 @@ class PersonEmergencyCountryDecorator {
 
     private String getPostalTitleForAddress(String iso3CountryCode) {
         String addrTitle = null
-        HedmPersonEmergencyCountry hedmCountry = HedmPersonEmergencyCountry.valueOf(iso3CountryCode)
+        HedmPersonEmergencyCountry hedmCountry = HedmPersonEmergencyCountry.getByString(iso3CountryCode)
         if (hedmCountry) {
             addrTitle = hedmCountry.postalTitle
         }

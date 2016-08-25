@@ -23,7 +23,7 @@ import net.hedtech.banner.general.utility.IsoCodeService
 import net.hedtech.banner.restfulapi.RestfulApiValidationUtility
 import org.springframework.transaction.annotation.Transactional
 
-
+@Transactional
 class PersonContactCompositeService extends LdmService {
     PersonEmergencyContactViewService personEmergencyContactViewService
     IntegrationConfigurationService integrationConfigurationService

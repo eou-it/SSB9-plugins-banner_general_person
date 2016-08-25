@@ -38,7 +38,7 @@ class PersonEmergencyAddressDecorator {
     }
 
 
-    private List<String> getAddressLinesForAddress(PersonEmergencyContactView personEmergencyContactView) {
+    public List<String> getAddressLinesForAddress(PersonEmergencyContactView personEmergencyContactView) {
         List<String> addressLines = []
         if (personEmergencyContactView.houseNumber) {
             addressLines << personEmergencyContactView.houseNumber
