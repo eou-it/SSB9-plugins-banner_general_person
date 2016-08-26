@@ -71,7 +71,10 @@ class PersonContactCompositeService extends LdmService {
         String sortField = params.sort?.trim()
         String sortOrder = params.order?.trim()
         int max = params.max?.trim()?.toInteger() ?: 0
-        int offset = params.offset?.trim()?.toInteger() ?: 0
+        int offset = 0
+        if (params.offset) {
+            offset = params.offset.trim()?.toInteger()
+        }
 
         List<PersonEmergencyContactView> personEmergencyContactViewList = personEmergencyContactViewService.fetchAllByCriteria(prepareSearchMapForList(params), sortField, sortOrder, max, offset)
 
