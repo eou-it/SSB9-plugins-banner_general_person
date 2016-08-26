@@ -68,7 +68,14 @@ import javax.persistence.*
         @NamedQuery(name = "PersonEmail.fetchByPidmsAndActiveStatus",
                 query = """FROM PersonEmail a
     WHERE a.pidm in (:pidms)
-    and a.statusIndicator = 'A' """)
+    and a.statusIndicator = 'A' """),
+        @NamedQuery(name = "PersonEmail.fetchByPidmAndActiveAndWebDisplayable",
+                query = """FROM PersonEmail a
+    WHERE a.pidm = :pidm
+    AND a.displayWebIndicator = 'Y'
+    AND a.emailType.displayWebIndicator = 'Y'
+    AND a.statusIndicator = 'A'
+""")
 ])
 class PersonEmail implements Serializable {
     static def log = Logger.getLogger('net.hedtech.banner.general.person.PersonEmail')
@@ -364,6 +371,14 @@ class PersonEmail implements Serializable {
         }
         log.debug "Executing fetchByPidmsAndActiveStatus with pidms = ${pidm} "
         log.debug "Fetched number of emails ${emails.size()} }"
+        return emails
+    }
+
+    public static List fetchByPidmAndActiveAndWebDisplayable(Integer pidm){
+        def emails = PersonEmail.withSession { session ->
+            session.getNamedQuery('PersonEmail.fetchByPidmAndActiveAndWebDisplayable').setInteger('pidm', pidm).list()
+        }
+
         return emails
     }
 

@@ -30,4 +30,8 @@ class PersonEmailService extends ServiceBase {
             }
         }
     }
+
+    def fetchByPidmAndActiveAndWebDisplayable(pidm) {
+        return PersonEmail.fetchByPidmAndActiveAndWebDisplayable(pidm)
+    }
 }
