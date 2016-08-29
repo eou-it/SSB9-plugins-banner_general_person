@@ -24,6 +24,8 @@ class NameV6 {
     String title
     String pedigree
 
+    String preferredName
+
 
     public static String getFullName(String firstName, String middleName, String lastName) {
         StringBuilder sb = new StringBuilder()
