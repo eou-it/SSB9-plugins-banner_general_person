@@ -114,7 +114,7 @@ class PersonContactCompositeServiceIntegrationTests extends BaseIntegrationTestC
         assertEquals o_success_personEmergencyContact.phoneExtension, decorator.contact.phone.extension
         assertEquals o_success_personEmergencyContact.relationshipTypeGuid, decorator.contact.relationshipGuid
         assertEquals o_success_personEmergencyContact.relationshipTypeGuid, decorator.contact.relationship.detail.id
-        assertEquals personContactCompositeService.count(params), decorators.size()
+        assertTrue personContactCompositeService.count(params) >= decorators.size()
     }
 
 
