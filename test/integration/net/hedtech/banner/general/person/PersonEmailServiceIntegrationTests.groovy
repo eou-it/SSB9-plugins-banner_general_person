@@ -208,6 +208,16 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
         }
     }
 
+    @Test
+    void testFetchByPidmAndActiveAndWebDisplayable(){
+        def pidm = PersonUtility.getPerson("GDP000001").pidm
+
+        def emails = personEmailService.fetchByPidmAndActiveAndWebDisplayable(pidm)
+
+        assertEquals 1, emails.size()
+        assertEquals 'ansbates@telstra.com', emails[0].emailAddress
+    }
+
 
     private def newValidForCreatePersonEmail() {
         def sql = new Sql(sessionFactory.getCurrentSession().connection())
