@@ -21,6 +21,8 @@ class PersonTelephoneService extends ServiceBase {
 
     boolean transactional = true
 
-
+    def fetchActiveTelephonesByPidm(pidm) {
+        return PersonTelephone.fetchActiveTelephoneByPidm(pidm)
+    }
 
 }
