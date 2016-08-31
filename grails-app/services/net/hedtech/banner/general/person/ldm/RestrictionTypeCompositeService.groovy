@@ -30,15 +30,11 @@ class RestrictionTypeCompositeService extends LdmService {
 
     public static final String PERSON_HOLD_TYPES = "person-hold-types"
 
-    private static
-    final List<String> VERSIONS = [GeneralValidationCommonConstants.VERSION_V1, GeneralValidationCommonConstants.VERSION_V4]
-
     def holdTypeService
 
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     List<RestrictionType> list(Map params) {
-        String acceptVersion = getAcceptVersion(VERSIONS)
 
         if (params?.parentPluralizedResourceName == GeneralValidationCommonConstants.PERSONS_ENDPOINT) {
             def returnLists = []
@@ -65,7 +61,7 @@ class RestrictionTypeCompositeService extends LdmService {
             return returnLists
         }
         //start-for Version 6 Schema support -PERSON-HOLD-TYPES
-        else if (params?.pluralizedResourceName?.equals(PERSON_HOLD_TYPES)) {
+        else if (getAcceptVersionByPluralizedResourceName(params) >= GeneralValidationCommonConstants.VERSION_V6) {
             List restrictionTypes = []
             RestfulApiValidationUtility.correctMaxAndOffset(params, RestfulApiValidationUtility.MAX_DEFAULT, RestfulApiValidationUtility.MAX_UPPER_LIMIT)
             params.offset = params?.offset ?: 0
@@ -77,7 +73,7 @@ class RestrictionTypeCompositeService extends LdmService {
 
         }
         //end-for Version 6 Schema support -PERSON-HOLD-TYPES
-        else {
+        else if(getAcceptVersionByPluralizedResourceName(params) < GeneralValidationCommonConstants.VERSION_V6){
             List restrictionTypes = []
             // List allowedSortFields = ("v4".equals(LdmService.getAcceptVersion(GeneralValidationCommonConstants.VERSIONS_V1_V4)) ? ['code', 'title'] : ['abbreviation', 'title'])
             // List allowedSortFields = ("v4".equals(LdmService.getAcceptVersion(GeneralValidationCommonConstants.VERSIONS_V1_V4)) ? ['code', 'title'] : ['abbreviation', 'title'])
@@ -116,19 +112,25 @@ class RestrictionTypeCompositeService extends LdmService {
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     RestrictionType get(String guid) {
-        String acceptVersion = getAcceptVersion(VERSIONS)
+        String acceptVersion
+        String requestURI = getHttpServletRequest().getForwardURI()
+        if(requestURI.contains('restriction-types')){
+            acceptVersion = getAcceptVersionByPluralizedResourceName([pluralizedResourceName:'restriction-types'])
+        }else if(requestURI.contains(PERSON_HOLD_TYPES)){
+            acceptVersion = getAcceptVersionByPluralizedResourceName([pluralizedResourceName:PERSON_HOLD_TYPES])
+        }
 
         GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(GeneralValidationCommonConstants.RESTRICTION_TYPE_LDM_NAME, guid)
-        if (!globalUniqueIdentifier && GeneralValidationCommonConstants.VERSION_V6.equals(getAcceptVersion(VERSIONS))) {
+        if (!globalUniqueIdentifier && GeneralValidationCommonConstants.VERSION_V6.equals(acceptVersion)) {
             throw new ApplicationException(GeneralValidationCommonConstants.PERSON_HOLD_TYPES, new NotFoundException())
-        } else if (!globalUniqueIdentifier && !GeneralValidationCommonConstants.VERSION_V6.equals(getAcceptVersion(VERSIONS))) {
+        } else if (!globalUniqueIdentifier && !GeneralValidationCommonConstants.VERSION_V6.equals(acceptVersion)) {
             throw new ApplicationException("restrictionType", new NotFoundException())
         }
 
         HoldType holdType = HoldType.get(globalUniqueIdentifier.domainId)
-        if (!holdType && GeneralValidationCommonConstants.VERSION_V6.equals(getAcceptVersion(VERSIONS))) {
+        if (!holdType && GeneralValidationCommonConstants.VERSION_V6.equals(acceptVersion)) {
             throw new ApplicationException(GeneralValidationCommonConstants.PERSON_HOLD_TYPES, new NotFoundException())
-        } else if (!holdType && !GeneralValidationCommonConstants.VERSION_V6.equals(getAcceptVersion(VERSIONS))) {
+        } else if (!holdType && !GeneralValidationCommonConstants.VERSION_V6.equals(acceptVersion)) {
             throw new ApplicationException("restrictionType", new NotFoundException())
         }
 
@@ -142,16 +144,10 @@ class RestrictionTypeCompositeService extends LdmService {
      * @return
      */
     def create(Map content) {
-        String acceptVersion = getAcceptVersion(VERSIONS)
+        String acceptVersion = getAcceptVersionByPluralizedResourceName(content)
 
         HoldType holdType = HoldType.findByCode(content?.code)
         if (holdType) {
-            /*  def parameterValue
-              if (GeneralValidationCommonConstants.VERSION_V4.equals(LdmService.getAcceptVersion(GeneralValidationCommonConstants.VERSIONS_V1_V4))) {
-                  parameterValue = GeneralValidationCommonConstants.CODE
-              } else if (GeneralValidationCommonConstants.VERSION_V1.equals(LdmService.getAcceptVersion(GeneralValidationCommonConstants.VERSIONS_V1_V4))) {
-                  parameterValue = GeneralValidationCommonConstants.ABBREVIATION
-              }*/
             throw new ApplicationException('restriction.type', new BusinessLogicValidationException(GeneralValidationCommonConstants.ERROR_MSG_CODE_EXISTS, [GeneralValidationCommonConstants.ABBREVIATION]))
         }
         holdType = bindRestrictionType(new HoldType(), content)
@@ -172,7 +168,7 @@ class RestrictionTypeCompositeService extends LdmService {
      * @return
      */
     def update(Map content) {
-        String acceptVersion = getAcceptVersion(VERSIONS)
+        String acceptVersion = getAcceptVersionByPluralizedResourceName(content)
 
         String holdTypeGuid = content?.id?.trim()?.toLowerCase()
         GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(GeneralValidationCommonConstants.RESTRICTION_TYPE_LDM_NAME, holdTypeGuid)
@@ -250,4 +246,13 @@ class RestrictionTypeCompositeService extends LdmService {
         return restrictionType
     }
 
+    private String getAcceptVersionByPluralizedResourceName(Map params) {
+        String acceptVersion
+        if (params?.pluralizedResourceName?.equals(PERSON_HOLD_TYPES)) {
+            acceptVersion = getAcceptVersion([GeneralValidationCommonConstants.VERSION_V6])
+        } else if (params?.pluralizedResourceName?.equals("restriction-types")) {
+            acceptVersion = getAcceptVersion([GeneralValidationCommonConstants.VERSION_V1, GeneralValidationCommonConstants.VERSION_V4])
+        }
+        return acceptVersion
+    }
 }
