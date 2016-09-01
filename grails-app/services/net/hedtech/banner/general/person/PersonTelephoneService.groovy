@@ -5,8 +5,10 @@ package net.hedtech.banner.general.person
 
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.i18n.phonenumbers.Phonenumber
+import net.hedtech.banner.general.person.PersonTelephoneUtility
 import net.hedtech.banner.general.system.InstitutionalDescription
 import net.hedtech.banner.general.system.Nation
+import net.hedtech.banner.person.PersonTelephoneDecorator
 import net.hedtech.banner.service.ServiceBase
 
 // NOTE:
@@ -22,7 +24,31 @@ class PersonTelephoneService extends ServiceBase {
     boolean transactional = true
 
     def fetchActiveTelephonesByPidm(pidm) {
-        return PersonTelephone.fetchActiveTelephoneByPidm(pidm)
+        def telephoneRecords = PersonTelephone.fetchActiveTelephoneByPidm(pidm)
+        def telephone
+        def telephones = []
+        def decorator
+
+        telephoneRecords.each { it ->
+            telephone = [:]
+            telephone.id = it.id
+            telephone.version = it.version
+            telephone.telephoneType = it.telephoneType
+            telephone.internationalAccess = it.internationalAccess
+            telephone.countryPhone = it.countryPhone
+            telephone.phoneArea = it.phoneArea
+            telephone.phoneNumber = it.phoneNumber
+            telephone.phoneExtension = it.phoneExtension
+            telephone.unlistIndicator = it.unlistIndicator
+            telephone.unlistIndicator = it.unlistIndicator
+
+            decorator = new PersonTelephoneDecorator(it)
+            telephone.displayPhoneNumber = decorator.displayPhone
+
+            telephones << telephone
+        }
+
+        return telephones
     }
 
 }
