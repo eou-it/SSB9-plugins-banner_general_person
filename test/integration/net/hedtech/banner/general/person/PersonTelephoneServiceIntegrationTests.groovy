@@ -252,7 +252,18 @@ class PersonTelephoneServiceIntegrationTests extends BaseIntegrationTestCase {
 			 assertApplicationException ae, "readonlyFieldsCannotBeModified"
     	}
 	}
-
+	
+	//TODO: uncomment when "No address exists..." issue is resolved
+//	@Test
+//	void testFetchActiveTelephonesByPidm(){
+//		def pidm = PersonUtility.getPerson("HOS00001").pidm
+//
+//		def phoneNumbers = personTelephoneService.fetchActiveTelephonesByPidm(pidm)
+//
+//		assertEquals 1, phoneNumbers.size()
+////		assertEquals 'ansbates@telstra.com', phoneNumbers[0].emailAddress
+//	}
+//
 	private def newValidForCreatePersonTelephone() {
 //        def sql = new Sql(sessionFactory.getCurrentSession().connection())
 //        String idSql = """select gb_common.f_generate_id bannerId, gb_common.f_generate_pidm pidm from dual """
