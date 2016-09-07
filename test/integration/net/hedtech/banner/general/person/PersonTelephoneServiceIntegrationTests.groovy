@@ -253,9 +253,19 @@ class PersonTelephoneServiceIntegrationTests extends BaseIntegrationTestCase {
     	}
 	}
 	
-	//TODO: uncomment when "No address exists..." issue is resolved
+	//TODO: uncomment when "No address exists..." issue is resolved.
 //	@Test
-//	void testFetchActiveTelephonesByPidm(){
+//	void testFetchActiveTelephonesByPidmWithUnlisted(){
+//		def pidm = PersonUtility.getPerson("HOS00001").pidm
+//
+//		def phoneNumbers = personTelephoneService.fetchActiveTelephonesByPidm(pidm, true)
+//
+//		assertEquals 1, phoneNumbers.size()
+////		assertEquals 'ansbates@telstra.com', phoneNumbers[0].emailAddress
+//	}
+//
+//	@Test
+//	void testFetchActiveTelephonesByPidmWithoutUnlisted(){
 //		def pidm = PersonUtility.getPerson("HOS00001").pidm
 //
 //		def phoneNumbers = personTelephoneService.fetchActiveTelephonesByPidm(pidm)
