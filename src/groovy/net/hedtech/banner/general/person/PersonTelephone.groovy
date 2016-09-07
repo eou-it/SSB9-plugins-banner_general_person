@@ -113,6 +113,11 @@ import javax.persistence.*
                              WHERE  pidm IN :pidms
                              AND NVL(statusIndicator,'A') <> 'I'
                              AND NVL(unlistIndicator,'N') <> 'Y'
+                    """),
+@NamedQuery(name = "PersonTelephone.fetchActiveTelephoneWithUnlistedByPidm",
+                query = """FROM PersonTelephone a
+                             WHERE  pidm = :pidm
+                             AND NVL(statusIndicator,'A') <> 'I'
                     """)
 ])
 @DatabaseModifiesState
@@ -539,6 +544,13 @@ class PersonTelephone implements Serializable {
     static Promise fetchActiveTelephoneByPidmInListAsync(List<Integer> pidms){
         PersonTelephone.async.task {
             fetchActiveTelephoneByPidmInList( pidms )
+        }
+    }
+
+    static def fetchActiveTelephoneWithUnlistedByPidm(Integer pidm){
+        PersonTelephone.withSession { session ->
+            session.getNamedQuery('PersonTelephone.fetchActiveTelephoneWithUnlistedByPidm')
+                    .setInteger('pidm', pidm).list()
         }
     }
 }

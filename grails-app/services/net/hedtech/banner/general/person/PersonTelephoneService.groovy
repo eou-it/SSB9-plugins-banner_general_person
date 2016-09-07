@@ -23,8 +23,9 @@ class PersonTelephoneService extends ServiceBase {
 
     boolean transactional = true
 
-    def fetchActiveTelephonesByPidm(pidm) {
-        def telephoneRecords = PersonTelephone.fetchActiveTelephoneByPidm(pidm)
+    def fetchActiveTelephonesByPidm(pidm, includeUnlisted = false) {
+        def telephoneRecords = includeUnlisted ? PersonTelephone.fetchActiveTelephoneWithUnlistedByPidm(pidm) :
+                                                 PersonTelephone.fetchActiveTelephoneByPidm(pidm)
         def telephone
         def telephones = []
         def decorator
@@ -39,7 +40,6 @@ class PersonTelephoneService extends ServiceBase {
             telephone.phoneArea = it.phoneArea
             telephone.phoneNumber = it.phoneNumber
             telephone.phoneExtension = it.phoneExtension
-            telephone.unlistIndicator = it.unlistIndicator
             telephone.unlistIndicator = it.unlistIndicator
 
             decorator = new PersonTelephoneDecorator(it)
