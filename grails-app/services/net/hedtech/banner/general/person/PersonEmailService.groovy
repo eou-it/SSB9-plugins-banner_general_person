@@ -31,7 +31,37 @@ class PersonEmailService extends ServiceBase {
         }
     }
 
-    def fetchByPidmAndActiveAndWebDisplayable(pidm) {
-        return PersonEmail.fetchByPidmAndActiveAndWebDisplayable(pidm)
+    def getDisplayableEmails(pidm) {
+        def emailList = PersonEmail.fetchByPidmAndActiveAndWebDisplayable(pidm)
+
+        def emails = []
+        emailList.each {
+            def email = [:]
+
+            email.emailType = [:]
+            email.emailType.code = it.emailType.code
+            email.emailType.description = it.emailType.description
+            email.emailType.urlIndicator = it.emailType.urlIndicator
+
+            email.emailAddress = it.emailAddress
+            email.preferredIndicator = it.preferredIndicator
+            email.commentData = it.commentData
+            email.displayWebIndicator = it.displayWebIndicator
+
+            email.id = it.id
+            email.version = it.version
+
+            emails << email
+        }
+
+        emails
+    }
+
+    def castEmailForUpdate (email) {
+        def personEmail = email as PersonEmail
+        personEmail.id = email.id
+        personEmail.version = email.version
+
+        personEmail
     }
 }
