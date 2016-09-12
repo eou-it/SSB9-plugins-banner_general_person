@@ -38,10 +38,11 @@ class PersonEmailService extends ServiceBase {
         emailList.each {
             def email = [:]
 
-            email.emailType = [:]
-            email.emailType.code = it.emailType.code
-            email.emailType.description = it.emailType.description
-            email.emailType.urlIndicator = it.emailType.urlIndicator
+            email.emailType = [
+                code: it.emailType.code,
+                description: it.emailType.description,
+                urlIndicator: it.emailType.urlIndicator
+            ]
 
             email.emailAddress = it.emailAddress
             email.preferredIndicator = it.preferredIndicator
