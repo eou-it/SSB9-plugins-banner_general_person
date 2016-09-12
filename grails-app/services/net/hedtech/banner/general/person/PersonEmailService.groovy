@@ -64,4 +64,16 @@ class PersonEmailService extends ServiceBase {
 
         personEmail
     }
+
+    def updatePreferredEmail (email) {
+        if(email.preferredIndicator){
+            def existingEmails = PersonEmail.fetchByPidmAndActiveAndWebDisplayable(email.pidm)
+            def oldPreferredEmail = existingEmails.find { it.preferredIndicator }
+
+            if(oldPreferredEmail) {
+                oldPreferredEmail.preferredIndicator = false
+                update([domainModel: oldPreferredEmail])
+            }
+        }
+    }
 }
