@@ -209,13 +209,47 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
     @Test
-    void testFetchByPidmAndActiveAndWebDisplayable(){
+    void testGetDisplayableEmails(){
         def pidm = PersonUtility.getPerson("GDP000001").pidm
 
-        def emails = personEmailService.fetchByPidmAndActiveAndWebDisplayable(pidm)
+        def emails = personEmailService.getDisplayableEmails(pidm)
 
         assertEquals 1, emails.size()
         assertEquals 'ansbates@telstra.com', emails[0].emailAddress
+        assertEquals null, emails[0].lastModified
+    }
+
+    @Test
+    void testCastEmailForUpdate(){
+        def emailMap = [:]
+        emailMap.id = 9899
+        emailMap.version = 0
+        emailMap.emailAddress = 'test@123.com'
+
+        def email = personEmailService.castEmailForUpdate(emailMap)
+
+        assertEquals 9899, email.id
+        assertEquals 0, email.version
+        assertEquals 'test@123.com', email.emailAddress
+        assertEquals PersonEmail, email.getClass()
+    }
+
+    @Test
+    void testUpdatePreferredEmail(){
+        def pidm = PersonUtility.getPerson("GDP000001").pidm
+
+        def email = [:]
+        email.pidm = pidm
+        email.emailAddress = 'myemail@somesite.org'
+        email.preferredIndicator = true
+
+        personEmailService.updatePreferredEmail(email)
+
+        def emails = personEmailService.getDisplayableEmails(pidm)
+
+        assertEquals 1, emails.size()
+        assertEquals 'ansbates@telstra.com', emails[0].emailAddress
+        assertEquals false, emails[0].preferredIndicator
     }
 
 
