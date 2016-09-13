@@ -77,4 +77,11 @@ class PersonEmailService extends ServiceBase {
             }
         }
     }
+
+    def inactivateEmail (email) {
+        def personEmail = castEmailForUpdate(email)
+        personEmail.preferredIndicator = false
+        personEmail.statusIndicator = 'I'
+        update([domainModel: personEmail])
+    }
 }

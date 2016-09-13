@@ -252,6 +252,20 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
         assertEquals false, emails[0].preferredIndicator
     }
 
+    @Test
+    void testInactivateEmail(){
+        def pidm = PersonUtility.getPerson("GDP000001").pidm
+
+        def email = PersonEmail.get(personEmailService.getDisplayableEmails(pidm)[0].id)
+        personEmailService.inactivateEmail(email)
+
+        def result = PersonEmail.get(email.id)
+
+        assertEquals 0, personEmailService.getDisplayableEmails(pidm).size()
+        assertEquals 'I', result.statusIndicator
+        assertEquals false, result.preferredIndicator
+    }
+
 
     private def newValidForCreatePersonEmail() {
         def sql = new Sql(sessionFactory.getCurrentSession().connection())
