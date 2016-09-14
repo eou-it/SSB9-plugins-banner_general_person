@@ -8,6 +8,10 @@ class PersonAddressByRoleViewService {
 
     def getActiveAddressesByRoles(roles, pidm) {
         Map params = [roles: roles, pidm: pidm]
-        PersonAddressByRoleView.fetchAddressesByPidmAndRoles(params)
+        def addresses = PersonAddressByRoleView.fetchAddressesByPidmAndRoles(params)
+
+        // PersonAddressByRoleView.fetchAddressesByPidmAndRoles has a known issue
+        // of not selecting unique addresses, so work around that.
+        addresses.unique()
     }
 }

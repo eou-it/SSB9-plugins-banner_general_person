@@ -35,4 +35,26 @@ class PersonAddressByRoleViewServiceIntegrationTests extends BaseIntegrationTest
         assertEquals '1200 Main Road', result[0].streetLine1  //current address
         assertEquals '123 Fake Street', result[1].streetLine1 //future address
     }
+
+    @Test
+    void testGetActiveAddressesByRolesWithUserHavingMultipleRoles() {
+        // This user has both STUDENT and EMPLOYEE roles
+        def pidm = PersonUtility.getPerson("710000007").pidm
+
+        // The PersonAddressByRoleView.fetchAddressesByPidmAndRoles method called by
+        // personAddressByRoleViewService.getActiveAddressesByRoles (below) returns
+        // multiple *non-unique* addresses for users *having multiple roles*.  We're testing
+        // here to make sure that personAddressByRoleViewService.getActiveAddressesByRoles
+        // fixes that.
+        // NOTE:  This user is configured with two roles *in the database*.  We also explicitly
+        // pass in two roles *here* (see next line).  Both of these criteria must be true for
+        // PersonAddressByRoleView.fetchAddressesByPidmAndRoles to return non-unique values.
+        def roles = ['STUDENT', 'EMPLOYEE']
+
+        def entityResult = PersonAddressByRoleView.fetchAddressesByPidmAndRoles([pidm:pidm, roles:roles])
+        def serviceResult = personAddressByRoleViewService.getActiveAddressesByRoles(roles, pidm)
+
+        assertEquals "Number of results from service should be half that returned by entity method",
+                     serviceResult.size(), entityResult.size() / 2, 0.0
+    }
 }
