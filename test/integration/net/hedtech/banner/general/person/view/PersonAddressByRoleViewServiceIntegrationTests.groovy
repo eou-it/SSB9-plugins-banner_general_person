@@ -54,12 +54,7 @@ class PersonAddressByRoleViewServiceIntegrationTests extends BaseIntegrationTest
         def entityResult = PersonAddressByRoleView.fetchAddressesByPidmAndRoles([pidm:pidm, roles:roles])
         def serviceResult = personAddressByRoleViewService.getActiveAddressesByRoles(roles, pidm)
 
-        // A convoluted test to determine if the service method result is half the size of the
-        // entity method result, while skirting double precision issues (i.e. ideally we'd write the
-        // below as "assertEquals serviceResult.size(), entityResult.size() / 2", but then we run into
-        // double precision issues).  The service method result is half the size because it removed
-        // non-unique addresses that the entity method handed it.
-        def serviceResultSize = serviceResult.size()
-        assertEquals serviceResultSize, entityResult.size() - serviceResultSize
+        assertEquals "Number of results from service should be half that returned by entity method",
+                     serviceResult.size(), entityResult.size() / 2, 0.0
     }
 }
