@@ -5,6 +5,7 @@
 package net.hedtech.banner.general.person
 
 import grails.util.Holders
+import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes
 import org.junit.Before
 import org.junit.Test
 import org.junit.After
@@ -103,7 +104,7 @@ class PersonUtilityTests extends BaseIntegrationTestCase {
 
     @Test
     void testIsPersonDeceased() {
-        def pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("JCSYS0001", null).pidm
+        def pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("HOF00718", null).pidm
         assertNotNull pidm
         def testPidm = PersonUtility.isPersonDeceased(pidm)
         assertTrue testPidm
@@ -137,10 +138,38 @@ class PersonUtilityTests extends BaseIntegrationTestCase {
 
     @Test
     void testGetEmailId() {
-        def pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("HOF00714", null).pidm
+        def pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("STUAFR152", null).pidm
         assertNotNull pidm
         def emailId = PersonUtility.getEmailId(pidm)
         assertNotNull emailId
-        assertEquals emailId, "Marita.Herwig@sungarduniv.edu"
+        assertEquals emailId, "Zayne152@college.edu"
     }
+
+
+
+//can't find the preferredNameService anywhere in the application. So commenting out this test.
+//    @Test
+//    void testGetPreferredName() {
+//        def application = Holders.getGrailsApplication()
+//        def ctx = Holders.servletContext.getAttribute(GrailsApplicationAttributes.APPLICATION_CONTEXT)
+//        def preferredNameService = ctx.preferredNameService
+//        application.config.productName = 'Student'
+//        application.config.banner.applicationName = 'Student Self-Service'
+//
+//        def pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("HOF00714", null).pidm
+//        assertNotNull pidm
+//
+//        def params=[:]
+//        params.put("pidm",pidm)
+//        String usage = preferredNameService.getUsage("Student","Student Self-Service")
+//        String preferredName1 = PersonUtility.getPreferredName(params)
+//        assertNotNull preferredName1
+//
+//        params.put("usage",usage)
+//        String preferredName2 = preferredNameService.getPreferredName(params)
+//        assertNotNull preferredName2
+//
+//        assertEquals preferredName1, preferredName2
+//    }
+
 }

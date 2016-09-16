@@ -47,12 +47,12 @@ class PersonSearchControllerIntegrationTests extends BaseIntegrationTestCase {
     @Test
     void testSearchByName() {
         controller.request.contentType = "text/json"
-        controller.params.searchFilter = "Lindblom"
+        controller.params.searchFilter = "Jansen"
         controller.searchByName()
         String actualJSON = controller.response.contentAsString
         def data = JSON.parse(actualJSON)
         assertNotNull data
-        assertTrue data.people.size() > 1
+        assertTrue data.people.size() >= 1
         //assertEquals "Lindblom, Atlas", data.people[0].formattedName
     }
 

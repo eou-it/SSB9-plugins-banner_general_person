@@ -23,7 +23,7 @@ class PersonTelephoneUtilityIntegrationTests extends BaseIntegrationTestCase {
     def i_success_telephoneType
     def i_success_addressType
 
-    def i_success_pidm = 999
+    def i_success_pidm = 361
     def i_success_sequenceNumber = 1
     def i_success_phoneArea = "607"
     def i_success_phoneNumber = "1234567"

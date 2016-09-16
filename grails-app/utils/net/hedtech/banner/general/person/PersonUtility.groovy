@@ -190,4 +190,19 @@ class PersonUtility {
             sqlCall?.close()
         }
     }
+
+
+    public static getPreferredName (params){
+        def ctx = Holders.servletContext.getAttribute(GA.APPLICATION_CONTEXT)
+        def preferredNameService = ctx.preferredNameService
+        def productName=Holders?.config?.productName ?: null
+        def applicationName=Holders?.config?.banner.applicationName ?: null
+
+        if(productName)
+            params.put("productname", productName)
+        if(applicationName)
+            params.put("appname", applicationName)
+
+        return preferredNameService.getPreferredName(params)
+    }
 }

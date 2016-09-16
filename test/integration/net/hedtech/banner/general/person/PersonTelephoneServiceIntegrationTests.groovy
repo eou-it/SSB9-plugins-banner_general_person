@@ -291,7 +291,7 @@ class PersonTelephoneServiceIntegrationTests extends BaseIntegrationTestCase {
 //        )
 //        person.save(flush: true, failOnError: true)
 //        assert person.id
-        def pidm = PersonUtility.getPerson("HOS00001").pidm
+        def pidm = PersonUtility.getPerson("210009710").pidm
 		def personTelephone = new PersonTelephone(
 			pidm: pidm,
 			sequenceNumber: i_success_sequenceNumber,
