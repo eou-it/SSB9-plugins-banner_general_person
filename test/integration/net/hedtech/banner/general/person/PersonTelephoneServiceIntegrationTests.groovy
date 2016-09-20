@@ -254,21 +254,21 @@ class PersonTelephoneServiceIntegrationTests extends BaseIntegrationTestCase {
 
     @Test
     void testFetchAllActiveByPidmInListAndTelephoneTypeCodeInList() {
-        def pidmList = [PersonUtility.getPerson("HOF00714").pidm, PersonUtility.getPerson("HOF00716").pidm]
-        def results = personTelephoneService.fetchAllActiveByPidmInListAndTelephoneTypeCodeInList(pidmList, [TelephoneType.findByCode("MA").code, TelephoneType.findByCode("PR").code])
-        assertTrue results.size() > 1
+        def pidmList = [PersonUtility.getPerson("210009710").pidm]
+        def results = personTelephoneService.fetchAllActiveByPidmInListAndTelephoneTypeCodeInList(pidmList, [TelephoneType.findByCode("MA").code])
+        assertTrue results.size() > 0
         assertTrue results[0] instanceof PersonTelephone
     }
 
 
     @Test
     void testFetchAllByIdInListAndTelephoneTypeCodeInList() {
-        def pidmList = [PersonUtility.getPerson("HOF00714").pidm, PersonUtility.getPerson("HOF00716").pidm]
+        def pidmList = [PersonUtility.getPerson("210009710").pidm]
         List<PersonTelephone> personTelephones = PersonTelephone.findAllByPidmInList(pidmList)
         def idList = personTelephones.collect { it.id }
         assertTrue idList.size() > 0
-        def results = personTelephoneService.fetchAllByIdInListAndTelephoneTypeCodeInList(idList, [TelephoneType.findByCode("MA").code, TelephoneType.findByCode("PR").code])
-        assertTrue results.size() > 1
+        def results = personTelephoneService.fetchAllByIdInListAndTelephoneTypeCodeInList(idList, [TelephoneType.findByCode("MA").code])
+        assertTrue results.size() > 0
         assertTrue results[0] instanceof PersonTelephone
     }
 
@@ -290,7 +290,7 @@ class PersonTelephoneServiceIntegrationTests extends BaseIntegrationTestCase {
 //        )
 //        person.save(flush: true, failOnError: true)
 //        assert person.id
-        def pidm = PersonUtility.getPerson("HOS00001").pidm
+        def pidm = PersonUtility.getPerson("210009710").pidm
         def personTelephone = new PersonTelephone(
                 pidm: pidm,
                 sequenceNumber: i_success_sequenceNumber,
