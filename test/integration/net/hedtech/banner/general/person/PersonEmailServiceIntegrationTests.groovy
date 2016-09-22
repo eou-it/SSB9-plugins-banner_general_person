@@ -207,7 +207,7 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
 
     @Test
     void testFetchListByPidmAndCodes() {
-        def pidmList = [PersonUtility.getPerson("966049236").pidm, PersonUtility.getPerson("HOS00003").pidm]
+        def pidmList = [PersonUtility.getPerson("HOS00003").pidm, PersonUtility.getPerson("STUAFR004").pidm]
         def results = personEmailService.fetchAllActiveEmails(pidmList, ['PERS', 'CAMP', 'MA'] as Set)
 
         assertEquals 3, results.size()
@@ -219,7 +219,7 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
         results.each {
             if (it.emailType.code == "PERS") {
                 foundCount++
-                assertEquals "einstein2be@verizon.net", it.emailAddress
+                assertEquals "Hank4@college.edu", it.emailAddress
                 assertTrue it.displayWebIndicator
             } else if (it.emailType.code == "MA") {
                 foundCount++
