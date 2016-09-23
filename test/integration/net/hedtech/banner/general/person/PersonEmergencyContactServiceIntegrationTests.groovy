@@ -312,6 +312,19 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         }
     }
 
+    @Test
+    void testFetchActiveEmergencyContactsByPidm(){
+        def personEmergencyContact = newValidForCreatePersonEmergencyContact()
+        def map = [domainModel: personEmergencyContact]
+        personEmergencyContactService.create(map)
+
+        def pidm = PersonUtility.getPerson("HOS00001").pidm
+        def contacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
+
+        assertEquals 1, contacts.size()
+        assertEquals 'M', contacts[0].relationship.code
+    }
+
 
     private def newValidForCreatePersonEmergencyContact() {
         def pidm = PersonUtility.getPerson("HOS00001").pidm
