@@ -145,6 +145,14 @@ class PersonUtilityTests extends BaseIntegrationTestCase {
         assertEquals emailId, "Marita.Herwig@sungarduniv.edu"
     }
 
+    @Test
+    void testGetEmailIdByCodeAndStatus() {
+        def pidm = PersonIdentificationName.findByBannerIdAndChangeIndicator("HOF00714", null).pidm
+        assertNotNull pidm
+        def emailId = PersonUtility.getEmailIdByCodeAndStatus(pidm,'HOME','A')
+        assertNotNull emailId
+        assertEquals emailId, "Marita.Herwig@sungarduniv.edu"
+    }
 
     @Test
     void testGetPreferredName() {
