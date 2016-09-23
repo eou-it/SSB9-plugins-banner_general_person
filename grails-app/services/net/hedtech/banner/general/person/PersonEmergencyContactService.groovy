@@ -12,4 +12,11 @@ import net.hedtech.banner.service.ServiceBase
 // create, update, and delete may throw grails.validation.ValidationException a runtime exception when there is a validation failure
 
 class PersonEmergencyContactService extends ServiceBase {
+
+    def getEmergencyContactsByPidm(pidm) {
+        def contacts = PersonEmergencyContact.fetchByPidmOrderByPriority(pidm)
+
+        return contacts
+    }
+
 }
