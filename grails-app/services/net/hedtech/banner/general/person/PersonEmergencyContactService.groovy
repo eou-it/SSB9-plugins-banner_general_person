@@ -2,6 +2,8 @@
 Copyright 2012 Ellucian Company L.P. and its affiliates.
 **********************************************************************************/
  package net.hedtech.banner.general.person
+
+import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.service.ServiceBase
 // NOTE:
 // This service is injected with create, update, and delete methods that may throw runtime exceptions (listed below).
@@ -19,4 +21,12 @@ class PersonEmergencyContactService extends ServiceBase {
         return contacts
     }
 
+    def checkEmergencyContactFieldsValid(contact){
+        if(!contact.firstName){
+            throw new ApplicationException(PersonAddress, "@@r1:firstNameRequired@@")
+        }
+        if(!contact.lastName){
+            throw new ApplicationException(PersonAddress, "@@r1:lastNameRequired@@")
+        }
+    }
 }
