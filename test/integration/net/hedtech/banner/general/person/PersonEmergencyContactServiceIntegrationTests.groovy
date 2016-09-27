@@ -325,6 +325,28 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         assertEquals 'M', contacts[0].relationship.code
     }
 
+    @Test
+    void testCheckEmergencyContactFieldsValidFirstNameFail() {
+        def contact = [firstName: null, lastName: "Doe"]
+        try {
+            personEmergencyContactService.checkEmergencyContactFieldsValid(contact)
+            fail("First Name failed to be flagged as invalid.") // This line should not be reached
+        } catch(ApplicationException ae) {
+            assertApplicationException ae, "firstNameRequired"
+        }
+    }
+
+    @Test
+    void testCheckEmergencyContactFieldsValidLastNameFail() {
+        def contact = [firstName: "Jane", lastName: null]
+        try {
+            personEmergencyContactService.checkEmergencyContactFieldsValid(contact)
+            fail("Last Name failed to be flagged as invalid.") // This line should not be reached
+        } catch(ApplicationException ae) {
+            assertApplicationException ae, "lastNameRequired"
+        }
+    }
+
 
     private def newValidForCreatePersonEmergencyContact() {
         def pidm = PersonUtility.getPerson("HOS00001").pidm

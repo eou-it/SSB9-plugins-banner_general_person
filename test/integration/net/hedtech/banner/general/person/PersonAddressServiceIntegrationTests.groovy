@@ -404,6 +404,7 @@ class PersonAddressServiceIntegrationTests extends BaseIntegrationTestCase {
         def address = [fromDate: null, streetLine1: "123 Fake Street"]
         try {
             personAddressService.checkAddressFieldsValid(address)
+            fail("Date failed to be flagged as invalid.") // This line should not be reached
         }
         catch(ApplicationException ae) {
             assertApplicationException ae, "fromDateRequired"
@@ -415,6 +416,7 @@ class PersonAddressServiceIntegrationTests extends BaseIntegrationTestCase {
         def address = [fromDate: i_success_fromDate, streetLine1: null]
         try {
             personAddressService.checkAddressFieldsValid(address)
+            fail("Street Line 1 failed to be flagged as invalid.") // This line should not be reached
         }
         catch(ApplicationException ae) {
             assertApplicationException ae, "streetLine1Required"
