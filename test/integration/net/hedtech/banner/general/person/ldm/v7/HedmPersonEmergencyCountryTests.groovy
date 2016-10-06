@@ -35,8 +35,7 @@ class HedmPersonEmergencyCountryTests extends BaseIntegrationTestCase {
 
     @Test
     void deriveTransactionDetailsTypeEnumWithValidEnums() {
-
-       assert HedmPersonEmergencyCountry.getByString( 'AUSTRALIA' ).postalTitle == 'AUSTRALIA'
+        assertNotNull HedmPersonEmergencyCountry.getByString( 'AUSTRALIA' ) != null
 
     }
 
