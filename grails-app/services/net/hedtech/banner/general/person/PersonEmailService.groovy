@@ -39,4 +39,8 @@ class PersonEmailService extends ServiceBase {
    List<PersonEmail> fetchAllActiveEmails(List<Integer> pidms,Set<String> codes){
       return PersonEmail.fetchListByActiveStatusPidmsAndEmailTypes(pidms,codes)
     }
+
+    List<PersonEmail>fetchAllEmails(Integer pidm,Set<String> codes){
+        return PersonEmail.fetchListByPidmAndEmailTypes(pidm, codes)
+    }
 }
