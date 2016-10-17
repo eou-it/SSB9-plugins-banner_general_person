@@ -4,6 +4,7 @@
 package net.hedtech.banner.general.person
 
 import net.hedtech.banner.exceptions.ApplicationException
+import net.hedtech.banner.general.system.SystemUtility
 import net.hedtech.banner.service.ServiceBase
 
 
@@ -19,14 +20,18 @@ class PersonAddressAdditionalPropertyService extends ServiceBase {
     }
 
     List<PersonAddressAdditionalProperty> fetchAllBySurrogateIds(Collection<Long> surrogateIds) {
-        def entities = []
+        List entities = []
         if (surrogateIds) {
-            PersonAddressAdditionalProperty.withSession { session ->
-                def query = session.getNamedQuery('PersonAddressAdditionalProperty.fetchAllBySurrogateIds')
-                query.with {
-                    setParameterList('surrogateIds', surrogateIds)
-                    entities = list()
+            def surrogateIdList = SystemUtility.splitList(surrogateIds, 1000)
+            surrogateIdList.each { surrogateIdPartition ->
+                List entitiesPartition = PersonAddressAdditionalProperty.withSession { session ->
+                    def query = session.getNamedQuery('PersonAddressAdditionalProperty.fetchAllBySurrogateIds')
+                    query.with {
+                        setParameterList('surrogateIds', surrogateIdPartition)
+                        list()
+                    }
                 }
+                entities.addAll(entitiesPartition)
             }
         }
         return entities
