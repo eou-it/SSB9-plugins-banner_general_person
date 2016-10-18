@@ -4,7 +4,6 @@
 
 package net.hedtech.banner.general.person
 
-import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.person.view.PersonAdvancedSearchView
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 import org.junit.After
@@ -14,6 +13,7 @@ import org.junit.Test
 class PersonAdvancedSearchViewServiceIntegrationTests extends BaseIntegrationTestCase {
 
     PersonAdvancedSearchViewService personAdvancedSearchViewService
+
 
     @Before
     public void setUp() {
@@ -26,6 +26,55 @@ class PersonAdvancedSearchViewServiceIntegrationTests extends BaseIntegrationTes
     public void tearDown() {
         super.tearDown()
     }
+
+
+    @Test
+    void testFetchAllByCriteria_EachPageHasUniqueRecords_WithoutPassingSortField() {
+        int max = 500
+        int offset = 0
+
+        def content = [:]
+        def totalCount = personAdvancedSearchViewService.countByCriteria(content)
+        def surrogateIds = [:]
+
+        while (offset < totalCount) {
+            def entities = personAdvancedSearchViewService.fetchAllByCriteria(content, null, null, max, offset)
+            assertTrue entities.size() <= max
+            assertListIsSortedOnField(entities, "id")
+
+            entities.each {
+                assertTrue !surrogateIds.containsKey(it.id)
+                surrogateIds.put(it.id, it)
+            }
+
+            offset += max
+        }
+    }
+
+
+    @Test
+    void testFetchAllByCriteria_EachPageHasUniqueRecords_PassingNonUniqueSortField() {
+        int max = 500
+        int offset = 0
+
+        def content = [:]
+        def totalCount = personAdvancedSearchViewService.countByCriteria(content)
+        def surrogateIds = [:]
+
+        while (offset < totalCount) {
+            def entities = personAdvancedSearchViewService.fetchAllByCriteria(content, "lastName", null, max, offset)
+            assertTrue entities.size() <= max
+            assertListIsSortedOnField(entities, "lastName")
+
+            entities.each {
+                assertTrue !surrogateIds.containsKey(it.id)
+                surrogateIds.put(it.id, it)
+            }
+
+            offset += max
+        }
+    }
+
 
     @Test
     void testFetchAllWithGuidByCriteria() {
@@ -93,6 +142,7 @@ class PersonAdvancedSearchViewServiceIntegrationTests extends BaseIntegrationTes
         verifyFilterDataResponse(params, entities)
     }
 
+
     private void verifyFilterByBannerId(String bannerId) {
         // bannerId filter
         params.clear()
@@ -103,6 +153,7 @@ class PersonAdvancedSearchViewServiceIntegrationTests extends BaseIntegrationTes
         Long expectedCount = personAdvancedSearchViewService.countByCriteria(params)
         assertEquals entities.size(), expectedCount
     }
+
 
     private void verifyFilterByFirstName(String firstName) {
         // firstName filter
@@ -117,6 +168,7 @@ class PersonAdvancedSearchViewServiceIntegrationTests extends BaseIntegrationTes
         assertEquals entities.size(), expectedCount
     }
 
+
     private void verifyFilterByMiddleName(String middleName) {
         // middleName filter
         params.clear()
@@ -129,6 +181,7 @@ class PersonAdvancedSearchViewServiceIntegrationTests extends BaseIntegrationTes
         Long expectedCount = personAdvancedSearchViewService.countByCriteria(params)
         assertEquals entities.size(), expectedCount
     }
+
 
     private void verifyFilterByLastName(String lastName) {
         // lastName filter
@@ -143,6 +196,7 @@ class PersonAdvancedSearchViewServiceIntegrationTests extends BaseIntegrationTes
         assertEquals entities.size(), expectedCount
     }
 
+
     private void verifyFilterBySurnamePrefix(String surnamePrefix) {
         // surnamePrefix filter
         params.clear()
@@ -156,6 +210,7 @@ class PersonAdvancedSearchViewServiceIntegrationTests extends BaseIntegrationTes
         assertEquals entities.size(), expectedCount
     }
 
+
     private void verifyFilterByNameSuffix(String nameSuffix) {
         // nameSuffix filter
         params.clear()
@@ -168,6 +223,7 @@ class PersonAdvancedSearchViewServiceIntegrationTests extends BaseIntegrationTes
         Long expectedCount = personAdvancedSearchViewService.countByCriteria(params)
         assertEquals entities.size(), expectedCount
     }
+
 
     private void verifyFilterByNamePrefix(String namePrefix) {
         // namePrefix filter
@@ -189,7 +245,7 @@ class PersonAdvancedSearchViewServiceIntegrationTests extends BaseIntegrationTes
             PersonAdvancedSearchView personSearchView = it
             assertNotNull personSearchView
             if (params.bannerId) {
-              assertEquals params.bannerId ,personSearchView.bannerId
+                assertEquals params.bannerId, personSearchView.bannerId
             }
 
             if (params.firstName) {
@@ -201,7 +257,7 @@ class PersonAdvancedSearchViewServiceIntegrationTests extends BaseIntegrationTes
             }
 
             if (params.lastName) {
-                assertEquals  params.lastName.toLowerCase(), personSearchView.lastName.toLowerCase()
+                assertEquals params.lastName.toLowerCase(), personSearchView.lastName.toLowerCase()
             }
 
             if (params.surnamePrefix) {
@@ -217,6 +273,23 @@ class PersonAdvancedSearchViewServiceIntegrationTests extends BaseIntegrationTes
             }
 
         }
-
     }
+
+
+    private void assertListIsSortedOnField(def list, String field, String sortOrder = "ASC") {
+        def prevListItemVal
+        list.each {
+            def curListItemVal = it[field]
+            if (!prevListItemVal) {
+                prevListItemVal = curListItemVal
+            }
+            if (sortOrder == "ASC") {
+                assertTrue prevListItemVal.compareTo(curListItemVal) < 0 || prevListItemVal.compareTo(curListItemVal) == 0
+            } else {
+                assertTrue prevListItemVal.compareTo(curListItemVal) > 0 || prevListItemVal.compareTo(curListItemVal) == 0
+            }
+            prevListItemVal = curListItemVal
+        }
+    }
+
 }

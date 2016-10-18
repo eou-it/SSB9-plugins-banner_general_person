@@ -4,10 +4,8 @@
 package net.hedtech.banner.general.person
 
 import net.hedtech.banner.exceptions.ApplicationException
-import net.hedtech.banner.general.common.GeneralValidationCommonConstants
 import net.hedtech.banner.general.person.view.PersonAdvancedSearchView
 import net.hedtech.banner.query.DynamicFinder
-import net.hedtech.banner.query.QueryBuilder
 import net.hedtech.banner.query.operators.Operators
 import net.hedtech.banner.service.ServiceBase
 
@@ -18,35 +16,43 @@ class PersonAdvancedSearchViewService extends ServiceBase {
 
     boolean transactional = true
 
+
     def preCreate(map) {
         throwUnsupportedException()
     }
+
 
     def preUpdate(map) {
         throwUnsupportedException()
     }
 
+
     def preDelete(map) {
         throwUnsupportedException()
     }
+
 
     def throwUnsupportedException() {
         throw new ApplicationException(PersonAdvancedSearchView.class, "@@r1:unsupported.operation@@")
     }
 
-    def fetchAllByCriteria(Map content, String sortField = null, String sortOrder = null, int max = 0, int offset = -1) {
 
+    def fetchAllByCriteria(Map content, String sortField = null, String sortOrder = null, int max = 0, int offset = -1) {
         def params = [:]
         def criteria = []
         def pagingAndSortParams = [:]
 
         buildCriteria(content, params, criteria)
 
+        sortOrder = sortOrder ?: 'asc'
         if (sortField) {
-            pagingAndSortParams.sortColumn = sortField
-            if (["asc", "desc"].contains(sortOrder?.trim()?.toLowerCase())) {
-                pagingAndSortParams.sortDirection = sortOrder
-            }
+            pagingAndSortParams.sortCriteria = [
+                    ["sortColumn": sortField, "sortDirection": sortOrder],
+                    ["sortColumn": "id", "sortDirection": "asc"]
+            ]
+        } else {
+            pagingAndSortParams.sortColumn = "id"
+            pagingAndSortParams.sortDirection = sortOrder
         }
 
         if (max > 0) {
@@ -56,20 +62,21 @@ class PersonAdvancedSearchViewService extends ServiceBase {
             pagingAndSortParams.offset = offset
         }
 
-        return finderByAll().find([params: params, criteria: criteria], pagingAndSortParams)
+        return getDynamicFinderForFetchAllByCriteria().find([params: params, criteria: criteria], pagingAndSortParams)
     }
+
 
     def countByCriteria(Map content) {
         def params = [:]
         def criteria = []
 
         buildCriteria(content, params, criteria)
-        return finderByAll().count([params: params, criteria: criteria])
+
+        return getDynamicFinderForFetchAllByCriteria().count([params: params, criteria: criteria])
     }
 
 
     private void buildCriteria(Map content, LinkedHashMap params, ArrayList criteria) {
-
         if (content.firstName) {
             params.put("firstName", content.firstName?.trim())
             criteria.add([key: "firstName", binding: "firstName", operator: Operators.CONTAINS])
@@ -106,7 +113,8 @@ class PersonAdvancedSearchViewService extends ServiceBase {
         }
     }
 
-    def private finderByAll = {
+
+    private DynamicFinder getDynamicFinderForFetchAllByCriteria() {
         def query = """FROM PersonAdvancedSearchView a
                        where a.entityIndicator = 'P' and a.changeIndicator is null
 		            """
