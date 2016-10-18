@@ -51,6 +51,12 @@ class PersonAddressAdditionalProperty implements Serializable {
     @Column(name = "SPRADDR_CNTY_TITLE")
     String countyDescription
 
+    /**
+     * DATA SOURCE: Source system that generated the data
+     */
+    @Column(name = "SPRADDR_DATA_ORIGIN")
+    String dataOrigin
+
     static constraints = {
         addressGuid(nullable: true, maxSize: 36)
         countyISOCode(nullable: true, maxSize: 8)
