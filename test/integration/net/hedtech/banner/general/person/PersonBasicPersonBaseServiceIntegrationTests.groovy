@@ -498,6 +498,22 @@ class PersonBasicPersonBaseServiceIntegrationTests extends BaseIntegrationTestCa
         }
     }
 
+    @Test
+    void testGetPersonalDetails() {
+        def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()
+        def map = [domainModel: personBasicPersonBase]
+        personBasicPersonBase = personBasicPersonBaseService.create(map)
+        assertNotNull "PersonBasicPersonBase ID is null in PersonBasicPersonBase Service Tests Create", personBasicPersonBase.id
+
+        def details = personBasicPersonBaseService.getPersonalDetails(personBasicPersonBase.pidm)
+        assertEquals i_success_birthDate.day, details.birthDate.day
+        assertEquals i_success_birthDate.month, details.birthDate.month
+        assertEquals i_success_birthDate.year, details.birthDate.year
+        assertEquals i_success_sex, details.gender
+        assertEquals i_success_preferenceFirstName, details.preferenceFirstName
+        assertEquals i_success_maritalStatus, details.maritalStatus
+    }
+
 
     private def newValidForCreatePersonBasicPersonBase() {
         def sql = new Sql(sessionFactory.getCurrentSession().connection())
