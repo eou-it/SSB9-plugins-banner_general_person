@@ -23,11 +23,15 @@ class PersonTelephoneService extends ServiceBase {
 
     boolean transactional = true
 
-    def fetchActiveTelephonesByPidm(pidm, includeUnlisted = false) {
+    def personalInformationConfigService
+
+
+    def fetchActiveTelephonesByPidm(pidm, session, includeUnlisted = false) {
         def telephoneRecords = includeUnlisted ? PersonTelephone.fetchActiveTelephoneWithUnlistedByPidm(pidm) :
                                                  PersonTelephone.fetchActiveTelephoneByPidm(pidm)
         def telephone
         def telephones = []
+        def telephoneDisplayPriorities = personalInformationConfigService.getTelephoneDisplayPriorities(session)
         def decorator
 
         telephoneRecords.each { it ->
@@ -35,6 +39,7 @@ class PersonTelephoneService extends ServiceBase {
             telephone.id = it.id
             telephone.version = it.version
             telephone.telephoneType = it.telephoneType
+            telephone.displayPriority = telephoneDisplayPriorities[telephone.telephoneType.code]
             telephone.internationalAccess = it.internationalAccess
             telephone.countryPhone = it.countryPhone
             telephone.phoneArea = it.phoneArea
