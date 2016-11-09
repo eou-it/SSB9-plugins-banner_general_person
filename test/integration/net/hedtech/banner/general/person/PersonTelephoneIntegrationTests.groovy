@@ -584,16 +584,14 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
         assertTrue results[0] instanceof PersonTelephone
     }
 
-    //TODO: uncomment when issue with none of the above tests passing is resolved.
-    //TODO: Does HOF00714 need seed data?
-//    @Test
-//    void testFetchActiveTelephoneWithUnlistedByPidm() {
-//        def pidm = PersonUtility.getPerson("HOF00714").pidm
-//        def results = PersonTelephone.fetchActiveTelephoneWithUnlistedByPidm(pidm)
-//
-//        assertTrue results.size() > 1
-//        assertTrue results[0] instanceof PersonTelephone
-//    }
+    @Test
+    void testFetchActiveTelephoneWithUnlistedByPidm() {
+        def pidm = PersonUtility.getPerson("510000001").pidm
+        def results = PersonTelephone.fetchActiveTelephoneWithUnlistedByPidm(pidm)
+
+        assertTrue results.size() > 1
+        assertTrue results[0] instanceof PersonTelephone
+    }
 
 
     private def newValidForCreatePersonTelephone() {

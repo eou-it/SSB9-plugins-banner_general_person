@@ -253,27 +253,25 @@ class PersonTelephoneServiceIntegrationTests extends BaseIntegrationTestCase {
     	}
 	}
 	
-	//TODO: uncomment when "No address exists..." issue is resolved.
-//	@Test
-//	void testFetchActiveTelephonesByPidmWithUnlisted(){
-//		def pidm = PersonUtility.getPerson("HOS00001").pidm
-//
-//		def phoneNumbers = personTelephoneService.fetchActiveTelephonesByPidm(pidm, true)
-//
-//		assertEquals 1, phoneNumbers.size()
-////		assertEquals 'ansbates@telstra.com', phoneNumbers[0].emailAddress
-//	}
-//
-//	@Test
-//	void testFetchActiveTelephonesByPidmWithoutUnlisted(){
-//		def pidm = PersonUtility.getPerson("HOS00001").pidm
-//
-//		def phoneNumbers = personTelephoneService.fetchActiveTelephonesByPidm(pidm)
-//
-//		assertEquals 1, phoneNumbers.size()
-////		assertEquals 'ansbates@telstra.com', phoneNumbers[0].emailAddress
-//	}
-//
+	@Test
+	void testFetchActiveTelephonesByPidmWithUnlisted(){
+		def pidm = PersonUtility.getPerson("510000001").pidm
+
+		def phoneNumbers = personTelephoneService.fetchActiveTelephonesByPidm(pidm, true)
+
+		assertEquals 4, phoneNumbers.size()
+		assertEquals '5555000', phoneNumbers[0].phoneNumber
+	}
+
+	@Test
+	void testFetchActiveTelephonesByPidmWithoutUnlisted(){
+		def pidm = PersonUtility.getPerson("510000001").pidm
+
+		def phoneNumbers = personTelephoneService.fetchActiveTelephonesByPidm(pidm)
+
+		assertEquals 3, phoneNumbers.size()
+	}
+
 	private def newValidForCreatePersonTelephone() {
 //        def sql = new Sql(sessionFactory.getCurrentSession().connection())
 //        String idSql = """select gb_common.f_generate_id bannerId, gb_common.f_generate_pidm pidm from dual """
