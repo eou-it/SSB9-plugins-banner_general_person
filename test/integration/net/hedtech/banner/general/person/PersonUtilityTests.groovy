@@ -14,6 +14,7 @@ import net.hedtech.banner.person.dsl.NameTemplate
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 import org.springframework.context.ApplicationContext
 import org.springframework.context.i18n.LocaleContextHolder
+import org.springframework.web.context.request.RequestContextHolder
 
 class PersonUtilityTests extends BaseIntegrationTestCase {
 
@@ -143,6 +144,49 @@ class PersonUtilityTests extends BaseIntegrationTestCase {
         def emailId = PersonUtility.getEmailId(pidm)
         assertNotNull emailId
         assertEquals emailId, "Zayne152@college.edu"
+    }
+
+    @Test
+    void testSetPersonConfigInSession() {
+        def session = RequestContextHolder.currentRequestAttributes().request.session
+        assertNull session.getAttribute(PersonUtility.PERSON_CONFIG)
+
+        PersonUtility.setPersonConfigInSession([:])
+
+        assertNotNull session.getAttribute(PersonUtility.PERSON_CONFIG)
+    }
+
+    @Test
+    void testGetPersonConfigFromSession() {
+        assertNull PersonUtility.getPersonConfigFromSession()
+
+        def session = RequestContextHolder.currentRequestAttributes().request.session
+        session.setAttribute(PersonUtility.PERSON_CONFIG, [:])
+
+        assertNotNull PersonUtility.getPersonConfigFromSession()
+    }
+
+    @Test
+    void testGetDisplaySequence() {
+        def session = RequestContextHolder.currentRequestAttributes().request.session
+        assertNull session.getAttribute(PersonUtility.PERSON_CONFIG)
+
+        def sequenceConfig = [gtvsdaxInternalCode: 'PINFOADDR', gtvsdaxInternalCodeGroup: 'ADDRESS']
+        def addrPriorities = PersonUtility.getDisplaySequence('addressDisplayPriorities', sequenceConfig)
+
+        assertNotNull session.getAttribute(PersonUtility.PERSON_CONFIG)
+        assertEquals(2, addrPriorities.UPDATE_ME)
+    }
+
+    @Test
+    void testGetDisplaySequenceWithNullSequenceConfig() {
+        def session = RequestContextHolder.currentRequestAttributes().request.session
+        assertNull session.getAttribute(PersonUtility.PERSON_CONFIG)
+
+        def addrPriorities = PersonUtility.getDisplaySequence('addressDisplayPriorities', null)
+
+        assertNull session.getAttribute(PersonUtility.PERSON_CONFIG)
+        assertNull addrPriorities
     }
 
 

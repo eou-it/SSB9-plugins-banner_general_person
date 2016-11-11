@@ -1,13 +1,8 @@
 /*********************************************************************************
-Copyright 2012 Ellucian Company L.P. and its affiliates.
+Copyright 2016 Ellucian Company L.P. and its affiliates.
 **********************************************************************************/
 package net.hedtech.banner.general.person
 
-import com.google.i18n.phonenumbers.PhoneNumberUtil
-import com.google.i18n.phonenumbers.Phonenumber
-import net.hedtech.banner.general.person.PersonTelephoneUtility
-import net.hedtech.banner.general.system.InstitutionalDescription
-import net.hedtech.banner.general.system.Nation
 import net.hedtech.banner.person.PersonTelephoneDecorator
 import net.hedtech.banner.service.ServiceBase
 
@@ -23,18 +18,21 @@ class PersonTelephoneService extends ServiceBase {
 
     boolean transactional = true
 
-    def fetchActiveTelephonesByPidm(pidm, includeUnlisted = false) {
+
+    def fetchActiveTelephonesByPidm(pidm, sequenceConfig = null, includeUnlisted = false) {
         def telephoneRecords = includeUnlisted ? PersonTelephone.fetchActiveTelephoneWithUnlistedByPidm(pidm) :
                                                  PersonTelephone.fetchActiveTelephoneByPidm(pidm)
         def telephone
         def telephones = []
         def decorator
+        def telephoneDisplaySequence = PersonUtility.getDisplaySequence('telephoneDisplaySequence', sequenceConfig)
 
         telephoneRecords.each { it ->
             telephone = [:]
             telephone.id = it.id
             telephone.version = it.version
             telephone.telephoneType = it.telephoneType
+            telephone.displayPriority = telephoneDisplaySequence ? telephoneDisplaySequence[telephone.telephoneType.code] : null
             telephone.internationalAccess = it.internationalAccess
             telephone.countryPhone = it.countryPhone
             telephone.phoneArea = it.phoneArea
