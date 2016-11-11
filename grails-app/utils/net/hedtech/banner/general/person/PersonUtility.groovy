@@ -5,12 +5,14 @@ package net.hedtech.banner.general.person
 
 import grails.util.Holders
 import groovy.sql.Sql
+import net.hedtech.banner.general.system.SdaCrosswalkConversion
 import net.hedtech.banner.service.ServiceBase
 import grails.util.Holders as SCH
 import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes as GA
 import org.codehaus.groovy.runtime.InvokerHelper
 import org.springframework.context.ApplicationContext
 import org.springframework.context.i18n.LocaleContextHolder
+import org.springframework.web.context.request.RequestContextHolder
 
 import java.sql.CallableStatement
 
@@ -21,6 +23,8 @@ import java.sql.CallableStatement
  */
 
 class PersonUtility {
+
+    static final PERSON_CONFIG = 'personConfig'
 
 
     public static Boolean isPersonValid(String bannerId) {
@@ -204,5 +208,54 @@ class PersonUtility {
             params.put("appname", applicationName)
 
         return preferredNameService.getPreferredName(params)
+    }
+
+    public static setPersonConfigInSession(config) {
+        def session = RequestContextHolder.currentRequestAttributes().request.session
+
+        session.setAttribute(PERSON_CONFIG, config)
+    }
+
+    public static getPersonConfigFromSession() {
+        def session = RequestContextHolder.currentRequestAttributes().request.session
+
+        session.getAttribute(PERSON_CONFIG)
+    }
+
+    /**
+     * Get sequence from GTVSDAX in which Person items should be displayed in UI.
+     * As sequences are fetched, cache them in a configuration map in the current session.
+     * @param sequenceCacheProperty Property name this sequence should be cached under
+     * @param sequenceConfig Map of properties used to extract sequence from GTVSDAX. Properties are
+     *        gtvsdaxInternalCode and gtvsdaxInternalCodeGroup.
+     * @return Sequence list specified by sequenceCacheProperty. Will be pulled from cache, if it's there.
+     */
+    public static getDisplaySequence(sequenceCacheProperty, sequenceConfig) {
+        if (!sequenceConfig) return null; // Sequence configuration is required
+
+        def internalCode = sequenceConfig?.gtvsdaxInternalCode
+        def internalGroup = sequenceConfig?.gtvsdaxInternalCodeGroup
+        def personConfig = getPersonConfigFromSession()
+
+        if (personConfig) {
+            if (personConfig[sequenceCacheProperty]) {
+                return personConfig[sequenceCacheProperty] // Use cache
+            }
+        } else {
+            personConfig = [:]
+        }
+
+        def sequence = [:]
+        def itemList = SdaCrosswalkConversion.fetchAllByInternalAndInternalGroup(internalCode, internalGroup)
+
+        itemList.each {it ->
+            // KEY is GTVSDAX external code; VALUE is its corresponding GTVSDAX internal code sequence number
+            sequence[it.external] = it.internalSequenceNumber
+        }
+
+        personConfig[sequenceCacheProperty] = sequence
+        setPersonConfigInSession(personConfig)
+
+        sequence
     }
 }

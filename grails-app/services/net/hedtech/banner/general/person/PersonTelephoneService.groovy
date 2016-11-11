@@ -3,6 +3,7 @@ Copyright 2016 Ellucian Company L.P. and its affiliates.
 **********************************************************************************/
 package net.hedtech.banner.general.person
 
+import net.hedtech.banner.person.PersonTelephoneDecorator
 import net.hedtech.banner.service.ServiceBase
 
 // NOTE:
@@ -18,9 +19,34 @@ class PersonTelephoneService extends ServiceBase {
     boolean transactional = true
 
 
-    def fetchActiveTelephonesByPidm(pidm, includeUnlisted = false) {
-        includeUnlisted ? PersonTelephone.fetchActiveTelephoneWithUnlistedByPidm(pidm) :
-                          PersonTelephone.fetchActiveTelephoneByPidm(pidm)
+    def fetchActiveTelephonesByPidm(pidm, sequenceConfig = null, includeUnlisted = false) {
+        def telephoneRecords = includeUnlisted ? PersonTelephone.fetchActiveTelephoneWithUnlistedByPidm(pidm) :
+                                                 PersonTelephone.fetchActiveTelephoneByPidm(pidm)
+        def telephone
+        def telephones = []
+        def decorator
+        def telephoneDisplaySequence = PersonUtility.getDisplaySequence('telephoneDisplaySequence', sequenceConfig)
+
+        telephoneRecords.each { it ->
+            telephone = [:]
+            telephone.id = it.id
+            telephone.version = it.version
+            telephone.telephoneType = it.telephoneType
+            telephone.displayPriority = telephoneDisplaySequence ? telephoneDisplaySequence[telephone.telephoneType.code] : null
+            telephone.internationalAccess = it.internationalAccess
+            telephone.countryPhone = it.countryPhone
+            telephone.phoneArea = it.phoneArea
+            telephone.phoneNumber = it.phoneNumber
+            telephone.phoneExtension = it.phoneExtension
+            telephone.unlistIndicator = it.unlistIndicator
+
+            decorator = new PersonTelephoneDecorator(it)
+            telephone.displayPhoneNumber = decorator.displayPhone
+
+            telephones << telephone
+        }
+
+        return telephones
     }
 
 }
