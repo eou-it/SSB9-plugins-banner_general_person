@@ -39,6 +39,7 @@ class PersonTelephoneService extends ServiceBase {
             telephone.phoneNumber = it.phoneNumber
             telephone.phoneExtension = it.phoneExtension
             telephone.unlistIndicator = it.unlistIndicator
+            telephone.primaryIndicator = it.primaryIndicator
 
             decorator = new PersonTelephoneDecorator(it)
             telephone.displayPhoneNumber = decorator.displayPhone
