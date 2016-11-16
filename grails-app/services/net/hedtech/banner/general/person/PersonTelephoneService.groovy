@@ -50,4 +50,20 @@ class PersonTelephoneService extends ServiceBase {
         return telephones
     }
 
+    void inactivatePhone(phone) {
+        def phoneToInactivate = PersonTelephone.get(phone.id)
+
+        phoneToInactivate.statusIndicator = 'I'
+        update(phoneToInactivate)
+    }
+
+    void inactivateAndCreate(phone) {
+        inactivatePhone(phone)
+
+        phone.remove('id');
+        phone.remove('version');
+        phone.statusIndicator = null
+        create(phone)
+    }
+
 }

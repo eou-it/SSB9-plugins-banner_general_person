@@ -288,6 +288,48 @@ class PersonTelephoneServiceIntegrationTests extends BaseIntegrationTestCase {
 		assertEquals '301 5555000 51', phoneNumbers[0].displayPhoneNumber
 	}
 
+	@Test
+    void testInactivatePhone() {
+        def pidm = PersonUtility.getPerson("GDP000005").pidm
+        def phones = personTelephoneService.fetchActiveTelephonesByPidm(pidm)
+
+        assertLength 1, phones
+        assertEquals '2083094', phones[0].phoneNumber
+
+        phones[0].phoneNumber = '57557571'
+        personTelephoneService.inactivatePhone(phones[0]);
+
+        def inactivePhone = PersonTelephone.get(phones[0].id);
+
+        assertEquals 'I', inactivePhone.statusIndicator
+        assertEquals '2083094', inactivePhone.phoneNumber
+    }
+
+    @Test
+    void testInactivateAndCreate() {
+        def pidm = PersonUtility.getPerson("GDP000005").pidm
+        def phones = personTelephoneService.fetchActiveTelephonesByPidm(pidm)
+
+        assertLength 1, phones
+        assertEquals '2083094', phones[0].phoneNumber
+
+        def id = phones[0].id
+
+        phones[0].pidm = pidm
+        phones[0].phoneNumber = '57557571'
+        personTelephoneService.inactivateAndCreate(phones[0]);
+
+        def inactivePhone = PersonTelephone.get(id);
+
+        assertEquals 'I', inactivePhone.statusIndicator
+        assertEquals '2083094', inactivePhone.phoneNumber
+
+        phones = personTelephoneService.fetchActiveTelephonesByPidm(pidm)
+
+        assertLength 1, phones
+        assertEquals '57557571', phones[0].phoneNumber
+    }
+
 	private def newValidForCreatePersonTelephone() {
 //        def sql = new Sql(sessionFactory.getCurrentSession().connection())
 //        String idSql = """select gb_common.f_generate_id bannerId, gb_common.f_generate_pidm pidm from dual """
