@@ -53,7 +53,7 @@ class PersonEmergencyContactService extends ServiceBase {
             // Insert new or updated contact at proper location.
             // (Priority is one-based, while its place in the list is zero-based, so make the adjustment.)
             def updatedContactPriority = updatedContact.priority as Integer
-            toBeCreated.addAll(updatedContactPriority - 1, updatedContact)
+            toBeCreated.add(updatedContactPriority - 1, updatedContact)
 
             // Sweep through, setting priority on each one
             def currentPriority = 1
