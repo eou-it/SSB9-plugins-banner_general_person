@@ -234,7 +234,7 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
         assertEquals res.preferredIndicator, true
         assertEquals res.commentData, personEmail.commentData
         assertEquals res.displayWebIndicator, true
-        assertEquals res.dataOrigin, "GRAILS"
+        assertEquals res.dataOrigin, personEmail.dataOrigin
 
     }
 
@@ -419,7 +419,7 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
         assertEquals res.preferredIndicator, true
         assertEquals res.commentData, personEmail.commentData
         assertEquals res.displayWebIndicator, true
-        assertEquals res.dataOrigin, "GRAILS"
+        assertEquals res.dataOrigin, personEmail.dataOrigin
 
     }
 
