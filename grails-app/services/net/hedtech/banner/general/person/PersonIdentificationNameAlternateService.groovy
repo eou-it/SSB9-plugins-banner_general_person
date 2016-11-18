@@ -1,11 +1,10 @@
 /*********************************************************************************
- Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2016 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
 
 import net.hedtech.banner.exceptions.ApplicationException
-import net.hedtech.banner.general.system.InstitutionalDescription
 import net.hedtech.banner.service.ServiceBase
 
 // NOTE:
@@ -88,4 +87,29 @@ class PersonIdentificationNameAlternateService extends ServiceBase {
             throw e
         }
     }
+
+
+    List<PersonIdentificationNameAlternate> fetchAllMostRecentlyCreated(List<Integer> pidms, List<String> nameTypeCodes) {
+        List<PersonIdentificationNameAlternate> entities = []
+        if (pidms && nameTypeCodes) {
+            String hql = """ from PersonIdentificationNameAlternate a
+                             where a.pidm in :pidms
+                             and a.nameType.code in :nameTypes
+                             and a.entityIndicator = 'P'
+                             and a.changeIndicator = 'N'
+                             and (a.pidm, a.nameType.code, a.createDate) in (select b.pidm, b.nameType.code, max(b.createDate)
+                                                                             from PersonIdentificationNameAlternate b
+                                                                             where b.entityIndicator = 'P'
+                                                                             and b.changeIndicator = 'N'
+                                                                             group by b.pidm, b.nameType.code)) """
+            PersonIdentificationNameAlternate.withSession { session ->
+                def query = session.createQuery(hql)
+                query.setParameterList('pidms', pidms)
+                query.setParameterList('nameTypes', nameTypeCodes)
+                entities = query.list()
+            }
+        }
+        return entities
+    }
+
 }

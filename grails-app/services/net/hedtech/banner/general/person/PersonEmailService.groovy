@@ -1,5 +1,5 @@
 /*********************************************************************************
-Copyright 2012 Ellucian Company L.P. and its affiliates.
+Copyright 2012-2016 Ellucian Company L.P. and its affiliates.
 **********************************************************************************/
  package net.hedtech.banner.general.person
 
@@ -29,6 +29,19 @@ class PersonEmailService extends ServiceBase {
                 throw new RuntimeException("@@r1:primaryKeyFieldsCannotBeModified@@")
             }
         }
+    }
+
+    /**
+     * Fetch Active Person Email Details
+     * @param pidms
+     * @return
+     */
+   List<PersonEmail> fetchAllActiveEmails(List<Integer> pidms,Set<String> codes){
+      return PersonEmail.fetchListByActiveStatusPidmsAndEmailTypes(pidms,codes)
+    }
+
+    List<PersonEmail>fetchAllEmails(Integer pidm,Set<String> codes){
+        return PersonEmail.fetchListByPidmAndEmailTypes(pidm, codes)
     }
 
     def getDisplayableEmails(pidm) {

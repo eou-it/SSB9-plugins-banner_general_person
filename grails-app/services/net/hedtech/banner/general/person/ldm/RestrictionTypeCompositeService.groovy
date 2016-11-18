@@ -1,5 +1,5 @@
 /*********************************************************************************
- Copyright 2014-2016 Ellucian Company L.P. and its affiliates.
+ Copyright 2015-2016 Ellucian Company L.P. and its affiliates.
  **********************************************************************************/
 package net.hedtech.banner.general.person.ldm
 
@@ -28,10 +28,14 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class RestrictionTypeCompositeService extends LdmService {
 
+    public static final String PERSON_HOLD_TYPES = "person-hold-types"
+
     def holdTypeService
+
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     List<RestrictionType> list(Map params) {
+
         if (params?.parentPluralizedResourceName == GeneralValidationCommonConstants.PERSONS_ENDPOINT) {
             def returnLists = []
             if (params?.parentId) {
@@ -55,9 +59,24 @@ class RestrictionTypeCompositeService extends LdmService {
                 }
             }
             return returnLists
-        } else {
+        }
+        //start-for Version 6 Schema support -PERSON-HOLD-TYPES
+        else if (getAcceptVersionByPluralizedResourceName(params) >= GeneralValidationCommonConstants.VERSION_V6) {
             List restrictionTypes = []
-           // List allowedSortFields = ("v4".equals(LdmService.getAcceptVersion(GeneralValidationCommonConstants.VERSIONS_V1_V4)) ? ['code', 'title'] : ['abbreviation', 'title'])
+            RestfulApiValidationUtility.correctMaxAndOffset(params, RestfulApiValidationUtility.MAX_DEFAULT, RestfulApiValidationUtility.MAX_UPPER_LIMIT)
+            params.offset = params?.offset ?: 0
+            List<HoldType> holdTypes = holdTypeService.list(params) as List
+            holdTypes.each { holdType ->
+                restrictionTypes << getDecorator(holdType)
+            }
+            return restrictionTypes
+
+        }
+        //end-for Version 6 Schema support -PERSON-HOLD-TYPES
+        else if(getAcceptVersionByPluralizedResourceName(params) < GeneralValidationCommonConstants.VERSION_V6){
+            List restrictionTypes = []
+            // List allowedSortFields = ("v4".equals(LdmService.getAcceptVersion(GeneralValidationCommonConstants.VERSIONS_V1_V4)) ? ['code', 'title'] : ['abbreviation', 'title'])
+            // List allowedSortFields = ("v4".equals(LdmService.getAcceptVersion(GeneralValidationCommonConstants.VERSIONS_V1_V4)) ? ['code', 'title'] : ['abbreviation', 'title'])
             List allowedSortFields = [GeneralValidationCommonConstants.ABBREVIATION, GeneralValidationCommonConstants.TITLE]
             RestfulApiValidationUtility.correctMaxAndOffset(params, RestfulApiValidationUtility.MAX_DEFAULT, RestfulApiValidationUtility.MAX_UPPER_LIMIT)
             RestfulApiValidationUtility.validateSortField(params.sort, allowedSortFields)
@@ -72,6 +91,7 @@ class RestrictionTypeCompositeService extends LdmService {
 
         }
     }
+
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     Long count(params) {
@@ -89,36 +109,45 @@ class RestrictionTypeCompositeService extends LdmService {
         return count
     }
 
+
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     RestrictionType get(String guid) {
+        String acceptVersion
+        String requestURI = getHttpServletRequest().getForwardURI()
+        if(requestURI.contains('restriction-types')){
+            acceptVersion = getAcceptVersionByPluralizedResourceName([pluralizedResourceName:'restriction-types'])
+        }else if(requestURI.contains(PERSON_HOLD_TYPES)){
+            acceptVersion = getAcceptVersionByPluralizedResourceName([pluralizedResourceName:PERSON_HOLD_TYPES])
+        }
+
         GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(GeneralValidationCommonConstants.RESTRICTION_TYPE_LDM_NAME, guid)
-        if (!globalUniqueIdentifier) {
+        if (!globalUniqueIdentifier && GeneralValidationCommonConstants.VERSION_V6.equals(acceptVersion)) {
+            throw new ApplicationException(GeneralValidationCommonConstants.PERSON_HOLD_TYPES, new NotFoundException())
+        } else if (!globalUniqueIdentifier && !GeneralValidationCommonConstants.VERSION_V6.equals(acceptVersion)) {
             throw new ApplicationException("restrictionType", new NotFoundException())
         }
 
         HoldType holdType = HoldType.get(globalUniqueIdentifier.domainId)
-        if (!holdType) {
+        if (!holdType && GeneralValidationCommonConstants.VERSION_V6.equals(acceptVersion)) {
+            throw new ApplicationException(GeneralValidationCommonConstants.PERSON_HOLD_TYPES, new NotFoundException())
+        } else if (!holdType && !GeneralValidationCommonConstants.VERSION_V6.equals(acceptVersion)) {
             throw new ApplicationException("restrictionType", new NotFoundException())
         }
 
         return getDecorator(holdType, globalUniqueIdentifier?.guid)
     }
 
-/**
- * POST /api/restriction-types
- *
- * @param content Request body
- * @return
- */
+    /**
+     * POST /api/restriction-types
+     *
+     * @param content Request body
+     * @return
+     */
     def create(Map content) {
+        String acceptVersion = getAcceptVersionByPluralizedResourceName(content)
+
         HoldType holdType = HoldType.findByCode(content?.code)
         if (holdType) {
-          /*  def parameterValue
-            if (GeneralValidationCommonConstants.VERSION_V4.equals(LdmService.getAcceptVersion(GeneralValidationCommonConstants.VERSIONS_V1_V4))) {
-                parameterValue = GeneralValidationCommonConstants.CODE
-            } else if (GeneralValidationCommonConstants.VERSION_V1.equals(LdmService.getAcceptVersion(GeneralValidationCommonConstants.VERSIONS_V1_V4))) {
-                parameterValue = GeneralValidationCommonConstants.ABBREVIATION
-            }*/
             throw new ApplicationException('restriction.type', new BusinessLogicValidationException(GeneralValidationCommonConstants.ERROR_MSG_CODE_EXISTS, [GeneralValidationCommonConstants.ABBREVIATION]))
         }
         holdType = bindRestrictionType(new HoldType(), content)
@@ -139,6 +168,8 @@ class RestrictionTypeCompositeService extends LdmService {
      * @return
      */
     def update(Map content) {
+        String acceptVersion = getAcceptVersionByPluralizedResourceName(content)
+
         String holdTypeGuid = content?.id?.trim()?.toLowerCase()
         GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.fetchByLdmNameAndGuid(GeneralValidationCommonConstants.RESTRICTION_TYPE_LDM_NAME, holdTypeGuid)
         if (holdTypeGuid) {
@@ -172,10 +203,12 @@ class RestrictionTypeCompositeService extends LdmService {
         holdTypeService.createOrUpdate(holdType)
     }
 
+
     private void bindData(domainModel, content) {
         super.setDataOrigin(domainModel, content)
         super.bindData(domainModel, content, [:])
     }
+
 
     private def getDecorator(HoldType holdType, String holdTypeGuid = null) {
         if (holdType) {
@@ -185,6 +218,8 @@ class RestrictionTypeCompositeService extends LdmService {
             new RestrictionType(holdType, holdTypeGuid, new Metadata(holdType?.dataOrigin))
         }
     }
+
+
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     RestrictionType fetchByRestrictionTypeId(Long holdTypeId) {
         if (null == holdTypeId) {
@@ -197,6 +232,7 @@ class RestrictionTypeCompositeService extends LdmService {
         return new RestrictionType(holdType, GlobalUniqueIdentifier.findByLdmNameAndDomainId(GeneralValidationCommonConstants.RESTRICTION_TYPE_LDM_NAME, holdTypeId)?.guid, new Metadata(holdType.dataOrigin))
     }
 
+
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     RestrictionType fetchByRestrictionTypeCode(String holdTypeCode) {
         RestrictionType restrictionType = null
@@ -208,5 +244,15 @@ class RestrictionTypeCompositeService extends LdmService {
             restrictionType = new RestrictionType(holdType, GlobalUniqueIdentifier.findByLdmNameAndDomainId(GeneralValidationCommonConstants.RESTRICTION_TYPE_LDM_NAME, holdType.id)?.guid, new Metadata(holdType.dataOrigin))
         }
         return restrictionType
+    }
+
+    private String getAcceptVersionByPluralizedResourceName(Map params) {
+        String acceptVersion
+        if (params?.pluralizedResourceName?.equals(PERSON_HOLD_TYPES)) {
+            acceptVersion = getAcceptVersion([GeneralValidationCommonConstants.VERSION_V6])
+        } else if (params?.pluralizedResourceName?.equals("restriction-types")) {
+            acceptVersion = getAcceptVersion([GeneralValidationCommonConstants.VERSION_V1, GeneralValidationCommonConstants.VERSION_V4])
+        }
+        return acceptVersion
     }
 }

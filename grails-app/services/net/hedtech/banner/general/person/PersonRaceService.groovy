@@ -1,5 +1,5 @@
 /*********************************************************************************
-Copyright 2012 Ellucian Company L.P. and its affiliates.
+Copyright 2012-2016 Ellucian Company L.P. and its affiliates.
 **********************************************************************************/
  package net.hedtech.banner.general.person
 
@@ -45,6 +45,12 @@ class PersonRaceService extends ServiceBase {
                 this.update([domainModel: personRace])
             }
         }
+    }
+
+
+
+    public static List<PersonRace> fetchRaceByPidmList(List<Integer> pidmList) {
+        return PersonRace.fetchByPidmList(pidmList)
     }
 
 }

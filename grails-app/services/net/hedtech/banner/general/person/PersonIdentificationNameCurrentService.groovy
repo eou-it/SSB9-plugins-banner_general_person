@@ -1,15 +1,13 @@
 /*********************************************************************************
- Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2016 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
 
 import net.hedtech.banner.exceptions.ApplicationException
+import net.hedtech.banner.general.common.GeneralValidationCommonConstants
 import net.hedtech.banner.general.system.InstitutionalDescription
 import net.hedtech.banner.service.ServiceBase
-
-import java.sql.CallableStatement
-import java.sql.SQLException
 
 // NOTE:
 // This supports CRUD operations on the current ID record.  In other words, SPRIDEN records that have a null value
@@ -96,6 +94,62 @@ class PersonIdentificationNameCurrentService extends ServiceBase {
                 throw e
             }
         }
+    }
+
+    def fetchAllWithGuidByPidmInList(Collection<Integer> pidms, String sortField = null, String sortOrder = null) {
+        List rows = []
+        if (pidms) {
+            List entitiesList = PersonIdentificationNameCurrent.withSession { session ->
+                String query = getGuidJoinHQL()
+                query += " and a.pidm IN :pidms "
+                if (sortField) {
+                    def orderBy = " order by a." + sortField
+                    if (["asc", "desc"].contains(sortOrder?.trim()?.toLowerCase())) {
+                        orderBy += " $sortOrder"
+                    }
+                    query += orderBy
+                }
+                def hqlQuery = session.createQuery(query)
+                hqlQuery.with {
+                    setString('ldmName', GeneralValidationCommonConstants.PERSONS_LDM_NAME)
+                    setParameterList('pidms', pidms.unique())
+                    list()
+                }
+            }
+            entitiesList.each {
+                Map entitiesMap = [personIdentificationNameCurrent: it[0], globalUniqueIdentifier: it[1]]
+                rows.add(entitiesMap)
+            }
+        }
+        return rows
+    }
+
+    def fetchByGuid(String guid) {
+        Map row = [:]
+        if (guid) {
+            def entitiesList = PersonIdentificationNameCurrent.withSession { session ->
+                String query = getGuidJoinHQL() + " and b.guid = :guid"
+                def hqlQuery = session.createQuery(query)
+                hqlQuery.with {
+                    setString('ldmName', GeneralValidationCommonConstants.PERSONS_LDM_NAME)
+                    setString('guid', guid)
+                    uniqueResult()
+                }
+            }
+            if (entitiesList) {
+                row.personIdentificationNameCurrent = entitiesList[0]
+                row.globalUniqueIdentifier = entitiesList[1]
+            }
+        }
+        return row
+    }
+
+    private String getGuidJoinHQL() {
+        def query = """FROM PersonIdentificationNameCurrent a, GlobalUniqueIdentifier b
+                            where a.entityIndicator = 'P' and a.changeIndicator is null
+                            and b.domainKey = a.pidm and b.ldmName = :ldmName
+                     """
+        return query
     }
 
 }

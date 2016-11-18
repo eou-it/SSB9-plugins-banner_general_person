@@ -1,5 +1,5 @@
 /*********************************************************************************
-  Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+  Copyright 2009-2016 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
@@ -11,6 +11,8 @@ import net.hedtech.banner.general.system.HoldType
 import net.hedtech.banner.general.system.Originator
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 import groovy.sql.Sql
+import org.springframework.dao.InvalidDataAccessResourceUsageException
+
 import java.text.SimpleDateFormat
 import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
 import org.junit.Ignore
@@ -332,5 +334,87 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
         )
         return personRelatedHold
     }
+
+
+
+    /**
+     * Test to validate the count
+     * */
+    @Test
+    void testCount() {
+        def count = PersonRelatedHold.countRecord(new Date())
+        assertNotNull count
+        Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
+        def result = sql.firstRow("select count(*) as cnt from SPRHOLD where SPRHOLD_TO_DATE > TO_DATE(SYSDATE, 'DD-MM-YY') ")
+        Long expectCount = result.cnt
+        assertNotNull expectCount
+        assertEquals expectCount,count
+    }
+
+
+
+    /**
+     * <p> Test to get the count from AcademicHonorView and cumulative count of DepartmentalHonor and InstitutionalHonor</p>
+     * */
+    @Test
+    public void testCountWithFilter() {
+        def params = personHoldFilterMap()
+        def count = PersonRelatedHold.countRecordWithFilter(params, new Date())
+        assertNotNull count
+        Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
+        def result = sql.firstRow("select  count(*) as cnt from SPRHOLD,STVHLDD,GORGUID g1,GORGUID g2,GORGUID g3 where SPRHOLD_TO_DATE > TO_DATE(SYSDATE, 'DD-MM-YY') and STVHLDD_CODE = SPRHOLD_HLDD_CODE and g1.GORGUID_LDM_NAME = 'person-holds' AND g1.GORGUID_DOMAIN_SURROGATE_ID = SPRHOLD.SPRHOLD_SURROGATE_ID and g2.GORGUID_LDM_NAME = 'persons' AND g2.GORGUID_DOMAIN_KEY= SPRHOLD_PIDM AND g2.GORGUID_GUID = '"+params.person+"' and g3.GORGUID_LDM_NAME = 'restriction-types' AND g3.GORGUID_DOMAIN_KEY= SPRHOLD_HLDD_CODE")
+        Long expectCount = result.cnt
+        assertNotNull expectCount
+        assertEquals expectCount, count
+
+    }
+
+    /*
+      * Tests validate for list
+      * */
+    @Test
+    void testFetchLists() {
+        def params = [max: '10', offset: '0']
+        def personHoldsList = PersonRelatedHold.fetchAll(params,new Date())
+        assertNotNull personHoldsList
+    }
+
+    /*
+   * Tests validate for filter
+   **/
+    @Test
+    void fetchByPersonGuid() {
+        def params = personHoldFilterMap()
+        def personHoldsList = PersonRelatedHold.fetchByPersonsGuid(params,new Date())
+        assertNotNull personHoldsList
+    }
+
+
+    private Map personHoldFilterMap() {
+        def params = [max: '10', offset: '0']
+        def personHoldsList =  PersonRelatedHold.fetchAll(params,new Date())
+        def personHoldsGuid = personHoldsList.get(0).getAt(2).guid
+        params.person = personHoldsGuid
+        return params
+    }
+
+
+
+    /** Tests validate for filter*/
+    @Test
+    void fetchPersonHoldByGuid() {
+        def params = [max: '10', offset: '0']
+        def personHoldsList = PersonRelatedHold.fetchAll(params,new Date())
+        def personHoldGuid = personHoldsList.get(0).getAt(1).guid
+        def personHold = PersonRelatedHold.fetchByPersonHoldGuid(personHoldGuid,new Date())
+        assertNotNull personHold
+    }
+
+
+
+
+
+
+
 }
 

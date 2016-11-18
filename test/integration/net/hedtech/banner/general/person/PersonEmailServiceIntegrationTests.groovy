@@ -1,9 +1,6 @@
 /*********************************************************************************
-Copyright 2012 Ellucian Company L.P. and its affiliates.
+Copyright 2012-2016 Ellucian Company L.P. and its affiliates.
 **********************************************************************************/
-/*******************************************************************************
- Copyright 2013 Ellucian Company L.P. and its affiliates.
- ****************************************************************************** */
 package net.hedtech.banner.general.person
 import org.junit.Before
 import org.junit.Test
@@ -206,6 +203,36 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
         catch (ApplicationException ae) {
             assertApplicationException ae, "readonlyFieldsCannotBeModified"
         }
+    }
+
+    @Test
+    void testFetchListByPidmAndCodes() {
+        def pidmList = [PersonUtility.getPerson("HOS00003").pidm, PersonUtility.getPerson("STUAFR004").pidm]
+        def results = personEmailService.fetchAllActiveEmails(pidmList, ['PERS', 'CAMP', 'MA'] as Set)
+
+        assertEquals 3, results.size()
+        assertTrue results[0] instanceof PersonEmail
+        assertTrue results[1] instanceof PersonEmail
+        assertTrue results[2] instanceof PersonEmail
+
+        def foundCount = 0
+        results.each {
+            if (it.emailType.code == "PERS") {
+                foundCount++
+                assertEquals "Hank4@college.edu", it.emailAddress
+                assertTrue it.displayWebIndicator
+            } else if (it.emailType.code == "MA") {
+                foundCount++
+                assertEquals "pamix@charter.net", it.emailAddress
+                assertTrue it.displayWebIndicator
+            } else if (it.emailType.code == "CAMP") {
+                foundCount++
+                assertEquals "pauline.amyx@charter.net", it.emailAddress
+                assertFalse it.displayWebIndicator
+            }
+        }
+        assertEquals 3, foundCount
+
     }
 
     @Test

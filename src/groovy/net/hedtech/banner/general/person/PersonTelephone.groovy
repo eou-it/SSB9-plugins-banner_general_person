@@ -1,5 +1,5 @@
 /*********************************************************************************
- Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2016 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
@@ -17,64 +17,64 @@ import javax.persistence.*
 @Entity
 @Table(name = "SV_SPRTELE")
 @NamedQueries(value = [
-@NamedQuery(name = "PersonTelephone.fetchByPidmTelephoneTypeAndTelephoneSequence",
-        query = """FROM PersonTelephone a
+        @NamedQuery(name = "PersonTelephone.fetchByPidmTelephoneTypeAndTelephoneSequence",
+                query = """FROM PersonTelephone a
                              WHERE  pidm = :pidm
                              AND  telephoneType.code = :telephoneType
                              AND  sequenceNumber = :sequenceNumber
                     """),
-@NamedQuery(name = "PersonTelephone.fetchByPidmSequenceNoAndAddressType",
-        query = """FROM PersonTelephone a
+        @NamedQuery(name = "PersonTelephone.fetchByPidmSequenceNoAndAddressType",
+                query = """FROM PersonTelephone a
                              WHERE  pidm = :pidm
                              AND  addressSequenceNumber = :addressSequenceNumber
                              AND  addressType.code  = :addressType
                              AND  primaryIndicator IS NOT NULL
                     """),
-@NamedQuery(name = "PersonTelephone.fetchByPidmSequenceNoAndAddressTypeWithPrimaryCheck",
-        query = """FROM PersonTelephone a
+        @NamedQuery(name = "PersonTelephone.fetchByPidmSequenceNoAndAddressTypeWithPrimaryCheck",
+                query = """FROM PersonTelephone a
                              WHERE  pidm = :pidm
                              AND  addressSequenceNumber = :addressSequenceNumber
                              AND  addressType.code  = :addressType
                              AND  primaryIndicator = 'Y'
                     """),
-@NamedQuery(name = "PersonTelephone.fetchByPidmSequenceNoAndAddressTypeWithoutPrimaryCheck",
-        query = """FROM PersonTelephone a
+        @NamedQuery(name = "PersonTelephone.fetchByPidmSequenceNoAndAddressTypeWithoutPrimaryCheck",
+                query = """FROM PersonTelephone a
                              WHERE  pidm = :pidm
                              AND  addressSequenceNumber = :addressSequenceNumber
                              AND  addressType.code  = :addressType
                              AND NVL(statusIndicator,'A') <> 'I'
                     """),
-@NamedQuery(name = "PersonTelephone.fetchMaxSequenceNumber",
-        query = """select max(a.sequenceNumber)
+        @NamedQuery(name = "PersonTelephone.fetchMaxSequenceNumber",
+                query = """select max(a.sequenceNumber)
                              FROM  PersonTelephone a
 	  	                     WHERE a.pidm = :pidm
                     """),
-@NamedQuery(name = "PersonTelephone.fetchByPidmTelephoneTypeAndAddressType",
-        query = """FROM PersonTelephone a
+        @NamedQuery(name = "PersonTelephone.fetchByPidmTelephoneTypeAndAddressType",
+                query = """FROM PersonTelephone a
                              WHERE  pidm = :pidm
                              AND addressType IS NOT NULL
                              AND  (telephoneType LIKE :filter
                              OR addressType LIKE :filter)
                              ORDER BY DECODE(a.statusIndicator, 'I',-2) DESC
                     """),
-@NamedQuery(name = "PersonTelephone.fetchActiveTelephoneByPidmAndTelephoneType",
-        query = """FROM PersonTelephone a
+        @NamedQuery(name = "PersonTelephone.fetchActiveTelephoneByPidmAndTelephoneType",
+                query = """FROM PersonTelephone a
                              WHERE  pidm = :pidm
                              AND telephoneType = :telephoneType
                              AND primaryIndicator = 'Y'
                              AND NVL(statusIndicator,'A') <> 'I'
                              AND NVL(unlistIndicator,'N') <> 'Y'
                     """),
-@NamedQuery(name = "PersonTelephone.fetchListActiveTelephoneByPidmAndTelephoneType",
-        query = """FROM PersonTelephone a
+        @NamedQuery(name = "PersonTelephone.fetchListActiveTelephoneByPidmAndTelephoneType",
+                query = """FROM PersonTelephone a
                              WHERE  pidm IN :pidm
                              AND telephoneType IN :telephoneType
                              AND primaryIndicator = 'Y'
                              AND NVL(statusIndicator,'A') <> 'I'
                              AND NVL(unlistIndicator,'N') <> 'Y'
                     """),
-@NamedQuery(name = "PersonTelephone.fetchListActiveTelephoneByPidmAndTelephoneTypeWithPrimaryPrefered",
-        query = """FROM PersonTelephone a
+        @NamedQuery(name = "PersonTelephone.fetchListActiveTelephoneByPidmAndTelephoneTypeWithPrimaryPrefered",
+                query = """FROM PersonTelephone a
                              WHERE  pidm IN :pidm
                              AND telephoneType IN :telephoneType
                              AND (primaryIndicator = 'Y'
@@ -89,32 +89,43 @@ import javax.persistence.*
                              AND NVL(statusIndicator,'A') <> 'I'
                              AND NVL(unlistIndicator,'N') <> 'Y'
                     """),
-@NamedQuery(name = "PersonTelephone.fetchActiveTelephoneByPidmAndAddressType",
-        query = """FROM PersonTelephone a
+        @NamedQuery(name = "PersonTelephone.fetchActiveTelephoneByPidmAndAddressType",
+                query = """FROM PersonTelephone a
                              WHERE  pidm = :pidm
                              AND addressType = :addressType
                              AND primaryIndicator = 'Y'
                              AND NVL(statusIndicator,'A') <> 'I'
                              AND NVL(unlistIndicator,'N') <> 'Y' """),
-@NamedQuery(name = "PersonTelephone.fetchActiveTelephonesByPidmAndAddressTypes",
-        query = """FROM PersonTelephone a
+        @NamedQuery(name = "PersonTelephone.fetchActiveTelephonesByPidmAndAddressTypes",
+                query = """FROM PersonTelephone a
                              WHERE  pidm = :pidm
                              AND addressType.code in :addressTypes
                              AND NVL(statusIndicator,'A') <> 'I'
                              AND NVL(unlistIndicator,'N') <> 'Y' """),
-@NamedQuery(name = "PersonTelephone.fetchActiveTelephoneByPidm",
+        @NamedQuery(name = "PersonTelephone.fetchActiveTelephoneByPidm",
                 query = """FROM PersonTelephone a
                              WHERE  pidm = :pidm
                              AND NVL(statusIndicator,'A') <> 'I'
                              AND NVL(unlistIndicator,'N') <> 'Y'
                     """),
-@NamedQuery(name = "PersonTelephone.fetchActiveTelephoneByPidmInList",
+        @NamedQuery(name = "PersonTelephone.fetchActiveTelephoneByPidmInList",
                 query = """FROM PersonTelephone a
                              WHERE  pidm IN :pidms
                              AND NVL(statusIndicator,'A') <> 'I'
                              AND NVL(unlistIndicator,'N') <> 'Y'
                     """),
-@NamedQuery(name = "PersonTelephone.fetchActiveTelephoneWithUnlistedByPidm",
+        @NamedQuery(name = "PersonTelephone.fetchAllActiveByPidmInListAndTelephoneTypeCodeInList",
+                query = """FROM PersonTelephone
+                           WHERE pidm IN :pidms
+                           AND NVL(statusIndicator,'A') <> 'I'
+                           AND NVL(unlistIndicator,'N') <> 'Y'
+                           AND concat(phoneArea, phoneNumber) is not null
+                           AND telephoneType.code IN :telephoneTypes"""),
+        @NamedQuery(name = "PersonTelephone.fetchAllByIdInListAndTelephoneTypeCodeInList",
+                query = """FROM PersonTelephone
+                           WHERE id IN :ids
+                           AND telephoneType.code IN :telephoneTypes"""),
+        @NamedQuery(name = "PersonTelephone.fetchActiveTelephoneWithUnlistedByPidm",
                 query = """FROM PersonTelephone a
                              WHERE  pidm = :pidm
                              AND NVL(statusIndicator,'A') <> 'I'
@@ -235,7 +246,7 @@ class PersonTelephone implements Serializable {
      */
     @ManyToOne
     @JoinColumns([
-    @JoinColumn(name = "SPRTELE_TELE_CODE", referencedColumnName = "STVTELE_CODE")
+            @JoinColumn(name = "SPRTELE_TELE_CODE", referencedColumnName = "STVTELE_CODE")
     ])
     TelephoneType telephoneType
 
@@ -244,7 +255,7 @@ class PersonTelephone implements Serializable {
      */
     @ManyToOne
     @JoinColumns([
-    @JoinColumn(name = "SPRTELE_ATYP_CODE", referencedColumnName = "STVATYP_CODE")
+            @JoinColumn(name = "SPRTELE_ATYP_CODE", referencedColumnName = "STVATYP_CODE")
     ])
     AddressType addressType
 
@@ -349,20 +360,20 @@ class PersonTelephone implements Serializable {
     public static readonlyProperties = ['pidm', 'sequenceNumber']
 
 
-    static PersonTelephone fetchByPidmSequenceNoAndAddressType(Integer pidm, Integer addressSequenceNumber, def addressType) {
+    static PersonTelephone fetchByPidmSequenceNoAndAddressType(Integer pidm, Integer addressSequenceNumber,
+                                                               def addressType) {
         def address
         if (addressType instanceof AddressType) address = addressType.code
         else address = addressType
         def personTelephone =
-            PersonTelephone.withSession { session ->
-                session.getNamedQuery('PersonTelephone.fetchByPidmSequenceNoAndAddressType')
-                        .setInteger('pidm', pidm)
-                        .setInteger('addressSequenceNumber', addressSequenceNumber)
-                        .setString('addressType', address).uniqueResult()
-            }
+                PersonTelephone.withSession { session ->
+                    session.getNamedQuery('PersonTelephone.fetchByPidmSequenceNoAndAddressType')
+                            .setInteger('pidm', pidm)
+                            .setInteger('addressSequenceNumber', addressSequenceNumber)
+                            .setString('addressType', address).uniqueResult()
+                }
         return personTelephone
     }
-
 
     /**
      * Finder for advanced filtering and sorting
@@ -386,7 +397,8 @@ class PersonTelephone implements Serializable {
     }
 
 
-    public static PersonTelephone fetchByPidmSequenceNoAndAddressType(Integer pidm, Integer addressSequenceNumber, AddressType addressType) {
+    public
+    static PersonTelephone fetchByPidmSequenceNoAndAddressType(Integer pidm, Integer addressSequenceNumber, AddressType addressType) {
         PersonTelephone.withSession { session ->
             def personTelephone = session.getNamedQuery('PersonTelephone.fetchByPidmSequenceNoAndAddressType')
                     .setInteger('pidm', pidm)
@@ -398,7 +410,8 @@ class PersonTelephone implements Serializable {
     }
 
 
-    static def fetchByPidmSequenceNoAndAddressTypeWithPrimaryCheck(Integer pidm, Integer addressSequenceNumber, AddressType addressType) {
+    static
+    def fetchByPidmSequenceNoAndAddressTypeWithPrimaryCheck(Integer pidm, Integer addressSequenceNumber, AddressType addressType) {
         PersonTelephone.withSession { session ->
             def personTelephone = session.getNamedQuery('PersonTelephone.fetchByPidmSequenceNoAndAddressTypeWithPrimaryCheck')
                     .setInteger('pidm', pidm)
@@ -409,7 +422,8 @@ class PersonTelephone implements Serializable {
     }
 
 
-    static def fetchByPidmSequenceNoAndAddressTypeWithoutPrimaryCheck(Integer pidm, Integer addressSequenceNumber, AddressType addressType) {
+    static
+    def fetchByPidmSequenceNoAndAddressTypeWithoutPrimaryCheck(Integer pidm, Integer addressSequenceNumber, AddressType addressType) {
         PersonTelephone.withSession { session ->
             def personTelephone = session.getNamedQuery('PersonTelephone.fetchByPidmSequenceNoAndAddressTypeWithoutPrimaryCheck')
                     .setInteger('pidm', pidm)
@@ -464,7 +478,7 @@ class PersonTelephone implements Serializable {
     }
 
 
-    static PersonTelephone fetchActiveTelephoneByPidmAndTelephoneType(Integer pidm, String telephoneType){
+    static PersonTelephone fetchActiveTelephoneByPidmAndTelephoneType(Integer pidm, String telephoneType) {
         PersonTelephone.withSession { session ->
             PersonTelephone personTelephone = session.getNamedQuery('PersonTelephone.fetchActiveTelephoneByPidmAndTelephoneType')
                     .setInteger('pidm', pidm)
@@ -474,18 +488,18 @@ class PersonTelephone implements Serializable {
     }
 
 
-	static List fetchListActiveTelephoneByPidmAndTelephoneType(List pidm, List telephoneType){
-		if (pidm.isEmpty() || telephoneType.isEmpty()) return []
-		PersonTelephone.withSession { session ->
-			List personTelephone = session.getNamedQuery('PersonTelephone.fetchListActiveTelephoneByPidmAndTelephoneType')
-					.setParameterList('pidm', pidm)
-					.setParameterList('telephoneType', telephoneType).list()
-			return personTelephone
-		}
-	}
+    static List fetchListActiveTelephoneByPidmAndTelephoneType(List pidm, List telephoneType) {
+        if (pidm.isEmpty() || telephoneType.isEmpty()) return []
+        PersonTelephone.withSession { session ->
+            List personTelephone = session.getNamedQuery('PersonTelephone.fetchListActiveTelephoneByPidmAndTelephoneType')
+                    .setParameterList('pidm', pidm)
+                    .setParameterList('telephoneType', telephoneType).list()
+            return personTelephone
+        }
+    }
 
 
-    static List fetchListActiveTelephoneByPidmAndTelephoneTypeWithPrimaryPrefered(List pidm, List telephoneType){
+    static List fetchListActiveTelephoneByPidmAndTelephoneTypeWithPrimaryPrefered(List pidm, List telephoneType) {
         if (pidm.isEmpty() || telephoneType.isEmpty()) return []
         PersonTelephone.withSession { session ->
             List personTelephone = session.getNamedQuery('PersonTelephone.fetchListActiveTelephoneByPidmAndTelephoneTypeWithPrimaryPrefered')
@@ -496,7 +510,8 @@ class PersonTelephone implements Serializable {
     }
 
 
-    public static PersonTelephone fetchActiveTelephoneByPidmAndTelephoneType(Integer pidm, TelephoneType telephoneType){
+    public
+    static PersonTelephone fetchActiveTelephoneByPidmAndTelephoneType(Integer pidm, TelephoneType telephoneType) {
         PersonTelephone.withSession { session ->
             PersonTelephone personTelephone = session.getNamedQuery('PersonTelephone.fetchActiveTelephoneByPidmAndTelephoneType')
                     .setInteger('pidm', pidm)
@@ -506,7 +521,7 @@ class PersonTelephone implements Serializable {
     }
 
 
-    static def fetchActiveTelephoneByPidmAndAddressType(Integer pidm, AddressType addressType){
+    static def fetchActiveTelephoneByPidmAndAddressType(Integer pidm, AddressType addressType) {
         PersonTelephone.withSession { session ->
             session.getNamedQuery('PersonTelephone.fetchActiveTelephoneByPidmAndAddressType')
                     .setInteger('pidm', pidm)
@@ -519,31 +534,33 @@ class PersonTelephone implements Serializable {
 
         def result = []
         result = PersonTelephone.withSession { session ->
-                session.getNamedQuery('PersonTelephone.fetchActiveTelephonesByPidmAndAddressTypes').setInteger('pidm', params?.pidm)
-                        .setParameterList('addressTypes', params.addressTypes).list()
+            session.getNamedQuery('PersonTelephone.fetchActiveTelephonesByPidmAndAddressTypes').setInteger('pidm', params?.pidm)
+                    .setParameterList('addressTypes', params.addressTypes).list()
         }
 
         return result
     }
 
-    static def fetchActiveTelephoneByPidm(Integer pidm){
+    static def fetchActiveTelephoneByPidm(Integer pidm) {
         PersonTelephone.withSession { session ->
             session.getNamedQuery('PersonTelephone.fetchActiveTelephoneByPidm')
                     .setInteger('pidm', pidm).list()
         }
     }
 
-    static List<PersonTelephone> fetchActiveTelephoneByPidmInList(List<Integer> pidms){
-        if( pidms.isEmpty() ) { return [] }
+    static List<PersonTelephone> fetchActiveTelephoneByPidmInList(List<Integer> pidms) {
+        if (pidms.isEmpty()) {
+            return []
+        }
         PersonTelephone.withSession { session ->
             session.getNamedQuery('PersonTelephone.fetchActiveTelephoneByPidmInList')
                     .setParameterList('pidms', pidms).list()
         }
     }
 
-    static Promise fetchActiveTelephoneByPidmInListAsync(List<Integer> pidms){
+    static Promise fetchActiveTelephoneByPidmInListAsync(List<Integer> pidms) {
         PersonTelephone.async.task {
-            fetchActiveTelephoneByPidmInList( pidms )
+            fetchActiveTelephoneByPidmInList(pidms)
         }
     }
 

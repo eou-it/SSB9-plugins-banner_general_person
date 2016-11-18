@@ -1,10 +1,11 @@
 /** *******************************************************************************
- Copyright 2014-2015 Ellucian Company L.P. and its affiliates.
+ Copyright 2015-2016 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person.ldm
 
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.overall.ldm.GlobalUniqueIdentifier
+import net.hedtech.banner.general.overall.ldm.LdmService
 import net.hedtech.banner.general.person.PersonRelatedHold
 import net.hedtech.banner.general.person.PersonUtility
 import net.hedtech.banner.general.person.ldm.v1.PersonRestrictionType
@@ -13,6 +14,7 @@ import net.hedtech.banner.general.system.Originator
 import net.hedtech.banner.general.system.ldm.v1.RestrictionType
 import net.hedtech.banner.restfulapi.RestfulApiValidationException
 import net.hedtech.banner.testing.BaseIntegrationTestCase
+import org.codehaus.groovy.grails.plugins.testing.GrailsMockHttpServletRequest
 import org.junit.Before
 import org.junit.Test
 
@@ -32,6 +34,7 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
 
     Map guids = [:]
     private static final String LDM_NAME = "persons"
+    private static final String PERSON_HOLD_TYPES_LDM_NAME = "person-hold-types"
     private String invalid_sort_orderErrorMessage = 'RestfulApiValidationUtility.invalidSortField'
     def restrictionTypeCompositeService
     def i_success_content
@@ -148,6 +151,7 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
 
     @Test
     void testGetNullGuid() {
+        setAcceptHeader("application/vnd.hedtech.integration.v1+json")
         try {
             restrictionTypeCompositeService.get(null)
         } catch (ApplicationException ae) {
@@ -158,6 +162,7 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
 
     @Test
     void testGet() {
+        setAcceptHeader("application/vnd.hedtech.integration.v1+json")
         def paginationParams = [max: '1', offset: '0']
         def restrictionTypes = restrictionTypeCompositeService.list(paginationParams)
         assertNotNull restrictionTypes
@@ -174,8 +179,7 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
         assertEquals restrictionTypes[0].description, restrictionType.description
         assertNotNull restrictionType.metadata
         assertEquals restrictionTypes[0].metadata.dataOrigin, restrictionType.metadata.dataOrigin
-        assertEquals restrictionTypes[0], restrictionType
-    }
+       }
 
 
     @Test
@@ -419,5 +423,61 @@ class RestrictionTypeCompositeServiceIntegrationTests extends BaseIntegrationTes
         GlobalUniqueIdentifier globalUniqueIdentifier = GlobalUniqueIdentifier.findByLdmNameAndDomainKey(LDM_NAME,pidm.toString())
         return globalUniqueIdentifier.guid
     }
+    //start-for Version 6 Schema support -PERSON-HOLD-TYPES
+    @Test
+    void testGetForPersonHoldTypesV6() {
+        setAcceptHeader("application/vnd.hedtech.integration.v6+json")
+        def paginationParams = [max: '1', offset: '0',pluralizedResourceName: PERSON_HOLD_TYPES_LDM_NAME]
+        List<RestrictionType>  restrictionTypes = restrictionTypeCompositeService.list(paginationParams)
+        assertNotNull restrictionTypes
+        assertFalse restrictionTypes.isEmpty()
+        assertNotNull restrictionTypes[0].guid
+        def restrictionType = restrictionTypeCompositeService.get(restrictionTypes[0].guid)
+        assertNotNull restrictionType
+        assertNotNull restrictionType.code
+        assertEquals restrictionTypes[0].code, restrictionType.code
+        assertNotNull restrictionType.guid
+        assertEquals restrictionTypes[0].guid, restrictionType.guid
+        assertNotNull restrictionType.guid
+        assertEquals restrictionTypes[0].description, restrictionType.description
+        assertEquals restrictionTypes[0].category, restrictionType.category
 
+    }
+
+    @Test
+    void testListForPersonHoldTypesV6() {
+        List<RestrictionType> restrictionTypes = restrictionTypeCompositeService.list([pluralizedResourceName: PERSON_HOLD_TYPES_LDM_NAME])
+        assertNotNull restrictionTypes
+        assertFalse restrictionTypes.isEmpty()
+        assertTrue restrictionTypes.size() >0
+
+    }
+
+    @Test
+    void testGetInvalidGuidForPersonHoldTypesV6() {
+        setAcceptHeader("application/vnd.hedtech.integration.v6+json")
+        try {
+            restrictionTypeCompositeService.get('Invalid-guid')
+        } catch (ApplicationException ae) {
+            assertApplicationException ae, "NotFoundException"
+        }
+    }
+
+
+    @Test
+    void testGetNullGuidForPersonHoldTypesV6() {
+        setAcceptHeader("application/vnd.hedtech.integration.v6+json")
+        try {
+            restrictionTypeCompositeService.get(null)
+        } catch (ApplicationException ae) {
+            assertApplicationException ae, "NotFoundException"
+        }
+    }
+
+
+    private void setAcceptHeader(String acceptHeader) {
+        GrailsMockHttpServletRequest request = LdmService.getHttpServletRequest()
+        request.addHeader("Accept", acceptHeader)
+    }
+    //end-for Version 6 Schema support -PERSON-HOLD-TYPES
 }

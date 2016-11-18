@@ -1,5 +1,5 @@
 /*********************************************************************************
- Copyright 2009-2015 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2016 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 import org.junit.Before
@@ -215,7 +215,12 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
 
     @Test
     void testFetchByPidmAndStatusAndWebDisplayAndPreferredIndicator( ) {
-        def results = PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator( PersonUtility.getPerson( "STUADV955" ).pidm, 'A', 'Y', 'Y' )
+        def personEmail = newValidForCreatePersonEmail()
+        personEmail.save( failOnError: true, flush: true )
+        //Test if the generated entity now has an id assigned
+        assertNotNull personEmail.id
+
+        def results = PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator( personEmail.pidm, 'A', 'Y', 'Y' )
 
         assertTrue results.size() == 1
 
@@ -223,11 +228,11 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
 
 
         assertEquals res.version, 0
-        assertEquals res.pidm, 29955
-        assertEquals res.emailAddress, "Karrie255@codfllege.edu"
-        assertEquals res.statusIndicator, "A"
+        assertEquals res.pidm, personEmail.pidm
+        assertEquals res.emailAddress, personEmail.emailAddress
+        assertEquals res.statusIndicator, personEmail.statusIndicator
         assertEquals res.preferredIndicator, true
-        assertEquals res.commentData, null
+        assertEquals res.commentData, personEmail.commentData
         assertEquals res.displayWebIndicator, true
         assertEquals res.dataOrigin, "GRAILS"
 
@@ -236,13 +241,13 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
 
     @Test
     void testFetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicator( ) {
-        def results = PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator( PersonUtility.getPerson( "STUADV955" ).pidm, 'A', 'Y', 'Y' )
+        def results = PersonEmail.fetchByPidmAndStatusAndWebDisplayAndPreferredIndicator( PersonUtility.getPerson( "STUAFR004" ).pidm, 'A', 'Y', 'Y' )
 
         assertTrue results.size() == 1
 
         def res = results.get( 0 )
 
-        def email = PersonEmail.fetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicator( PersonUtility.getPerson( "STUADV955" ).pidm, 'A', 'Y', 'Y' )
+        def email = PersonEmail.fetchFirstByPidmAndStatusAndWebDisplayAndPreferredIndicator( PersonUtility.getPerson( "STUAFR004" ).pidm, 'A', 'Y', 'Y' )
 
         assertEquals res.emailAddress, email
 
@@ -281,7 +286,7 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
 
     @Test
     void testFetchListByPidmAndStatusAndWebDisplay( ) {
-        def pidmList = [PersonUtility.getPerson( "STUADV955" ).pidm, PersonUtility.getPerson( "HOSL0001" ).pidm]
+        def pidmList = [PersonUtility.getPerson( "STUAFR004" ).pidm, PersonUtility.getPerson( "HOS00003" ).pidm]
         def results = PersonEmail.fetchListByPidmAndStatusAndWebDisplay( pidmList, 'A', 'Y' )
 
         assertEquals 2, results.size()
@@ -290,23 +295,52 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
         
         def foundCount = 0
         results.each {
-            if (it.emailType.code == "SCHL") {
+            if (it.emailType.code == "PERS") {
                 foundCount++
-                assertEquals "Karrie255@codfllege.edu", it.emailAddress
+                assertEquals "Hank4@college.edu", it.emailAddress
                 assertTrue it.displayWebIndicator
-            } else if (it.emailType.code == "CAMP") {
+            } else if (it.emailType.code == "MA") {
                 foundCount++
-                assertEquals "mahockett@verizon.net", it.emailAddress
+                assertEquals "pamix@charter.net", it.emailAddress
                 assertTrue it.displayWebIndicator
             }
         }
         assertEquals 2, foundCount
     }
 
+    @Test
+    void testFetchListByPidmAndCodes() {
+        def pidmList = [PersonUtility.getPerson("STUAFR004").pidm, PersonUtility.getPerson("HOS00003").pidm]
+        def results = PersonEmail.fetchListByActiveStatusPidmsAndEmailTypes(pidmList, ['PERS', 'CAMP', 'MA'] as Set)
+
+        assertEquals 3, results.size()
+        assertTrue results[0] instanceof PersonEmail
+        assertTrue results[1] instanceof PersonEmail
+        assertTrue results[2] instanceof PersonEmail
+
+        def foundCount = 0
+        results.each {
+            if (it.emailType.code == "PERS") {
+                foundCount++
+                assertEquals "Hank4@college.edu", it.emailAddress
+                assertTrue it.displayWebIndicator
+            } else if (it.emailType.code == "MA") {
+                foundCount++
+                assertEquals "pamix@charter.net", it.emailAddress
+                assertTrue it.displayWebIndicator
+            } else if (it.emailType.code == "CAMP") {
+                foundCount++
+                assertEquals "pauline.amyx@charter.net", it.emailAddress
+                assertFalse it.displayWebIndicator
+            }
+        }
+        assertEquals 3, foundCount
+
+    }
 
     @Test
     void testFetchListByPidmAndStatus() {
-        def pidmList = [PersonUtility.getPerson("STUADV955").pidm, PersonUtility.getPerson("HOSL0001").pidm, PersonUtility.getPerson("STUADV956").pidm]
+        def pidmList = [PersonUtility.getPerson("STUAFR004").pidm, PersonUtility.getPerson("HOS00003").pidm]
         def results = PersonEmail.fetchListByPidmAndStatus(pidmList, 'A')
 
         assertEquals 3, results.size()
@@ -316,18 +350,18 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
         
         def foundCount = 0
         results.each {
-            if (it.emailType.code == "SCHL") {
+            if (it.emailType.code == "PERS") {
                 foundCount++
-                assertEquals "Karrie255@codfllege.edu", it.emailAddress
+                assertEquals "Hank4@college.edu", it.emailAddress
+                assertTrue it.displayWebIndicator
+            } else if (it.emailType.code == "MA") {
+                foundCount++
+                assertEquals "pamix@charter.net", it.emailAddress
                 assertTrue it.displayWebIndicator
             } else if (it.emailType.code == "CAMP") {
                 foundCount++
-                assertEquals "mahockett@verizon.net", it.emailAddress
-                assertTrue it.displayWebIndicator
-            } else if (it.emailType.code == "BUS") {
-                foundCount++
-                assertEquals "Carsdfmine256@college.edu", it.emailAddress
-                assertTrue it.displayWebIndicator
+                assertEquals "pauline.amyx@charter.net", it.emailAddress
+                assertFalse it.displayWebIndicator
             }
         }
         assertEquals 3, foundCount
@@ -372,13 +406,18 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
 
     @Test
     void testFetchByPidmAndEmailTypeAndStatusAndWebDisplayAndPreferredIndicator() {
-        def res = PersonEmail.fetchByPidmAndEmailTypeAndStatusAndWebDisplayAndPreferredIndicator(PersonUtility.getPerson("STUADV955").pidm, 'SCHL','A', 'Y', 'Y')
+        def personEmail = newValidForCreatePersonEmail()
+        personEmail.save( failOnError: true, flush: true )
+        //Test if the generated entity now has an id assigned
+        assertNotNull personEmail.id
+
+        def res = PersonEmail.fetchByPidmAndEmailTypeAndStatusAndWebDisplayAndPreferredIndicator(personEmail.pidm, personEmail.emailType.code,'A', 'Y', 'Y')
         assertEquals res.version, 0
-        assertEquals res.pidm, 29955
-        assertEquals res.emailAddress, "Karrie255@codfllege.edu"
+        assertEquals res.pidm, personEmail.pidm
+        assertEquals res.emailAddress, personEmail.emailAddress
         assertEquals res.statusIndicator, "A"
         assertEquals res.preferredIndicator, true
-        assertEquals res.commentData, null
+        assertEquals res.commentData, personEmail.commentData
         assertEquals res.displayWebIndicator, true
         assertEquals res.dataOrigin, "GRAILS"
 

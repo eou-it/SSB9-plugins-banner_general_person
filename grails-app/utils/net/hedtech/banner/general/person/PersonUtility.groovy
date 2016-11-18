@@ -104,6 +104,19 @@ class PersonUtility {
         return conf?.email
     }
 
+    public static String getEmailIdByCodeAndStatus(Integer pidm,String emailCode,String status) {
+        def emailQuery = """ select goremal_email_address email from goremal
+                         where goremal_pidm = ?
+                           and goremal_status_ind = ?
+                           and goremal_emal_code = ? """
+        def ctx = SCH.servletContext.getAttribute(GA.APPLICATION_CONTEXT)
+        def sessionFactory = ctx.sessionFactory
+        def session = sessionFactory.currentSession
+        def sql = new Sql(session.connection())
+        def conf = sql.rows(emailQuery, [pidm, status,emailCode])[0]
+        return conf?.email
+    }
+
     //Public method for formatting a person's name based on the LinkedHashMap passed in.
     public static String formatName(person) {
         if (!person) return null
