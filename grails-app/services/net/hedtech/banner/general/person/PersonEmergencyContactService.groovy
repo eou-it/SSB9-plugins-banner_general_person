@@ -31,7 +31,7 @@ class PersonEmergencyContactService extends ServiceBase {
         }
     }
 
-    def createOrUpdateEmergencyContactWithPriorityShuffle(updatedContact) {
+    def createUpdateOrDeleteEmergencyContactWithPriorityShuffle(updatedContact, isDelete=false) {
         // If priority has been changed, in addition to any updates to the affected contact
         // we need to shuffle priorities for all contacts.
         // NOTE: Priority is not updatable, so the strategy is to delete and then re-insert
@@ -50,10 +50,12 @@ class PersonEmergencyContactService extends ServiceBase {
                 }
             }
 
-            // Insert new or updated contact at proper location.
-            // (Priority is one-based, while its place in the list is zero-based, so make the adjustment.)
-            def updatedContactPriority = updatedContact.priority as Integer
-            toBeCreated.add(updatedContactPriority - 1, updatedContact)
+            if (!isDelete) {
+                // Insert new or updated contact at proper location.
+                // (Priority is one-based, while its place in the list is zero-based, so make the adjustment.)
+                def updatedContactPriority = updatedContact.priority as Integer
+                toBeCreated.add(updatedContactPriority - 1, updatedContact)
+            }
 
             // Sweep through, setting priority on each one
             def currentPriority = 1
@@ -64,7 +66,7 @@ class PersonEmergencyContactService extends ServiceBase {
 
             // Delete all emergency contacts for user
             delete(contacts)
-        } else {
+        } else if (!isDelete) {
             // No emergency contacts exist; just insert this one
             toBeCreated.push(updatedContact)
         }
