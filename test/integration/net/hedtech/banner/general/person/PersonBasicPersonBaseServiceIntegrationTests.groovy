@@ -512,6 +512,7 @@ class PersonBasicPersonBaseServiceIntegrationTests extends BaseIntegrationTestCa
         assertEquals i_success_sex, details.gender
         assertEquals i_success_preferenceFirstName, details.preferenceFirstName
         assertEquals i_success_maritalStatus, details.maritalStatus
+        assertEquals '1', details.ethnic
     }
 
 

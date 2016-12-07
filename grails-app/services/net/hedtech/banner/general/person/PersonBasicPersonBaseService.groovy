@@ -47,7 +47,8 @@ class PersonBasicPersonBaseService extends ServiceBase {
                 preferenceFirstName: personBase.preferenceFirstName,
                 gender: personBase.sex,
                 birthDate: personBase.birthDate,
-                maritalStatus: personBase.maritalStatus
+                maritalStatus: personBase.maritalStatus,
+                ethnic: personBase.ethnic
         ]
 
         return personalDetails
