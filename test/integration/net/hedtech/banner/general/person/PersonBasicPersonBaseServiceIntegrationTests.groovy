@@ -509,7 +509,7 @@ class PersonBasicPersonBaseServiceIntegrationTests extends BaseIntegrationTestCa
         assertEquals i_success_birthDate.day, details.birthDate.day
         assertEquals i_success_birthDate.month, details.birthDate.month
         assertEquals i_success_birthDate.year, details.birthDate.year
-        assertEquals i_success_sex, details.gender
+        assertEquals i_success_sex, details.sex
         assertEquals i_success_preferenceFirstName, details.preferenceFirstName
         assertEquals i_success_maritalStatus, details.maritalStatus
         assertEquals '1', details.ethnic
