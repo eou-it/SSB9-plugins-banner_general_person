@@ -45,7 +45,7 @@ class PersonBasicPersonBaseService extends ServiceBase {
                 id: personBase.id,
                 version: personBase.version,
                 preferenceFirstName: personBase.preferenceFirstName,
-                gender: personBase.sex,
+                sex: personBase.sex,
                 birthDate: personBase.birthDate,
                 maritalStatus: personBase.maritalStatus,
                 ethnic: personBase.ethnic
