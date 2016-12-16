@@ -144,6 +144,12 @@ class PersonIdentificationNameCurrentService extends ServiceBase {
         return row
     }
 
+    def getCurrentNameByPidm(pidm) {
+        def currentName = PersonIdentificationNameCurrent.fetchByPidm(pidm)
+
+        return currentName
+    }
+
     private String getGuidJoinHQL() {
         def query = """FROM PersonIdentificationNameCurrent a, GlobalUniqueIdentifier b
                             where a.entityIndicator = 'P' and a.changeIndicator is null
