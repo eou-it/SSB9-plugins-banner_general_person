@@ -1,7 +1,7 @@
 /*********************************************************************************
-Copyright 2012 Ellucian Company L.P. and its affiliates.
-**********************************************************************************/
- package net.hedtech.banner.general.person
+ Copyright 2012 - 2016 Ellucian Company L.P. and its affiliates.
+ **********************************************************************************/
+package net.hedtech.banner.general.person
 
 import net.hedtech.banner.service.ServiceBase
 
@@ -14,4 +14,21 @@ import net.hedtech.banner.service.ServiceBase
 // create, update, and delete may throw grails.validation.ValidationException a runtime exception when there is a validation failure
 
 class AdditionalIDService extends ServiceBase {
+
+    boolean transactional = true
+
+
+    def fetchAllByPidmInListAndIdentificationTypeCodeInList(Collection<Integer> pidms, Collection<String> identificationTypeCodes) {
+        def list = []
+        if (pidms && identificationTypeCodes) {
+            AdditionalID.withSession { session ->
+                list = session.getNamedQuery('AdditionalId.fetchAllByPidmInListAndAdditionalIdentificationTypeInList')
+                        .setParameterList('pidms', pidms)
+                        .setParameterList('idTypes', identificationTypeCodes)
+                        .list()
+            }
+        }
+        return list
+    }
+
 }
