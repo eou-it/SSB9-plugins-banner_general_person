@@ -276,20 +276,19 @@ class PersonTelephoneServiceIntegrationTests extends BaseIntegrationTestCase {
 	@Test
 	void testFetchActiveTelephonesByPidmWithUnlisted(){
 		def pidm = PersonUtility.getPerson("510000001").pidm
-		def sequenceConfig = [gtvsdaxInternalCode: 'PINFOPHON', gtvsdaxInternalCodeGroup: 'TELEPHONE']
+		def sequenceConfig = [processCode: 'PERSONAL_INFORMATION_SSB', settingName: 'PERS.INFO.OVERVIEW.PHONE']
 
 		def phoneNumbers = personTelephoneService.fetchActiveTelephonesByPidm(pidm, sequenceConfig, true)
 
 		assertEquals 4, phoneNumbers.size()
 		assertEquals '5555000', phoneNumbers[0].phoneNumber
-		assertEquals  1, phoneNumbers[0].displayPriority
 		assertEquals '301 5555000 51', phoneNumbers[0].displayPhoneNumber
 	}
 
 	@Test
 	void testFetchActiveTelephonesByPidmWithoutUnlisted(){
 		def pidm = PersonUtility.getPerson("510000001").pidm
-		def sequenceConfig = [gtvsdaxInternalCode: 'PINFOPHON', gtvsdaxInternalCodeGroup: 'TELEPHONE']
+		def sequenceConfig = [processCode: 'PERSONAL_INFORMATION_SSB', settingName: 'PERS.INFO.OVERVIEW.PHONE']
 
 		def phoneNumbers = personTelephoneService.fetchActiveTelephonesByPidm(pidm, sequenceConfig)
 

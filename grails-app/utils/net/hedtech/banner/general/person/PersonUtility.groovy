@@ -5,7 +5,7 @@ package net.hedtech.banner.general.person
 
 import grails.util.Holders
 import groovy.sql.Sql
-import net.hedtech.banner.general.system.SdaCrosswalkConversion
+import net.hedtech.banner.general.overall.IntegrationConfiguration
 import net.hedtech.banner.service.ServiceBase
 import grails.util.Holders as SCH
 import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes as GA
@@ -236,18 +236,16 @@ class PersonUtility {
     }
 
     /**
-     * Get sequence from GTVSDAX in which Person items should be displayed in UI.
+     * Get sequence from GORICCR data in which Person items should be displayed in UI.
      * As sequences are fetched, cache them in a configuration map in the current session.
      * @param sequenceCacheProperty Property name this sequence should be cached under
-     * @param sequenceConfig Map of properties used to extract sequence from GTVSDAX. Properties are
-     *        gtvsdaxInternalCode and gtvsdaxInternalCodeGroup.
-     * @return Sequence list specified by sequenceCacheProperty. Will be pulled from cache, if it's there.
+     * @param sequenceConfig Map of properties used to extract sequence from GORICCR. Properties are
+     *        processCode and settingName.
+     * @return Sequence list specified by sequenceCacheProperty. Will be pulled from cache, if it already exists.
      */
     public static getDisplaySequence(sequenceCacheProperty, sequenceConfig) {
         if (!sequenceConfig) return null; // Sequence configuration is required
 
-        def internalCode = sequenceConfig?.gtvsdaxInternalCode
-        def internalGroup = sequenceConfig?.gtvsdaxInternalCodeGroup
         def personConfig = getPersonConfigFromSession()
 
         if (personConfig) {
@@ -258,12 +256,13 @@ class PersonUtility {
             personConfig = [:]
         }
 
+        def processCode = sequenceConfig?.processCode
+        def settingName = sequenceConfig?.settingName
         def sequence = [:]
-        def itemList = SdaCrosswalkConversion.fetchAllByInternalAndInternalGroup(internalCode, internalGroup)
+        def itemList = IntegrationConfiguration.fetchAllByProcessCodeAndSettingName(processCode, settingName)
 
         itemList.each {it ->
-            // KEY is GTVSDAX external code; VALUE is its corresponding GTVSDAX internal code sequence number
-            sequence[it.external] = it.internalSequenceNumber
+            sequence[it.value] = it.sequenceNumber
         }
 
         personConfig[sequenceCacheProperty] = sequence
