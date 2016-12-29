@@ -180,7 +180,7 @@ class PersonUtilityTests extends BaseIntegrationTestCase {
         def session = RequestContextHolder.currentRequestAttributes().request.session
         assertNull session.getAttribute(PersonUtility.PERSON_CONFIG)
 
-        def sequenceConfig = [processCode: 'PERSONAL_INFORMATION_SSB', settingName: 'PERS.INFO.OVERVIEW.ADDRESS']
+        def sequenceConfig = [processCode: 'PERSONAL_INFORMATION_SSB', settingName: 'OVERVIEW.ADDRESS']
         def addrPriorities = PersonUtility.getDisplaySequence('addressDisplayPriorities', sequenceConfig)
 
         assertNotNull session.getAttribute(PersonUtility.PERSON_CONFIG)
