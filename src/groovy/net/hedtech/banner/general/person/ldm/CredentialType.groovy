@@ -15,16 +15,11 @@ enum CredentialType {
     BANNER_UDC_ID([v3: "Banner UDC ID", v6: "bannerUdcId", v8: "bannerUdcId"]),
     COLLEAGUE_USER_NAME([v8: "colleagueUserName"])
 
-    private final Map<String, String> versionToEnumMap
+    final Map<String, String> versionToEnumMap
 
 
     CredentialType(Map<String, String> versionToEnumMap) {
         this.versionToEnumMap = versionToEnumMap
-    }
-
-
-    public Map<String, String> getVersionToEnumMap() {
-        return versionToEnumMap
     }
 
 
