@@ -276,7 +276,7 @@ class PersonTelephoneServiceIntegrationTests extends BaseIntegrationTestCase {
 	@Test
 	void testFetchActiveTelephonesByPidmWithUnlisted(){
 		def pidm = PersonUtility.getPerson("510000001").pidm
-		def sequenceConfig = [processCode: 'PERSONAL_INFORMATION_SSB', settingName: 'OVERVIEW.PHONE']
+		def sequenceConfig = [processCode: 'PERSONAL_INFORMATION_SSB', settingName: 'OVERVIEW.PHONE.TYPE']
 
 		def phoneNumbers = personTelephoneService.fetchActiveTelephonesByPidm(pidm, sequenceConfig, true)
 
@@ -288,7 +288,7 @@ class PersonTelephoneServiceIntegrationTests extends BaseIntegrationTestCase {
 	@Test
 	void testFetchActiveTelephonesByPidmWithoutUnlisted(){
 		def pidm = PersonUtility.getPerson("510000001").pidm
-		def sequenceConfig = [processCode: 'PERSONAL_INFORMATION_SSB', settingName: 'OVERVIEW.PHONE']
+		def sequenceConfig = [processCode: 'PERSONAL_INFORMATION_SSB', settingName: 'OVERVIEW.PHONE.TYPE']
 
 		def phoneNumbers = personTelephoneService.fetchActiveTelephonesByPidm(pidm, sequenceConfig)
 
