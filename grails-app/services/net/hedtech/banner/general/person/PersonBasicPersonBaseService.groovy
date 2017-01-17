@@ -54,6 +54,26 @@ class PersonBasicPersonBaseService extends ServiceBase {
         return personalDetails
     }
 
+    def getPersonalDetailsForPersonalInformation(pidm) {
+        def personBase = PersonBasicPersonBase.fetchByPidm(pidm)
+        def personalDetails = [
+                id: personBase.id,
+                version: personBase.version,
+                preferenceFirstName: personBase.preferenceFirstName,
+                sex: personBase.sex,
+                birthDate: personBase.birthDate,
+                maritalStatus: personBase.maritalStatus,
+                ethnic: personBase.ethnic,
+                vetActiveDutySeparationDate:personBase.activeDutySeprDate,
+                vetArmedServiceMedalIndicator:personBase.armedServiceMedalVetIndicator,
+                vetDisabledIndicator:personBase.sdvetIndicator,
+                vetFileNumber:personBase.vetcFileNumber,
+                vetCategoryIndicator:personBase.veraIndicator
+        ]
+
+        return personalDetails
+    }
+
     private def validateSsn(domain) {
         def institutionalDescription = InstitutionalDescription.fetchByKey()
 
