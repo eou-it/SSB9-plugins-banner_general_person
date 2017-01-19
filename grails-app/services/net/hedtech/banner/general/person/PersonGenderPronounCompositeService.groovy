@@ -87,6 +87,35 @@ class PersonGenderPronounCompositeService {
         }
     }
 
+    def fetchGenderList(int max = 10, int offset = 0, String searchString = '') {
+        def resultList = []
+        if (checkGenderPronounInstalled()) {
+            Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
+            def genderSql = 'select gtvgndr_gndr_code, gtvgndr_gndr_desc ' +
+                    'from ' +
+                    '(select a.*, rownum rnum ' +
+                       'from ' +
+                       '(select gtvgndr_gndr_code, gtvgndr_gndr_desc ' +
+                          'from gtvgndr ' +
+                          'where gtvgndr_active_ind = \'Y\' and gtvgndr_web_ind = \'Y\' ' +
+                          'and upper(gtvgndr_gndr_desc) like ? ' +
+                          'order by gtvgndr_gndr_desc, gtvgndr_gndr_code) a ' +
+                      'where rownum <= ?) ' +
+                    'where rnum >= ?'
+            String preppedSearchString = '%' + searchString.toUpperCase() + '%'
+
+            try {
+                resultList = sql.rows(genderSql, [preppedSearchString, max, offset]).collect {
+                    it = [code: it.gtvgndr_gndr_code, description: it.gtvgndr_gndr_desc]
+                }
+            } finally {
+                sql?.close()
+            }
+        }
+
+        resultList
+    }
+
     boolean checkGenderPronounInstalled() {
         boolean isGenderPronounInstalled
         def session = RequestContextHolder?.currentRequestAttributes()?.request?.session
