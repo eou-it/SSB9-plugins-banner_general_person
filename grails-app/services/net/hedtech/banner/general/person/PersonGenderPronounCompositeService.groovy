@@ -42,7 +42,7 @@ class PersonGenderPronounCompositeService {
             if (!person.gender) {
                 genderCode = persistedPerson.gender.code
             }
-            else if (person.gender.code != null) {
+            else if (person.gender.code) {
                 if(person.gender.code != persistedPerson.gender.code) {
                     fetchGenderByCode(person.gender.code)
                     genderCode = person.gender.code
@@ -55,7 +55,7 @@ class PersonGenderPronounCompositeService {
             if(!person.pronoun) {
                 pronounCode = persistedPerson.pronoun.code
             }
-            else if (person.pronoun?.code != null) {
+            else if (person.pronoun.code) {
                 if(person.pronoun.code != persistedPerson.pronoun.code) {
                     fetchPronounByCode(person.pronoun.code)
                     pronounCode = person.pronoun.code
@@ -131,41 +131,51 @@ class PersonGenderPronounCompositeService {
     }
 
     private def fetchGenderByCode(code) {
-        def genderResult = [:]
-        Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
-        def genderSql = 'select GTVGNDR_GNDR_CODE, GTVGNDR_GNDR_DESC, GTVGNDR_ACTIVE_IND, GTVGNDR_WEB_IND ' +
-                'from gtvgndr where gtvgndr_gndr_code = ? and gtvgndr_active_ind = \'Y\' and gtvgndr_web_ind = \'Y\''
+        if (code != null) {
+            def genderResult = [:]
+            Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
+            def genderSql = 'select GTVGNDR_GNDR_CODE, GTVGNDR_GNDR_DESC, GTVGNDR_ACTIVE_IND, GTVGNDR_WEB_IND ' +
+                    'from gtvgndr where gtvgndr_gndr_code = ? and gtvgndr_active_ind = \'Y\' and gtvgndr_web_ind = \'Y\''
 
-        try {
-            genderResult = sql.firstRow(genderSql, [code])
-        } finally {
-            sql?.close()
+            try {
+                genderResult = sql.firstRow(genderSql, [code])
+            } finally {
+                sql?.close()
+            }
+
+            if (genderResult == null) {
+                throw new ApplicationException(this, "@@r1:invalidGenderCode@@")
+            }
+
+            return [code: genderResult.gtvgndr_gndr_code, description: genderResult.gtvgndr_gndr_desc]
         }
-
-        if(genderResult == null){
+        else {
             throw new ApplicationException(this, "@@r1:invalidGenderCode@@")
         }
-
-        return [code: genderResult.gtvgndr_gndr_code, description: genderResult.gtvgndr_gndr_desc]
     }
 
     private def fetchPronounByCode(code) {
-        def pronounResult
-        Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
-        def genderSql = 'select GTVPPRN_PPRN_CODE, GTVPPRN_PPRN_DESC, GTVPPRN_ACTIVE_IND, GTVPPRN_WEB_IND ' +
-                'from gtvpprn where gtvpprn_pprn_code = ? and gtvpprn_active_ind = \'Y\' and gtvpprn_web_ind = \'Y\''
+        if(code != null) {
+            def pronounResult
+            Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
+            def genderSql = 'select GTVPPRN_PPRN_CODE, GTVPPRN_PPRN_DESC, GTVPPRN_ACTIVE_IND, GTVPPRN_WEB_IND ' +
+                    'from gtvpprn where gtvpprn_pprn_code = ? and gtvpprn_active_ind = \'Y\' and gtvpprn_web_ind = \'Y\''
 
-        try {
-            pronounResult = sql.firstRow(genderSql, [code])
-        } finally {
-            sql?.close()
+            try {
+                pronounResult = sql.firstRow(genderSql, [code])
+            } finally {
+                sql?.close()
+            }
+
+            if (pronounResult == null) {
+                throw new ApplicationException(this, "@@r1:invalidPronounCode@@")
+            }
+
+            return [code: pronounResult.gtvpprn_pprn_code, description: pronounResult.gtvpprn_pprn_desc]
         }
-
-        if(pronounResult == null){
+        else {
             throw new ApplicationException(this, "@@r1:invalidPronounCode@@")
         }
-
-        return [code: pronounResult.gtvpprn_pprn_code, description: pronounResult.gtvpprn_pprn_desc]
     }
 
 
