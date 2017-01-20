@@ -34,8 +34,6 @@ class PersonGenderPronounCompositeService {
         if(checkGenderPronounInstalled()) {
 
             def persistedPerson = fetchPersonalDetails(person.pidm)
-            boolean isDirty = (person.gender?.code != persistedPerson.gender.code) ||
-                    (person.pronoun?.code != persistedPerson.pronoun.code)
             def genderCode = null
             def pronounCode = null
 
@@ -65,6 +63,8 @@ class PersonGenderPronounCompositeService {
                 }
             }
 
+            boolean isDirty = (genderCode != persistedPerson.gender.code) ||
+                    (pronounCode != persistedPerson.pronoun.code)
             def baseUpdateResult = personBasicPersonBaseService.update(person)
             int version = person.version + 1 == baseUpdateResult.version ? baseUpdateResult.version : person.version
 
@@ -116,6 +116,35 @@ class PersonGenderPronounCompositeService {
         resultList
     }
 
+    def fetchPronounList(int max = 10, int offset = 0, String searchString = '') {
+        def resultList = []
+        if (checkGenderPronounInstalled()) {
+            Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
+            def pronounSql = 'select gtvpprn_pprn_code, gtvpprn_pprn_desc ' +
+                    'from ' +
+                    '(select a.*, rownum rnum ' +
+                       'from ' +
+                       '(select gtvpprn_pprn_code, gtvpprn_pprn_desc ' +
+                          'from gtvpprn ' +
+                          'where gtvpprn_active_ind = \'Y\' and gtvpprn_web_ind = \'Y\' ' +
+                          'and upper(gtvpprn_pprn_desc) like ? ' +
+                          'order by gtvpprn_pprn_desc, gtvpprn_pprn_code) a ' +
+                      'where rownum <= ?) ' +
+                    'where rnum >= ?'
+            String preppedSearchString = '%' + searchString.toUpperCase() + '%'
+
+            try {
+                resultList = sql.rows(pronounSql, [preppedSearchString, max, offset]).collect {
+                    it = [code: it.gtvpprn_pprn_code, description: it.gtvpprn_pprn_desc]
+                }
+            } finally {
+                sql?.close()
+            }
+        }
+
+        resultList
+    }
+
     boolean checkGenderPronounInstalled() {
         boolean isGenderPronounInstalled
         def session = RequestContextHolder?.currentRequestAttributes()?.request?.session
@@ -124,7 +153,7 @@ class PersonGenderPronounCompositeService {
             isGenderPronounInstalled = session.getAttribute("isGenderPronounInstalled")
         }
         else {
-            isGenderPronounInstalled = checkForGndrPprnTablesAndColumns()
+            isGenderPronounInstalled = checkForGtvndrGtvpprnTablesAndColumns()
             session.setAttribute("isGenderPronounInstalled", isGenderPronounInstalled)
         }
         return isGenderPronounInstalled
@@ -198,19 +227,19 @@ class PersonGenderPronounCompositeService {
                 pronoun: [code: result?.spbpers_pprn_code, description: result?.gtvpprn_pprn_desc]]
     }
 
-    private boolean checkForGndrPprnTablesAndColumns() {
-        boolean gndrPprnTablesAndColumnsExist = false;
+    private boolean checkForGtvndrGtvpprnTablesAndColumns() {
+        boolean gtvgndrGtvpprnTablesAndColumnsExist = false;
         Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
         def genderColumnSql = 'select count(*) from all_tab_cols ' +
                 'where table_name = \'SPBPERS\' and column_name = \'SPBPERS_GNDR_CODE\''
 
         try {
-            gndrPprnTablesAndColumnsExist = sql.firstRow(genderColumnSql)[0] == 1
+            gtvgndrGtvpprnTablesAndColumnsExist = sql.firstRow(genderColumnSql)[0] == 1
         } finally {
             sql?.close()
         }
 
-        return gndrPprnTablesAndColumnsExist
+        return gtvgndrGtvpprnTablesAndColumnsExist
     }
 
 }
