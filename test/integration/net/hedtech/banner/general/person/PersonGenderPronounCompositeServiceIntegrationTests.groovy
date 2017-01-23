@@ -24,9 +24,10 @@ class PersonGenderPronounCompositeServiceIntegrationTests extends BaseIntegratio
         super.tearDown()
     }
 
-    /* TODO: uncomment tests after seed data is created
     @Test
     void testFetchPersonalDetails() {
+        setupGDP000005()
+
         def pidm = PersonUtility.getPerson("GDP000005").pidm
         def details = personGenderPronounCompositeService.fetchPersonalDetails(pidm)
         assertEquals 'Other', details.gender.description
@@ -37,25 +38,21 @@ class PersonGenderPronounCompositeServiceIntegrationTests extends BaseIntegratio
     void testUpdatePerson() {
         def pidm = PersonUtility.getPerson("GDP000005").pidm
         def details = personGenderPronounCompositeService.fetchPersonalDetails(pidm)
+
         details.pidm = pidm
-
-        assertEquals 'Other', details.gender.description
-        assertEquals 'TR1', details.gender.code
-        assertEquals null, details.preferenceFirstName
-
-        details.gender= [code : 'WOMA']
-        details.pronoun= [code : 'HER']
+        details.gender = [code : 'WOMA']
+        details.pronoun = [code : 'B002']
         details.preferenceFirstName = 'NickName'
         details.maritalStatus = MaritalStatus.findByCode('S')
 
         personGenderPronounCompositeService.updatePerson(details)
-        def newDetails = personGenderPronounCompositeService.fetchPersonalDetails(pidm)
+        def newDetails = personGenderPronounCompositeService.fetchPersonalDetails(details.pidm)
 
         assertEquals details.id, newDetails.id
         assertEquals 'WOMA', newDetails.gender.code
         assertEquals 'Woman', newDetails.gender.description
-        assertEquals 'HER', newDetails.pronoun.code
-        assertEquals 'her', newDetails.pronoun.description
+        assertEquals 'B002', newDetails.pronoun.code
+        assertEquals 'she', newDetails.pronoun.description
         assertEquals 'NickName', newDetails.preferenceFirstName
         assertEquals 'S', newDetails.maritalStatus.code
         assertEquals details.version+1, newDetails.version
@@ -63,24 +60,22 @@ class PersonGenderPronounCompositeServiceIntegrationTests extends BaseIntegratio
 
     @Test
     void testUpdatePronoun() {
-        def pidm = PersonUtility.getPerson("GDP000005").pidm
-        def details = personGenderPronounCompositeService.fetchPersonalDetails(pidm)
-        details.pidm = pidm
+        def details = setupGDP000005()
 
         assertEquals 'Other', details.gender.description
         assertEquals 'TR1', details.gender.code
         assertEquals null, details.preferenceFirstName
 
-        details.pronoun = [code : 'HER']
+        details.pronoun = [code : 'B002']
 
         personGenderPronounCompositeService.updatePerson(details)
-        def newDetails = personGenderPronounCompositeService.fetchPersonalDetails(pidm)
+        def newDetails = personGenderPronounCompositeService.fetchPersonalDetails(details.pidm)
 
         assertEquals details.id, newDetails.id
         assertEquals 'TR1', newDetails.gender.code
         assertEquals 'Other', newDetails.gender.description
-        assertEquals 'HER', newDetails.pronoun.code
-        assertEquals 'her', newDetails.pronoun.description
+        assertEquals 'B002', newDetails.pronoun.code
+        assertEquals 'she', newDetails.pronoun.description
         assertEquals null, newDetails.preferenceFirstName
         assertEquals details.version+1, newDetails.version
     }
@@ -90,21 +85,18 @@ class PersonGenderPronounCompositeServiceIntegrationTests extends BaseIntegratio
         def pidm = PersonUtility.getPerson("GDP000005").pidm
         def details = personGenderPronounCompositeService.fetchPersonalDetails(pidm)
         details.pidm = pidm
-
-        assertEquals 'Other', details.gender.description
-        assertEquals 'TR1', details.gender.code
         assertEquals null, details.preferenceFirstName
 
         details.gender = [code: null]
-        details.pronoun= [code : 'HER']
+        details.pronoun= [code : 'B002']
         details.preferenceFirstName = 'NickName'
 
         personGenderPronounCompositeService.updatePerson(details)
-        def newDetails = personGenderPronounCompositeService.fetchPersonalDetails(pidm)
+        def newDetails = personGenderPronounCompositeService.fetchPersonalDetails(details.pidm)
 
         assertEquals details.id, newDetails.id
-        assertEquals 'HER', newDetails.pronoun.code
-        assertEquals 'her', newDetails.pronoun.description
+        assertEquals 'B002', newDetails.pronoun.code
+        assertEquals 'she', newDetails.pronoun.description
         assertEquals null, newDetails.gender.code
         assertEquals null, newDetails.gender.description
         assertEquals 'NickName', newDetails.preferenceFirstName
@@ -117,17 +109,16 @@ class PersonGenderPronounCompositeServiceIntegrationTests extends BaseIntegratio
         def details = personGenderPronounCompositeService.fetchPersonalDetails(pidm)
         details.pidm = pidm
 
-        assertEquals 'Other', details.gender.description
-        assertEquals 'TR1', details.gender.code
+        assertEquals null, details.pronoun.code
+        assertEquals null, details.gender.code
         assertEquals null, details.preferenceFirstName
 
         personGenderPronounCompositeService.updatePerson(details)
-        def newDetails = personGenderPronounCompositeService.fetchPersonalDetails(pidm)
+        def newDetails = personGenderPronounCompositeService.fetchPersonalDetails(details.pidm)
 
         assertEquals details.id, newDetails.id
         assertEquals null, newDetails.pronoun.code
-        assertEquals 'TR1', newDetails.gender.code
-        assertEquals 'Other', newDetails.gender.description
+        assertEquals null, newDetails.gender.code
         assertEquals null, newDetails.preferenceFirstName
         assertEquals details.version, newDetails.version
     }
@@ -138,25 +129,25 @@ class PersonGenderPronounCompositeServiceIntegrationTests extends BaseIntegratio
         def details = personGenderPronounCompositeService.fetchPersonalDetails(pidm)
         details.pidm = pidm
 
-        assertEquals 'Other', details.gender.description
-        assertEquals 'TR1', details.gender.code
+        assertEquals null, details.pronoun.code
+        assertEquals null, details.gender.code
         assertEquals null, details.preferenceFirstName
 
         details.gender = [code: 'INVALID']
-        details.pronoun= [code : 'HER']
+        details.pronoun= [code : 'B002']
         details.preferenceFirstName = 'NickName'
 
         try {
             personGenderPronounCompositeService.updatePerson(details)
         }
         catch (ApplicationException e) {
-            def newDetails = personGenderPronounCompositeService.fetchPersonalDetails(pidm)
+            def newDetails = personGenderPronounCompositeService.fetchPersonalDetails(details.pidm)
 
             assertEquals details.id, newDetails.id
             assertEquals null, newDetails.pronoun.code
             assertEquals null, newDetails.pronoun.description
-            assertEquals 'TR1', newDetails.gender.code
-            assertEquals 'Other', newDetails.gender.description
+            assertEquals null, newDetails.gender.code
+            assertEquals null, newDetails.gender.description
             assertEquals null, newDetails.preferenceFirstName
             assertEquals details.version, newDetails.version
         }
@@ -168,22 +159,50 @@ class PersonGenderPronounCompositeServiceIntegrationTests extends BaseIntegratio
         def details = personGenderPronounCompositeService.fetchPersonalDetails(pidm)
         details.pidm = pidm
 
-        assertEquals 'Other', details.gender.description
-        assertEquals 'TR1', details.gender.code
+        assertEquals null, details.gender.description
+        assertEquals null, details.gender.code
         assertEquals null, details.preferenceFirstName
 
         details.version = details.version - 2
-        details.pronoun = [code : 'HER']
+        details.pronoun = [code : 'B002']
 
         shouldFail(ApplicationException) {
             personGenderPronounCompositeService.updatePerson(details)
         }
     }
-    */
 
     @Test
     void testCheckGeneral889Installed() {
         def result = personGenderPronounCompositeService.checkGenderPronounInstalled()
         assertTrue result
+    }
+
+    @Test
+    void testFetchGenderList() {
+        def result = personGenderPronounCompositeService.fetchGenderList()
+        println result
+        assertTrue 3 <= result.size()
+        assertTrue result.code.contains('MAN')
+        assertTrue result.description.contains('Woman')
+    }
+
+    @Test
+    void testFetchPronounList() {
+        def result = personGenderPronounCompositeService.fetchPronounList()
+        println result
+        assertTrue 3 <= result.size()
+        assertTrue result.code.contains('C001')
+        assertTrue result.description.contains('she')
+    }
+
+    private def setupGDP000005() {
+        def pidm = PersonUtility.getPerson("GDP000005").pidm
+        def details = personGenderPronounCompositeService.fetchPersonalDetails(pidm)
+        details.pidm = pidm
+        details.gender = [code: 'TR1', description: 'Other']
+
+        personGenderPronounCompositeService.updatePerson(details)
+
+        return details
     }
 }
