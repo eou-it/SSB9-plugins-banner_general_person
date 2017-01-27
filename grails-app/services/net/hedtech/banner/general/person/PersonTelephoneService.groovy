@@ -73,6 +73,7 @@ class PersonTelephoneService extends ServiceBase {
             telephone.phoneArea = it.phoneArea
             telephone.phoneNumber = it.phoneNumber
             telephone.phoneExtension = it.phoneExtension
+            telephone.sequenceNumber = it.sequenceNumber
             telephone.unlistIndicator = it.unlistIndicator
             telephone.primaryIndicator = it.primaryIndicator
 

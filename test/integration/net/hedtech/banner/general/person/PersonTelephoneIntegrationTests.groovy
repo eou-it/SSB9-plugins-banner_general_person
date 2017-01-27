@@ -583,6 +583,17 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
         assertTrue results[0] instanceof PersonTelephone
     }
 
+    @Test
+    void testFetchActiveTelephoneWithUnlistedByPidmAndTelephoneType() {
+        def pidm = PersonUtility.getPerson("510000001").pidm
+        def telephoneType =  TelephoneType.findByCode("PR")
+        def results = PersonTelephone.fetchActiveTelephoneWithUnlistedByPidmAndTelephoneType(pidm, telephoneType)
+
+        // TODO: finish this test.  Need seed data?  Jim Caley
+        assertTrue results.size() > 1
+        assertTrue results[0] instanceof PersonTelephone
+    }
+
 
     private def newValidForCreatePersonTelephone() {
         def personTelephone = new PersonTelephone(
