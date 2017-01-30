@@ -232,7 +232,9 @@ class PersonUtility {
     public static getPersonConfigFromSession() {
         def session = RequestContextHolder.currentRequestAttributes().request.session
 
-        session.getAttribute(PERSON_CONFIG)
+        def personConfig = session.getAttribute(PERSON_CONFIG)
+
+        (personConfig == null) ? [:] : personConfig
     }
 
     /**
@@ -248,12 +250,8 @@ class PersonUtility {
 
         def personConfig = getPersonConfigFromSession()
 
-        if (personConfig) {
-            if (personConfig[sequenceCacheProperty]) {
-                return personConfig[sequenceCacheProperty] // Use cache
-            }
-        } else {
-            personConfig = [:]
+        if (personConfig[sequenceCacheProperty]) {
+            return personConfig[sequenceCacheProperty] // Use cache
         }
 
         def processCode = sequenceConfig?.processCode
