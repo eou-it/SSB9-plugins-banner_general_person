@@ -167,7 +167,7 @@ class PersonUtilityTests extends BaseIntegrationTestCase {
 
     @Test
     void testGetPersonConfigFromSession() {
-        assertNull PersonUtility.getPersonConfigFromSession()
+        assertEquals [:], PersonUtility.getPersonConfigFromSession()
 
         def session = RequestContextHolder.currentRequestAttributes().request.session
         session.setAttribute(PersonUtility.PERSON_CONFIG, [:])
