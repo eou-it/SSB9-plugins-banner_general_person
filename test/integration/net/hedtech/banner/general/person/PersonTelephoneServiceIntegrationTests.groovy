@@ -283,6 +283,7 @@ class PersonTelephoneServiceIntegrationTests extends BaseIntegrationTestCase {
 		assertEquals 4, phoneNumbers.size()
 		assertEquals '5555000', phoneNumbers[0].phoneNumber
 		assertEquals '301 5555000 51', phoneNumbers[0].displayPhoneNumber
+		assertEquals 2, phoneNumbers[0].sequenceNumber
 	}
 
 	@Test

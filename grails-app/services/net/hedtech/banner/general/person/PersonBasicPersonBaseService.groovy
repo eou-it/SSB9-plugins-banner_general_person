@@ -40,7 +40,7 @@ class PersonBasicPersonBaseService extends ServiceBase {
     }
 
     def getPersonalDetails(pidm) {
-        def personalDetails = []
+        def personalDetails = [:]
         def personBase = PersonBasicPersonBase.fetchByPidm(pidm)
 
         if (personBase) {
