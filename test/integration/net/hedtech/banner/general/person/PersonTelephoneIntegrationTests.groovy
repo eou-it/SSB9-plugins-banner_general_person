@@ -583,17 +583,27 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
         assertTrue results[0] instanceof PersonTelephone
     }
 
-    // TODO: Uncomment when test is complete - Jim Caley
-//    @Test
-//    void testFetchActiveTelephoneWithUnlistedByPidmAndTelephoneType() {
-//        def pidm = PersonUtility.getPerson("510000001").pidm
-//        def telephoneType =  TelephoneType.findByCode("PR")
-//        def results = PersonTelephone.fetchActiveTelephoneWithUnlistedByPidmAndTelephoneType(pidm, telephoneType)
-//
-//        // TODO: finish this test.  Need seed data?  Jim Caley
-//        assertTrue results.size() > 1
-//        assertTrue results[0] instanceof PersonTelephone
-//    }
+    @Test
+    void testFetchActiveTelephoneWithUnlistedByPidmAndTelephoneTypeHavingAListedNumber() {
+        def pidm = PersonUtility.getPerson("510000001").pidm
+        def telephoneType =  TelephoneType.findByCode("PR")
+        def results = PersonTelephone.fetchActiveTelephoneWithUnlistedByPidmAndTelephoneType(pidm, telephoneType)
+
+        assertEquals 1, results.size()
+        assertTrue results[0] instanceof PersonTelephone
+        assertEquals '5551234', results[0].phoneNumber
+    }
+
+    @Test
+    void testFetchActiveTelephoneWithUnlistedByPidmAndTelephoneTypeHavingAnUnlistedNumber() {
+        def pidm = PersonUtility.getPerson("510000001").pidm
+        def telephoneType =  TelephoneType.findByCode("SE")
+        def results = PersonTelephone.fetchActiveTelephoneWithUnlistedByPidmAndTelephoneType(pidm, telephoneType)
+
+        assertEquals 1, results.size()
+        assertTrue results[0] instanceof PersonTelephone
+        assertEquals '4441512', results[0].phoneNumber
+    }
 
 
     private def newValidForCreatePersonTelephone() {

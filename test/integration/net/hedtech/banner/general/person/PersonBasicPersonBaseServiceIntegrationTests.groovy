@@ -535,6 +535,15 @@ class PersonBasicPersonBaseServiceIntegrationTests extends BaseIntegrationTestCa
         assertEquals i_success_veraIndicator, details.veraIndicator
     }
 
+    @Test
+    void testGetPersonalDetailsWhereBasicPersonBaseNotFound() {
+        def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()
+
+        assertNull "PersonBasicPersonBase ID is not null in PersonBasicPersonBase Service Tests Create", personBasicPersonBase.id
+
+        def details = personBasicPersonBaseService.getPersonalDetails(personBasicPersonBase.pidm)
+        assertEquals 0, details.size()
+    }
 
     private def newValidForCreatePersonBasicPersonBase() {
         def sql = new Sql(sessionFactory.getCurrentSession().connection())
