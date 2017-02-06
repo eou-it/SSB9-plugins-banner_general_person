@@ -17,7 +17,7 @@ class PersonGenderPronounCompositeService {
     def maritalStatusService
 
     def fetchPersonalDetails(pidm) {
-        def personalDetails = personBasicPersonBaseService.getPersonalDetails(pidm)
+        def personalDetails = personBasicPersonBaseService.getPersonalDetailsForPersonalInformation(pidm)
 
         if(checkGenderPronounInstalled()) {
             def fetchResult = fetchPersonsGenderPronoun(personalDetails.id)
