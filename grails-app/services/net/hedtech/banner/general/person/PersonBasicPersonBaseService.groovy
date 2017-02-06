@@ -59,21 +59,24 @@ class PersonBasicPersonBaseService extends ServiceBase {
     }
 
     def getPersonalDetailsForPersonalInformation(pidm) {
+        def personalDetails = []
         def personBase = PersonBasicPersonBase.fetchByPidm(pidm)
-        def personalDetails = [
-                id: personBase.id,
-                version: personBase.version,
-                preferenceFirstName: personBase.preferenceFirstName,
-                sex: personBase.sex,
-                birthDate: personBase.birthDate,
-                maritalStatus: personBase.maritalStatus,
-                ethnic: personBase.ethnic,
-                vetActiveDutySeparationDate:personBase.activeDutySeprDate,
-                vetArmedServiceMedalIndicator:personBase.armedServiceMedalVetIndicator,
-                vetDisabledIndicator:personBase.sdvetIndicator,
-                vetFileNumber:personBase.vetcFileNumber,
-                vetCategoryIndicator:personBase.veraIndicator
-        ]
+        if (personBase) {
+            personalDetails = [
+                    id                           : personBase.id,
+                    version                      : personBase.version,
+                    preferenceFirstName          : personBase.preferenceFirstName,
+                    sex                          : personBase.sex,
+                    birthDate                    : personBase.birthDate,
+                    maritalStatus                : personBase.maritalStatus,
+                    ethnic                       : personBase.ethnic,
+                    activeDutySeprDate           : personBase.activeDutySeprDate,
+                    armedServiceMedalVetIndicator: personBase.armedServiceMedalVetIndicator,
+                    sdvetIndicator               : personBase.sdvetIndicator,
+                    vetcFileNumber               : personBase.vetcFileNumber,
+                    veraIndicator                : personBase.veraIndicator
+            ]
+        }
 
         return personalDetails
     }
