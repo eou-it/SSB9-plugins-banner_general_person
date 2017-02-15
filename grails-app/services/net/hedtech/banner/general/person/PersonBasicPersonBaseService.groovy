@@ -39,25 +39,6 @@ class PersonBasicPersonBaseService extends ServiceBase {
         }
     }
 
-    def getPersonalDetails(pidm) {
-        def personalDetails = [:]
-        def personBase = PersonBasicPersonBase.fetchByPidm(pidm)
-
-        if (personBase) {
-            personalDetails = [
-                    id                 : personBase.id,
-                    version            : personBase.version,
-                    preferenceFirstName: personBase.preferenceFirstName,
-                    sex                : personBase.sex,
-                    birthDate          : personBase.birthDate,
-                    maritalStatus      : personBase.maritalStatus,
-                    ethnic             : personBase.ethnic
-            ]
-        }
-
-        return personalDetails
-    }
-
     def getPersonalDetailsForPersonalInformation(pidm) {
         def personalDetails = []
         def personBase = PersonBasicPersonBase.fetchByPidm(pidm)

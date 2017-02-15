@@ -499,23 +499,6 @@ class PersonBasicPersonBaseServiceIntegrationTests extends BaseIntegrationTestCa
     }
 
     @Test
-    void testGetPersonalDetails() {
-        def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()
-        def map = [domainModel: personBasicPersonBase]
-        personBasicPersonBase = personBasicPersonBaseService.create(map)
-        assertNotNull "PersonBasicPersonBase ID is null in PersonBasicPersonBase Service Tests Create", personBasicPersonBase.id
-
-        def details = personBasicPersonBaseService.getPersonalDetails(personBasicPersonBase.pidm)
-        assertEquals i_success_birthDate.day, details.birthDate.day
-        assertEquals i_success_birthDate.month, details.birthDate.month
-        assertEquals i_success_birthDate.year, details.birthDate.year
-        assertEquals i_success_sex, details.sex
-        assertEquals i_success_preferenceFirstName, details.preferenceFirstName
-        assertEquals i_success_maritalStatus, details.maritalStatus
-        assertEquals '1', details.ethnic
-    }
-
-    @Test
     void testGetPersonalInformationDetails() {
         def personBasicPersonBase = newValidForCreatePersonBasicPersonBase()
         def map = [domainModel: personBasicPersonBase]
@@ -541,7 +524,7 @@ class PersonBasicPersonBaseServiceIntegrationTests extends BaseIntegrationTestCa
 
         assertNull "PersonBasicPersonBase ID is not null in PersonBasicPersonBase Service Tests Create", personBasicPersonBase.id
 
-        def details = personBasicPersonBaseService.getPersonalDetails(personBasicPersonBase.pidm)
+        def details = personBasicPersonBaseService.getPersonalDetailsForPersonalInformation(personBasicPersonBase.pidm)
         assertEquals 0, details.size()
     }
 
