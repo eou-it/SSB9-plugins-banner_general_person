@@ -384,6 +384,21 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
         assertEquals "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL", person2.fullName
     }
 
+    @Test
+    void testGetCurrentNameByPidm() {
+        def person = setupNewPersonIdentificationNameCurrent()
+        def pidm = person?.pidm
+
+        assertNotNull pidm
+
+        def val = personIdentificationNameCurrentService.getCurrentNameByPidm(pidm)
+
+        assertNotNull(val)
+        assertEquals 'Troy',  val.firstName
+        assertEquals 'W',     val.middleName
+        assertEquals 'Adams', val.lastName
+    }
+
     // *************************************************************************************************************
     //  Start non-person tests.
     // *************************************************************************************************************

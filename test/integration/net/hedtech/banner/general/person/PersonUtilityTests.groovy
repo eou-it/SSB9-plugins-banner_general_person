@@ -167,7 +167,7 @@ class PersonUtilityTests extends BaseIntegrationTestCase {
 
     @Test
     void testGetPersonConfigFromSession() {
-        assertNull PersonUtility.getPersonConfigFromSession()
+        assertEquals [:], PersonUtility.getPersonConfigFromSession()
 
         def session = RequestContextHolder.currentRequestAttributes().request.session
         session.setAttribute(PersonUtility.PERSON_CONFIG, [:])
@@ -180,11 +180,13 @@ class PersonUtilityTests extends BaseIntegrationTestCase {
         def session = RequestContextHolder.currentRequestAttributes().request.session
         assertNull session.getAttribute(PersonUtility.PERSON_CONFIG)
 
-        def sequenceConfig = [gtvsdaxInternalCode: 'PINFOADDR', gtvsdaxInternalCodeGroup: 'ADDRESS']
+        def sequenceConfig = [processCode: 'PERSONAL_INFORMATION_SSB', settingName: 'OVERVIEW.ADDRESS.TYPE']
         def addrPriorities = PersonUtility.getDisplaySequence('addressDisplayPriorities', sequenceConfig)
 
         assertNotNull session.getAttribute(PersonUtility.PERSON_CONFIG)
-        assertEquals(2, addrPriorities.UPDATE_ME)
+        assertEquals(2, addrPriorities.size())
+        assertEquals(1, addrPriorities["UPDATE_ME (PRIORITY 1)"])
+        assertEquals(2, addrPriorities["UPDATE_ME (PRIORITY 2)"])
     }
 
     @Test

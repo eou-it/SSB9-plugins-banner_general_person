@@ -128,6 +128,11 @@ import javax.persistence.*
         @NamedQuery(name = "PersonTelephone.fetchActiveTelephoneWithUnlistedByPidm",
                 query = """FROM PersonTelephone a
                              WHERE  pidm = :pidm
+                             AND NVL(statusIndicator,'A') <> 'I' """),
+        @NamedQuery(name = "PersonTelephone.fetchActiveTelephoneWithUnlistedByPidmAndTelephoneType",
+                query = """FROM PersonTelephone a
+                             WHERE  pidm = :pidm
+                             AND telephoneType = :telephoneType
                              AND NVL(statusIndicator,'A') <> 'I'
                     """)
 ])
@@ -568,6 +573,14 @@ class PersonTelephone implements Serializable {
         PersonTelephone.withSession { session ->
             session.getNamedQuery('PersonTelephone.fetchActiveTelephoneWithUnlistedByPidm')
                     .setInteger('pidm', pidm).list()
+        }
+    }
+
+    static def fetchActiveTelephoneWithUnlistedByPidmAndTelephoneType(Integer pidm, TelephoneType telephoneType){
+        PersonTelephone.withSession { session ->
+            session.getNamedQuery('PersonTelephone.fetchActiveTelephoneWithUnlistedByPidmAndTelephoneType')
+                    .setInteger('pidm', pidm)
+                    .setString('telephoneType', telephoneType.code).list()
         }
     }
 }

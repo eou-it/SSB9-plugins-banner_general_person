@@ -40,15 +40,43 @@ class PersonBasicPersonBaseService extends ServiceBase {
     }
 
     def getPersonalDetails(pidm) {
+        def personalDetails = [:]
         def personBase = PersonBasicPersonBase.fetchByPidm(pidm)
-        def personalDetails = [
-                id: personBase.id,
-                version: personBase.version,
-                preferenceFirstName: personBase.preferenceFirstName,
-                gender: personBase.sex,
-                birthDate: personBase.birthDate,
-                maritalStatus: personBase.maritalStatus
-        ]
+
+        if (personBase) {
+            personalDetails = [
+                    id                 : personBase.id,
+                    version            : personBase.version,
+                    preferenceFirstName: personBase.preferenceFirstName,
+                    sex                : personBase.sex,
+                    birthDate          : personBase.birthDate,
+                    maritalStatus      : personBase.maritalStatus,
+                    ethnic             : personBase.ethnic
+            ]
+        }
+
+        return personalDetails
+    }
+
+    def getPersonalDetailsForPersonalInformation(pidm) {
+        def personalDetails = []
+        def personBase = PersonBasicPersonBase.fetchByPidm(pidm)
+        if (personBase) {
+            personalDetails = [
+                    id                           : personBase.id,
+                    version                      : personBase.version,
+                    preferenceFirstName          : personBase.preferenceFirstName,
+                    sex                          : personBase.sex,
+                    birthDate                    : personBase.birthDate,
+                    maritalStatus                : personBase.maritalStatus,
+                    ethnic                       : personBase.ethnic,
+                    activeDutySeprDate           : personBase.activeDutySeprDate,
+                    armedServiceMedalVetIndicator: personBase.armedServiceMedalVetIndicator,
+                    sdvetIndicator               : personBase.sdvetIndicator,
+                    vetcFileNumber               : personBase.vetcFileNumber,
+                    veraIndicator                : personBase.veraIndicator
+            ]
+        }
 
         return personalDetails
     }
