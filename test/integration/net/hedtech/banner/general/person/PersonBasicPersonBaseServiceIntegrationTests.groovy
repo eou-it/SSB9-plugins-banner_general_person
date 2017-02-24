@@ -1,8 +1,5 @@
-/*********************************************************************************
-Copyright 2012 Ellucian Company L.P. and its affiliates.
-**********************************************************************************/
 /*******************************************************************************
- Copyright 2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2012-2017 Ellucian Company L.P. and its affiliates.
  ****************************************************************************** */
 package net.hedtech.banner.general.person
 
