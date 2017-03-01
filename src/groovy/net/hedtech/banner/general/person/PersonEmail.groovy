@@ -76,7 +76,14 @@ import javax.persistence.*
         @NamedQuery(name = "PersonEmail.fetchListByActiveStatusPidmsAndEmailTypes",
                 query = """FROM PersonEmail a
     WHERE a.pidm IN (:pidms)  AND a.statusIndicator = 'A'
-    AND a.emailType.code IN (:emailTypes)""")
+    AND a.emailType.code IN (:emailTypes)"""),
+        @NamedQuery(name = "PersonEmail.fetchByPidmAndActiveAndWebDisplayable",
+                query = """FROM PersonEmail a
+    WHERE a.pidm = :pidm
+    AND a.displayWebIndicator = 'Y'
+    AND a.emailType.displayWebIndicator = 'Y'
+    AND a.statusIndicator = 'A'
+""")
 ])
 class PersonEmail implements Serializable {
     static def log = Logger.getLogger('net.hedtech.banner.general.person.PersonEmail')
@@ -329,6 +336,14 @@ class PersonEmail implements Serializable {
        return PersonEmail.withSession { session ->
            session.getNamedQuery('PersonEmail.fetchListByActiveStatusPidmsAndEmailTypes').setParameterList('pidms', pidms).setParameterList('emailTypes', emailTypes).list()
         }
+    }
+
+    public static List fetchByPidmAndActiveAndWebDisplayable(Integer pidm){
+        def emails = PersonEmail.withSession { session ->
+            session.getNamedQuery('PersonEmail.fetchByPidmAndActiveAndWebDisplayable').setInteger('pidm', pidm).list()
+        }
+
+        return emails
     }
 
 }

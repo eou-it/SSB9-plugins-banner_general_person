@@ -273,6 +273,84 @@ class PersonTelephoneServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+	@Test
+	void testFetchActiveTelephonesByPidmWithUnlisted(){
+		def pidm = PersonUtility.getPerson("510000001").pidm
+		def sequenceConfig = [processCode: 'PERSONAL_INFORMATION_SSB', settingName: 'OVERVIEW.PHONE.TYPE']
+
+		def phoneNumbers = personTelephoneService.fetchActiveTelephonesByPidm(pidm, sequenceConfig, true)
+
+		assertEquals 4, phoneNumbers.size()
+		assertEquals '5555000', phoneNumbers[0].phoneNumber
+		assertEquals '301 5555000 51', phoneNumbers[0].displayPhoneNumber
+		assertEquals 2, phoneNumbers[0].sequenceNumber
+	}
+
+	@Test
+	void testFetchActiveTelephonesByPidmWithoutUnlisted(){
+		def pidm = PersonUtility.getPerson("510000001").pidm
+		def sequenceConfig = [processCode: 'PERSONAL_INFORMATION_SSB', settingName: 'OVERVIEW.PHONE.TYPE']
+
+		def phoneNumbers = personTelephoneService.fetchActiveTelephonesByPidm(pidm, sequenceConfig)
+
+		assertEquals 3, phoneNumbers.size()
+	}
+
+	@Test
+	void testFetchActiveTelephonesByPidmWithoutSequenceConfigAndWithoutUnlisted(){
+		def pidm = PersonUtility.getPerson("510000001").pidm
+
+		def phoneNumbers = personTelephoneService.fetchActiveTelephonesByPidm(pidm)
+
+		assertEquals 3, phoneNumbers.size()
+		assertEquals '5555000', phoneNumbers[0].phoneNumber
+		assertNull phoneNumbers[0].displayPriority
+		assertEquals '301 5555000 51', phoneNumbers[0].displayPhoneNumber
+	}
+
+	@Test
+    void testInactivatePhone() {
+        def pidm = PersonUtility.getPerson("GDP000005").pidm
+        def phones = personTelephoneService.fetchActiveTelephonesByPidm(pidm)
+
+        assertLength 1, phones
+        assertEquals '2083094', phones[0].phoneNumber
+
+        phones[0].phoneNumber = '57557571'
+        personTelephoneService.inactivatePhone(phones[0]);
+
+        def inactivePhone = PersonTelephone.get(phones[0].id);
+
+        assertEquals 'I', inactivePhone.statusIndicator
+        assertEquals '2083094', inactivePhone.phoneNumber
+    }
+
+    @Test
+    void testInactivateAndCreate() {
+        def pidm = PersonUtility.getPerson("GDP000005").pidm
+        def phones = personTelephoneService.fetchActiveTelephonesByPidm(pidm)
+
+        assertLength 1, phones
+        assertEquals '2083094', phones[0].phoneNumber
+
+        def id = phones[0].id
+
+        phones[0].pidm = pidm
+        phones[0].phoneNumber = '57557571'
+        personTelephoneService.inactivateAndCreate(phones[0]);
+
+        def inactivePhone = PersonTelephone.get(id);
+
+        assertEquals 'I', inactivePhone.statusIndicator
+        assertEquals '2083094', inactivePhone.phoneNumber
+
+        phones = personTelephoneService.fetchActiveTelephonesByPidm(pidm)
+
+        assertLength 1, phones
+        assertEquals '57557571', phones[0].phoneNumber
+    }
+
+
     private def newValidForCreatePersonTelephone() {
 //        def sql = new Sql(sessionFactory.getCurrentSession().connection())
 //        String idSql = """select gb_common.f_generate_id bannerId, gb_common.f_generate_pidm pidm from dual """

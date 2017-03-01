@@ -92,15 +92,15 @@ class MedicalInformationIntegrationTests extends BaseIntegrationTestCase {
 
     @Test
     void testFindWhere() {
-        def entity = MedicalInformation.findWhere(onsetAge: 12)
-        assertEquals "FindWhere did not return expected entity", 12, entity.onsetAge
+        def entity = MedicalInformation.findWhere(onsetAge: 39)
+        assertEquals "FindWhere did not return expected entity", 39, entity.onsetAge
     }
 
 
     @Test
     void testFindAll() {
         def medInfos = MedicalInformation.findAll()
-        assertTrue medInfos.size() >= 10
+        assertTrue medInfos.size() >= 9
     }
 
 
@@ -108,7 +108,16 @@ class MedicalInformationIntegrationTests extends BaseIntegrationTestCase {
     void testFindAllWithHQL() {
         String hql = "from MedicalInformation as m where m.onsetAge != null"
         def medInfos = MedicalInformation.findAll(hql)
-        assertTrue medInfos.size() >= 10
+        assertTrue medInfos.size() >= 1
+    }
+
+    @Test
+    void testFindByPidmForDisabilityNamedQuery() {
+        def entity = newMedicalInformationForDisabSurvey('DY')
+        save entity
+        def medInfo = MedicalInformation.fetchByPidmForDisabSurvey(entity.pidm)
+        assertNotNull medInfo
+        assertEquals 'DY', medInfo.disability.code
     }
 
 
@@ -209,6 +218,38 @@ class MedicalInformationIntegrationTests extends BaseIntegrationTestCase {
         return medicalInformation
     }
 
+    public MedicalInformation newMedicalInformationForDisabSurvey(String disabilityCode) {
+        def sql = new Sql(sessionFactory.getCurrentSession().connection())
+        String idSql = """select gb_common.f_generate_id bannerId, gb_common.f_generate_pidm pidm from dual """
+        def bannerValues = sql.firstRow(idSql)
+        def ibannerId = bannerValues.bannerId
+        def ipidm = bannerValues.pidm
+
+        def person = new PersonIdentificationName(
+                pidm: ipidm,
+                bannerId: ibannerId,
+                lastName: "TTTTT",
+                firstName: "TTTTT",
+                middleName: "TTTTT",
+                changeIndicator: null,
+                entityIndicator: "P"
+        )
+        person.save(flush:true, failOnError:true)
+        assert person.id
+
+        def medicalInformation = new MedicalInformation(disability: Disability.findByCode(disabilityCode),
+                disabilityAssistance: createDisabilityAssistance(),
+                medicalCondition: MedicalCondition.findByCode('DISABSURV'),
+                medicalEquipment: createMedicalEquipment(),
+                pidm: person.pidm,
+                disabilityIndicator: true,
+                comment: "unit-test",
+                medicalDate: new Date(),
+                onsetAge: 29,
+                lastModified: new Date(), lastModifiedBy: "test", dataOrigin: "Banner")
+        save medicalInformation
+        return medicalInformation
+    }
 
     private Disability createDisability(String disCode) {
         if (disCode == null) disCode = "uu"

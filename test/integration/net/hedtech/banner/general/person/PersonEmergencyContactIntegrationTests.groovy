@@ -313,7 +313,7 @@ class PersonEmergencyContactIntegrationTests extends BaseIntegrationTestCase {
 
         // test date values -
         assertEquals date.format(today), date.format(personEmergencyContact.lastModified)
-        assertEquals hour.format(today), hour.format(personEmergencyContact.lastModified)
+      //  assertEquals hour.format(today), hour.format(personEmergencyContact.lastModified)
 
 
     }

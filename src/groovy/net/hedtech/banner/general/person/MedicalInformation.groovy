@@ -16,6 +16,12 @@ import javax.persistence.*
  */
 @Entity
 @Table (name = "SV_SPRMEDI")
+@NamedQueries(value = [
+        @NamedQuery(name = "MedicalInformation.fetchByPidmForDisabSurvey",
+                query = """FROM  MedicalInformation a
+	       WHERE a.pidm = :pidm
+	       AND   a.medicalCondition.code = 'DISABSURV'""")
+])
 @DatabaseModifiesState 
 class MedicalInformation implements Serializable {
         
@@ -149,5 +155,13 @@ class MedicalInformation implements Serializable {
         result = 31 * result + (medicalEquipment != null ? medicalEquipment.hashCode() : 0);
         result = 31 * result + (disabilityAssistance != null ? disabilityAssistance.hashCode() : 0);
         return result;
+    }
+
+    def static fetchByPidmForDisabSurvey(Integer pidm) {
+        MedicalInformation object = MedicalInformation.withSession { session ->
+            def list = session.getNamedQuery('MedicalInformation.fetchByPidmForDisabSurvey').setInteger('pidm', pidm).list()[0]
+        }
+
+        return object
     }
 }

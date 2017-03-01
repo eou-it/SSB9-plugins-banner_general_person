@@ -31,7 +31,7 @@ class AdditionalIdSearchIntegrationTests extends BaseIntegrationTestCase {
     void testAdditionalIdSearchByFilterAndPagination() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
-        def filter = "nne1"   //DEANNE1
+        def filter = "hor"   //DEANNE1
         def results = PersonAdditionalIdView.fetchPersonAdditionalId(filter, pagingAndSortParams)
 
         assertNotNull results?.list
@@ -49,7 +49,7 @@ class AdditionalIdSearchIntegrationTests extends BaseIntegrationTestCase {
     @Test
     void testAdditionalIdSearchByFilter() {
 
-        def filter = "nne1"  //DEANNE1
+        def filter = "hor"  //DEANNE1
         def results = PersonAdditionalIdView.fetchByAdditionalId(filter)
 
         assertNotNull results
@@ -67,7 +67,7 @@ class AdditionalIdSearchIntegrationTests extends BaseIntegrationTestCase {
     @Test
     void testAdditionalIdSearchByFilterBirthday() {
 
-        def filter = "glasses"  //Wears glasses
+        def filter = "hor"  //Wears glasses
         def results = PersonAdditionalIdView.fetchByAdditionalId(filter)
 
         assertNotNull results
@@ -114,9 +114,9 @@ class AdditionalIdSearchIntegrationTests extends BaseIntegrationTestCase {
     @Test
     void testAdditionalIdSearchByFilterAndPidm() {
         def pidmList = []
-        pidmList.add(new Integer("36336"))
+        pidmList.add(new Integer("49435"))
 
-        def filter = "nne1"
+        def filter = "hor"
         def resultsMany = PersonAdditionalIdView.fetchByAdditionalId(filter)
 
         assertTrue resultsMany.size() > 1
@@ -124,6 +124,6 @@ class AdditionalIdSearchIntegrationTests extends BaseIntegrationTestCase {
         def results = PersonAdditionalIdView.fetchByAdditionalIdAndPidm(pidmList, filter)
 
         assertNotNull results
-        assertEquals 5, results.size()
+        assertEquals 1, results.size()
     }
 }

@@ -3,6 +3,7 @@
  ****************************************************************************** */
 package net.hedtech.banner.general.person
 
+import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.service.ServiceBase
 
 // NOTE:
@@ -46,4 +47,18 @@ class PersonAddressService extends ServiceBase {
         return entities
     }
 
+    def getActiveAddresses(map) {
+        def activeAddresses = PersonAddress.fetchActiveAddressesByPidm(map)
+
+        return activeAddresses
+    }
+
+    def checkAddressFieldsValid(address){
+        if(!address.fromDate){
+            throw new ApplicationException(PersonAddress, "@@r1:fromDateRequired@@")
+        }
+        if(!address.streetLine1){
+            throw new ApplicationException(PersonAddress, "@@r1:streetLine1Required@@")
+        }
+    }
 }

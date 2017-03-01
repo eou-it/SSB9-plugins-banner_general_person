@@ -234,7 +234,7 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
         assertEquals res.preferredIndicator, true
         assertEquals res.commentData, personEmail.commentData
         assertEquals res.displayWebIndicator, true
-        assertEquals res.dataOrigin, "Banner"
+        assertEquals res.dataOrigin, personEmail.dataOrigin
 
     }
 
@@ -419,7 +419,7 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
         assertEquals res.preferredIndicator, true
         assertEquals res.commentData, personEmail.commentData
         assertEquals res.displayWebIndicator, true
-        assertEquals res.dataOrigin, "Banner"
+        assertEquals res.dataOrigin, personEmail.dataOrigin
 
     }
 
@@ -437,6 +437,16 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
 
         assertEquals emails.size(), persons.size()
 
+    }
+
+    @Test
+    void testFetchByPidmAndActiveAndWebDisplayable(){
+        def pidm = PersonUtility.getPerson("GDP000001").pidm
+
+        def emails = PersonEmail.fetchByPidmAndActiveAndWebDisplayable(pidm)
+
+        assertEquals 1, emails.size()
+        assertEquals 'ansbates@telstra.com', emails[0].emailAddress
     }
 
 

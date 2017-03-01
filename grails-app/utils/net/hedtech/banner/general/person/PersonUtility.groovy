@@ -5,12 +5,14 @@ package net.hedtech.banner.general.person
 
 import grails.util.Holders
 import groovy.sql.Sql
+import net.hedtech.banner.general.overall.IntegrationConfiguration
 import net.hedtech.banner.service.ServiceBase
 import grails.util.Holders as SCH
 import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes as GA
 import org.codehaus.groovy.runtime.InvokerHelper
 import org.springframework.context.ApplicationContext
 import org.springframework.context.i18n.LocaleContextHolder
+import org.springframework.web.context.request.RequestContextHolder
 
 import java.sql.CallableStatement
 
@@ -21,6 +23,8 @@ import java.sql.CallableStatement
  */
 
 class PersonUtility {
+
+    static final PERSON_CONFIG = 'personConfig'
 
 
     public static Boolean isPersonValid(String bannerId) {
@@ -217,5 +221,51 @@ class PersonUtility {
             params.put("appname", applicationName)
 
         return preferredNameService.getPreferredName(params)
+    }
+
+    public static setPersonConfigInSession(config) {
+        def session = RequestContextHolder.currentRequestAttributes().request.session
+
+        session.setAttribute(PERSON_CONFIG, config)
+    }
+
+    public static getPersonConfigFromSession() {
+        def session = RequestContextHolder.currentRequestAttributes().request.session
+
+        def personConfig = session.getAttribute(PERSON_CONFIG)
+
+        (personConfig == null) ? [:] : personConfig
+    }
+
+    /**
+     * Get sequence from GORICCR data in which Person items should be displayed in UI.
+     * As sequences are fetched, cache them in a configuration map in the current session.
+     * @param sequenceCacheProperty Property name this sequence should be cached under
+     * @param sequenceConfig Map of properties used to extract sequence from GORICCR. Properties are
+     *        processCode and settingName.
+     * @return Sequence list specified by sequenceCacheProperty. Will be pulled from cache, if it already exists.
+     */
+    public static getDisplaySequence(sequenceCacheProperty, sequenceConfig) {
+        if (!sequenceConfig) return null; // Sequence configuration is required
+
+        def personConfig = getPersonConfigFromSession()
+
+        if (personConfig[sequenceCacheProperty]) {
+            return personConfig[sequenceCacheProperty] // Use cache
+        }
+
+        def processCode = sequenceConfig?.processCode
+        def settingName = sequenceConfig?.settingName
+        def sequence = [:]
+        def itemList = IntegrationConfiguration.fetchAllByProcessCodeAndSettingName(processCode, settingName)
+
+        itemList.each {it ->
+            sequence[it.value] = it.sequenceNumber
+        }
+
+        personConfig[sequenceCacheProperty] = sequence
+        setPersonConfigInSession(personConfig)
+
+        sequence
     }
 }

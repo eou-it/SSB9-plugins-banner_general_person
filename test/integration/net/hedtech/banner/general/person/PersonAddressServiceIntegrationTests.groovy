@@ -390,6 +390,39 @@ class PersonAddressServiceIntegrationTests extends BaseIntegrationTestCase {
 		assertNull "PersonAddress should have been deleted", personAddress.get(id)
   	}
 
+    @Test
+    void testGetActiveAddresses() {
+        def person = [pidm: u_success_pidm]
+        def activeAddresses = personAddressService.getActiveAddresses(person)
+
+        assertNotNull activeAddresses
+        assertEquals 'Incorrect number of addresses.', 1, activeAddresses.size()
+    }
+
+    @Test
+    void testCheckAddressFieldsValidDateFail() {
+        def address = [fromDate: null, streetLine1: "123 Fake Street"]
+        try {
+            personAddressService.checkAddressFieldsValid(address)
+            fail("Date failed to be flagged as invalid.") // This line should not be reached
+        }
+        catch(ApplicationException ae) {
+            assertApplicationException ae, "fromDateRequired"
+        }
+    }
+
+    @Test
+    void testCheckAddressFieldsValidLine1Fail() {
+        def address = [fromDate: i_success_fromDate, streetLine1: null]
+        try {
+            personAddressService.checkAddressFieldsValid(address)
+            fail("Street Line 1 failed to be flagged as invalid.") // This line should not be reached
+        }
+        catch(ApplicationException ae) {
+            assertApplicationException ae, "streetLine1Required"
+        }
+    }
+
 
 	private def newValidForCreatePersonAddress() {
         def personAddress = new PersonAddress(

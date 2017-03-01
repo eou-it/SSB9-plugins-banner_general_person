@@ -3,6 +3,7 @@
  **********************************************************************************/
 package net.hedtech.banner.general.person
 
+import net.hedtech.banner.person.PersonTelephoneDecorator
 import net.hedtech.banner.service.ServiceBase
 
 // NOTE:
@@ -53,5 +54,52 @@ class PersonTelephoneService extends ServiceBase {
         return entities
     }
 
+    def fetchActiveTelephonesByPidm(pidm, sequenceConfig = null, includeUnlisted = false) {
+        def telephoneRecords = includeUnlisted ? PersonTelephone.fetchActiveTelephoneWithUnlistedByPidm(pidm) :
+                                                 PersonTelephone.fetchActiveTelephoneByPidm(pidm)
+        def telephone
+        def telephones = []
+        def decorator
+        def telephoneDisplaySequence = PersonUtility.getDisplaySequence('telephoneDisplaySequence', sequenceConfig)
+
+        telephoneRecords.each { it ->
+            telephone = [:]
+            telephone.id = it.id
+            telephone.version = it.version
+            telephone.telephoneType = it.telephoneType
+            telephone.displayPriority = telephoneDisplaySequence ? telephoneDisplaySequence[telephone.telephoneType.code] : null
+            telephone.internationalAccess = it.internationalAccess
+            telephone.countryPhone = it.countryPhone
+            telephone.phoneArea = it.phoneArea
+            telephone.phoneNumber = it.phoneNumber
+            telephone.phoneExtension = it.phoneExtension
+            telephone.sequenceNumber = it.sequenceNumber
+            telephone.unlistIndicator = it.unlistIndicator
+            telephone.primaryIndicator = it.primaryIndicator
+
+            decorator = new PersonTelephoneDecorator(it)
+            telephone.displayPhoneNumber = decorator.displayPhone
+
+            telephones << telephone
+        }
+
+        return telephones
+    }
+
+    void inactivatePhone(phone) {
+        def phoneToInactivate = PersonTelephone.get(phone.id)
+
+        phoneToInactivate.statusIndicator = 'I'
+        update(phoneToInactivate)
+    }
+
+    void inactivateAndCreate(phone) {
+        inactivatePhone(phone)
+
+        phone.remove('id');
+        phone.remove('version');
+        phone.statusIndicator = null
+        create(phone)
+    }
 
 }

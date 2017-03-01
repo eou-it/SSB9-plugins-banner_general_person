@@ -63,7 +63,22 @@ class MedicalInformationServiceIntegrationTests extends BaseIntegrationTestCase 
     }
 
 
+   @Test
+   void testDisabilitySurvey() {
+       def mi = newMedicalInformationForDisabSurvey('DN');
+       mi = medicalInformationService.create([domainModel:mi])
 
+       assertNotNull "Medical Information should be valued",mi.id
+       assertEquals('DN',mi.disability.code)
+
+       mi.disability = Disability.findByCode('DY')
+       mi = medicalInformationService.update([domainModel:mi])
+       assertEquals('DY', mi.disability.code)
+
+       def updatedmi = medicalInformationService.get(mi.id)
+       assertEquals(mi.pidm, updatedmi.pidm)
+       assertEquals ('DY',updatedmi.disability.code)
+   }
 
 
     @Test
@@ -196,6 +211,37 @@ class MedicalInformationServiceIntegrationTests extends BaseIntegrationTestCase 
         return medicalInformation
     }
 
+    public MedicalInformation newMedicalInformationForDisabSurvey(String disabilityCode) {
+        def sql = new Sql(sessionFactory.getCurrentSession().connection())
+        String idSql = """select gb_common.f_generate_id bannerId, gb_common.f_generate_pidm pidm from dual """
+        def bannerValues = sql.firstRow(idSql)
+        def ibannerId = bannerValues.bannerId
+        def ipidm = bannerValues.pidm
+
+        def person = new PersonIdentificationName(
+                pidm: ipidm,
+                bannerId: ibannerId,
+                lastName: "TTTTT",
+                firstName: "TTTTT",
+                middleName: "TTTTT",
+                changeIndicator: null,
+                entityIndicator: "P"
+        )
+        person.save(flush:true, failOnError:true)
+        assert person.id
+
+        def medicalInformation = new MedicalInformation(disability: Disability.findByCode(disabilityCode),
+                disabilityAssistance: createDisabilityAssistance(),
+                medicalCondition: MedicalCondition.findByCode('DISABSURV'),
+                medicalEquipment: createMedicalEquipment(),
+                pidm: person.pidm,
+                disabilityIndicator: true,
+                comment: "unit-test",
+                medicalDate: new Date(),
+                onsetAge: 29,
+                lastModified: new Date(), lastModifiedBy: "test", dataOrigin: "Banner")
+        return medicalInformation
+    }
 
     private Disability createDisability(String disCode) {
         if (disCode == null) disCode = "uu"

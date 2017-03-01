@@ -43,4 +43,58 @@ class PersonEmailService extends ServiceBase {
     List<PersonEmail>fetchAllEmails(Integer pidm,Set<String> codes){
         return PersonEmail.fetchListByPidmAndEmailTypes(pidm, codes)
     }
+
+    def getDisplayableEmails(pidm) {
+        def emailList = PersonEmail.fetchByPidmAndActiveAndWebDisplayable(pidm)
+
+        def emails = []
+        emailList.each {
+            def email = [:]
+
+            email.emailType = [
+                code: it.emailType.code,
+                description: it.emailType.description,
+                urlIndicator: it.emailType.urlIndicator
+            ]
+
+            email.emailAddress = it.emailAddress
+            email.preferredIndicator = it.preferredIndicator
+            email.commentData = it.commentData
+            email.displayWebIndicator = it.displayWebIndicator
+
+            email.id = it.id
+            email.version = it.version
+
+            emails << email
+        }
+
+        emails
+    }
+
+    def castEmailForUpdate (email) {
+        def personEmail = email as PersonEmail
+        personEmail.id = email.id
+        personEmail.version = email.version
+
+        personEmail
+    }
+
+    def updatePreferredEmail (email) {
+        if(email.preferredIndicator){
+            def existingEmails = PersonEmail.fetchByPidmAndActiveAndWebDisplayable(email.pidm)
+            def oldPreferredEmail = existingEmails.find { it.preferredIndicator }
+
+            if(oldPreferredEmail) {
+                oldPreferredEmail.preferredIndicator = false
+                update([domainModel: oldPreferredEmail])
+            }
+        }
+    }
+
+    def inactivateEmail (email) {
+        def personEmail = castEmailForUpdate(email)
+        personEmail.preferredIndicator = false
+        personEmail.statusIndicator = 'I'
+        update([domainModel: personEmail])
+    }
 }
