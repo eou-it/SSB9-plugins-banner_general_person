@@ -47,7 +47,7 @@ class PersonContactCompositeServiceIntegrationTests extends BaseIntegrationTestC
         assertEquals o_success_personGuid, decorator.getPerson().id
         assertNotNull decorator.contact
         assertEquals decorator.contact, decorator.getContacts()[0]
-        assertEquals o_success_personEmergencyContact.priority, decorator.contact.priority
+        assertEquals o_success_personEmergencyContact.priority.toInteger(), decorator.contact.priority
         assertEquals o_success_types, decorator.contact.types
         assertEquals o_success_personEmergencyContact.firstName, decorator.contact.name.firstName
         assertEquals o_success_personEmergencyContact.middleInitial, decorator.contact.name.middleName
@@ -87,14 +87,14 @@ class PersonContactCompositeServiceIntegrationTests extends BaseIntegrationTestC
         Map params = ["person": o_success_personGuid]
         List<PersonContactDecorator> decorators = personContactCompositeService.list(params)
         assertTrue decorators.size() > 0
-        PersonContactDecorator decorator = decorators.find { it.contact.priority == i_success_priority }
+        PersonContactDecorator decorator = decorators.find { it.contact.priority == i_success_priority.toInteger() }
         assertNotNull decorator
         assertEquals o_success_personEmergencyContact.guid, decorator.guid
         assertEquals o_success_personGuid, decorator.personGuid
         assertEquals o_success_personGuid, decorator.getPerson().id
         assertNotNull decorator.contact
         assertEquals decorator.contact, decorator.getContacts()[0]
-        assertEquals o_success_personEmergencyContact.priority, decorator.contact.priority
+        assertEquals o_success_personEmergencyContact.priority.toInteger(), decorator.contact.priority
         assertEquals o_success_types, decorator.contact.types
         assertEquals o_success_personEmergencyContact.firstName, decorator.contact.name.firstName
         assertEquals o_success_personEmergencyContact.middleInitial, decorator.contact.name.middleName

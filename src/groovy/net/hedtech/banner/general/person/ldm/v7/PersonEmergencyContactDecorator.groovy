@@ -11,7 +11,7 @@ import net.hedtech.banner.general.person.ldm.v6.NameV6
 @ToString(includeNames = true, includeFields = true)
 class PersonEmergencyContactDecorator {
     NameV6 name
-    String priority
+    Integer priority
     def contactAddress
     PersonEmergencyPhoneDecorator phone
     String hedmRelationshipType
