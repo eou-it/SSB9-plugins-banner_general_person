@@ -31,4 +31,15 @@ class AdditionalIDService extends ServiceBase {
         return list
     }
 
+    def fetchAllByPidmInList(Collection<Integer> pidms) {
+        def list = []
+        if (pidms) {
+            AdditionalID.withSession { session ->
+                list = session.getNamedQuery('AdditionalId.fetchAllByPidmInList')
+                        .setParameterList('pidms', pidms)
+                        .list()
+            }
+        }
+        return list
+    }
 }

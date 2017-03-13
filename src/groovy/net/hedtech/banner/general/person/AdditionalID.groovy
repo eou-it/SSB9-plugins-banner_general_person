@@ -16,6 +16,10 @@ import javax.persistence.*
                 query = """ FROM AdditionalID a
                             WHERE  a.pidm IN :pidms
                             AND a.additionalIdentificationType.code IN :idTypes
+                """),
+        @NamedQuery(name = "AdditionalId.fetchAllByPidmInList",
+                query = """ FROM AdditionalID a
+                            WHERE  a.pidm IN :pidms
                 """)
 ])
 @Entity
