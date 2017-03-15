@@ -99,12 +99,12 @@ class PersonGenderPronounCompositeService {
                           'and upper(gtvgndr_gndr_desc) like ? ' +
                           'order by gtvgndr_gndr_desc, gtvgndr_gndr_code) a ' +
                       'where rownum <= ?) ' +
-                    'where rnum >= ?'
+                    'where rnum > ?'
             String preppedSearchString = '%' + searchString.toUpperCase() + '%'
 
             resultList = sessionFactory.getCurrentSession().createSQLQuery(genderSql)
                         .setString(0, preppedSearchString)
-                        .setInteger(1, max)
+                        .setInteger(1, max+offset)
                         .setInteger(2, offset).list().collect { it = [code: it[0], description: it[1]] }
         }
 
@@ -124,12 +124,12 @@ class PersonGenderPronounCompositeService {
                           'and upper(gtvpprn_pprn_desc) like ? ' +
                           'order by gtvpprn_pprn_desc, gtvpprn_pprn_code) a ' +
                       'where rownum <= ?) ' +
-                    'where rnum >= ?'
+                    'where rnum > ?'
             String preppedSearchString = '%' + searchString.toUpperCase() + '%'
 
                 resultList = sessionFactory.getCurrentSession().createSQLQuery(pronounSql)
                         .setString(0, preppedSearchString)
-                        .setInteger(1, max)
+                        .setInteger(1, max+offset)
                         .setInteger(2, offset).list().collect { it = [code: it[0], description: it[1]] }
         }
 
