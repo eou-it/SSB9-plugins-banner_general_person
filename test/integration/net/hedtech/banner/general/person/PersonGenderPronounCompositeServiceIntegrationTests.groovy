@@ -35,6 +35,13 @@ class PersonGenderPronounCompositeServiceIntegrationTests extends BaseIntegratio
     }
 
     @Test
+    void testFetchPersonalDetailsWhereNoDetailsExist() {
+        def pidm = PersonUtility.getPerson("GDP000004").pidm // Has no personal details
+        def details = personGenderPronounCompositeService.fetchPersonalDetails(pidm)
+        assertEquals 0, details.size()
+    }
+
+    @Test
     void testUpdatePerson() {
         def pidm = PersonUtility.getPerson("GDP000005").pidm
         def details = personGenderPronounCompositeService.fetchPersonalDetails(pidm)
