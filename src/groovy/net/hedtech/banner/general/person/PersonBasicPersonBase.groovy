@@ -521,7 +521,7 @@ class PersonBasicPersonBase implements Serializable {
         driverLicense(nullable: true, maxSize: 20)
         height(nullable: true, min: -99, max: 99)
         weight(nullable: true, min: -9999, max: 9999)
-        sdvetIndicator(nullable: true, maxSize: 1, inList: ["Y"])
+        sdvetIndicator(nullable: true, maxSize: 1, inList: ["Y", "N"])
         licenseIssuedDate(nullable: true)
         licenseExpiresDate(nullable: true)
         incarcerationIndicator(nullable: true, maxSize: 1)
