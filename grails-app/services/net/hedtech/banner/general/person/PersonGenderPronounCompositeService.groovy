@@ -95,7 +95,7 @@ class PersonGenderPronounCompositeService {
                        'from ' +
                        '(select gtvgndr_gndr_code, gtvgndr_gndr_desc ' +
                           'from gtvgndr ' +
-                          'where gtvgndr_active_ind = \'Y\' and gtvgndr_web_ind = \'Y\' ' +
+                          'where gtvgndr_web_ind = \'Y\' ' +
                           'and upper(gtvgndr_gndr_desc) like ? ' +
                           'order by gtvgndr_gndr_desc, gtvgndr_gndr_code) a ' +
                       'where rownum <= ?) ' +
@@ -120,7 +120,7 @@ class PersonGenderPronounCompositeService {
                        'from ' +
                        '(select gtvpprn_pprn_code, gtvpprn_pprn_desc ' +
                           'from gtvpprn ' +
-                          'where gtvpprn_active_ind = \'Y\' and gtvpprn_web_ind = \'Y\' ' +
+                          'where gtvpprn_web_ind = \'Y\' ' +
                           'and upper(gtvpprn_pprn_desc) like ? ' +
                           'order by gtvpprn_pprn_desc, gtvpprn_pprn_code) a ' +
                       'where rownum <= ?) ' +
@@ -154,7 +154,7 @@ class PersonGenderPronounCompositeService {
         if (code != null) {
             def genderResult = []
             def genderSql = 'select GTVGNDR_GNDR_CODE, GTVGNDR_GNDR_DESC, GTVGNDR_ACTIVE_IND, GTVGNDR_WEB_IND ' +
-                    'from gtvgndr where gtvgndr_gndr_code = ? and gtvgndr_active_ind = \'Y\' and gtvgndr_web_ind = \'Y\''
+                    'from gtvgndr where gtvgndr_gndr_code = ? and gtvgndr_web_ind = \'Y\''
 
             genderResult = sessionFactory.getCurrentSession().createSQLQuery(genderSql).setString(0, code).list()[0]
 
@@ -173,7 +173,7 @@ class PersonGenderPronounCompositeService {
         if(code != null) {
             def pronounResult
             def pronounSql = 'select GTVPPRN_PPRN_CODE, GTVPPRN_PPRN_DESC, GTVPPRN_ACTIVE_IND, GTVPPRN_WEB_IND ' +
-                    'from gtvpprn where gtvpprn_pprn_code = ? and gtvpprn_active_ind = \'Y\' and gtvpprn_web_ind = \'Y\''
+                    'from gtvpprn where gtvpprn_pprn_code = ? and gtvpprn_web_ind = \'Y\''
 
             pronounResult = sessionFactory.getCurrentSession().createSQLQuery(pronounSql).setString(0, code).list()[0]
 

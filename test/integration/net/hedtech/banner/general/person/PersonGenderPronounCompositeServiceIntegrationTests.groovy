@@ -187,7 +187,7 @@ class PersonGenderPronounCompositeServiceIntegrationTests extends BaseIntegratio
     @Test
     void testFetchGenderList() {
         def result = personGenderPronounCompositeService.fetchGenderList()
-        assertTrue 3 <= result.size()
+        assertTrue 4 <= result.size()
         assertTrue result.code.contains('MAN')
         assertTrue result.description.contains('Woman')
     }
@@ -195,7 +195,7 @@ class PersonGenderPronounCompositeServiceIntegrationTests extends BaseIntegratio
     @Test
     void testFetchGenderListOffset() {
         def result = personGenderPronounCompositeService.fetchGenderList(2, 2, '')
-        assertTrue 1 <= result.size()
+        assertTrue 2 >= result.size()
         assertTrue result.code.contains('WOMA')
         assertTrue result.description.contains('Woman')
     }
@@ -203,7 +203,7 @@ class PersonGenderPronounCompositeServiceIntegrationTests extends BaseIntegratio
     @Test
     void testFetchPronounList() {
         def result = personGenderPronounCompositeService.fetchPronounList()
-        assertTrue 3 <= result.size()
+        assertTrue 4 <= result.size()
         assertTrue result.code.contains('C001')
         assertTrue result.description.contains('she')
     }
@@ -211,7 +211,7 @@ class PersonGenderPronounCompositeServiceIntegrationTests extends BaseIntegratio
     @Test
     void testFetchPronounListOffset() {
         def result = personGenderPronounCompositeService.fetchPronounList(2, 2, '')
-        assertTrue 1 <= result.size()
+        assertTrue 2 >= result.size()
         assertTrue result.code.contains('B002')
         assertTrue result.description.contains('she')
     }
