@@ -109,4 +109,10 @@ abstract class PhoneNumberUtility {
         return false
     }
 
+
+    static String getRegionCodeForCountryCode(int countryCallingCode) {
+        PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance()
+        return phoneNumberUtil.getRegionCodeForCountryCode(countryCallingCode)
+    }
+
 }

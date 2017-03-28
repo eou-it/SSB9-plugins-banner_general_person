@@ -143,4 +143,26 @@ class PhoneNumberUtilityTests extends GrailsUnitTestCase {
         assertFalse same
     }
 
+
+    @Test
+    void testGetRegionCodeForCountryCode() {
+        int countryCallingCode = 1
+        String regionCode = PhoneNumberUtility.getRegionCodeForCountryCode(countryCallingCode)
+        assertEquals "US", regionCode
+
+        countryCallingCode = 91
+        regionCode = PhoneNumberUtility.getRegionCodeForCountryCode(countryCallingCode)
+        assertEquals "IN", regionCode
+
+        // valid countryCallingCode, but non-geographical calling code like 800
+        countryCallingCode = 800
+        regionCode = PhoneNumberUtility.getRegionCodeForCountryCode(countryCallingCode)
+        assertEquals "001", regionCode
+
+        // Invalid countryCallingCode
+        countryCallingCode = 2345
+        regionCode = PhoneNumberUtility.getRegionCodeForCountryCode(countryCallingCode)
+        assertEquals "ZZ", regionCode
+    }
+
 }

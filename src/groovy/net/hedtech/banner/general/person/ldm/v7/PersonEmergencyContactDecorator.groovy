@@ -1,5 +1,5 @@
 /*******************************************************************************
- Copyright 2016-2016 Ellucian Company L.P. and its affiliates.
+ Copyright 2017 Ellucian Company L.P. and its affiliates.
  ****************************************************************************** */
 package net.hedtech.banner.general.person.ldm.v7
 
@@ -11,7 +11,7 @@ import net.hedtech.banner.general.person.ldm.v6.NameV6
 @ToString(includeNames = true, includeFields = true)
 class PersonEmergencyContactDecorator {
     NameV6 name
-    String priority
+    Integer priority
     def contactAddress
     PersonEmergencyPhoneDecorator phone
     String hedmRelationshipType

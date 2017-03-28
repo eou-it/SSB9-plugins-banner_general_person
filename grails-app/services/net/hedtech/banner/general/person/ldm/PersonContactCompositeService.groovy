@@ -1,5 +1,5 @@
 /*******************************************************************************
- Copyright 2016-2016 Ellucian Company L.P. and its affiliates.
+ Copyright 2017 Ellucian Company L.P. and its affiliates.
  ****************************************************************************** */
 package net.hedtech.banner.general.person.ldm
 
@@ -108,7 +108,7 @@ class PersonContactCompositeService extends LdmService {
             personContactDecorator.guid = it.guid
             personContactDecorator.personGuid = it.personGuid
             PersonEmergencyContactDecorator personEmergencyContactDecorator = new PersonEmergencyContactDecorator()
-            personEmergencyContactDecorator.priority = it.priority
+            personEmergencyContactDecorator.priority = it.priority.toInteger()
             personEmergencyContactDecorator.name = getName(it.firstName, it.middleInitial, it.lastName)
 
             String hedmAddressType = bannerAddressTypeToHedmAddressTypeMap.get(it.addressTypeCode)
