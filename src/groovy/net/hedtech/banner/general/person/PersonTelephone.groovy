@@ -102,6 +102,11 @@ import javax.persistence.*
                              AND addressType.code in :addressTypes
                              AND NVL(statusIndicator,'A') <> 'I'
                              AND NVL(unlistIndicator,'N') <> 'Y' """),
+        @NamedQuery(name = "PersonTelephone.fetchTelephonesByPidmAndAddressTypes",
+                query = """FROM PersonTelephone a
+                             WHERE  pidm = :pidm
+                             AND addressType.code in :addressTypes
+                             AND NVL(statusIndicator,'A') <> 'I' """),
         @NamedQuery(name = "PersonTelephone.fetchActiveTelephoneByPidm",
                 query = """FROM PersonTelephone a
                              WHERE  pidm = :pidm
@@ -540,6 +545,17 @@ class PersonTelephone implements Serializable {
         def result = []
         result = PersonTelephone.withSession { session ->
             session.getNamedQuery('PersonTelephone.fetchActiveTelephonesByPidmAndAddressTypes').setInteger('pidm', params?.pidm)
+                    .setParameterList('addressTypes', params.addressTypes).list()
+        }
+
+        return result
+    }
+
+    public static def fetchTelephonesByPidmAndAddressTypes(Map params) {
+
+        def result = []
+        result = PersonTelephone.withSession { session ->
+            session.getNamedQuery('PersonTelephone.fetchTelephonesByPidmAndAddressTypes').setInteger('pidm', params?.pidm)
                     .setParameterList('addressTypes', params.addressTypes).list()
         }
 

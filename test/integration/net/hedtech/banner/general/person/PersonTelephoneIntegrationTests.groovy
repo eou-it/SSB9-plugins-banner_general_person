@@ -606,6 +606,18 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+    @Test
+    void testFetchTelephonesByPidmAndAddressTypes() {
+        def pidm = PersonUtility.getPerson("210009703").pidm
+        def results = PersonTelephone.fetchTelephonesByPidmAndAddressTypes([pidm: pidm, addressTypes:['PR']])
+
+        assertEquals 1, results.size()
+        assertTrue results[0] instanceof PersonTelephone
+        assertEquals '3728172', results[0].phoneNumber
+    }
+
+
+
     private def newValidForCreatePersonTelephone() {
         def personTelephone = new PersonTelephone(
                 pidm: i_success_pidm,
@@ -687,6 +699,8 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
         )
         personAddress.save(failOnError: true, flush: true)
     }
+
+
 
 
     private def initializeCodes() {
