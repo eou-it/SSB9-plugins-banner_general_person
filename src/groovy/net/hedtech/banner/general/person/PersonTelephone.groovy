@@ -105,7 +105,8 @@ import javax.persistence.*
         @NamedQuery(name = "PersonTelephone.fetchTelephonesByPidmAndAddressTypes",
                 query = """FROM PersonTelephone a
                              WHERE  pidm = :pidm
-                             AND addressType.code in :addressTypes
+                             AND ( addressType.code in :addressTypes
+                               OR (addressType is null and unlistIndicator = 'Y' and primaryIndicator = 'Y'))
                              AND NVL(statusIndicator,'A') <> 'I' """),
         @NamedQuery(name = "PersonTelephone.fetchActiveTelephoneByPidm",
                 query = """FROM PersonTelephone a
