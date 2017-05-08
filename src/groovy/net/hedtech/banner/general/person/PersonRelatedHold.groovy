@@ -16,6 +16,9 @@ import net.hedtech.banner.query.DynamicFinder
  * Person Related Holds model.
  */
 @NamedQueries(value = [
+        @NamedQuery(name = "PersonRelatedHold.fetchById",
+                query = """FROM PersonRelatedHold a
+             WHERE a.id = :id"""),
         @NamedQuery(name = "PersonRelatedHold.fetchByPidm",
                 query = """FROM PersonRelatedHold a
              WHERE a.pidm = :pidm

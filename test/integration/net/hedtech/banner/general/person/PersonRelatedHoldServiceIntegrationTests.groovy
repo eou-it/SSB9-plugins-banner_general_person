@@ -329,6 +329,13 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
+    @Test
+    public void testFetchById() {
+        PersonRelatedHold personRelatedHold = PersonRelatedHold.findAll("from PersonRelatedHold where id is not null")[0]
+        assertEquals(personRelatedHold, personRelatedHoldService.fetchById(personRelatedHold.id))
+    }
+
+
     private def newPersonRelatedHold() {
 
         def iholdType = HoldType.findWhere(code: "RG")

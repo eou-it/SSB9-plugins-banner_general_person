@@ -88,4 +88,10 @@ class PersonRelatedHoldService extends ServiceBase {
         return changed
     }
 
+
+    public PersonRelatedHold fetchById(Long id) {
+        return PersonRelatedHold.withSession { session ->
+            session.getNamedQuery("PersonRelatedHold.fetchById").setLong('id', id).uniqueResult()
+        }
+    }
 }
