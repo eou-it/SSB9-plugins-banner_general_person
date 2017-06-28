@@ -1,5 +1,5 @@
 /*********************************************************************************
- Copyright 2009-2016 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2017 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
@@ -7,6 +7,7 @@ package net.hedtech.banner.general.person
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.common.GeneralValidationCommonConstants
 import net.hedtech.banner.general.system.InstitutionalDescription
+import net.hedtech.banner.query.DynamicFinder
 import net.hedtech.banner.service.ServiceBase
 
 // NOTE:
@@ -156,6 +157,56 @@ class PersonIdentificationNameCurrentService extends ServiceBase {
                             and b.domainKey = a.pidm and b.ldmName = :ldmName
                      """
         return query
+    }
+
+    def List<PersonIdentificationNameCurrent> fetchAllByCriteria(Map content, String sortField = null, String sortOrder = null, int max = 0, int offset = -1) {
+        def params = [:]
+        def criteria = []
+        def pagingAndSortParams = [:]
+
+        buildCriteria(content, params, criteria)
+
+        sortOrder = sortOrder ?: 'asc'
+        if (sortField) {
+            pagingAndSortParams.sortCriteria = [
+                    ["sortColumn": sortField, "sortDirection": sortOrder],
+                    ["sortColumn": "id", "sortDirection": "asc"]
+            ]
+        } else {
+            pagingAndSortParams.sortColumn = "id"
+            pagingAndSortParams.sortDirection = sortOrder
+        }
+
+        if (max > 0) {
+            pagingAndSortParams.max = max
+        }
+        if (offset > -1) {
+            pagingAndSortParams.offset = offset
+        }
+
+        return getDynamicFinderForFetchAllByCriteria().find([params: params, criteria: criteria], pagingAndSortParams)
+    }
+
+
+    def countByCriteria(Map content) {
+        def params = [:]
+        def criteria = []
+
+        buildCriteria(content, params, criteria)
+
+        return getDynamicFinderForFetchAllByCriteria().count([params: params, criteria: criteria])
+    }
+
+
+    private void buildCriteria(Map content, LinkedHashMap params, ArrayList criteria) {
+    }
+
+
+    private DynamicFinder getDynamicFinderForFetchAllByCriteria() {
+        def query = """FROM PersonIdentificationNameCurrent a
+                       where a.entityIndicator = 'P' and a.changeIndicator is null
+		            """
+        return new DynamicFinder(PersonIdentificationNameCurrent.class, query, "a")
     }
 
 }

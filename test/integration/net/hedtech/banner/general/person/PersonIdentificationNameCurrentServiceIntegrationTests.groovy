@@ -1,5 +1,5 @@
 /*********************************************************************************
-Copyright 2012-2016 Ellucian Company L.P. and its affiliates.
+Copyright 2012-2017 Ellucian Company L.P. and its affiliates.
 **********************************************************************************/
 
 package net.hedtech.banner.general.person
@@ -546,6 +546,20 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
             assertFalse entitiesMap.isEmpty()
             assertEquals globalUniqueIdentifier, entitiesMap.globalUniqueIdentifier
             assertEquals personIdentificationNameCurrent, entitiesMap.personIdentificationNameCurrent
+        }
+    }
+
+    @Test
+    void testFetchAllByCriteria(){
+        List entities = personIdentificationNameCurrentService.fetchAllByCriteria([:], null,null,5)
+        assertFalse entities.isEmpty()
+        assertTrue entities.size() == 5
+        entities.each {
+            PersonIdentificationNameCurrent entitiesPerson = it
+            assertNotNull entitiesPerson
+            assertFalse entitiesPerson.bannerId.isEmpty()
+            assertNull entitiesPerson.changeIndicator
+            assertEquals entitiesPerson.entityIndicator, 'P'
         }
     }
 
