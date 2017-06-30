@@ -293,6 +293,57 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
         assertEquals false, result.preferredIndicator
     }
 
+    @Test
+    void testUpdateIfExistingEmailNoExist() {
+        def personEmail = newValidForCreatePersonEmail()
+        def emailMap = [
+                pidm: personEmail.pidm,
+                emailAddress: personEmail.emailAddress,
+                preferredIndicator: personEmail.preferredIndicator,
+                commentData: personEmail.commentData,
+                displayWebIndicator: personEmail.displayWebIndicator,
+                emailType: personEmail.emailType
+        ]
+        emailMap = personEmailService.updateIfExistingEmail(emailMap)
+
+        assertNull emailMap.id
+        assertNull emailMap.version
+    }
+
+    @Test
+    void testUpdateIfExistingEmail() {
+        def personEmail = newValidForCreatePersonEmail()
+        personEmail.statusIndicator = 'I'
+        personEmail.preferredIndicator = false
+        personEmail.save()
+        def emailMap = [
+                pidm: personEmail.pidm,
+                emailAddress: personEmail.emailAddress,
+                preferredIndicator: personEmail.preferredIndicator,
+                commentData: personEmail.commentData,
+                emailType: personEmail.emailType
+        ]
+        emailMap = personEmailService.updateIfExistingEmail(emailMap)
+
+        assertEquals personEmail.id, emailMap.id
+        assertEquals personEmail.version, emailMap.version
+        assertEquals 'A', emailMap.statusIndicator
+    }
+
+    @Test
+    void testFetchByPidmAndTypeAndAddress() {
+        def personEmail = newValidForCreatePersonEmail()
+        personEmail.statusIndicator = 'I'
+        personEmail.preferredIndicator = false
+        personEmail.save()
+        def result = personEmailService.fetchByPidmAndTypeAndAddress(personEmail.pidm, personEmail.emailType.code, personEmail.emailAddress)
+
+        assertEquals 1, result.size()
+        assertEquals i_success_emailType.code, result[0].emailType.code
+        assertEquals i_success_emailAddress, result[0].emailAddress
+        assertEquals 'I', result[0].statusIndicator
+    }
+
 
     private def newValidForCreatePersonEmail() {
         def sql = new Sql(sessionFactory.getCurrentSession().connection())
