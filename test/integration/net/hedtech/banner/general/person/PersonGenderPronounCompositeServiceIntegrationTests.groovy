@@ -66,6 +66,47 @@ class PersonGenderPronounCompositeServiceIntegrationTests extends BaseIntegratio
     }
 
     @Test
+    void testUpdatePersonNoId() {
+        def pidm = PersonUtility.getPerson("HOSH00018").pidm
+        def details = personGenderPronounCompositeService.fetchPersonalDetails(pidm)
+
+        details.pidm = pidm
+        details.gender = [code : 'WOMA']
+        details.pronoun = [code : 'B002']
+        details.preferenceFirstName = 'NickName'
+        details.maritalStatus = MaritalStatus.findByCode('S')
+
+        try {
+            personGenderPronounCompositeService.updatePerson(details)
+            fail("I should have received an error but it passed; @@r1:personDoesNotExist@@ ")
+        }
+        catch (ApplicationException ae) {
+            assertApplicationException ae, "personDoesNotExist"
+        }
+    }
+
+    @Test
+    void testUpdatePersonBadId() {
+        def pidm = PersonUtility.getPerson("HOSH00018").pidm
+        def details = personGenderPronounCompositeService.fetchPersonalDetails(pidm)
+
+        details.id = 9320932
+        details.pidm = pidm
+        details.gender = [code : 'WOMA']
+        details.pronoun = [code : 'B002']
+        details.preferenceFirstName = 'NickName'
+        details.maritalStatus = MaritalStatus.findByCode('S')
+
+        try {
+            personGenderPronounCompositeService.updatePerson(details)
+            fail("I should have received an error but it passed; @@r1:personDoesNotExist@@ ")
+        }
+        catch (ApplicationException ae) {
+            assertApplicationException ae, "personDoesNotExist"
+        }
+    }
+
+    @Test
     void testUpdatePronoun() {
         def details = setupGDP000005()
 
