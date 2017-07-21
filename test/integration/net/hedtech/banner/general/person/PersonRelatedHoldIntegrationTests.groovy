@@ -3,19 +3,18 @@
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
-import org.junit.Before
-import org.junit.Test
-import org.junit.After
 
+import groovy.sql.Sql
 import net.hedtech.banner.general.system.HoldType
 import net.hedtech.banner.general.system.Originator
 import net.hedtech.banner.testing.BaseIntegrationTestCase
-import groovy.sql.Sql
-import org.springframework.dao.InvalidDataAccessResourceUsageException
+import org.junit.After
+import org.junit.Before
+import org.junit.Ignore
+import org.junit.Test
+import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
 
 import java.text.SimpleDateFormat
-import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
-import org.junit.Ignore
 
 class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
 
@@ -56,7 +55,7 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
         assertEquals false, personRelatedHold.releaseIndicator
         assertEquals "TTTTT", personRelatedHold.reason
         assertTrue new BigDecimal(1) == personRelatedHold.amountOwed
-        assertEquals "grails_user", personRelatedHold.lastModifiedBy
+        assertEquals "grails_user", personRelatedHold.lastModifiedBy.toLowerCase()
 
         //Update the entity
         def testDate = new Date()
@@ -81,7 +80,7 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
         assertEquals "UUUUU", personRelatedHold.reason
         assertTrue new BigDecimal(0) == personRelatedHold.amountOwed
         //Make sure that last modified by user is not being updated
-        assertEquals "grails_user", personRelatedHold.lastModifiedBy
+        assertEquals "grails_user", personRelatedHold.lastModifiedBy.toLowerCase()
 
     }
 
