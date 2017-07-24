@@ -1,5 +1,5 @@
 /*********************************************************************************
- Copyright 2012 Ellucian Company L.P. and its affiliates.
+ Copyright 2012-2017 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
@@ -14,7 +14,7 @@ class PersonIdentificationNameCompositeService extends ServiceBase {
 
     boolean transactional = true
     def sessionFactory
-    def log = Logger.getLogger(this.getClass())
+    private static final log = Logger.getLogger(PersonIdentificationNameCompositeService.class)
 
     def personIdentificationNameCurrentService
     def personIdentificationNameAlternateService

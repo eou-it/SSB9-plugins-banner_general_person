@@ -1,5 +1,5 @@
 /*********************************************************************************
- Copyright 2009-2016 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2017 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
@@ -86,7 +86,7 @@ import javax.persistence.*
 """)
 ])
 class PersonEmail implements Serializable {
-    static def log = Logger.getLogger('net.hedtech.banner.general.person.PersonEmail')
+    private static final log = Logger.getLogger(PersonEmail.class)
 
     /**
      * Surrogate ID for GOREMAL

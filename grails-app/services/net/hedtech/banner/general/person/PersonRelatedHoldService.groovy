@@ -10,7 +10,7 @@ import org.codehaus.groovy.runtime.InvokerHelper
 import org.springframework.security.core.context.SecurityContextHolder
 
 class PersonRelatedHoldService extends ServiceBase {
-    def log = Logger.getLogger( this.getClass() )
+    private static final log = Logger.getLogger(PersonRelatedHoldService.class)
     boolean transactional = true
 
     def sessionFactory

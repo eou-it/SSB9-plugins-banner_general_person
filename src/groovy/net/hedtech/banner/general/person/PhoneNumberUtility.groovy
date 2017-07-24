@@ -1,5 +1,5 @@
 /*********************************************************************************
- Copyright 2016-2016 Ellucian Company L.P. and its affiliates.
+ Copyright 2016-2017 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
@@ -16,7 +16,7 @@ import org.apache.log4j.Logger
  */
 abstract class PhoneNumberUtility {
 
-    private static final Logger log = Logger.getLogger(PhoneNumberUtility.class)
+    private static final log = Logger.getLogger(PhoneNumberUtility.class)
 
     private static final String REGEX_EXCEPT_ALPHABETS = "[^a-zA-Z]"
     private static final String REGEX_EXCEPT_ALPHABETS_DIGITS = "[^a-zA-Z0-9]"
