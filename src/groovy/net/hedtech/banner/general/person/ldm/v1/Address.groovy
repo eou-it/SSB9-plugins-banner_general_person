@@ -18,8 +18,6 @@ class Address {
     String addressType
     def country
     static final String PROCESS_CODE = "HEDM"
-    static final String PERSON_REGION = "PERSON.ADDRESSES.REGION"
-    static final String PERSON_POSTAL_CODE = "PERSON.ADDRESSES.POSTAL.CODE"
 
     def Address(PersonAddress address) {
         this.address = address
