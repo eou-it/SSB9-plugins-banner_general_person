@@ -77,6 +77,11 @@ import javax.persistence.*
                 query = """FROM PersonEmail a
     WHERE a.pidm IN (:pidms)  AND a.statusIndicator = 'A'
     AND a.emailType.code IN (:emailTypes)"""),
+        @NamedQuery(name = "PersonEmail.fetchByPidmAndTypeAndAddress",
+                query = """FROM PersonEmail a
+    WHERE a.pidm = :pidm
+    AND a.emailType.code = :emailType
+    AND upper(a.emailAddress) = upper(:emailAddress)"""),
         @NamedQuery(name = "PersonEmail.fetchByPidmAndActiveAndWebDisplayable",
                 query = """FROM PersonEmail a
     WHERE a.pidm = :pidm

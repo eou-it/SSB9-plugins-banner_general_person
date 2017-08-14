@@ -28,6 +28,8 @@ class PersonGenderPronounCompositeService {
     }
 
     def updatePerson(Map person) {
+        checkPersonBaseExists(person)
+
         person.maritalStatus = maritalStatusService.fetchByCode(person.maritalStatus.code)
 
         if(checkGenderPronounInstalled()) {
@@ -136,6 +138,12 @@ class PersonGenderPronounCompositeService {
         resultList
     }
 
+    def checkPersonBaseExists(person) {
+        if(!person.id || !PersonBasicPersonBase.get(person.id)) {
+            throw new ApplicationException(PersonGenderPronounCompositeService, "@@r1:personDoesNotExist@@")
+        }
+    }
+
     boolean checkGenderPronounInstalled() {
         boolean isGenderPronounInstalled
         def session = RequestContextHolder?.currentRequestAttributes()?.request?.session
@@ -159,13 +167,13 @@ class PersonGenderPronounCompositeService {
             genderResult = sessionFactory.getCurrentSession().createSQLQuery(genderSql).setString(0, code).list()[0]
 
             if (genderResult == null) {
-                throw new ApplicationException(this, "@@r1:invalidGenderCode@@")
+                throw new ApplicationException(PersonGenderPronounCompositeService, "@@r1:invalidGenderCode@@")
             }
 
             return [code: genderResult[0], description: genderResult[1]]
         }
         else {
-            throw new ApplicationException(this, "@@r1:invalidGenderCode@@")
+            throw new ApplicationException(PersonGenderPronounCompositeService, "@@r1:invalidGenderCode@@")
         }
     }
 
@@ -178,13 +186,13 @@ class PersonGenderPronounCompositeService {
             pronounResult = sessionFactory.getCurrentSession().createSQLQuery(pronounSql).setString(0, code).list()[0]
 
             if (pronounResult == null) {
-                throw new ApplicationException(this, "@@r1:invalidPronounCode@@")
+                throw new ApplicationException(PersonGenderPronounCompositeService, "@@r1:invalidPronounCode@@")
             }
 
             return [code: pronounResult[0], description: pronounResult[1]]
         }
         else {
-            throw new ApplicationException(this, "@@r1:invalidPronounCode@@")
+            throw new ApplicationException(PersonGenderPronounCompositeService, "@@r1:invalidPronounCode@@")
         }
     }
 

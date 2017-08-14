@@ -1,5 +1,5 @@
 /*********************************************************************************
-Copyright 2012-2016 Ellucian Company L.P. and its affiliates.
+Copyright 2012-2017 Ellucian Company L.P. and its affiliates.
 **********************************************************************************/
  package net.hedtech.banner.general.person
 
@@ -96,5 +96,28 @@ class PersonEmailService extends ServiceBase {
         personEmail.preferredIndicator = false
         personEmail.statusIndicator = 'I'
         update([domainModel: personEmail])
+    }
+
+    def updateIfExistingEmail(email) {
+        def existingEmail = fetchByPidmAndTypeAndAddress(email.pidm, email.emailType.code, email.emailAddress)[0]
+        if(existingEmail != null && existingEmail.statusIndicator != 'A') {
+            email.id = existingEmail.id
+            email.version = existingEmail.version
+            email.statusIndicator = 'A'
+            email = castEmailForUpdate(email)
+        }
+        return email
+    }
+
+    List fetchByPidmAndTypeAndAddress(Integer pidm, String typeCode, String emailAddress) {
+        def emails = PersonEmail.withSession { session ->
+            session.getNamedQuery('PersonEmail.fetchByPidmAndTypeAndAddress')
+                    .setInteger('pidm', pidm)
+                    .setString('emailType', typeCode)
+                    .setString('emailAddress', emailAddress)
+                    .list()
+        }
+
+        return emails
     }
 }
