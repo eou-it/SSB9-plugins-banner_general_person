@@ -46,6 +46,7 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
         personRelatedHold = personRelatedHoldService.create(map)
 
         // login as our other user
+        logout(  )
         def auth = selfServiceBannerAuthenticationProvider.authenticate(new UPAT(person.bannerId, '111111'))
         SecurityContextHolder.getContext().setAuthentication(auth)
 
@@ -102,7 +103,7 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
         //Set back user Data field in the DB to "grails_user"
         try {
             sql = new Sql(sessionFactory.getCurrentSession().connection())
-            sql.executeUpdate("update SPRHOLD set SPRHOLD_USER = 'grails_user' where SPRHOLD_SURROGATE_ID = ?", [personRelatedHold.id])
+            sql.executeUpdate("update SPRHOLD set SPRHOLD_USER = 'GRAILS_USER' where SPRHOLD_SURROGATE_ID = ?", [personRelatedHold.id])
         } finally {
             sql?.close()
         }
@@ -113,7 +114,7 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
         login("grails_user","u_pick_it")
         personRelatedHold.discard()
         personRelatedHold = PersonRelatedHold.findById(personRelatedHold.id)
-        assertEquals "grails_user", personRelatedHold.createdBy
+        assertEquals "GRAILS_USER", personRelatedHold.createdBy
         personRelatedHold.releaseIndicator = true
         personRelatedHold.holdType = HoldType.findByCode("WC")
         personRelatedHold = personRelatedHoldService.update([domainModel: personRelatedHold])
@@ -191,14 +192,14 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
         //Update back the user in the DB to grails_user and verify that fields are updatable.
         try {
             sql = new Sql(sessionFactory.getCurrentSession().connection())
-            sql.executeUpdate("update SPRHOLD set SPRHOLD_USER = 'grails_user' where SPRHOLD_SURROGATE_ID = ?", [personRelatedHold.id])
+            sql.executeUpdate("update SPRHOLD set SPRHOLD_USER = 'GRAILS_USER' where SPRHOLD_SURROGATE_ID = ?", [personRelatedHold.id])
         } finally {
             sql?.close()
         }
 
         personRelatedHold.discard()
         personRelatedHold = PersonRelatedHold.findById(personRelatedHold.id)
-        assertEquals "grails_user", personRelatedHold.createdBy
+        assertEquals "GRAILS_USER", personRelatedHold.createdBy
         personRelatedHold.reason = "XXXX"
         personRelatedHold.fromDate = new Date()
         personRelatedHold.toDate = new Date()
