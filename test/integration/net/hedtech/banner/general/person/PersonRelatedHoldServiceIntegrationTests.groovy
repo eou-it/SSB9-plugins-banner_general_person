@@ -1,12 +1,12 @@
 /*********************************************************************************
-  Copyright 2009-2017 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2017 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
+
 import org.junit.Before
 import org.junit.Test
 import org.junit.After
-
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.system.HoldType
 import net.hedtech.banner.general.system.Originator
@@ -15,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder
 import groovy.sql.Sql
 import java.text.SimpleDateFormat
+
 
 class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
 
@@ -61,7 +62,7 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
         personRelatedHold = personRelatedHoldService.update([domainModel: personRelatedHold])
 
         assertEquals "Reason not as expected", "YYYY", personRelatedHold.reason
-        assertEquals "grails_user", personRelatedHold.createdBy
+        assertEquals "GRAILS_USER", personRelatedHold.createdBy
         assertEquals person.bannerId, personRelatedHold.lastModifiedBy
 
         def sql
@@ -102,7 +103,7 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
         //Set back user Data field in the DB to "grails_user"
         try {
             sql = new Sql(sessionFactory.getCurrentSession().connection())
-            sql.executeUpdate("update SPRHOLD set SPRHOLD_USER = 'grails_user' where SPRHOLD_SURROGATE_ID = ?", [personRelatedHold.id])
+            sql.executeUpdate("update SPRHOLD set SPRHOLD_USER = 'GRAILS_USER' where SPRHOLD_SURROGATE_ID = ?", [personRelatedHold.id])
         } finally {
             sql?.close()
         }
@@ -110,10 +111,10 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
         //current loggedin user is grails_user, can updated Release indicator and Hold Type.
 
         logout()
-        login("grails_user","u_pick_it")
+        login("GRAILS_USER","u_pick_it")
         personRelatedHold.discard()
         personRelatedHold = PersonRelatedHold.findById(personRelatedHold.id)
-        assertEquals "grails_user", personRelatedHold.createdBy
+        assertEquals "GRAILS_USER", personRelatedHold.createdBy
         personRelatedHold.releaseIndicator = true
         personRelatedHold.holdType = HoldType.findByCode("WC")
         personRelatedHold = personRelatedHoldService.update([domainModel: personRelatedHold])
@@ -191,14 +192,14 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
         //Update back the user in the DB to grails_user and verify that fields are updatable.
         try {
             sql = new Sql(sessionFactory.getCurrentSession().connection())
-            sql.executeUpdate("update SPRHOLD set SPRHOLD_USER = 'grails_user' where SPRHOLD_SURROGATE_ID = ?", [personRelatedHold.id])
+            sql.executeUpdate("update SPRHOLD set SPRHOLD_USER = 'GRAILS_USER' where SPRHOLD_SURROGATE_ID = ?", [personRelatedHold.id])
         } finally {
             sql?.close()
         }
 
         personRelatedHold.discard()
         personRelatedHold = PersonRelatedHold.findById(personRelatedHold.id)
-        assertEquals "grails_user", personRelatedHold.createdBy
+        assertEquals "GRAILS_USER", personRelatedHold.createdBy
         personRelatedHold.reason = "XXXX"
         personRelatedHold.fromDate = new Date()
         personRelatedHold.toDate = new Date()
@@ -220,7 +221,7 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
         assertNotNull personRelatedHold.id
         assertEquals "Hold Type not as expected", personRelatedHold.holdType.code, "RG"
         assertEquals "Originator not as expected", personRelatedHold.originator.code, "ACCT"
-        assertEquals "grails_user", personRelatedHold.createdBy
+        assertEquals "GRAILS_USER", personRelatedHold.createdBy
 
         //Delete the record and verify that it allows to delete
         personRelatedHoldService.delete([domainModel: personRelatedHold])
@@ -231,6 +232,8 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
 
     @Test
     void testDeleteWithReleaseIndicatorBySameUser() {
+        logout()
+        login("GRAILS_USER","u_pick_it")
         def personRelatedHold = newPersonRelatedHold()
         personRelatedHold.releaseIndicator = true
         def map = [domainModel: personRelatedHold]
@@ -256,7 +259,7 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
         personRelatedHold = personRelatedHoldService.create(map)
         //Test if the generated entity now has an id assigned
         assertNotNull personRelatedHold.id
-        assertEquals "grails_user", personRelatedHold.createdBy
+        assertEquals "GRAILS_USER", personRelatedHold.createdBy
         assertEquals "Hold Type not as expected", personRelatedHold.holdType.code, "RG"
         assertEquals "Originator not as expected", personRelatedHold.originator.code, "ACCT"
 
@@ -288,7 +291,7 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
         assertNotNull personRelatedHold.id
         assertEquals "Hold Type not as expected", personRelatedHold.holdType.code, "RG"
         assertEquals "Originator not as expected", personRelatedHold.originator.code, "ACCT"
-        assertEquals "grails_user", personRelatedHold.createdBy
+        assertEquals "GRAILS_USER", personRelatedHold.createdBy
         try {
             sql = new Sql(sessionFactory.getCurrentSession().connection())
             sql.executeUpdate("update SPRHOLD set SPRHOLD_USER = 'systest1' where SPRHOLD_SURROGATE_ID = ?", [personRelatedHold.id])
@@ -355,10 +358,7 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
                 amountOwed: 1,
                 holdType: iholdType,
                 originator: ioriginator,
-                lastModified: new Date(),
-                lastModifiedBy: "test",
-                createdBy: "grails_user",
-                dataOrigin: "Banner"
+                createdBy: "GRAILS_USER",
         )
         return personRelatedHold
     }
