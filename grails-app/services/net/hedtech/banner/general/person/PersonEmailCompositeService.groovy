@@ -86,4 +86,30 @@ class PersonEmailCompositeService {
         }
     }
 
+    /**
+     * Get Vendor Email Address
+     * @param request code
+     * @return
+     */
+    def fetchVendorEmailAddress( vendorPidm ) {
+        def vendorEmail = personEmailService.findVendorEmailAddress( vendorPidm )
+        return [emailAddress : vendorEmail ? vendorEmail.emailAddress : '']
+    }
+
+    /**
+     * Get Vendor Email Address
+     * @param request code
+     * @return
+     */
+    def fetchVendorEmailAddressList( vendorPidm, Map attrs, Map pagingParams ) {
+        def vendorEmail = personEmailService.findVendorEmailAddressList( vendorPidm , attrs, pagingParams)
+        def list = []
+        vendorEmail.each{
+            list.add([
+                    emailAddress : it.emailAddress
+            ])
+        }
+        return list
+    }
+
 }
