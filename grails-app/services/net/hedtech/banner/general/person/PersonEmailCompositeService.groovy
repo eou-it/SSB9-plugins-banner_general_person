@@ -102,12 +102,14 @@ class PersonEmailCompositeService {
      * @return
      */
     def fetchVendorEmailAddressList( vendorPidm, Map attrs, Map pagingParams ) {
-        def vendorEmail = personEmailService.findVendorEmailAddressList( vendorPidm , attrs, pagingParams)
         def list = []
-        vendorEmail.each{
-            list.add([
-                    emailAddress : it.emailAddress
-            ])
+        if(vendorPidm != null ) {
+            def vendorEmail = personEmailService.findVendorEmailAddressList(vendorPidm, attrs, pagingParams)
+            vendorEmail.each {
+                list.add([
+                        emailAddress: it.emailAddress
+                ])
+            }
         }
         return list
     }
