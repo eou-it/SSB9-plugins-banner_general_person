@@ -512,5 +512,34 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
         return personEmail
     }
 
+
+    @Test
+    void testFetchByEmailAddressByVendorPidm( ) {
+        def pidm = 30450;
+        def result = PersonEmail.fetchVendorEmail( pidm )
+        assertNotNull  result
+        assertNotNull result.emailAddress
+    }
+
+    @Test
+    void testFetchByEmailAddressByVendorPidmAndActiveEmails( ) {
+        def pidm = 30450;
+        def result = PersonEmail.fetchByPidmsAndActiveStatusEmails( pidm , '%',  [max: 10, offset: 0] )
+        assertNotNull result
+        assertEquals 30450, result[0].pidm
+    }
+
+    @Test
+    void testFetchByEmailAddressByVendorPidmAndSearchOption( ) {
+        def result = PersonEmail.fetchByPidmsAndActiveStatusEmails( 30450 , 'DHAREPPA%',  [max: 10, offset: 0] )
+        assertTrue  result.size() > 0
+    }
+
+    @Test
+    void testFetchByEmailAddressByVendorPidmAndInvalidSearchOption( ) {
+        def result = PersonEmail.fetchByPidmsAndActiveStatusEmails( 30450 , 'INVALID',  [max: 10, offset: 0] )
+        assertTrue result.size() == 0
+    }
+
 }
 

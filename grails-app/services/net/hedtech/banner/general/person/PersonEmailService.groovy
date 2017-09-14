@@ -4,7 +4,6 @@ Copyright 2012-2017 Ellucian Company L.P. and its affiliates.
  package net.hedtech.banner.general.person
 
 import net.hedtech.banner.service.ServiceBase
-import net.hedtech.banner.finance.util.FinanceCommonUtility
 
 // NOTE:
 // This service is injected with create, update, and delete methods that may throw runtime exceptions (listed below).
@@ -137,8 +136,31 @@ class PersonEmailService extends ServiceBase {
      */
     def findVendorEmailAddressList( vendorPidm, Map attrs, Map pagingParams ) {
         def inputMap = [searchParam: attrs.searchParam?.toUpperCase()]
-        FinanceCommonUtility.applyWildCard( inputMap, true, true )
+        applyWildCard( inputMap, true, true )
         def vendorEmail = PersonEmail.fetchByPidmsAndActiveStatusEmails( vendorPidm, inputMap.searchParam, pagingParams )
         return vendorEmail;
+    }
+
+    /**
+     * Applies WildCard
+     * @param parameters
+     * @param applyToPrefix
+     * @param applyToSuffix
+     * @return
+     */
+    static applyWildCard( parameters, boolean isPrefix, boolean isSuffix ) {
+
+        def suffixOrPrefixWildCard = {value, addToPrefix, addToSuffix ->
+            if (!(value.contains( '%' ))) {
+                value = (addToSuffix) ? (value + '%') : value
+                value = (addToPrefix) ? ('%' + value) : value
+            }
+            value
+        }
+        parameters.each {key, value ->
+            value = (value) ? suffixOrPrefixWildCard( value, isPrefix, isSuffix ) : '%'
+            parameters.put( key, value )
+        }
+        parameters
     }
 }
