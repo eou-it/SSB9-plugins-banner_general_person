@@ -360,7 +360,7 @@ class PersonEmail implements Serializable {
     }
 
     public
-    static PersonEmail fetchVendorEmail (pidm) {
+    static PersonEmail fetchPreferredEmail (pidm) {
 
         def email = PersonEmail.withSession { session ->
             session.getNamedQuery('PersonEmail.fetchByPidmsAndPreferredIndicator').setInteger('pidm', pidm).list()

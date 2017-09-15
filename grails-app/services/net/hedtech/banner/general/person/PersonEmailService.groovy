@@ -125,8 +125,8 @@ class PersonEmailService extends ServiceBase {
      * Find the requisition Vendor Email Address
      * @param requestCode
      */
-    def findVendorEmailAddress( vendorPidm ) {
-        def vendorEmail = PersonEmail.fetchVendorEmail( vendorPidm )
+    def findPreferredEmailAddress( vendorPidm ) {
+        def vendorEmail = PersonEmail.fetchPreferredEmail( vendorPidm )
         return vendorEmail;
     }
 
@@ -134,7 +134,7 @@ class PersonEmailService extends ServiceBase {
      * Find the requisition Vendor Email Address List
      * @param requestCode
      */
-    def findVendorEmailAddressList( vendorPidm, Map attrs, Map pagingParams ) {
+    def findPersonEmailAddressList( vendorPidm, Map attrs, Map pagingParams ) {
         def inputMap = [searchParam: attrs.searchParam?.toUpperCase()]
         applyWildCard( inputMap, true, true )
         def vendorEmail = PersonEmail.fetchByPidmsAndActiveStatusEmails( vendorPidm, inputMap.searchParam, pagingParams )

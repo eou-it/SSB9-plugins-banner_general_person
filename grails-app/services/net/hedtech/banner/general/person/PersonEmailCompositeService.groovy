@@ -91,8 +91,8 @@ class PersonEmailCompositeService {
      * @param request code
      * @return
      */
-    def fetchVendorEmailAddress( vendorPidm ) {
-        def vendorEmail = personEmailService.findVendorEmailAddress( vendorPidm )
+    def fetchPreferredEmailAddress( vendorPidm ) {
+        def vendorEmail = personEmailService.findPreferredEmailAddress( vendorPidm )
         return [emailAddress : vendorEmail ? vendorEmail.emailAddress : '']
     }
 
@@ -101,10 +101,10 @@ class PersonEmailCompositeService {
      * @param request code
      * @return
      */
-    def fetchVendorEmailAddressList( vendorPidm, Map attrs, Map pagingParams ) {
+    def fetchEmailAddressList( vendorPidm, Map attrs, Map pagingParams ) {
         def list = []
         if(vendorPidm != null ) {
-            def vendorEmail = personEmailService.findVendorEmailAddressList(vendorPidm, attrs, pagingParams)
+            def vendorEmail = personEmailService.findPersonEmailAddressList(vendorPidm, attrs, pagingParams)
             vendorEmail.each {
                 list.add([
                         emailAddress: it.emailAddress
