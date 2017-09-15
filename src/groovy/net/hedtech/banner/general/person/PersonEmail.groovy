@@ -87,8 +87,16 @@ import javax.persistence.*
     WHERE a.pidm = :pidm
     AND a.displayWebIndicator = 'Y'
     AND a.emailType.displayWebIndicator = 'Y'
-    AND a.statusIndicator = 'A'
-""")
+    AND a.statusIndicator = 'A' """),
+        @NamedQuery(name = "PersonEmail.fetchByPidmsAndPreferredIndicator",
+                query = """FROM PersonEmail a
+                        WHERE  a.pidm = :pidm
+                         AND a.preferredIndicator = 'Y'
+                        AND a.statusIndicator = 'A' """),
+        @NamedQuery(name = "PersonEmail.fetchByPidmsAndActiveStatusEmails",
+                query = """FROM PersonEmail a
+    WHERE UPPER(a.emailAddress) like :emailAddress  AND a.pidm = :pidm
+    and a.statusIndicator = 'A' """)
 ])
 class PersonEmail implements Serializable {
     private static final log = Logger.getLogger(PersonEmail.class)
@@ -351,4 +359,28 @@ class PersonEmail implements Serializable {
         return emails
     }
 
+    public
+    static PersonEmail fetchPreferredEmail (pidm) {
+
+        def email = PersonEmail.withSession { session ->
+            session.getNamedQuery('PersonEmail.fetchByPidmsAndPreferredIndicator').setInteger('pidm', pidm).list()
+        }
+        log.debug "Executing fetchByPidmsAndPreferredIndicator  with pidm = ${pidm} "
+        log.debug "Fetched number of emails ${email.size()}"
+        return email[0]
+    }
+
+    public static def fetchByPidmsAndActiveStatusEmails(pidm, def searchParam ,def pagingParams) {
+        def emails = PersonEmail.withSession { session ->
+            session.getNamedQuery('PersonEmail.fetchByPidmsAndActiveStatusEmails')
+                    .setInteger('pidm', pidm)
+                    .setString( 'emailAddress', searchParam )
+                    .setMaxResults( pagingParams.max )
+                    .setFirstResult( pagingParams.offset )
+                    .list()
+        }
+        log.debug "Executing fetchByPidmsAndActiveStatusEmails with pidms = ${pidm} "
+        log.debug "Fetched number of emails ${emails.size()} }"
+        return emails
+    }
 }

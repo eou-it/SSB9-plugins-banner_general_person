@@ -213,4 +213,30 @@ class PersonEmailCompositeServiceIntegrationTests extends BaseIntegrationTestCas
         personEmails << personEmail2
         return personEmails
     }
+
+    @Test
+    void testEmailAddressByVendorPidmAndActive( ) {
+        def result = personEmailCompositeService.fetchPreferredEmailAddress( 30450 )
+        assertNotNull  result
+        assertNotNull result.emailAddress
+    }
+
+    @Test
+    void testEmailAddressByVendorPidmAndActiveEmailList( ) {
+        def result = personEmailCompositeService.fetchEmailAddressList( 30450 , [searchParam:''],  [max: 10, offset: 0] )
+        assertNotNull result
+        assertTrue  result.size() > 0
+    }
+
+    @Test
+    void testFetchByEmailAddressByVendorPidmAndSearchOptionList( ) {
+        def result = personEmailCompositeService.fetchEmailAddressList( 30450 , [searchParam:'dhareppa'],  [max: 10, offset: 0] )
+        assertTrue  result.size() > 0
+    }
+
+    @Test
+    void testFetchByEmailAddressByVendorPidmAndInvalidSearchOptionList( ) {
+        def result = personEmailCompositeService.fetchEmailAddressList( 30450 , [searchParam:'INVALID'],  [max: 10, offset: 0] )
+        assertTrue result.size() == 0
+    }
 }

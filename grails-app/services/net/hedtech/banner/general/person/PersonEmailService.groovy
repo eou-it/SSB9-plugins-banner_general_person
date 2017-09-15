@@ -120,4 +120,47 @@ class PersonEmailService extends ServiceBase {
 
         return emails
     }
+
+    /**
+     * Find the requisition Vendor Email Address
+     * @param requestCode
+     */
+    def findPreferredEmailAddress( vendorPidm ) {
+        def vendorEmail = PersonEmail.fetchPreferredEmail( vendorPidm )
+        return vendorEmail;
+    }
+
+    /**
+     * Find the requisition Vendor Email Address List
+     * @param requestCode
+     */
+    def findPersonEmailAddressList( vendorPidm, Map attrs, Map pagingParams ) {
+        def inputMap = [searchParam: attrs.searchParam?.toUpperCase()]
+        applyWildCard( inputMap, true, true )
+        def vendorEmail = PersonEmail.fetchByPidmsAndActiveStatusEmails( vendorPidm, inputMap.searchParam, pagingParams )
+        return vendorEmail;
+    }
+
+    /**
+     * Applies WildCard
+     * @param parameters
+     * @param applyToPrefix
+     * @param applyToSuffix
+     * @return
+     */
+    static applyWildCard( parameters, boolean isPrefix, boolean isSuffix ) {
+
+        def suffixOrPrefixWildCard = {value, addToPrefix, addToSuffix ->
+            if (!(value.contains( '%' ))) {
+                value = (addToSuffix) ? (value + '%') : value
+                value = (addToPrefix) ? ('%' + value) : value
+            }
+            value
+        }
+        parameters.each {key, value ->
+            value = (value) ? suffixOrPrefixWildCard( value, isPrefix, isSuffix ) : '%'
+            parameters.put( key, value )
+        }
+        parameters
+    }
 }
