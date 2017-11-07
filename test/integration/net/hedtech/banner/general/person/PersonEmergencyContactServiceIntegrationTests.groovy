@@ -149,6 +149,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
 
     @After
     public void tearDown() {
+        logout()
         super.tearDown()
     }
 
@@ -348,9 +349,10 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
     }
 
     @Test
-    void testCreateOrUpdateEmergencyContactWithPriorityShuffleForCreate() {
+    void testCreateEmergencyContactWithPriorityShuffle() {
         def map = newValidForCreatePersonEmergencyContact()
-        def personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[0]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        def personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[0]
 
         assertNotNull "PersonEmergencyContact ID is null in PersonEmergencyContact Service Tests Create", personEmergencyContact.id
         assertNotNull "PersonEmergencyContact state is null in PersonEmergencyContact Service Tests", personEmergencyContact.state
@@ -365,11 +367,12 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
     }
 
     @Test
-    void testCreateOrUpdateEmergencyContactWithPriorityShuffleForNonPriorityUpdate() {
+    void testUpdateEmergencyContactWithPriorityShuffleForNonPriorityUpdate() {
         def map = newValidForCreatePersonEmergencyContact()
 
         // Create new entity
-        def personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[0]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        def personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[0]
 
         assertNotNull "PersonEmergencyContact ID is null in PersonEmergencyContact Service Tests Create", personEmergencyContact.id
         assertNotNull "PersonEmergencyContact state is null in PersonEmergencyContact Service Tests", personEmergencyContact.state
@@ -383,6 +386,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
 
         // Update the entity with new values.  For this test, priority is NOT changed.
         map = personEmergencyContactService.populateEmergencyContact(personEmergencyContact)
+        map.id = personEmergencyContact.id
+        map.version = personEmergencyContact.version
         map.state = u_success_state
         map.nation = u_success_nation
         map.relationship = u_success_relationship
@@ -403,7 +408,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map.houseNumber = u_success_houseNumber
         map.streetLine4 = u_success_streetLine4
 
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[0]
+        personEmergencyContactService.updateEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[0]
 
         // Test the values
         assertEquals u_success_lastName, personEmergencyContact.lastName
@@ -429,7 +435,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
     }
 
     @Test
-    void testCreateOrUpdateEmergencyContactWithPriorityShuffleAddMultipleContacts() {
+    void testCreateEmergencyContactWithPriorityShuffleAddMultipleContacts() {
         // Check all existing emergency contacts for the same user
         def pidm = PersonUtility.getPerson("HOS00001").pidm
         def existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
@@ -440,7 +446,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         // Create new entity #1
         def map = newValidForCreatePersonEmergencyContact()
 
-        def personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[0]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        def personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[0]
 
         assertEquals "TTTTT", personEmergencyContact.firstName
         assertEquals("1", personEmergencyContact.priority)
@@ -449,7 +456,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT2"
         map.priority = 2
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[1]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[1]
 
         assertEquals "TTTTT2", personEmergencyContact.firstName
         assertEquals("2", personEmergencyContact.priority)
@@ -458,7 +466,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT3"
         map.priority = 3
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[2]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[2]
 
         assertEquals "TTTTT3", personEmergencyContact.firstName
         assertEquals("3", personEmergencyContact.priority)
@@ -479,7 +488,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
     }
 
     @Test
-    void testCreateOrUpdateEmergencyContactWithPriorityShuffleDoInsertAtBeginning() {
+    void testCreateEmergencyContactWithPriorityShuffleDoInsertAtBeginning() {
         // Check all existing emergency contacts for the same user
         def pidm = PersonUtility.getPerson("HOS00001").pidm
         def existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
@@ -490,7 +499,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         // Create new entity #1
         def map = newValidForCreatePersonEmergencyContact()
 
-        def personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[0]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        def personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[0]
 
         assertEquals "TTTTT", personEmergencyContact.firstName
         assertEquals("1", personEmergencyContact.priority)
@@ -499,7 +509,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT2"
         map.priority = 2
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[1]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[1]
 
         assertEquals "TTTTT2", personEmergencyContact.firstName
         assertEquals("2", personEmergencyContact.priority)
@@ -508,7 +519,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT3"
         map.priority = 3
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[2]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[2]
 
         assertEquals "TTTTT3", personEmergencyContact.firstName
         assertEquals("3", personEmergencyContact.priority)
@@ -517,7 +529,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT4"
         map.priority = 1
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[0]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[0]
 
         assertEquals "TTTTT4", personEmergencyContact.firstName
         assertEquals("1", personEmergencyContact.priority)
@@ -541,7 +554,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
     }
 
     @Test
-    void testCreateOrUpdateEmergencyContactWithPriorityShuffleDoInsertInMiddle() {
+    void testCreateEmergencyContactWithPriorityShuffleDoInsertInMiddle() {
         // Check all existing emergency contacts for the same user
         def pidm = PersonUtility.getPerson("HOS00001").pidm
         def existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
@@ -552,7 +565,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         // Create new entity #1
         def map = newValidForCreatePersonEmergencyContact()
 
-        def personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[0]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        def personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[0]
 
         assertEquals "TTTTT", personEmergencyContact.firstName
         assertEquals("1", personEmergencyContact.priority)
@@ -561,7 +575,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT2"
         map.priority = 2
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[1]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[1]
 
         assertEquals "TTTTT2", personEmergencyContact.firstName
         assertEquals("2", personEmergencyContact.priority)
@@ -570,7 +585,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT3"
         map.priority = 3
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[2]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[2]
 
         assertEquals "TTTTT3", personEmergencyContact.firstName
         assertEquals("3", personEmergencyContact.priority)
@@ -579,7 +595,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT4"
         map.priority = 2
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[1]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[1]
 
         assertEquals "TTTTT4", personEmergencyContact.firstName
         assertEquals("2", personEmergencyContact.priority)
@@ -603,7 +620,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
     }
 
     @Test
-    void testCreateOrUpdateEmergencyContactWithPriorityShuffleDoMoveFromMiddleToFirst() {
+    void testUpdateEmergencyContactWithPriorityShuffleDoMoveFromMiddleToFirst() {
         // Check all existing emergency contacts for the same user
         def pidm = PersonUtility.getPerson("HOS00001").pidm
         def existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
@@ -614,7 +631,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         // Create new entity #1
         def map = newValidForCreatePersonEmergencyContact()
 
-        def personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[0]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        def personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[0]
 
         assertEquals "TTTTT", personEmergencyContact.firstName
         assertEquals("1", personEmergencyContact.priority)
@@ -623,7 +641,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT2"
         map.priority = 2
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[1]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[1]
 
         assertEquals "TTTTT2", personEmergencyContact.firstName
         assertEquals("2", personEmergencyContact.priority)
@@ -632,7 +651,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT3"
         map.priority = 3
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[2]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[2]
 
         assertEquals "TTTTT3", personEmergencyContact.firstName
         assertEquals("3", personEmergencyContact.priority)
@@ -641,7 +661,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT4"
         map.priority = 4
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[3]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[3]
 
         assertEquals "TTTTT4", personEmergencyContact.firstName
         assertEquals("4", personEmergencyContact.priority)
@@ -668,7 +689,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map.id = existingContacts[2].id
         map.priority = 1
 
-        personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContactService.updateEmergencyContactWithPriorityShuffle(map)
 
         // Confirm each has the priority we expect
         existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
@@ -687,7 +708,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
     }
 
     @Test
-    void testCreateOrUpdateEmergencyContactWithPriorityShuffleDoMoveFromMiddleToLast() {
+    void testUpdateEmergencyContactWithPriorityShuffleDoMoveFromMiddleToLast() {
         // Check all existing emergency contacts for the same user
         def pidm = PersonUtility.getPerson("HOS00001").pidm
         def existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
@@ -698,7 +719,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         // Create new entity #1
         def map = newValidForCreatePersonEmergencyContact()
 
-        def personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[0]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        def personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[0]
 
         assertEquals "TTTTT", personEmergencyContact.firstName
         assertEquals("1", personEmergencyContact.priority)
@@ -707,7 +729,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT2"
         map.priority = 2
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[1]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[1]
 
         assertEquals "TTTTT2", personEmergencyContact.firstName
         assertEquals("2", personEmergencyContact.priority)
@@ -716,7 +739,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT3"
         map.priority = 3
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[2]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[2]
 
         assertEquals "TTTTT3", personEmergencyContact.firstName
         assertEquals("3", personEmergencyContact.priority)
@@ -725,7 +749,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT4"
         map.priority = 4
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[3]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[3]
 
         assertEquals "TTTTT4", personEmergencyContact.firstName
         assertEquals("4", personEmergencyContact.priority)
@@ -752,7 +777,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map.id = existingContacts[2].id
         map.priority = 4
 
-        personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContactService.updateEmergencyContactWithPriorityShuffle(map)
 
         // Confirm each has the priority we expect
         existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
@@ -771,7 +796,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
     }
 
     @Test
-    void testCreateOrUpdateEmergencyContactWithPriorityShuffleDoMoveFromFirstToLast() {
+    void testUpdateEmergencyContactWithPriorityShuffleDoMoveFromFirstToLast() {
         // Check all existing emergency contacts for the same user
         def pidm = PersonUtility.getPerson("HOS00001").pidm
         def existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
@@ -782,7 +807,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         // Create new entity #1
         def map = newValidForCreatePersonEmergencyContact()
 
-        def personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[0]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        def personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[0]
 
         assertEquals "TTTTT", personEmergencyContact.firstName
         assertEquals("1", personEmergencyContact.priority)
@@ -791,7 +817,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT2"
         map.priority = 2
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[1]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[1]
 
         assertEquals "TTTTT2", personEmergencyContact.firstName
         assertEquals("2", personEmergencyContact.priority)
@@ -800,7 +827,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT3"
         map.priority = 3
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[2]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[2]
 
         assertEquals "TTTTT3", personEmergencyContact.firstName
         assertEquals("3", personEmergencyContact.priority)
@@ -809,7 +837,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT4"
         map.priority = 4
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[3]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[3]
 
         assertEquals "TTTTT4", personEmergencyContact.firstName
         assertEquals("4", personEmergencyContact.priority)
@@ -836,7 +865,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map.id = existingContacts[0].id
         map.priority = 4
 
-        personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContactService.updateEmergencyContactWithPriorityShuffle(map)
 
         // Confirm each has the priority we expect
         existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
@@ -855,7 +884,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
     }
 
     @Test
-    void testCreateOrUpdateEmergencyContactWithPriorityShuffleDoMoveFromLastToFirst() {
+    void testUpdateEmergencyContactWithPriorityShuffleDoMoveFromLastToFirst() {
         // Check all existing emergency contacts for the same user
         def pidm = PersonUtility.getPerson("HOS00001").pidm
         def existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
@@ -866,7 +895,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         // Create new entity #1
         def map = newValidForCreatePersonEmergencyContact()
 
-        def personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[0]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        def personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[0]
 
         assertEquals "TTTTT", personEmergencyContact.firstName
         assertEquals("1", personEmergencyContact.priority)
@@ -875,7 +905,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT2"
         map.priority = 2
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[1]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[1]
 
         assertEquals "TTTTT2", personEmergencyContact.firstName
         assertEquals("2", personEmergencyContact.priority)
@@ -884,7 +915,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT3"
         map.priority = 3
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[2]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[2]
 
         assertEquals "TTTTT3", personEmergencyContact.firstName
         assertEquals("3", personEmergencyContact.priority)
@@ -893,7 +925,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT4"
         map.priority = 4
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[3]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[3]
 
         assertEquals "TTTTT4", personEmergencyContact.firstName
         assertEquals("4", personEmergencyContact.priority)
@@ -920,7 +953,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map.id = existingContacts[3].id
         map.priority = 1
 
-        personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContactService.updateEmergencyContactWithPriorityShuffle(map)
 
         // Confirm each has the priority we expect
         existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
@@ -939,7 +972,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
     }
 
     @Test
-    void testCreateOrUpdateEmergencyContactWithPriorityShuffleDoDeleteFirst() {
+    void testDeleteEmergencyContactWithPriorityShuffleDoDeleteFirst() {
         // Check all existing emergency contacts for the same user
         def pidm = PersonUtility.getPerson("HOS00001").pidm
         def existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
@@ -950,7 +983,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         // Create new entity #1
         def map = newValidForCreatePersonEmergencyContact()
 
-        def personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[0]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        def personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[0]
 
         assertEquals "TTTTT", personEmergencyContact.firstName
         assertEquals("1", personEmergencyContact.priority)
@@ -959,7 +993,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT2"
         map.priority = 2
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[1]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[1]
 
         assertEquals "TTTTT2", personEmergencyContact.firstName
         assertEquals("2", personEmergencyContact.priority)
@@ -968,7 +1003,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT3"
         map.priority = 3
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[2]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[2]
 
         assertEquals "TTTTT3", personEmergencyContact.firstName
         assertEquals("3", personEmergencyContact.priority)
@@ -977,7 +1013,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT4"
         map.priority = 4
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[3]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[3]
 
         assertEquals "TTTTT4", personEmergencyContact.firstName
         assertEquals("4", personEmergencyContact.priority)
@@ -1003,7 +1040,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = personEmergencyContactService.populateEmergencyContact(existingContacts[0])
         map.id = existingContacts[0].id
 
-        personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map, true)
+        personEmergencyContactService.deleteEmergencyContactWithPriorityShuffle(map)
 
         // Confirm each has the priority we expect
         existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
@@ -1019,7 +1056,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
     }
 
     @Test
-    void testCreateOrUpdateEmergencyContactWithPriorityShuffleDoDeleteFromMiddle() {
+    void testDeleteEmergencyContactWithPriorityShuffleDoDeleteFromMiddle() {
         // Check all existing emergency contacts for the same user
         def pidm = PersonUtility.getPerson("HOS00001").pidm
         def existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
@@ -1030,7 +1067,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         // Create new entity #1
         def map = newValidForCreatePersonEmergencyContact()
 
-        def personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[0]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        def personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[0]
 
         assertEquals "TTTTT", personEmergencyContact.firstName
         assertEquals("1", personEmergencyContact.priority)
@@ -1039,7 +1077,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT2"
         map.priority = 2
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[1]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[1]
 
         assertEquals "TTTTT2", personEmergencyContact.firstName
         assertEquals("2", personEmergencyContact.priority)
@@ -1048,7 +1087,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT3"
         map.priority = 3
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[2]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[2]
 
         assertEquals "TTTTT3", personEmergencyContact.firstName
         assertEquals("3", personEmergencyContact.priority)
@@ -1057,7 +1097,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT4"
         map.priority = 4
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[3]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[3]
 
         assertEquals "TTTTT4", personEmergencyContact.firstName
         assertEquals("4", personEmergencyContact.priority)
@@ -1083,7 +1124,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = personEmergencyContactService.populateEmergencyContact(existingContacts[1])
         map.id = existingContacts[1].id
 
-        personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map, true)
+        personEmergencyContactService.deleteEmergencyContactWithPriorityShuffle(map)
 
         // Confirm each has the priority we expect
         existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
@@ -1099,7 +1140,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
     }
 
     @Test
-    void testCreateOrUpdateEmergencyContactWithPriorityShuffleDoDeleteLast() {
+    void testDeleteEmergencyContactWithPriorityShuffleDoDeleteLast() {
         // Check all existing emergency contacts for the same user
         def pidm = PersonUtility.getPerson("HOS00001").pidm
         def existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
@@ -1110,7 +1151,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         // Create new entity #1
         def map = newValidForCreatePersonEmergencyContact()
 
-        def personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[0]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        def personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[0]
 
         assertEquals "TTTTT", personEmergencyContact.firstName
         assertEquals("1", personEmergencyContact.priority)
@@ -1119,7 +1161,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT2"
         map.priority = 2
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[1]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[1]
 
         assertEquals "TTTTT2", personEmergencyContact.firstName
         assertEquals("2", personEmergencyContact.priority)
@@ -1128,7 +1171,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT3"
         map.priority = 3
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[2]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[2]
 
         assertEquals "TTTTT3", personEmergencyContact.firstName
         assertEquals("3", personEmergencyContact.priority)
@@ -1137,7 +1181,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT4"
         map.priority = 4
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[3]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[3]
 
         assertEquals "TTTTT4", personEmergencyContact.firstName
         assertEquals("4", personEmergencyContact.priority)
@@ -1163,7 +1208,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = personEmergencyContactService.populateEmergencyContact(existingContacts[3])
         map.id = existingContacts[3].id
 
-        personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map, true)
+        personEmergencyContactService.deleteEmergencyContactWithPriorityShuffle(map)
 
         // Confirm each has the priority we expect
         existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
@@ -1176,11 +1221,66 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
 
         assertEquals("TTTTT3", existingContacts[2].firstName)
         assertEquals("3", existingContacts[2].priority)
+    }
+
+    // BEGIN Test that records which should be unaffected by CRUD and reprioritization operations have
+    // the same modifiedBy and modifiedByDate values after said operations.
+    @Test
+    void testCreateEmergencyContactWithPriorityShuffleAddMultipleContactsAndCheckUnaffectedOnes() {
+        def GRAILS_USER = 'GRAILS_USER'
+        def SAISUSR = 'SAISUSR'
+        def pidm = PersonUtility.getPerson("HOS00001").pidm
+        def existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
+
+        // No contacts exist yet
+        assertEquals(0, existingContacts.size())
+
+        // Create new entity #1
+        def map = newValidForCreatePersonEmergencyContact()
+
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        def personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[0]
+
+        assertEquals "TTTTT", personEmergencyContact.firstName
+        assertEquals("1", personEmergencyContact.priority)
+
+        // Create new entity #2
+        map = newValidForCreatePersonEmergencyContact()
+        map.firstName = "TTTTT2"
+        map.priority = 2
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[1]
+
+        assertEquals "TTTTT2", personEmergencyContact.firstName
+        assertEquals("2", personEmergencyContact.priority)
+
+        sleep(1000) // Cause different lastModified date than the records above
+        login(SAISUSR, 'u_pick_it')
+
+        // Create new entity #3
+        map = newValidForCreatePersonEmergencyContact()
+        map.firstName = "TTTTT3"
+        map.priority = 3
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        def contacts = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)
+
+        // The first and second contacts' "last modified" times should be quite close, as they were created at
+        // about the same time.
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) < 100)
+
+        // The second and third contacts' "last modified" times should differ by about 1000 ms, as the third one
+        // was inserted later.
+        assertTrue('Emergency contact "modified by" times are similar.', Math.abs(contacts[1].lastModified.getTime() - contacts[2].lastModified.getTime()) > 800)
+
+        // The first and second contacts' lastModifiedBy should be one value, while the third should be another (see the login above in this test)
+        assertEquals GRAILS_USER, contacts[0].lastModifiedBy
+        assertEquals GRAILS_USER, contacts[1].lastModifiedBy
+        assertEquals SAISUSR, contacts[2].lastModifiedBy
     }
 
     @Test
-    void testCreateOrUpdateEmergencyContactWithPriorityShuffleReturnValue() {
-        // Check all existing emergency contacts for the same user
+    void testCreateEmergencyContactWithPriorityShuffleDoInsertAtBeginningAndCheckUnaffectedOnes() {
+        def SAISUSR = 'SAISUSR'
         def pidm = PersonUtility.getPerson("HOS00001").pidm
         def existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
 
@@ -1190,7 +1290,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         // Create new entity #1
         def map = newValidForCreatePersonEmergencyContact()
 
-        def personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[0]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        def personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[0]
 
         assertEquals "TTTTT", personEmergencyContact.firstName
         assertEquals("1", personEmergencyContact.priority)
@@ -1199,7 +1300,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT2"
         map.priority = 2
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[1]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[1]
 
         assertEquals "TTTTT2", personEmergencyContact.firstName
         assertEquals("2", personEmergencyContact.priority)
@@ -1208,7 +1310,137 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT3"
         map.priority = 3
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[2]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[2]
+
+        assertEquals "TTTTT3", personEmergencyContact.firstName
+        assertEquals("3", personEmergencyContact.priority)
+
+        // Insert entity #4 AT BEGINNING
+        sleep(1000) // Cause different lastModified date than the records above
+        login(SAISUSR, 'u_pick_it')
+
+        map = newValidForCreatePersonEmergencyContact()
+        map.firstName = "TTTTT4"
+        map.priority = 1
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        def contacts = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)
+
+        // All contacts' "last modified" times should be quite close as, although the one now at priority 1 was
+        // inserted one second later, all the others had to be updated to new priorities.
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) < 100)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[2].lastModified.getTime()) < 100)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[3].lastModified.getTime()) < 100)
+
+        // All contacts' lastModifiedBy should be the same value, as they were updated by SAISUSR (see the login above
+        // in this test) at the same time as the insert was done and the existing ones were reprioritized.
+        assertEquals SAISUSR, contacts[0].lastModifiedBy
+        assertEquals SAISUSR, contacts[1].lastModifiedBy
+        assertEquals SAISUSR, contacts[2].lastModifiedBy
+        assertEquals SAISUSR, contacts[3].lastModifiedBy
+    }
+
+    @Test
+    void testCreateEmergencyContactWithPriorityShuffleDoInsertInMiddleAndCheckUnaffectedOnes() {
+        def GRAILS_USER = 'GRAILS_USER'
+        def SAISUSR = 'SAISUSR'
+        def pidm = PersonUtility.getPerson("HOS00001").pidm
+        def existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
+
+        // No contacts exist yet
+        assertEquals(0, existingContacts.size())
+
+        // Create new entity #1
+        def map = newValidForCreatePersonEmergencyContact()
+
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        def personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[0]
+
+        assertEquals "TTTTT", personEmergencyContact.firstName
+        assertEquals("1", personEmergencyContact.priority)
+
+        // Create new entity #2
+        map = newValidForCreatePersonEmergencyContact()
+        map.firstName = "TTTTT2"
+        map.priority = 2
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[1]
+
+        assertEquals "TTTTT2", personEmergencyContact.firstName
+        assertEquals("2", personEmergencyContact.priority)
+
+        // Create new entity #3
+        map = newValidForCreatePersonEmergencyContact()
+        map.firstName = "TTTTT3"
+        map.priority = 3
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[2]
+
+        assertEquals "TTTTT3", personEmergencyContact.firstName
+        assertEquals("3", personEmergencyContact.priority)
+
+        // Insert entity #4 IN MIDDLE
+        sleep(1000) // Cause different lastModified date than the records above
+        login(SAISUSR, 'u_pick_it')
+
+        map = newValidForCreatePersonEmergencyContact()
+        map.firstName = "TTTTT4"
+        map.priority = 2
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        def contacts = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)
+
+        // The first and second contacts' "last modified" times should differ by about 1000 ms, as the second one
+        // was inserted later.
+        assertTrue('Emergency contact "modified by" times are similar.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) > 800)
+
+        // The second, third, and fourth "last modified" times should be quite close as the second was inserted, and
+        // the priority of the third and fourth had to be updated to new priorities.
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[1].lastModified.getTime() - contacts[2].lastModified.getTime()) < 100)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[1].lastModified.getTime() - contacts[3].lastModified.getTime()) < 100)
+
+        // The first contact's lastModifiedBy should be one value, while the second, third, and fourth should be
+        // another (see the login above in this test).
+        assertEquals GRAILS_USER, contacts[0].lastModifiedBy
+        assertEquals SAISUSR, contacts[1].lastModifiedBy
+        assertEquals SAISUSR, contacts[2].lastModifiedBy
+        assertEquals SAISUSR, contacts[3].lastModifiedBy
+    }
+
+    @Test
+    void testUpdateEmergencyContactWithPriorityShuffleDoMoveFromMiddleToFirstAndCheckUnaffectedOnes() {
+        def GRAILS_USER = 'GRAILS_USER'
+        def SAISUSR = 'SAISUSR'
+        def pidm = PersonUtility.getPerson("HOS00001").pidm
+        def existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
+
+        // No contacts exist yet
+        assertEquals(0, existingContacts.size())
+
+        // Create new entity #1
+        def map = newValidForCreatePersonEmergencyContact()
+
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        def personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[0]
+
+        assertEquals "TTTTT", personEmergencyContact.firstName
+        assertEquals("1", personEmergencyContact.priority)
+
+        // Create new entity #2
+        map = newValidForCreatePersonEmergencyContact()
+        map.firstName = "TTTTT2"
+        map.priority = 2
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[1]
+
+        assertEquals "TTTTT2", personEmergencyContact.firstName
+        assertEquals("2", personEmergencyContact.priority)
+
+        // Create new entity #3
+        map = newValidForCreatePersonEmergencyContact()
+        map.firstName = "TTTTT3"
+        map.priority = 3
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[2]
 
         assertEquals "TTTTT3", personEmergencyContact.firstName
         assertEquals("3", personEmergencyContact.priority)
@@ -1217,7 +1449,8 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         map = newValidForCreatePersonEmergencyContact()
         map.firstName = "TTTTT4"
         map.priority = 4
-        personEmergencyContact = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map)[3]
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[3]
 
         assertEquals "TTTTT4", personEmergencyContact.firstName
         assertEquals("4", personEmergencyContact.priority)
@@ -1226,35 +1459,500 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
         assertEquals(4, existingContacts.size())
 
-        // Confirm each has the priority we expect
-        assertEquals("TTTTT", existingContacts[0].firstName)
-        assertEquals("1", existingContacts[0].priority)
+        // Now MOVE the third one to the beginning
+        sleep(1000) // Cause different lastModified date than the records above
+        login(SAISUSR, 'u_pick_it')
 
-        assertEquals("TTTTT2", existingContacts[1].firstName)
-        assertEquals("2", existingContacts[1].priority)
+        map = personEmergencyContactService.populateEmergencyContact(existingContacts[2])
+        map.id = existingContacts[2].id
+        map.priority = 1
 
-        assertEquals("TTTTT3", existingContacts[2].firstName)
-        assertEquals("3", existingContacts[2].priority)
+        personEmergencyContactService.updateEmergencyContactWithPriorityShuffle(map)
+        def contacts = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)
 
-        assertEquals("TTTTT4", existingContacts[3].firstName)
-        assertEquals("4", existingContacts[3].priority)
+        // The first, second, and third contacts' "last modified" times should be quite close, as they were created at
+        // about the same time.
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) < 100)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[2].lastModified.getTime()) < 100)
+
+        // The third and fourth contacts' "last modified" times should differ by about 1000 ms, as the third one
+        // was inserted later.
+        assertTrue('Emergency contact "modified by" times are similar.', Math.abs(contacts[2].lastModified.getTime() - contacts[3].lastModified.getTime()) > 800)
+
+        // The first, second, and third contacts' lastModifiedBy should be one value, while the fourth should be
+        // another (see the login above in this test)
+        assertEquals SAISUSR, contacts[0].lastModifiedBy
+        assertEquals SAISUSR, contacts[1].lastModifiedBy
+        assertEquals SAISUSR, contacts[2].lastModifiedBy
+        assertEquals GRAILS_USER, contacts[3].lastModifiedBy
+    }
+
+    @Test
+    void testUpdateEmergencyContactWithPriorityShuffleDoMoveFromMiddleToLastAndCheckUnaffectedOnes() {
+        def GRAILS_USER = 'GRAILS_USER'
+        def SAISUSR = 'SAISUSR'
+        def pidm = PersonUtility.getPerson("HOS00001").pidm
+        def existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
+
+        // No contacts exist yet
+        assertEquals(0, existingContacts.size())
+
+        // Create new entity #1
+        def map = newValidForCreatePersonEmergencyContact()
+
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        def personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[0]
+
+        assertEquals "TTTTT", personEmergencyContact.firstName
+        assertEquals("1", personEmergencyContact.priority)
+
+        // Create new entity #2
+        map = newValidForCreatePersonEmergencyContact()
+        map.firstName = "TTTTT2"
+        map.priority = 2
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[1]
+
+        assertEquals "TTTTT2", personEmergencyContact.firstName
+        assertEquals("2", personEmergencyContact.priority)
+
+        // Create new entity #3
+        map = newValidForCreatePersonEmergencyContact()
+        map.firstName = "TTTTT3"
+        map.priority = 3
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[2]
+
+        assertEquals "TTTTT3", personEmergencyContact.firstName
+        assertEquals("3", personEmergencyContact.priority)
+
+        // Create new entity #4
+        map = newValidForCreatePersonEmergencyContact()
+        map.firstName = "TTTTT4"
+        map.priority = 4
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[3]
+
+        assertEquals "TTTTT4", personEmergencyContact.firstName
+        assertEquals("4", personEmergencyContact.priority)
+
+        // Confirm 4 contacts exist
+        existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
+        assertEquals(4, existingContacts.size())
+
+        // Now MOVE the third one to the end
+        sleep(1000) // Cause different lastModified date than the records above
+        login(SAISUSR, 'u_pick_it')
+
+        map = personEmergencyContactService.populateEmergencyContact(existingContacts[2])
+        map.id = existingContacts[2].id
+        map.priority = 4
+
+        personEmergencyContactService.updateEmergencyContactWithPriorityShuffle(map)
+        def contacts = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)
+
+        // The first and second contacts' "last modified" times should be quite close, as they were created at
+        // about the same time.
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) < 100)
+
+        // The third and fourth contacts' "last modified" times should be quite close, as they were modified at
+        // about the same time.
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[2].lastModified.getTime() - contacts[3].lastModified.getTime()) < 100)
+
+        // The second and third contacts' "last modified" times should differ by about 1000 ms, as the third one
+        // was updated later.
+        assertTrue('Emergency contact "modified by" times are similar.', Math.abs(contacts[1].lastModified.getTime() - contacts[2].lastModified.getTime()) > 800)
+
+        // The first and second contacts' lastModifiedBy should be one value, while the third and fourth should be
+        // another (see the login above in this test)
+        assertEquals GRAILS_USER, contacts[0].lastModifiedBy
+        assertEquals GRAILS_USER, contacts[1].lastModifiedBy
+        assertEquals SAISUSR, contacts[2].lastModifiedBy
+        assertEquals SAISUSR, contacts[3].lastModifiedBy
+    }
+
+    @Test
+    void testUpdateEmergencyContactWithPriorityShuffleDoMoveFromFirstToLastAndCheckUnaffectedOnes() {
+        def SAISUSR = 'SAISUSR'
+        def pidm = PersonUtility.getPerson("HOS00001").pidm
+        def existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
+
+        // No contacts exist yet
+        assertEquals(0, existingContacts.size())
+
+        // Create new entity #1
+        def map = newValidForCreatePersonEmergencyContact()
+
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        def personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[0]
+
+        assertEquals "TTTTT", personEmergencyContact.firstName
+        assertEquals("1", personEmergencyContact.priority)
+
+        // Create new entity #2
+        map = newValidForCreatePersonEmergencyContact()
+        map.firstName = "TTTTT2"
+        map.priority = 2
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[1]
+
+        assertEquals "TTTTT2", personEmergencyContact.firstName
+        assertEquals("2", personEmergencyContact.priority)
+
+        // Create new entity #3
+        map = newValidForCreatePersonEmergencyContact()
+        map.firstName = "TTTTT3"
+        map.priority = 3
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[2]
+
+        assertEquals "TTTTT3", personEmergencyContact.firstName
+        assertEquals("3", personEmergencyContact.priority)
+
+        // Create new entity #4
+        map = newValidForCreatePersonEmergencyContact()
+        map.firstName = "TTTTT4"
+        map.priority = 4
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[3]
+
+        assertEquals "TTTTT4", personEmergencyContact.firstName
+        assertEquals("4", personEmergencyContact.priority)
+
+        // Confirm 4 contacts exist
+        existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
+        assertEquals(4, existingContacts.size())
+
+        // Now MOVE the first one to the end
+        sleep(1000) // Cause different lastModified date than the records above
+        login(SAISUSR, 'u_pick_it')
+
+        map = personEmergencyContactService.populateEmergencyContact(existingContacts[0])
+        map.id = existingContacts[0].id
+        map.priority = 4
+
+        personEmergencyContactService.updateEmergencyContactWithPriorityShuffle(map)
+        def contacts = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)
+
+        // All contacts' "last modified" times should be quite close as, although the one now at priority 4 was
+        // moved there one second later, all the others had to be updated to new priorities.
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) < 100)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[2].lastModified.getTime()) < 100)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[3].lastModified.getTime()) < 100)
+
+        // All contacts' lastModifiedBy should be the same value, as they were updated by SAISUSR (see the login above
+        // in this test) at the same time as the update was done and the existing ones were reprioritized.
+        assertEquals SAISUSR, contacts[0].lastModifiedBy
+        assertEquals SAISUSR, contacts[1].lastModifiedBy
+        assertEquals SAISUSR, contacts[2].lastModifiedBy
+        assertEquals SAISUSR, contacts[3].lastModifiedBy
+    }
+
+    @Test
+    void testUpdateEmergencyContactWithPriorityShuffleDoMoveFromLastToFirstAndCheckUnaffectedOnes() {
+        def SAISUSR = 'SAISUSR'
+        def pidm = PersonUtility.getPerson("HOS00001").pidm
+        def existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
+
+        // No contacts exist yet
+        assertEquals(0, existingContacts.size())
+
+        // Create new entity #1
+        def map = newValidForCreatePersonEmergencyContact()
+
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        def personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[0]
+
+        assertEquals "TTTTT", personEmergencyContact.firstName
+        assertEquals("1", personEmergencyContact.priority)
+
+        // Create new entity #2
+        map = newValidForCreatePersonEmergencyContact()
+        map.firstName = "TTTTT2"
+        map.priority = 2
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[1]
+
+        assertEquals "TTTTT2", personEmergencyContact.firstName
+        assertEquals("2", personEmergencyContact.priority)
+
+        // Create new entity #3
+        map = newValidForCreatePersonEmergencyContact()
+        map.firstName = "TTTTT3"
+        map.priority = 3
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[2]
+
+        assertEquals "TTTTT3", personEmergencyContact.firstName
+        assertEquals("3", personEmergencyContact.priority)
+
+        // Create new entity #4
+        map = newValidForCreatePersonEmergencyContact()
+        map.firstName = "TTTTT4"
+        map.priority = 4
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[3]
+
+        assertEquals "TTTTT4", personEmergencyContact.firstName
+        assertEquals("4", personEmergencyContact.priority)
+
+        // Confirm 4 contacts exist
+        existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
+        assertEquals(4, existingContacts.size())
+
+        // Now MOVE the last one to the beginning
+        sleep(1000) // Cause different lastModified date than the records above
+        login(SAISUSR, 'u_pick_it')
+
+        map = personEmergencyContactService.populateEmergencyContact(existingContacts[3])
+        map.id = existingContacts[3].id
+        map.priority = 1
+
+        personEmergencyContactService.updateEmergencyContactWithPriorityShuffle(map)
+        def contacts = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)
+
+        // All contacts' "last modified" times should be quite close as, although the one now at priority 1 was
+        // moved there one second later, all the others had to be updated to new priorities.
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) < 100)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[2].lastModified.getTime()) < 100)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[3].lastModified.getTime()) < 100)
+
+        // All contacts' lastModifiedBy should be the same value, as they were updated by SAISUSR (see the login above
+        // in this test) at the same time as the update was done and the existing ones were reprioritized.
+        assertEquals SAISUSR, contacts[0].lastModifiedBy
+        assertEquals SAISUSR, contacts[1].lastModifiedBy
+        assertEquals SAISUSR, contacts[2].lastModifiedBy
+        assertEquals SAISUSR, contacts[3].lastModifiedBy
+    }
+
+    @Test
+    void testDeleteEmergencyContactWithPriorityShuffleDoDeleteFirstAndCheckUnaffectedOnes() {
+        def SAISUSR = 'SAISUSR'
+        def pidm = PersonUtility.getPerson("HOS00001").pidm
+        def existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
+
+        // No contacts exist yet
+        assertEquals(0, existingContacts.size())
+
+        // Create new entity #1
+        def map = newValidForCreatePersonEmergencyContact()
+
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        def personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[0]
+
+        assertEquals "TTTTT", personEmergencyContact.firstName
+        assertEquals("1", personEmergencyContact.priority)
+
+        // Create new entity #2
+        map = newValidForCreatePersonEmergencyContact()
+        map.firstName = "TTTTT2"
+        map.priority = 2
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[1]
+
+        assertEquals "TTTTT2", personEmergencyContact.firstName
+        assertEquals("2", personEmergencyContact.priority)
+
+        // Create new entity #3
+        map = newValidForCreatePersonEmergencyContact()
+        map.firstName = "TTTTT3"
+        map.priority = 3
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[2]
+
+        assertEquals "TTTTT3", personEmergencyContact.firstName
+        assertEquals("3", personEmergencyContact.priority)
+
+        // Create new entity #4
+        map = newValidForCreatePersonEmergencyContact()
+        map.firstName = "TTTTT4"
+        map.priority = 4
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[3]
+
+        assertEquals "TTTTT4", personEmergencyContact.firstName
+        assertEquals("4", personEmergencyContact.priority)
+
+        // Confirm 4 contacts exist
+        existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
+        assertEquals(4, existingContacts.size())
+
+        // Now DELETE the first one
+        sleep(1000) // Cause different lastModified date than the records above
+        login(SAISUSR, 'u_pick_it')
+
+        map = personEmergencyContactService.populateEmergencyContact(existingContacts[0])
+        map.id = existingContacts[0].id
+
+        personEmergencyContactService.deleteEmergencyContactWithPriorityShuffle(map)
+        def contacts = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)
+
+        // All contacts' "last modified" times should be quite close as, although the one originally at priority 1 was
+        // deleted there one second later, all the others had to be updated to new priorities.
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) < 100)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[2].lastModified.getTime()) < 100)
+
+        // All contacts' lastModifiedBy should be the same value, as they were updated by SAISUSR (see the login above
+        // in this test) at the same time as the delete was done and the existing ones were reprioritized.
+        assertEquals SAISUSR, contacts[0].lastModifiedBy
+        assertEquals SAISUSR, contacts[1].lastModifiedBy
+        assertEquals SAISUSR, contacts[2].lastModifiedBy
+    }
+
+    @Test
+    void testDeleteEmergencyContactWithPriorityShuffleDoDeleteFromMiddleAndCheckUnaffectedOnes() {
+        def GRAILS_USER = 'GRAILS_USER'
+        def SAISUSR = 'SAISUSR'
+        def pidm = PersonUtility.getPerson("HOS00001").pidm
+        def existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
+
+        // No contacts exist yet
+        assertEquals(0, existingContacts.size())
+
+        // Create new entity #1
+        def map = newValidForCreatePersonEmergencyContact()
+
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        def personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[0]
+
+        assertEquals "TTTTT", personEmergencyContact.firstName
+        assertEquals("1", personEmergencyContact.priority)
+
+        // Create new entity #2
+        map = newValidForCreatePersonEmergencyContact()
+        map.firstName = "TTTTT2"
+        map.priority = 2
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[1]
+
+        assertEquals "TTTTT2", personEmergencyContact.firstName
+        assertEquals("2", personEmergencyContact.priority)
+
+        // Create new entity #3
+        map = newValidForCreatePersonEmergencyContact()
+        map.firstName = "TTTTT3"
+        map.priority = 3
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[2]
+
+        assertEquals "TTTTT3", personEmergencyContact.firstName
+        assertEquals("3", personEmergencyContact.priority)
+
+        // Create new entity #4
+        map = newValidForCreatePersonEmergencyContact()
+        map.firstName = "TTTTT4"
+        map.priority = 4
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[3]
+
+        assertEquals "TTTTT4", personEmergencyContact.firstName
+        assertEquals("4", personEmergencyContact.priority)
+
+        // Confirm 4 contacts exist
+        existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
+        assertEquals(4, existingContacts.size())
+
+        // Now DELETE the second one
+        sleep(1000) // Cause different lastModified date than the records above
+        login(SAISUSR, 'u_pick_it')
+
+        map = personEmergencyContactService.populateEmergencyContact(existingContacts[1])
+        map.id = existingContacts[1].id
+
+        personEmergencyContactService.deleteEmergencyContactWithPriorityShuffle(map)
+        def contacts = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)
+
+        // The first and second contacts' "last modified" times should differ by about 1000 ms, as the one originally
+        // in the second position was deleted later and the ones below it were moved up in priority.
+        assertTrue('Emergency contact "modified by" times are similar.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) > 800)
+
+        // The second and third contacts' "last modified" times should be quite close, as they were updated at
+        // about the same time.
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[1].lastModified.getTime() - contacts[2].lastModified.getTime()) < 100)
+
+        // The first contact's lastModifiedBy should be one value, while the second and third should be
+        // another (see the login above in this test)
+        assertEquals GRAILS_USER, contacts[0].lastModifiedBy
+        assertEquals SAISUSR, contacts[1].lastModifiedBy
+        assertEquals SAISUSR, contacts[2].lastModifiedBy
+    }
+
+    @Test
+    void testDeleteEmergencyContactWithPriorityShuffleDoDeleteLastAndCheckUnaffectedOnes() {
+        def GRAILS_USER = 'GRAILS_USER'
+        def SAISUSR = 'SAISUSR'
+        def pidm = PersonUtility.getPerson("HOS00001").pidm
+        def existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
+
+        // No contacts exist yet
+        assertEquals(0, existingContacts.size())
+
+        // Create new entity #1
+        def map = newValidForCreatePersonEmergencyContact()
+
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        def personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[0]
+
+        assertEquals "TTTTT", personEmergencyContact.firstName
+        assertEquals("1", personEmergencyContact.priority)
+
+        // Create new entity #2
+        map = newValidForCreatePersonEmergencyContact()
+        map.firstName = "TTTTT2"
+        map.priority = 2
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[1]
+
+        assertEquals "TTTTT2", personEmergencyContact.firstName
+        assertEquals("2", personEmergencyContact.priority)
+
+        // Create new entity #3
+        map = newValidForCreatePersonEmergencyContact()
+        map.firstName = "TTTTT3"
+        map.priority = 3
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[2]
+
+        assertEquals "TTTTT3", personEmergencyContact.firstName
+        assertEquals("3", personEmergencyContact.priority)
+
+        // Create new entity #4
+        map = newValidForCreatePersonEmergencyContact()
+        map.firstName = "TTTTT4"
+        map.priority = 4
+        personEmergencyContactService.createEmergencyContactWithPriorityShuffle(map)
+        personEmergencyContact = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)[3]
+
+        assertEquals "TTTTT4", personEmergencyContact.firstName
+        assertEquals("4", personEmergencyContact.priority)
+
+        // Confirm 4 contacts exist
+        existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
+        assertEquals(4, existingContacts.size())
 
         // Now DELETE the last one
+        sleep(1000) // Cause different lastModified date than the records above
+        login(SAISUSR, 'u_pick_it')
+
         map = personEmergencyContactService.populateEmergencyContact(existingContacts[3])
         map.id = existingContacts[3].id
 
-        // Test that method returns the current contacts
-        existingContacts = personEmergencyContactService.createUpdateOrDeleteEmergencyContactWithPriorityShuffle(map, true)
+        personEmergencyContactService.deleteEmergencyContactWithPriorityShuffle(map)
+        def contacts = personEmergencyContactService.getEmergencyContactsByPidm(map.pidm)
 
-        assertEquals("TTTTT", existingContacts[0].firstName)
-        assertEquals("1", existingContacts[0].priority)
+        // The first, second, and third contacts' "last modified" times should be quite close, as they were created at
+        // about the same time, and they were not affected by the deleted one.
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) < 100)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[2].lastModified.getTime()) < 100)
 
-        assertEquals("TTTTT2", existingContacts[1].firstName)
-        assertEquals("2", existingContacts[1].priority)
-
-        assertEquals("TTTTT3", existingContacts[2].firstName)
-        assertEquals("3", existingContacts[2].priority)
+        // All contacts' lastModifiedBy should be the same value, as they were created at
+        // about the same time, and they were not affected by the deleted one.
+        assertEquals GRAILS_USER, contacts[0].lastModifiedBy
+        assertEquals GRAILS_USER, contacts[1].lastModifiedBy
+        assertEquals GRAILS_USER, contacts[2].lastModifiedBy
     }
+    // END Test that records which should be unaffected by CRUD and reprioritization operations have
+    // the same modifiedBy and modifiedByDate values after said operations.
 
     @Test
     void testPopulateEmergencyContact() {
