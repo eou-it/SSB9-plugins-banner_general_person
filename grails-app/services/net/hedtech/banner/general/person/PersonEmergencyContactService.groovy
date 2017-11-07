@@ -31,47 +31,112 @@ class PersonEmergencyContactService extends ServiceBase {
         }
     }
 
-    def createUpdateOrDeleteEmergencyContactWithPriorityShuffle(updatedContact, isDelete=false) {
-        // If priority has been changed, in addition to any updates to the affected contact
-        // we need to shuffle priorities for all contacts.
-        // NOTE: Priority is not updatable, so the strategy is to delete and then re-insert
-        // all pre-existing contacts.
-
-        def contacts = getEmergencyContactsByPidm(updatedContact.pidm)
+    def createEmergencyContactWithPriorityShuffle(newContact) {
+        def contacts = getEmergencyContactsByPidm(newContact.pidm)
         def toBeCreated = []
 
         if (contacts) {
-            // Create list of EXISTING contacts WITHOUT the updated (or new) one
+            def toBeDeleted = []
+
             contacts.each { it ->
-                if (it.id != updatedContact.id) {
-                    // Create a new map that can be inserted back into the table
+                def itPriority = it.priority as Integer
+
+                if (itPriority >= (newContact.priority as Integer)) {
+                    // The new contact is being inserted somewhere before this one, so we have to re-set its
+                    // priority.  As priority is not updateable, we need to delete and re-create.
+                    toBeDeleted << it
                     def contact = populateEmergencyContact(it)
-                    toBeCreated.push(contact)
+                    contact.priority = itPriority + 1 // Bump it up to make a place for the new contact
+                    toBeCreated <<contact
                 }
             }
 
-            if (!isDelete) {
-                // Insert new or updated contact at proper location.
-                // (Priority is one-based, while its place in the list is zero-based, so make the adjustment.)
-                def updatedContactPriority = updatedContact.priority as Integer
-                toBeCreated.add(updatedContactPriority - 1, updatedContact)
+            // Delete the existing ones which have changed priority
+            if (toBeDeleted) {
+                delete(toBeDeleted)
             }
-
-            // Sweep through, setting priority on each one
-            def currentPriority = 1
-
-            toBeCreated.each { it ->
-                it.priority = currentPriority++
-            }
-
-            // Delete all emergency contacts for user
-            delete(contacts)
-        } else if (!isDelete) {
-            // No emergency contacts exist; just insert this one
-            toBeCreated.push(updatedContact)
         }
 
         // (Re)create emergency contacts for user
+        toBeCreated << newContact
+        create(toBeCreated)
+    }
+
+    def updateEmergencyContactWithPriorityShuffle(updatedContact) {
+        def contacts = getEmergencyContactsByPidm(updatedContact.pidm)
+
+        def existingWithSamePriority = contacts.find {
+            it.id == updatedContact.id && it.priority == updatedContact.priority
+        }
+
+        if (existingWithSamePriority) {
+            // Priority has not been updated; this is a simple update of just one contact
+            update(updatedContact)
+        } else {
+            // Priority has changed in the updated contact; priorities of other contacts may need to be shuffled
+            def toBeCreated = []
+            def toBeDeleted = []
+            def currentPriority = 1
+
+            contacts.each {
+                if (it.id == updatedContact.id) {
+                    toBeDeleted << it // Deleting, as it will be replaced by the updated one
+                    toBeCreated << updatedContact
+                } else {
+                    if (currentPriority == updatedContact.priority) {
+                        currentPriority++ // Bump past this position reserved for the updated contact
+                    }
+
+                    if (currentPriority != (it.priority as Integer)) {
+                        // Priority on this needs to change due to the new priority of the updated contact. As priority
+                        // is not updateable, we need to delete and re-create.
+                        toBeDeleted << it
+                        def contact = populateEmergencyContact(it)
+                        contact.priority = currentPriority
+                        toBeCreated << contact
+                    }
+
+                    currentPriority++
+                }
+            }
+
+            // Delete the existing ones which have changed priority
+            if (toBeDeleted) {
+                delete(toBeDeleted)
+            }
+
+            // (Re)create emergency contacts for user
+            create(toBeCreated)
+        }
+    }
+
+    def deleteEmergencyContactWithPriorityShuffle(contactToDelete) {
+        def contacts = getEmergencyContactsByPidm(contactToDelete.pidm)
+        def toBeDeleted = []
+        def toBeCreated = []
+
+        contacts.each {
+            if (it.id == contactToDelete.id) {
+                toBeDeleted << it
+            } else {
+                def itPriority = it.priority as Integer
+                def contactToDeletePriority = contactToDelete.priority as Integer
+
+                if (itPriority > contactToDeletePriority) {
+                    // Priority on this needs to change due to the deleted contact. As priority
+                    // is not updateable, we need to delete and re-create.
+                    toBeDeleted << it
+                    def contact = populateEmergencyContact(it)
+                    contact.priority = itPriority - 1 // Bump it down due to the deleted contact above it
+                    toBeCreated << contact
+                }
+            }
+        }
+
+        // Delete the one specified for deletion as well as the existing ones which have changed priority
+        delete(toBeDeleted)
+
+        // Recreate emergency contacts for user
         create(toBeCreated)
     }
 
