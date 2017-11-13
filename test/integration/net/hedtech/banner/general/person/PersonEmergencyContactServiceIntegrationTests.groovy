@@ -1226,7 +1226,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
     // BEGIN Test that records which should be unaffected by CRUD and reprioritization operations have
     // the same modifiedBy and modifiedByDate values after said operations.
     @Test
-    void testCreateEmergencyContactWithPriorityShuffleAddMultipleContactsAndCheckUnaffectedOnes() {
+    void testCreateEmergencyContactWithPriorityShuffleAddMultipleContactsAndCheckLastModified() {
         def GRAILS_USER = 'GRAILS_USER'
         def SAISUSR = 'SAISUSR'
         def pidm = PersonUtility.getPerson("HOS00001").pidm
@@ -1254,7 +1254,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         assertEquals "TTTTT2", personEmergencyContact.firstName
         assertEquals("2", personEmergencyContact.priority)
 
-        sleep(1000) // Cause different lastModified date than the records above
+        sleep(2000) // Cause different lastModified date than the records above
         login(SAISUSR, 'u_pick_it')
 
         // Create new entity #3
@@ -1266,20 +1266,20 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
 
         // The first and second contacts' "last modified" times should be quite close, as they were created at
         // about the same time.
-        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) < 100)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) < 1800)
 
         // The second and third contacts' "last modified" times should differ by about 1000 ms, as the third one
         // was inserted later.
-        assertTrue('Emergency contact "modified by" times are similar.', Math.abs(contacts[1].lastModified.getTime() - contacts[2].lastModified.getTime()) > 800)
+        assertTrue('Emergency contact "modified by" times are similar.', Math.abs(contacts[1].lastModified.getTime() - contacts[2].lastModified.getTime()) > 1800)
 
         // The first and second contacts' lastModifiedBy should be one value, while the third should be another (see the login above in this test)
-        assertEquals GRAILS_USER, contacts[0].lastModifiedBy
-        assertEquals GRAILS_USER, contacts[1].lastModifiedBy
-        assertEquals SAISUSR, contacts[2].lastModifiedBy
+        assertEquals GRAILS_USER, contacts[0].lastModifiedBy.toUpperCase()
+        assertEquals GRAILS_USER, contacts[1].lastModifiedBy.toUpperCase()
+        assertEquals SAISUSR, contacts[2].lastModifiedBy.toUpperCase()
     }
 
     @Test
-    void testCreateEmergencyContactWithPriorityShuffleDoInsertAtBeginningAndCheckUnaffectedOnes() {
+    void testCreateEmergencyContactWithPriorityShuffleDoInsertAtBeginningAndCheckLastModified() {
         def SAISUSR = 'SAISUSR'
         def pidm = PersonUtility.getPerson("HOS00001").pidm
         def existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
@@ -1317,7 +1317,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         assertEquals("3", personEmergencyContact.priority)
 
         // Insert entity #4 AT BEGINNING
-        sleep(1000) // Cause different lastModified date than the records above
+        sleep(2000) // Cause different lastModified date than the records above
         login(SAISUSR, 'u_pick_it')
 
         map = newValidForCreatePersonEmergencyContact()
@@ -1328,20 +1328,20 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
 
         // All contacts' "last modified" times should be quite close as, although the one now at priority 1 was
         // inserted one second later, all the others had to be updated to new priorities.
-        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) < 100)
-        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[2].lastModified.getTime()) < 100)
-        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[3].lastModified.getTime()) < 100)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) < 1800)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[2].lastModified.getTime()) < 1800)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[3].lastModified.getTime()) < 1800)
 
         // All contacts' lastModifiedBy should be the same value, as they were updated by SAISUSR (see the login above
         // in this test) at the same time as the insert was done and the existing ones were reprioritized.
-        assertEquals SAISUSR, contacts[0].lastModifiedBy
-        assertEquals SAISUSR, contacts[1].lastModifiedBy
-        assertEquals SAISUSR, contacts[2].lastModifiedBy
-        assertEquals SAISUSR, contacts[3].lastModifiedBy
+        assertEquals SAISUSR, contacts[0].lastModifiedBy.toUpperCase()
+        assertEquals SAISUSR, contacts[1].lastModifiedBy.toUpperCase()
+        assertEquals SAISUSR, contacts[2].lastModifiedBy.toUpperCase()
+        assertEquals SAISUSR, contacts[3].lastModifiedBy.toUpperCase()
     }
 
     @Test
-    void testCreateEmergencyContactWithPriorityShuffleDoInsertInMiddleAndCheckUnaffectedOnes() {
+    void testCreateEmergencyContactWithPriorityShuffleDoInsertInMiddleAndCheckLastModified() {
         def GRAILS_USER = 'GRAILS_USER'
         def SAISUSR = 'SAISUSR'
         def pidm = PersonUtility.getPerson("HOS00001").pidm
@@ -1380,7 +1380,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         assertEquals("3", personEmergencyContact.priority)
 
         // Insert entity #4 IN MIDDLE
-        sleep(1000) // Cause different lastModified date than the records above
+        sleep(2000) // Cause different lastModified date than the records above
         login(SAISUSR, 'u_pick_it')
 
         map = newValidForCreatePersonEmergencyContact()
@@ -1391,23 +1391,23 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
 
         // The first and second contacts' "last modified" times should differ by about 1000 ms, as the second one
         // was inserted later.
-        assertTrue('Emergency contact "modified by" times are similar.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) > 800)
+        assertTrue('Emergency contact "modified by" times are similar.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) > 1800)
 
         // The second, third, and fourth "last modified" times should be quite close as the second was inserted, and
         // the priority of the third and fourth had to be updated to new priorities.
-        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[1].lastModified.getTime() - contacts[2].lastModified.getTime()) < 100)
-        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[1].lastModified.getTime() - contacts[3].lastModified.getTime()) < 100)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[1].lastModified.getTime() - contacts[2].lastModified.getTime()) < 1800)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[1].lastModified.getTime() - contacts[3].lastModified.getTime()) < 1800)
 
         // The first contact's lastModifiedBy should be one value, while the second, third, and fourth should be
         // another (see the login above in this test).
-        assertEquals GRAILS_USER, contacts[0].lastModifiedBy
-        assertEquals SAISUSR, contacts[1].lastModifiedBy
-        assertEquals SAISUSR, contacts[2].lastModifiedBy
-        assertEquals SAISUSR, contacts[3].lastModifiedBy
+        assertEquals GRAILS_USER, contacts[0].lastModifiedBy.toUpperCase()
+        assertEquals SAISUSR, contacts[1].lastModifiedBy.toUpperCase()
+        assertEquals SAISUSR, contacts[2].lastModifiedBy.toUpperCase()
+        assertEquals SAISUSR, contacts[3].lastModifiedBy.toUpperCase()
     }
 
     @Test
-    void testUpdateEmergencyContactWithPriorityShuffleDoMoveFromMiddleToFirstAndCheckUnaffectedOnes() {
+    void testUpdateEmergencyContactWithPriorityShuffleDoMoveFromMiddleToFirstAndCheckLastModified() {
         def GRAILS_USER = 'GRAILS_USER'
         def SAISUSR = 'SAISUSR'
         def pidm = PersonUtility.getPerson("HOS00001").pidm
@@ -1460,7 +1460,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         assertEquals(4, existingContacts.size())
 
         // Now MOVE the third one to the beginning
-        sleep(1000) // Cause different lastModified date than the records above
+        sleep(2000) // Cause different lastModified date than the records above
         login(SAISUSR, 'u_pick_it')
 
         map = personEmergencyContactService.populateEmergencyContact(existingContacts[2])
@@ -1472,23 +1472,23 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
 
         // The first, second, and third contacts' "last modified" times should be quite close, as they were created at
         // about the same time.
-        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) < 100)
-        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[2].lastModified.getTime()) < 100)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) < 1800)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[2].lastModified.getTime()) < 1800)
 
         // The third and fourth contacts' "last modified" times should differ by about 1000 ms, as the third one
         // was inserted later.
-        assertTrue('Emergency contact "modified by" times are similar.', Math.abs(contacts[2].lastModified.getTime() - contacts[3].lastModified.getTime()) > 800)
+        assertTrue('Emergency contact "modified by" times are similar.', Math.abs(contacts[2].lastModified.getTime() - contacts[3].lastModified.getTime()) > 1800)
 
         // The first, second, and third contacts' lastModifiedBy should be one value, while the fourth should be
         // another (see the login above in this test)
-        assertEquals SAISUSR, contacts[0].lastModifiedBy
-        assertEquals SAISUSR, contacts[1].lastModifiedBy
-        assertEquals SAISUSR, contacts[2].lastModifiedBy
-        assertEquals GRAILS_USER, contacts[3].lastModifiedBy
+        assertEquals SAISUSR, contacts[0].lastModifiedBy.toUpperCase()
+        assertEquals SAISUSR, contacts[1].lastModifiedBy.toUpperCase()
+        assertEquals SAISUSR, contacts[2].lastModifiedBy.toUpperCase()
+        assertEquals GRAILS_USER, contacts[3].lastModifiedBy.toUpperCase()
     }
 
     @Test
-    void testUpdateEmergencyContactWithPriorityShuffleDoMoveFromMiddleToLastAndCheckUnaffectedOnes() {
+    void testUpdateEmergencyContactWithPriorityShuffleDoMoveFromMiddleToLastAndCheckLastModified() {
         def GRAILS_USER = 'GRAILS_USER'
         def SAISUSR = 'SAISUSR'
         def pidm = PersonUtility.getPerson("HOS00001").pidm
@@ -1541,7 +1541,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         assertEquals(4, existingContacts.size())
 
         // Now MOVE the third one to the end
-        sleep(1000) // Cause different lastModified date than the records above
+        sleep(2000) // Cause different lastModified date than the records above
         login(SAISUSR, 'u_pick_it')
 
         map = personEmergencyContactService.populateEmergencyContact(existingContacts[2])
@@ -1553,26 +1553,26 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
 
         // The first and second contacts' "last modified" times should be quite close, as they were created at
         // about the same time.
-        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) < 100)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) < 1800)
 
         // The third and fourth contacts' "last modified" times should be quite close, as they were modified at
         // about the same time.
-        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[2].lastModified.getTime() - contacts[3].lastModified.getTime()) < 100)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[2].lastModified.getTime() - contacts[3].lastModified.getTime()) < 1800)
 
         // The second and third contacts' "last modified" times should differ by about 1000 ms, as the third one
         // was updated later.
-        assertTrue('Emergency contact "modified by" times are similar.', Math.abs(contacts[1].lastModified.getTime() - contacts[2].lastModified.getTime()) > 800)
+        assertTrue('Emergency contact "modified by" times are similar.', Math.abs(contacts[1].lastModified.getTime() - contacts[2].lastModified.getTime()) > 1800)
 
         // The first and second contacts' lastModifiedBy should be one value, while the third and fourth should be
         // another (see the login above in this test)
-        assertEquals GRAILS_USER, contacts[0].lastModifiedBy
-        assertEquals GRAILS_USER, contacts[1].lastModifiedBy
-        assertEquals SAISUSR, contacts[2].lastModifiedBy
-        assertEquals SAISUSR, contacts[3].lastModifiedBy
+        assertEquals GRAILS_USER, contacts[0].lastModifiedBy.toUpperCase()
+        assertEquals GRAILS_USER, contacts[1].lastModifiedBy.toUpperCase()
+        assertEquals SAISUSR, contacts[2].lastModifiedBy.toUpperCase()
+        assertEquals SAISUSR, contacts[3].lastModifiedBy.toUpperCase()
     }
 
     @Test
-    void testUpdateEmergencyContactWithPriorityShuffleDoMoveFromFirstToLastAndCheckUnaffectedOnes() {
+    void testUpdateEmergencyContactWithPriorityShuffleDoMoveFromFirstToLastAndCheckLastModified() {
         def SAISUSR = 'SAISUSR'
         def pidm = PersonUtility.getPerson("HOS00001").pidm
         def existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
@@ -1624,7 +1624,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         assertEquals(4, existingContacts.size())
 
         // Now MOVE the first one to the end
-        sleep(1000) // Cause different lastModified date than the records above
+        sleep(2000) // Cause different lastModified date than the records above
         login(SAISUSR, 'u_pick_it')
 
         map = personEmergencyContactService.populateEmergencyContact(existingContacts[0])
@@ -1636,20 +1636,20 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
 
         // All contacts' "last modified" times should be quite close as, although the one now at priority 4 was
         // moved there one second later, all the others had to be updated to new priorities.
-        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) < 100)
-        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[2].lastModified.getTime()) < 100)
-        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[3].lastModified.getTime()) < 100)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) < 1800)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[2].lastModified.getTime()) < 1800)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[3].lastModified.getTime()) < 1800)
 
         // All contacts' lastModifiedBy should be the same value, as they were updated by SAISUSR (see the login above
         // in this test) at the same time as the update was done and the existing ones were reprioritized.
-        assertEquals SAISUSR, contacts[0].lastModifiedBy
-        assertEquals SAISUSR, contacts[1].lastModifiedBy
-        assertEquals SAISUSR, contacts[2].lastModifiedBy
-        assertEquals SAISUSR, contacts[3].lastModifiedBy
+        assertEquals SAISUSR, contacts[0].lastModifiedBy.toUpperCase()
+        assertEquals SAISUSR, contacts[1].lastModifiedBy.toUpperCase()
+        assertEquals SAISUSR, contacts[2].lastModifiedBy.toUpperCase()
+        assertEquals SAISUSR, contacts[3].lastModifiedBy.toUpperCase()
     }
 
     @Test
-    void testUpdateEmergencyContactWithPriorityShuffleDoMoveFromLastToFirstAndCheckUnaffectedOnes() {
+    void testUpdateEmergencyContactWithPriorityShuffleDoMoveFromLastToFirstAndCheckLastModified() {
         def SAISUSR = 'SAISUSR'
         def pidm = PersonUtility.getPerson("HOS00001").pidm
         def existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
@@ -1701,7 +1701,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         assertEquals(4, existingContacts.size())
 
         // Now MOVE the last one to the beginning
-        sleep(1000) // Cause different lastModified date than the records above
+        sleep(2000) // Cause different lastModified date than the records above
         login(SAISUSR, 'u_pick_it')
 
         map = personEmergencyContactService.populateEmergencyContact(existingContacts[3])
@@ -1713,20 +1713,20 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
 
         // All contacts' "last modified" times should be quite close as, although the one now at priority 1 was
         // moved there one second later, all the others had to be updated to new priorities.
-        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) < 100)
-        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[2].lastModified.getTime()) < 100)
-        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[3].lastModified.getTime()) < 100)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) < 1800)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[2].lastModified.getTime()) < 1800)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[3].lastModified.getTime()) < 1800)
 
         // All contacts' lastModifiedBy should be the same value, as they were updated by SAISUSR (see the login above
         // in this test) at the same time as the update was done and the existing ones were reprioritized.
-        assertEquals SAISUSR, contacts[0].lastModifiedBy
-        assertEquals SAISUSR, contacts[1].lastModifiedBy
-        assertEquals SAISUSR, contacts[2].lastModifiedBy
-        assertEquals SAISUSR, contacts[3].lastModifiedBy
+        assertEquals SAISUSR, contacts[0].lastModifiedBy.toUpperCase()
+        assertEquals SAISUSR, contacts[1].lastModifiedBy.toUpperCase()
+        assertEquals SAISUSR, contacts[2].lastModifiedBy.toUpperCase()
+        assertEquals SAISUSR, contacts[3].lastModifiedBy.toUpperCase()
     }
 
     @Test
-    void testDeleteEmergencyContactWithPriorityShuffleDoDeleteFirstAndCheckUnaffectedOnes() {
+    void testDeleteEmergencyContactWithPriorityShuffleDoDeleteFirstAndCheckLastModified() {
         def SAISUSR = 'SAISUSR'
         def pidm = PersonUtility.getPerson("HOS00001").pidm
         def existingContacts = personEmergencyContactService.getEmergencyContactsByPidm(pidm)
@@ -1778,7 +1778,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         assertEquals(4, existingContacts.size())
 
         // Now DELETE the first one
-        sleep(1000) // Cause different lastModified date than the records above
+        sleep(2000) // Cause different lastModified date than the records above
         login(SAISUSR, 'u_pick_it')
 
         map = personEmergencyContactService.populateEmergencyContact(existingContacts[0])
@@ -1789,18 +1789,18 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
 
         // All contacts' "last modified" times should be quite close as, although the one originally at priority 1 was
         // deleted there one second later, all the others had to be updated to new priorities.
-        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) < 100)
-        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[2].lastModified.getTime()) < 100)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) < 1800)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[2].lastModified.getTime()) < 1800)
 
         // All contacts' lastModifiedBy should be the same value, as they were updated by SAISUSR (see the login above
         // in this test) at the same time as the delete was done and the existing ones were reprioritized.
-        assertEquals SAISUSR, contacts[0].lastModifiedBy
-        assertEquals SAISUSR, contacts[1].lastModifiedBy
-        assertEquals SAISUSR, contacts[2].lastModifiedBy
+        assertEquals SAISUSR, contacts[0].lastModifiedBy.toUpperCase()
+        assertEquals SAISUSR, contacts[1].lastModifiedBy.toUpperCase()
+        assertEquals SAISUSR, contacts[2].lastModifiedBy.toUpperCase()
     }
 
     @Test
-    void testDeleteEmergencyContactWithPriorityShuffleDoDeleteFromMiddleAndCheckUnaffectedOnes() {
+    void testDeleteEmergencyContactWithPriorityShuffleDoDeleteFromMiddleAndCheckLastModified() {
         def GRAILS_USER = 'GRAILS_USER'
         def SAISUSR = 'SAISUSR'
         def pidm = PersonUtility.getPerson("HOS00001").pidm
@@ -1853,7 +1853,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         assertEquals(4, existingContacts.size())
 
         // Now DELETE the second one
-        sleep(1000) // Cause different lastModified date than the records above
+        sleep(2000) // Cause different lastModified date than the records above
         login(SAISUSR, 'u_pick_it')
 
         map = personEmergencyContactService.populateEmergencyContact(existingContacts[1])
@@ -1864,21 +1864,21 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
 
         // The first and second contacts' "last modified" times should differ by about 1000 ms, as the one originally
         // in the second position was deleted later and the ones below it were moved up in priority.
-        assertTrue('Emergency contact "modified by" times are similar.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) > 800)
+        assertTrue('Emergency contact "modified by" times are similar.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) > 1800)
 
         // The second and third contacts' "last modified" times should be quite close, as they were updated at
         // about the same time.
-        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[1].lastModified.getTime() - contacts[2].lastModified.getTime()) < 100)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[1].lastModified.getTime() - contacts[2].lastModified.getTime()) < 1800)
 
         // The first contact's lastModifiedBy should be one value, while the second and third should be
         // another (see the login above in this test)
-        assertEquals GRAILS_USER, contacts[0].lastModifiedBy
-        assertEquals SAISUSR, contacts[1].lastModifiedBy
-        assertEquals SAISUSR, contacts[2].lastModifiedBy
+        assertEquals GRAILS_USER, contacts[0].lastModifiedBy.toUpperCase()
+        assertEquals SAISUSR, contacts[1].lastModifiedBy.toUpperCase()
+        assertEquals SAISUSR, contacts[2].lastModifiedBy.toUpperCase()
     }
 
     @Test
-    void testDeleteEmergencyContactWithPriorityShuffleDoDeleteLastAndCheckUnaffectedOnes() {
+    void testDeleteEmergencyContactWithPriorityShuffleDoDeleteLastAndCheckLastModified() {
         def GRAILS_USER = 'GRAILS_USER'
         def SAISUSR = 'SAISUSR'
         def pidm = PersonUtility.getPerson("HOS00001").pidm
@@ -1931,7 +1931,7 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
         assertEquals(4, existingContacts.size())
 
         // Now DELETE the last one
-        sleep(1000) // Cause different lastModified date than the records above
+        sleep(2000) // Cause different lastModified date than the records above
         login(SAISUSR, 'u_pick_it')
 
         map = personEmergencyContactService.populateEmergencyContact(existingContacts[3])
@@ -1942,14 +1942,14 @@ class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestC
 
         // The first, second, and third contacts' "last modified" times should be quite close, as they were created at
         // about the same time, and they were not affected by the deleted one.
-        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) < 100)
-        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[2].lastModified.getTime()) < 100)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[1].lastModified.getTime()) < 1800)
+        assertTrue('Emergency contact "modified by" times differ.', Math.abs(contacts[0].lastModified.getTime() - contacts[2].lastModified.getTime()) < 1800)
 
         // All contacts' lastModifiedBy should be the same value, as they were created at
         // about the same time, and they were not affected by the deleted one.
-        assertEquals GRAILS_USER, contacts[0].lastModifiedBy
-        assertEquals GRAILS_USER, contacts[1].lastModifiedBy
-        assertEquals GRAILS_USER, contacts[2].lastModifiedBy
+        assertEquals GRAILS_USER, contacts[0].lastModifiedBy.toUpperCase()
+        assertEquals GRAILS_USER, contacts[1].lastModifiedBy.toUpperCase()
+        assertEquals GRAILS_USER, contacts[2].lastModifiedBy.toUpperCase()
     }
     // END Test that records which should be unaffected by CRUD and reprioritization operations have
     // the same modifiedBy and modifiedByDate values after said operations.
