@@ -344,7 +344,7 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
         def count = PersonRelatedHold.countRecord(new Date())
         assertNotNull count
         Sql sql = new Sql(sessionFactory.getCurrentSession().connection())
-        def result = sql.firstRow("select count(*) as cnt from SPRHOLD where SPRHOLD_TO_DATE > TO_DATE(SYSDATE, 'DD-MM-YY') ")
+        def result = sql.firstRow("select count(*) as cnt from SPRHOLD where SPRHOLD_TO_DATE > TO_DATE(SYSDATE, 'DD-MM-YY') and SPRHOLD_HLDD_CODE <> 'AR' and SPRHOLD_HLDD_CODE <> 'LF' ")
         Long expectCount = result.cnt
         assertNotNull expectCount
         assertEquals expectCount,count
