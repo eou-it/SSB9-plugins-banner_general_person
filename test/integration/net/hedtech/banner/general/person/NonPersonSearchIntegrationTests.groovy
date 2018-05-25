@@ -1,5 +1,5 @@
 /*********************************************************************************
- Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2018 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
@@ -116,7 +116,7 @@ class NonPersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
         def filterData = [:]
         def param = [:]
-        param."bannerId" = "%300000016%"
+        param."bannerId" = "%NP00NP001%"
 
         filterData.params = param
 

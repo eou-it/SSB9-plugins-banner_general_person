@@ -1,5 +1,5 @@
 /*********************************************************************************
-  Copyright 2009-2017 Ellucian Company L.P. and its affiliates.
+  Copyright 2009-2018 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
@@ -351,20 +351,32 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
 
     @Test
     void testFetchByPidmAndAddressSequenceAndType() {
-        def pidm = PersonUtility.getPerson("210009710").pidm
+        def pidm = PersonUtility.getPerson("GDP000001").pidm
         def addressType = AddressType.findByCode("MA")
-        def maxSeqNo = PersonTelephone.fetchMaxSequenceNumber(pidm)
+        def maxSeqNo = PersonTelephone.fetchMaxSequenceNumber(pidm) ?: 0
         def personTelephone = newValidForCreatePersonTelephone()
         personTelephone.pidm = pidm
-        personTelephone.sequenceNumber = maxSeqNo + 1
+        personTelephone.sequenceNumber = maxSeqNo++
         personTelephone.telephoneType = TelephoneType.findByCode("MA")
         personTelephone.addressType = addressType
         personTelephone.addressSequenceNumber = 1
         personTelephone.primaryIndicator = null
         personTelephone.statusIndicator = null
-        personTelephone.save()
+        save personTelephone
+
+        def personTelephone2 = newValidForCreatePersonTelephone()
+        personTelephone2.pidm = pidm
+        personTelephone2.phoneNumber = "9030021"
+        personTelephone2.sequenceNumber = maxSeqNo++
+        personTelephone2.telephoneType = TelephoneType.findByCode("MA")
+        personTelephone2.addressType = addressType
+        personTelephone2.addressSequenceNumber = 1
+        personTelephone2.primaryIndicator = 'Y'
+        personTelephone2.statusIndicator = null
+        save personTelephone2
+
         def phones1 = PersonTelephone.fetchByPidmSequenceNoAndAddressTypeWithoutPrimaryCheck(pidm, 1, addressType)
-        def phone2 = PersonTelephone.fetchByPidmSequenceNoAndAddressType(pidm, 1, addressType)
+        def phone2 = PersonTelephone.fetchByPidmSequenceNoAndAddressType(pidm, 1, addressType) //needs primary
         assertNotNull "The phone for student with primary checked is not as expected ", phone2
         assertTrue "The number of phones for student of address type and address sequence number irrespective of primary checked is not correct ", phones1.size() == 2
     }
@@ -372,10 +384,19 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
 
     @Test
     void testFetchByPidmSequenceNoAndAddressTypeWithPrimaryCheck() {
-        def pidm = PersonUtility.getPerson("210009710").pidm
+        def pidm = PersonUtility.getPerson("GDP000001").pidm
         def addressType = AddressType.findByCode("MA")
+        def maxSeqNo = PersonTelephone.fetchMaxSequenceNumber(pidm) ?: 0
         def personTelephone = newValidForCreatePersonTelephone()
-        personTelephone.save()
+        personTelephone.pidm = pidm
+        personTelephone.sequenceNumber = maxSeqNo + 1
+        personTelephone.telephoneType = TelephoneType.findByCode("MA")
+        personTelephone.addressType = addressType
+        personTelephone.addressSequenceNumber = 1
+        personTelephone.primaryIndicator = 'Y'
+        personTelephone.statusIndicator = null
+        save personTelephone
+
         def phone = PersonTelephone.fetchByPidmSequenceNoAndAddressTypeWithPrimaryCheck(pidm, 1, addressType)
         assertNotNull "The phone for student with primary checked is as expected ", phone
     }
@@ -383,8 +404,8 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
 
     @Test
     void testFetchActiveTelephoneByPidmAndTelephoneType() {
-        def pidm = PersonUtility.getPerson("210009710").pidm
-        def maxSeqNo = PersonTelephone.fetchMaxSequenceNumber(pidm)
+        def pidm = PersonUtility.getPerson("GDP000001").pidm
+        int maxSeqNo = PersonTelephone.fetchMaxSequenceNumber(pidm) ?: 0
         def personTelephone = newValidForCreatePersonTelephone()
         def telephoneType =  TelephoneType.findByCode("PR")
         personTelephone.pidm = pidm
@@ -417,8 +438,8 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
 
     @Test
     void testFetchActiveTelephoneByPidmAndAddressType() {
-        def pidm = PersonUtility.getPerson("210009710").pidm
-        def maxSeqNo = PersonTelephone.fetchMaxSequenceNumber(pidm)
+        def pidm = PersonUtility.getPerson("GDP000001").pidm
+        int maxSeqNo = PersonTelephone.fetchMaxSequenceNumber(pidm) ?: 0
         def telephoneType =  TelephoneType.findByCode("MA")
 
         def sanity = PersonTelephone.findAllByPidm(pidm).size()
@@ -557,7 +578,20 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
 
     @Test
 	void testFetchListActiveTelephoneByPidmAndTelephoneType() {
-		def pidmList = [PersonUtility.getPerson("210009703").pidm, PersonUtility.getPerson("210009710").pidm]
+        def pidm = PersonUtility.getPerson("GDP000001").pidm
+        def addressType = AddressType.findByCode("MA")
+        def maxSeqNo = PersonTelephone.fetchMaxSequenceNumber(pidm) ?: 0
+        def personTelephone = newValidForCreatePersonTelephone()
+        personTelephone.pidm = pidm
+        personTelephone.sequenceNumber = maxSeqNo
+        personTelephone.telephoneType = TelephoneType.findByCode("MA")
+        personTelephone.addressType = addressType
+        personTelephone.addressSequenceNumber = 1
+        personTelephone.primaryIndicator = 'Y'
+        personTelephone.statusIndicator = null
+        save personTelephone
+
+		def pidmList = [PersonUtility.getPerson("GDP000004").pidm, PersonUtility.getPerson("GDP000001").pidm]
 		def results = PersonTelephone.fetchListActiveTelephoneByPidmAndTelephoneType(pidmList, [TelephoneType.findByCode("MA"), TelephoneType.findByCode("PR")])
 
 		assertTrue results.size() > 1
@@ -567,7 +601,20 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
 
     @Test
     void testFetchListActiveTelephoneByPidmAndTelephoneTypeWithPrimaryPrefered() {
-        def pidmList = [PersonUtility.getPerson("210009710").pidm, PersonUtility.getPerson("210009703").pidm]
+        def pidm = PersonUtility.getPerson("GDP000001").pidm
+        def addressType = AddressType.findByCode("MA")
+        def maxSeqNo = PersonTelephone.fetchMaxSequenceNumber(pidm) ?: 0
+        def personTelephone = newValidForCreatePersonTelephone()
+        personTelephone.pidm = pidm
+        personTelephone.sequenceNumber = maxSeqNo + 1
+        personTelephone.telephoneType = TelephoneType.findByCode("MA")
+        personTelephone.addressType = addressType
+        personTelephone.addressSequenceNumber = 1
+        personTelephone.primaryIndicator = 'Y'
+        personTelephone.statusIndicator = null
+        save personTelephone
+
+        def pidmList = [PersonUtility.getPerson("GDP000001").pidm, PersonUtility.getPerson("GDP000004").pidm]
         def results = PersonTelephone.fetchListActiveTelephoneByPidmAndTelephoneTypeWithPrimaryPrefered(pidmList, [TelephoneType.findByCode("MA"), TelephoneType.findByCode("PR")])
 
         assertTrue results.size() > 1
@@ -576,7 +623,7 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
 
     @Test
     void testFetchActiveTelephoneWithUnlistedByPidm() {
-        def pidm = PersonUtility.getPerson("510000001").pidm
+        def pidm = PersonUtility.getPerson("GDP000004").pidm
         def results = PersonTelephone.fetchActiveTelephoneWithUnlistedByPidm(pidm)
 
         assertTrue results.size() > 1
@@ -585,18 +632,18 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
 
     @Test
     void testFetchActiveTelephoneWithUnlistedByPidmAndTelephoneTypeHavingAListedNumber() {
-        def pidm = PersonUtility.getPerson("510000001").pidm
+        def pidm = PersonUtility.getPerson("GDP000004").pidm
         def telephoneType =  TelephoneType.findByCode("PR")
         def results = PersonTelephone.fetchActiveTelephoneWithUnlistedByPidmAndTelephoneType(pidm, telephoneType)
 
-        assertEquals 1, results.size()
+        assertTrue 3 <= results.size()
         assertTrue results[0] instanceof PersonTelephone
-        assertEquals '5551234', results[0].phoneNumber
+        assertTrue results.phoneNumber.contains('2083094')
     }
 
     @Test
     void testFetchActiveTelephoneWithUnlistedByPidmAndTelephoneTypeHavingAnUnlistedNumber() {
-        def pidm = PersonUtility.getPerson("510000001").pidm
+        def pidm = PersonUtility.getPerson("GDP000004").pidm
         def telephoneType =  TelephoneType.findByCode("SE")
         def results = PersonTelephone.fetchActiveTelephoneWithUnlistedByPidmAndTelephoneType(pidm, telephoneType)
 
@@ -608,17 +655,18 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
 
     @Test
     void testFetchTelephonesByPidmAndAddressTypes() {
-        def pidm = PersonUtility.getPerson("210009703").pidm
+        def pidm = PersonUtility.getPerson("GDP000004").pidm
         def results = PersonTelephone.fetchTelephonesByPidmAndAddressTypes([pidm: pidm, addressTypes:['PR']])
 
-        assertEquals 1, results.size()
+        assertTrue 1 < results.size()
         assertTrue results[0] instanceof PersonTelephone
-        assertEquals '3728172', results[0].phoneNumber
+        assertEquals '2083094', results[0].phoneNumber
     }
 
 
 
     private def newValidForCreatePersonTelephone() {
+        i_success_pidm = PersonUtility.getPerson("GDP000005").pidm
         def personTelephone = new PersonTelephone(
                 pidm: i_success_pidm,
                 sequenceNumber: i_success_sequenceNumber,
