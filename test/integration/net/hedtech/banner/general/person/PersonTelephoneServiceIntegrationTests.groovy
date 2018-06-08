@@ -201,7 +201,7 @@ class PersonTelephoneServiceIntegrationTests extends BaseIntegrationTestCase {
         assertNotNull personTelephone.lastModified
         //Update the entity with new invalid values
         personTelephone.addressType = u_failure_addressType
-        personTelephone.phoneArea = u_failure_phoneArea
+        personTelephone.phoneArea = 'TTTTTTTTTTTTTTTTTTTTTTTT' //too long
         personTelephone.phoneNumber = u_failure_phoneNumber
         personTelephone.phoneExtension = u_failure_phoneExtension
         personTelephone.statusIndicator = u_failure_statusIndicator
@@ -254,8 +254,9 @@ class PersonTelephoneServiceIntegrationTests extends BaseIntegrationTestCase {
 
     @Test
     void testFetchAllActiveByPidmInListAndTelephoneTypeCodeInList() {
-        def pidmList = [PersonUtility.getPerson("210009710").pidm]
-        def results = personTelephoneService.fetchAllActiveByPidmInListAndTelephoneTypeCodeInList(pidmList, [TelephoneType.findByCode("MA").code])
+        def pidmList = [PersonUtility.getPerson("GDP000004").pidm, PersonUtility.getPerson("GDP000005").pidm]
+        def typeCodeList = [TelephoneType.findByCode("PR").code]
+        def results = personTelephoneService.fetchAllActiveByPidmInListAndTelephoneTypeCodeInList(pidmList, typeCodeList)
         assertTrue results.size() > 0
         assertTrue results[0] instanceof PersonTelephone
     }
@@ -263,11 +264,11 @@ class PersonTelephoneServiceIntegrationTests extends BaseIntegrationTestCase {
 
     @Test
     void testFetchAllByIdInListAndTelephoneTypeCodeInList() {
-        def pidmList = [PersonUtility.getPerson("210009710").pidm]
+        def pidmList = [PersonUtility.getPerson("GDP000004").pidm]
         List<PersonTelephone> personTelephones = PersonTelephone.findAllByPidmInList(pidmList)
         def idList = personTelephones.collect { it.id }
         assertTrue idList.size() > 0
-        def results = personTelephoneService.fetchAllByIdInListAndTelephoneTypeCodeInList(idList, [TelephoneType.findByCode("MA").code])
+        def results = personTelephoneService.fetchAllByIdInListAndTelephoneTypeCodeInList(idList, [TelephoneType.findByCode("PR").code])
         assertTrue results.size() > 0
         assertTrue results[0] instanceof PersonTelephone
     }
@@ -275,37 +276,37 @@ class PersonTelephoneServiceIntegrationTests extends BaseIntegrationTestCase {
 
 	@Test
 	void testFetchActiveTelephonesByPidmWithUnlisted(){
-		def pidm = PersonUtility.getPerson("510000001").pidm
+		def pidm = PersonUtility.getPerson("GDP000004").pidm
 		def sequenceConfig = [processCode: 'PERSONAL_INFORMATION_SSB', settingName: 'OVERVIEW.PHONE.TYPE']
 
 		def phoneNumbers = personTelephoneService.fetchActiveTelephonesByPidm(pidm, sequenceConfig, true)
 
 		assertEquals 4, phoneNumbers.size()
-		assertEquals '5555000', phoneNumbers[0].phoneNumber
-		assertEquals '301 5555000 51', phoneNumbers[0].displayPhoneNumber
-		assertEquals 2, phoneNumbers[0].sequenceNumber
+		assertEquals '2083094', phoneNumbers[0].phoneNumber
+		assertEquals '215 2083094', phoneNumbers[0].displayPhoneNumber
+		assertEquals 1, phoneNumbers[0].sequenceNumber
 	}
 
 	@Test
 	void testFetchActiveTelephonesByPidmWithoutUnlisted(){
-		def pidm = PersonUtility.getPerson("510000001").pidm
+		def pidm = PersonUtility.getPerson("GDP000004").pidm
 		def sequenceConfig = [processCode: 'PERSONAL_INFORMATION_SSB', settingName: 'OVERVIEW.PHONE.TYPE']
 
 		def phoneNumbers = personTelephoneService.fetchActiveTelephonesByPidm(pidm, sequenceConfig)
 
-		assertEquals 3, phoneNumbers.size()
+		assertTrue 2 <= phoneNumbers.size()
 	}
 
 	@Test
 	void testFetchActiveTelephonesByPidmWithoutSequenceConfigAndWithoutUnlisted(){
-		def pidm = PersonUtility.getPerson("510000001").pidm
+		def pidm = PersonUtility.getPerson("GDP000004").pidm
 
 		def phoneNumbers = personTelephoneService.fetchActiveTelephonesByPidm(pidm)
 
-		assertEquals 3, phoneNumbers.size()
-		assertEquals '5555000', phoneNumbers[0].phoneNumber
+		assertTrue 2 <= phoneNumbers.size()
+		assertEquals '2083094', phoneNumbers[0].phoneNumber
 		assertNull phoneNumbers[0].displayPriority
-		assertEquals '301 5555000 51', phoneNumbers[0].displayPhoneNumber
+		assertEquals '215 2083094', phoneNumbers[0].displayPhoneNumber
 	}
 
 	@Test
@@ -368,7 +369,7 @@ class PersonTelephoneServiceIntegrationTests extends BaseIntegrationTestCase {
 //        )
 //        person.save(flush: true, failOnError: true)
 //        assert person.id
-        def pidm = PersonUtility.getPerson("210009710").pidm
+        def pidm = PersonUtility.getPerson("GDP000004").pidm
         def personTelephone = new PersonTelephone(
                 pidm: pidm,
                 sequenceNumber: i_success_sequenceNumber,

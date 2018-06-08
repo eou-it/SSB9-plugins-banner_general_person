@@ -28,7 +28,7 @@ class PersonAddressByRoleViewIntegrationTests extends BaseIntegrationTestCase {
 
     @Test
     void testCreatePersonAddressByRole() {
-        def pidm = PersonUtility.getPerson("710000006").pidm
+        def pidm = PersonUtility.getPerson("GDP000001").pidm
         def personAddress = newPersonAddress(pidm)
         shouldFail(InvalidDataAccessResourceUsageException)   {
             personAddress.save(failOnError: true, flush: true)
@@ -38,7 +38,7 @@ class PersonAddressByRoleViewIntegrationTests extends BaseIntegrationTestCase {
 
     @Test
     void testUpdatePersonAddressByRole() {
-        def pidm = PersonUtility.getPerson("207000001").pidm
+        def pidm = PersonUtility.getPerson("HOF00736").pidm
         def personAddress = PersonAddressByRoleView.findByPidm(pidm)
 
         // Update domain values
@@ -51,7 +51,7 @@ class PersonAddressByRoleViewIntegrationTests extends BaseIntegrationTestCase {
 
     @Test
     void testDeletePersonAddressByRole() {
-        def pidm = PersonUtility.getPerson("207000001").pidm
+        def pidm = PersonUtility.getPerson("GDP000005").pidm
         def personAddress = PersonAddressByRoleView.findByPidm(pidm)
 
         shouldFail(InvalidDataAccessResourceUsageException)   {
@@ -62,7 +62,7 @@ class PersonAddressByRoleViewIntegrationTests extends BaseIntegrationTestCase {
 
     @Test
     void testFetchByPidmAndRole() {
-        def pidm = PersonUtility.getPerson("207000001").pidm
+        def pidm = PersonUtility.getPerson("GDP000003").pidm
         def employeeAddresses = PersonAddressByRoleView.fetchAddressesByPidmAndRole([pidm:pidm,role:'EMPLOYEE'])
         assertTrue employeeAddresses.size() == 1
 

@@ -111,8 +111,9 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
         //Step 1.
         // Client submits a search query as Lindblom
         //Returned Result for the Advanced Search UI Component
-        def result = personSearchService.personNameSearch("O'Brien", filterData, pagingAndSortParams)
+        def result = personSearchService.personNameSearch("McDonough", filterData, pagingAndSortParams)
         assertNotNull result
+        assertTrue result.size() > 0
         assertTrue result.size() <= 8
         result[0].changeIndicator = ""
         //assertEquals "Lindblom, Atlas", result[0].formattedName
@@ -134,7 +135,7 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
         //Step 1.
         // Client submits a search query
         //Returned Result for the Advanced Search UI Component
-        def result = personSearchService.personNameSearch("O'Brien", filterData, pagingAndSortParams)
+        def result = personSearchService.personNameSearch("McDonough", filterData, pagingAndSortParams)
         assertNotNull result
         assertTrue result.size() > 0
 
@@ -216,7 +217,7 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
      */
     @Test
     void testAdvancedSearchBySsn() {
-        def userId = '210009701' //000277832
+        def userId = 'A00017133' //'210009701' 000277832
         def person = PersonUtility.getPerson( userId )
         assertNotNull( person )
         def personBase = PersonBasicPersonBase.fetchByPidm(person.pidm)
@@ -289,18 +290,18 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
             //Step 1.
             // Client submits a search query to find an exact match
             // Search by SSN
-            //   HOSK00009  999992359
-            def persons = personSearchService.personIdSearch("999-99-2359", filterData, pagingAndSortParams)
+            //   GDP000003 136440386
+            def persons = personSearchService.personIdSearch("136-44-0386", filterData, pagingAndSortParams)
             assertNotNull persons
             assertTrue persons.size() == 0
 
             //Step 2.
             // Client submits a search query by SSN and other parameter(i.e Id)
             // Search by SSN
-            persons = personSearchService.personIdSearch("210009701", filterData, pagingAndSortParams)
+            persons = personSearchService.personIdSearch("GDP000003", filterData, pagingAndSortParams)
 
             assertNotNull persons
-            def ssnFound = persons.find {it.ssn == '210009701'}
+            def ssnFound = persons.find {it.ssn == '136440386'}
             assertNotNull ssnFound
 
             param."lastName" = "%Lopez%"
