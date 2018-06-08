@@ -168,8 +168,9 @@ class PersonTelephoneUtilityIntegrationTests extends BaseIntegrationTestCase {
 
 
     private def newValidPersonInternationalTelephone() {
+        def pidm = PersonUtility.getPerson("GDP000004").pidm
         def personTelephone = new PersonTelephone(
-                pidm: i_success_pidm,
+                pidm: pidm,
                 sequenceNumber: i_success_sequenceNumber,
                 statusIndicator: i_success_statusIndicator,
                 addressSequenceNumber: i_success_addressSequenceNumber,
@@ -188,8 +189,9 @@ class PersonTelephoneUtilityIntegrationTests extends BaseIntegrationTestCase {
 
 
     private def newValidPersonTelephoneWithInternationalAndCountry() {
+        def pidm = PersonUtility.getPerson("GDP000004").pidm
         def personTelephone = new PersonTelephone(
-                pidm: i_success_pidm,
+                pidm: pidm,
                 sequenceNumber: i_success_sequenceNumber,
                 phoneArea: i_success_phoneArea,
                 phoneNumber: i_success_phoneNumber,

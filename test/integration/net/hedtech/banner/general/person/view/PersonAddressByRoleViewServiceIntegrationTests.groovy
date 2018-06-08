@@ -39,7 +39,7 @@ class PersonAddressByRoleViewServiceIntegrationTests extends BaseIntegrationTest
     @Test
     void testGetActiveAddressesByRolesWithUserHavingMultipleRoles() {
         // This user has both STUDENT and EMPLOYEE roles
-        def pidm = PersonUtility.getPerson("710000007").pidm
+        def pidm = PersonUtility.getPerson("GDP000003").pidm
 
         // The PersonAddressByRoleView.fetchAddressesByPidmAndRoles method called by
         // personAddressByRoleViewService.getActiveAddressesByRoles (below) returns
@@ -52,9 +52,24 @@ class PersonAddressByRoleViewServiceIntegrationTests extends BaseIntegrationTest
         def roles = ['STUDENT', 'EMPLOYEE']
 
         def entityResult = PersonAddressByRoleView.fetchAddressesByPidmAndRoles([pidm:pidm, roles:roles])
-        def serviceResult = personAddressByRoleViewService.getActiveAddressesByRoles(roles, pidm)
 
-        assertEquals "Number of results from service should be half that returned by entity method",
-                     serviceResult.size(), entityResult.size() / 2, 0.0
+        Set set = new HashSet()
+        boolean dupesExist = false
+        for(def a : entityResult) {
+            dupesExist = !set.add(a)
+            if(dupesExist) break
+        }
+        assertTrue dupesExist
+
+        def serviceResult = personAddressByRoleViewService.getActiveAddressesByRoles(roles, pidm)
+        assertTrue entityResult.size() >= serviceResult.size()
+
+        set = new HashSet()
+        dupesExist = false
+        for(def a : serviceResult) {
+            dupesExist = !set.add(a)
+            if(dupesExist) break
+        }
+        assertFalse dupesExist
     }
 }

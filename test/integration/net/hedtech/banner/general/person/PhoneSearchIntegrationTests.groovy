@@ -29,7 +29,7 @@ class PhoneSearchIntegrationTests extends BaseIntegrationTestCase {
     void testPhoneSearchByFilterAndPagination() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
-        def filter = "1235000"
+        def filter = "2083094"
         def results = PersonPhoneView.fetchPersonPhone(filter, pagingAndSortParams)
 
         assertNotNull results?.list
@@ -49,7 +49,7 @@ class PhoneSearchIntegrationTests extends BaseIntegrationTestCase {
     void testPhoneSearchWithFormatByFilterAndPagination() {
 
         def pagingAndSortParams = ["max": 8, "offset": 0]
-        def filter = "(215) 372 -"   //610) 111 -
+        def filter = "(215) 208 - " //"(215) 372 -"   //610) 111 -
         def results = PersonPhoneView.fetchPersonPhone(filter, pagingAndSortParams)
 
         assertNotNull results?.list
@@ -66,7 +66,7 @@ class PhoneSearchIntegrationTests extends BaseIntegrationTestCase {
     @Test
     void testPhoneSearchByFilter() {
 
-        def filter = "1235000"
+        def filter = "2083094"
         def results = PersonPhoneView.fetchByPhone(filter)
 
         assertNotNull results
@@ -114,9 +114,9 @@ class PhoneSearchIntegrationTests extends BaseIntegrationTestCase {
     @Test
     void testPhoneSearchByFilterAndPidm() {
         def pidmList = []
-        pidmList.add(new Integer("354"))
+        pidmList.add(new Integer(PersonUtility.getPerson("GDP000005").pidm))
 
-        def filter = "3728172"
+        def filter = "2083094"
 
         def resultsMany = PersonPhoneView.fetchByPhone(filter)
 

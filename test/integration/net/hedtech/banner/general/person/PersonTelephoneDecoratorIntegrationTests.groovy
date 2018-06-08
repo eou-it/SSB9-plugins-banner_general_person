@@ -52,14 +52,14 @@ class PersonTelephoneDecoratorIntegrationTests extends BaseIntegrationTestCase {
 
     @Test
     void testNewSectionFromSprtele() {
-        def personPidm = PersonUtility.getPerson("HOF00746").pidm
+        def personPidm = PersonUtility.getPerson("GDP000004").pidm
         def personTelephone = PersonTelephone.fetchActiveTelephoneByPidmAndTelephoneType(personPidm, 'PR')
         assertNotNull personTelephone.pidm
         assertNotNull personTelephone.telephoneType
         def newPersonTelephone = new PersonTelephoneDecorator(personTelephone)
-        assertEquals newPersonTelephone.phoneArea, "215"
-        assertEquals newPersonTelephone.phoneNumber, "3728172"
-        assertEquals newPersonTelephone.displayPhone, "215 3728172"
+        assertEquals "312", newPersonTelephone.phoneArea
+        assertEquals "5568001", newPersonTelephone.phoneNumber
+        assertEquals "312 5568001", newPersonTelephone.displayPhone
     }
 
 
