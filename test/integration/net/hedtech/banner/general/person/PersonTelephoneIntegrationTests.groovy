@@ -32,7 +32,7 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
     def i_success_nation
     def i_success_source
 
-    def i_success_pidm = 354
+    def i_success_pidm
     def i_success_sequenceNumber = 1
     def i_success_phoneArea = "TTTTT"
     def i_success_phoneNumber = "TTTTT"
@@ -44,10 +44,10 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
     def i_success_commentData = "TTTTT"
     def i_success_internationalAccess = "TTTTT"
     def i_success_countryPhone = "TTTT"
+
     //Invalid test data (For failure tests)
     def i_failure_telephoneType
     def i_failure_addressType
-
     def i_failure_pidm = 2
     def i_failure_sequenceNumber = 1
     def i_failure_phoneArea = "TTTTT"
@@ -65,7 +65,6 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
     //Valid test data (For success tests)
     def u_success_telephoneType
     def u_success_addressType
-
     def u_success_pidm = 999
     def u_success_sequenceNumber = 1
     def u_success_phoneArea = "WWWWW"
@@ -82,7 +81,6 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
     //Valid test data (For failure tests)
     def u_failure_telephoneType
     def u_failure_addressType
-
     def u_failure_pidm = 999
     def u_failure_sequenceNumber = 1
     def u_failure_phoneArea = "TTTTT"
@@ -111,6 +109,8 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
     //This method is used to initialize test data for references.
     //A method is required to execute database calls as it requires a active transaction
     void initializeTestDataForReferences() {
+        i_success_pidm = PersonUtility.getPerson("210009703").pidm
+
         //Valid test data (For success tests)
         i_success_telephoneType = TelephoneType.findByCode("GR")
 

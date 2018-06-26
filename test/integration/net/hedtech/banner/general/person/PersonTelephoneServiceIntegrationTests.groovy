@@ -20,7 +20,7 @@ class PersonTelephoneServiceIntegrationTests extends BaseIntegrationTestCase {
     //Valid test data (For success tests)
     def i_success_telephoneType
     def i_success_addressType
-    def i_success_pidm = 1
+    def i_success_pidm
     def i_success_sequenceNumber = 1
     def i_success_phoneArea = "TTTTT"
     def i_success_phoneNumber = "TTTTT"
@@ -94,6 +94,8 @@ class PersonTelephoneServiceIntegrationTests extends BaseIntegrationTestCase {
     //A method is required to execute database calls as it requires a active transaction
     void initializeTestDataForReferences() {
         //Valid test data (For success tests)
+        i_success_pidm = PersonUtility.getPerson("207000001").pidm
+
         i_success_telephoneType = TelephoneType.findByCode("TE")
         i_success_addressType = AddressType.findByCode("MA")
 
