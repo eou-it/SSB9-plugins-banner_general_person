@@ -94,4 +94,64 @@ class PersonRelatedHoldService extends ServiceBase {
             session.getNamedQuery("PersonRelatedHold.fetchById").setLong('id', id).uniqueResult()
         }
     }
+
+    def getWebDisplayableHolds(def pidm) {
+
+        def result = [rows: [], message: '']
+        def list = PersonRelatedHold.fetchByPidmAndDateBetween(new Integer(pidm), new Date())
+
+        if(list.size() == 0) {
+            result.message = 'noHoldsExist'
+        }
+        else {
+            def webList = list.findAll { it -> it.holdType.displayWebIndicator }
+
+            if (webList.size() == 0) {
+                result.message = 'noWebHoldsExist'
+            }
+            else {
+                webList.each { it ->
+                    def holdFor = []
+                    if (it.holdType.accountsReceivableHoldIndicator) {
+                        holdFor.add('accountsReceivable')
+                    }
+                    if (it.holdType.registrationHoldIndicator) {
+                        holdFor.add('registration')
+                    }
+                    if (it.holdType.transcriptHoldIndicator) {
+                        holdFor.add('transcripts')
+                    }
+                    if (it.holdType.graduationHoldIndicator) {
+                        holdFor.add('graduation')
+                    }
+                    if (it.holdType.gradeHoldIndicator) {
+                        holdFor.add('grades')
+                    }
+                    if (it.holdType.enrollmentVerificationHoldIndicator) {
+                        holdFor.add('enrollmentVerification')
+                    }
+                    if (it.holdType.applicationHoldIndicator) {
+                        holdFor.add('application')
+                    }
+                    if (it.holdType.complianceHoldIndicator) {
+                        holdFor.add('evaluation')
+                    }
+
+                    def hold = [
+                            hold_for     : holdFor,
+                            r_amount_owed: it.amountOwed,
+                            r_from_date  : it.fromDate,
+                            r_reason     : it.reason,
+                            r_to_date    : it.toDate,
+                            stvhold_desc : it.holdType.description,
+                            stvorig_desc : it.originator?.description
+                    ]
+
+                    result.rows.add(hold)
+                }
+            }
+        }
+
+        return result
+    }
 }

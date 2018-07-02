@@ -339,6 +339,42 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
         assertEquals(personRelatedHold, personRelatedHoldService.fetchById(personRelatedHold.id))
     }
 
+    @Test
+    void testGetWebDisplayableHolds() {
+        def pidm = PersonUtility.getPerson("STUAFR320").pidm
+        def result = personRelatedHoldService.getWebDisplayableHolds(pidm)
+
+        assertNotNull result.message
+        assertTrue result.rows.size() > 0
+
+        def row = result.rows.find { it -> it.r_reason.equals('This one has them all') }
+
+        assertTrue row.hold_for.contains('evaluation')
+        assertEquals 111.22, row.r_amount_owed
+        assertEquals '06/11/2014', row.r_from_date.format('MM/dd/yyyy')
+        assertEquals 'This one has them all', row.r_reason
+        assertEquals '12/31/2025', row.r_to_date.format('MM/dd/yyy')
+        assertEquals 'Compliance Hold', row.stvhold_desc
+        assertEquals 'Hold Originator', row.stvorig_desc
+    }
+
+    @Test
+    void testGetWebDisplayableHoldsNoWeb() {
+        def pidm = PersonUtility.getPerson("STUAFR311").pidm
+        def result = personRelatedHoldService.getWebDisplayableHolds(pidm)
+
+        assertEquals 'noWebHoldsExist', result.message
+        assertTrue result.rows.size() == 0
+    }
+
+    @Test
+    void testGetWebDisplayableHoldsNoHolds() {
+        def pidm = PersonUtility.getPerson("GDP000005").pidm
+        def result = personRelatedHoldService.getWebDisplayableHolds(pidm)
+
+        assertEquals 'noHoldsExist', result.message
+        assertTrue result.rows.size() == 0
+    }
 
     private def newPersonRelatedHold() {
 
