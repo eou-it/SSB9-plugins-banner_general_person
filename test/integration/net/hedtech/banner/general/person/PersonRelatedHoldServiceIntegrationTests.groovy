@@ -340,6 +340,27 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
     }
 
     @Test
+    void testGetWebDisplayableHoldsAllTypes() {
+        def pidm = PersonUtility.getPerson("A00017091").pidm
+        def result = personRelatedHoldService.getWebDisplayableHolds(pidm)
+
+        assertNotNull result.message
+        assertTrue result.rows.size() > 0
+
+        def row = result.rows.find { it -> it.r_reason.equals('bbb') }
+
+        assertTrue row.hold_for.contains('transcripts')
+        assertTrue row.hold_for.contains('grades')
+        assertTrue row.hold_for.contains('enrollmentVerification')
+        assertEquals 1.0, row.r_amount_owed, 0.0
+        assertEquals '01/24/2018', row.r_from_date.format('MM/dd/yyyy')
+        assertEquals 'bbb', row.r_reason
+        assertEquals '12/31/2099', row.r_to_date.format('MM/dd/yyy')
+        assertEquals 'Testing Hold by Gopal 1', row.stvhold_desc
+        assertEquals 'Student Accounts Office', row.stvorig_desc
+    }
+
+    @Test
     void testGetWebDisplayableHolds() {
         def pidm = PersonUtility.getPerson("STUAFR320").pidm
         def result = personRelatedHoldService.getWebDisplayableHolds(pidm)
