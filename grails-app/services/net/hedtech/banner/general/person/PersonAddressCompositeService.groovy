@@ -12,17 +12,17 @@ class PersonAddressCompositeService {
     boolean transactional = true
     def sessionFactory
 
-    def createOrUpdate(map) {
+    def createOrUpdate(map, overwrite = true) {
         if (map?.deletePersonAddressTelephones) {
             processDeletes(map.deletePersonAddressTelephones.collect{it.personAddress})
         }
         if (map?.createPersonAddressTelephones) {
-            processInsertUpdates(map.createPersonAddressTelephones)
+            processInsertUpdates(map.createPersonAddressTelephones, overwrite)
         }
     }
 
 
-    private void processInsertUpdates(domains) {
+    private void processInsertUpdates(domains, overwrite = true) {
         def address
         domains.each { domain ->
             //As the edits for the address checking are done in API, we will not do them here.
@@ -36,7 +36,13 @@ class PersonAddressCompositeService {
                 }  }
             else   {
                 checkDatesForUpdate(domain.personAddress)
-                personAddressService.update(domain.personAddress)
+
+                if (overwrite) {
+                    personAddressService.update(domain.personAddress)
+                } else {
+                    updateWithoutOverwrite(domain.personAddress)
+                }
+
                 if (domain.telephoneSequenceNumber)     {
                 // if delete issue an error here
                     def telephone = PersonTelephone.fetchByPidmTelephoneTypeAndTelephoneSequence([pidm:domain.personAddress.pidm,telephoneType:domain.telephoneType,telephoneSequenceNumber:domain.telephoneSequenceNumber])
@@ -59,6 +65,17 @@ class PersonAddressCompositeService {
         }
     }
 
+    private void updateWithoutOverwrite(address) {
+        def existingAddr = personAddressService.get(address.id)
+
+        // Archive the old address as inactive
+        if (existingAddr) {
+            existingAddr.statusIndicator = 'I'
+            personAddressService.update(existingAddr)
+        }
+
+        personAddressService.create([domainModel:address])
+    }
 
     private void processDeletes(domains) {
         domains.each { domain ->
