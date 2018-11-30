@@ -30,7 +30,7 @@ class PersonAddressCompositeService {
                 if (!(domain.personAddress.statusIndicator == 'I'))
                     checkDatesForCreate(domain.personAddress)
                 address = personAddressService.create([domainModel:domain.personAddress])
-                if ((domain?.telephoneType) || (domain?.countryPhone) || (domain?.phoneArea) || (domain?.phoneNumber) || (domain?.phoneExtension))      {
+                if ((domain.telephoneType) || (domain.countryPhone) || (domain.phoneArea) || (domain.phoneNumber) || (domain.phoneExtension))      {
                     checkPhone(domain)
                     personTelephoneService.create([pidm:domain.personAddress.pidm,telephoneType:domain.telephoneType,countryPhone:domain.countryPhone,phoneArea:domain.phoneArea,phoneNumber:domain.phoneNumber,phoneExtension:domain.phoneExtension,addressType:domain.personAddress.addressType,addressSequenceNumber:address.sequenceNumber])
                 }  }
@@ -57,7 +57,7 @@ class PersonAddressCompositeService {
                     telephone.telephoneType = domain.telephoneType
                     personTelephoneService.update(telephone)}
                 else
-                    if ((domain?.telephoneType) || (domain?.countryPhone) || (domain?.phoneArea) || (domain?.phoneNumber) || (domain?.phoneExtension))      {
+                    if ((domain.telephoneType) || (domain.countryPhone) || (domain.phoneArea) || (domain.phoneNumber) || (domain.phoneExtension))      {
                         checkPhone(domain)
                         personTelephoneService.create([pidm:domain.personAddress.pidm,addressType:domain.personAddress.addressType,addressSequenceNumber:domain.personAddress.sequenceNumber,telephoneType:domain.telephoneType,countryPhone:domain.countryPhone,phoneArea:domain.phoneArea,phoneNumber:domain.phoneNumber,phoneExtension:domain.phoneExtension])
                     }
