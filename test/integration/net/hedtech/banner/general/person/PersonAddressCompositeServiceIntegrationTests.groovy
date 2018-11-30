@@ -243,6 +243,87 @@ class PersonAddressCompositeServiceIntegrationTests extends BaseIntegrationTestC
 
 
     @Test
+    void testCreateActiveAddressesWithArchival() {
+        //Create 2 new addresses both active
+        def ipidm = PersonIdentificationName.findByBannerId("HOF00714").pidm
+        def personAddressTelephones = newPersonAddressTelephones(null)
+        def personAddresses = PersonAddress.findAllByPidm(ipidm)
+        def initSize = personAddresses.size()
+        personAddressCompositeService.createOrUpdate(
+                [
+                        createPersonAddressTelephones: personAddressTelephones,
+                ])
+        personAddresses = PersonAddress.findAllByPidm(ipidm)
+        assertTrue "The number of addresses expected for HOF00714 is " + initSize.plus(2) + " but found "+ personAddresses.size(),personAddresses.size() == initSize.plus(2)
+        //Create another address of same atyp as one of the two just created
+        personAddressTelephones = newSinglePersonAddress("PO",new Date().plus(3),new Date().plus(10))
+        personAddressCompositeService.createOrUpdate(
+                [
+                        createPersonAddressTelephones: personAddressTelephones,
+                ], false)
+        personAddresses = PersonAddress.findAllByPidm(ipidm)
+        assertTrue "The number of addresses expected for HOF00714 is " + initSize.plus(3) + " but found "+ personAddresses.size(),personAddresses.size() == initSize.plus(3)
+        personAddresses.each{ it ->
+            if (it.addressType.code == 'PO' && it.sequenceNumber == 2) {
+                assertTrue it.streetLine1 == "i_streetLine11" && it.streetLine2 == "i_streetLine21" && it.streetLine3 == "i_streetLine31"
+            }
+        }
+    }
+
+
+    @Test
+    void testUpdateAddressWithArchival() {
+        def ipidm = PersonIdentificationName.findByBannerId("GDP000001").pidm
+        def personAddressTelephones
+        def personAddresses = PersonAddress.findAllByPidm(ipidm)
+        def initSize = personAddresses.size()
+        def initStreet1 = ''
+        personAddressTelephones = []
+        personAddresses.each{ it ->
+            if (it.addressType.code == 'MA') {
+                initStreet1 = it.streetLine1
+                def updatedAddress = [:]
+                updatedAddress.id = it.id
+                updatedAddress.version = it.version
+                updatedAddress.pidm = it.pidm
+                updatedAddress.addressType = it.addressType
+                updatedAddress.fromDate = it.fromDate
+                updatedAddress.toDate = it.toDate
+                updatedAddress.houseNumber = it.houseNumber
+                updatedAddress.streetLine1 = 'Test Update 1'
+                updatedAddress.streetLine2 = it.streetLine2
+                updatedAddress.streetLine3 = it.streetLine3
+                updatedAddress.streetLine4 = it.streetLine4
+                updatedAddress.city = it.city
+                updatedAddress.county = it.county
+                updatedAddress.state = it.state
+                updatedAddress.zip = it.zip
+                updatedAddress.nation = it.nation
+
+                personAddressTelephones << [personAddress: updatedAddress]
+            }
+        }
+        personAddressCompositeService.createOrUpdate(
+                [
+                        createPersonAddressTelephones: personAddressTelephones,
+                ], false)
+        personAddresses = PersonAddress.findAllByPidm(ipidm)
+        assert extractAddressTypes(personAddresses).contains('MA')
+        assertEquals initSize+1, personAddresses.size()
+
+        def updatedAddr = personAddresses.find( { it ->
+            it.addressType.code == 'MA' && it.statusIndicator != 'I'
+        })
+        assertEquals 'Test Update 1', updatedAddr.streetLine1
+
+        def archivedAddr = personAddresses.find( { it ->
+            it.addressType.code == 'MA' && it.statusIndicator == 'I'
+        })
+        assertEquals initStreet1, archivedAddr.streetLine1
+    }
+
+
+    @Test
     void testUpdateAddressCannotDeletePhone() {
         //Update of addresses along with updating the telephone with new telephones.  ie. update of sprtele
         def ipidm = PersonIdentificationName.findByBannerId("HOF00714").pidm
