@@ -1,11 +1,11 @@
 /*********************************************************************************
- Copyright 2009-2017 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2019 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
-
 package net.hedtech.banner.general.person
 
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.common.GeneralValidationCommonConstants
+import net.hedtech.banner.general.overall.ldm.GlobalUniqueIdentifierService
 import net.hedtech.banner.general.system.InstitutionalDescription
 import net.hedtech.banner.query.DynamicFinder
 import net.hedtech.banner.service.ServiceBase
@@ -26,6 +26,7 @@ class PersonIdentificationNameCurrentService extends ServiceBase {
 
     boolean transactional = true
     def sessionFactory
+    GlobalUniqueIdentifierService globalUniqueIdentifierService
 
 
     def preCreate(domainModelOrMap) {
@@ -97,6 +98,7 @@ class PersonIdentificationNameCurrentService extends ServiceBase {
         }
     }
 
+
     def fetchAllWithGuidByPidmInList(Collection<Integer> pidms, String sortField = null, String sortOrder = null) {
         List rows = []
         if (pidms) {
@@ -125,6 +127,24 @@ class PersonIdentificationNameCurrentService extends ServiceBase {
         return rows
     }
 
+
+    def getPidmToGuidMap(Collection<Integer> pidms) {
+        def entities = []
+        if (!pidms) {
+            return entities
+        }
+        Collection<String> strPidms = pidms.collect { it.toString() }
+        Collection<Collection<String>> subLists = strPidms.collate(1000)
+        subLists.each {
+            def subEntities = globalUniqueIdentifierService.fetchAllByLdmNameAndDomainKeyInList(GeneralValidationCommonConstants.PERSONS_LDM_NAME, it)
+            if (subEntities) {
+                entities.addAll(subEntities)
+            }
+        }
+        return entities.collectEntries { [it.domainKey?.toInteger(), it.guid] }
+    }
+
+
     def fetchByGuid(String guid) {
         Map row = [:]
         if (guid) {
@@ -145,11 +165,13 @@ class PersonIdentificationNameCurrentService extends ServiceBase {
         return row
     }
 
+
     def getCurrentNameByPidm(pidm) {
         def currentName = PersonIdentificationNameCurrent.fetchByPidm(pidm)
 
         return currentName
     }
+
 
     private String getGuidJoinHQL() {
         def query = """FROM PersonIdentificationNameCurrent a, GlobalUniqueIdentifier b
@@ -158,6 +180,7 @@ class PersonIdentificationNameCurrentService extends ServiceBase {
                      """
         return query
     }
+
 
     def List<PersonIdentificationNameCurrent> fetchAllByCriteria(Map content, String sortField = null, String sortOrder = null, int max = 0, int offset = -1) {
         def params = [:]

@@ -1,14 +1,21 @@
 /*********************************************************************************
-Copyright 2012-2017 Ellucian Company L.P. and its affiliates.
-**********************************************************************************/
-
+ Copyright 2012-2019 Ellucian Company L.P. and its affiliates.
+ **********************************************************************************/
 package net.hedtech.banner.general.person
 
 import groovy.sql.Sql
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.common.GeneralValidationCommonConstants
 import net.hedtech.banner.general.overall.ldm.GlobalUniqueIdentifier
-import net.hedtech.banner.general.system.*
+import net.hedtech.banner.general.system.CitizenType
+import net.hedtech.banner.general.system.Ethnicity
+import net.hedtech.banner.general.system.Legacy
+import net.hedtech.banner.general.system.MaritalStatus
+import net.hedtech.banner.general.system.NameType
+import net.hedtech.banner.general.system.Nation
+import net.hedtech.banner.general.system.Religion
+import net.hedtech.banner.general.system.State
+import net.hedtech.banner.general.system.UnitOfMeasure
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 import org.junit.After
 import org.junit.Before
@@ -19,6 +26,7 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
     def personIdentificationNameCurrentService
 
     final def GENERATED = "GENERATED"
+
 
     @Before
     public void setUp() {
@@ -53,6 +61,7 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
         def alternatePersons = PersonIdentificationNameAlternate.fetchAllByPidm(currentPerson.pidm)
         assertEquals 0, alternatePersons.size()
     }
+
 
     @Test
     void testCreatePersonIdentificationNameCurrentWithGeneratedId() {
@@ -206,7 +215,6 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
         assertEquals origMiddleName, alternatePerson.middleName
         assertEquals 0L, alternatePerson.version
     }
-
 
 
     @Test
@@ -384,6 +392,7 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
         assertEquals "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL", person2.fullName
     }
 
+
     @Test
     void testGetCurrentNameByPidm() {
         def person = setupNewPersonIdentificationNameCurrent()
@@ -394,8 +403,8 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
         def val = personIdentificationNameCurrentService.getCurrentNameByPidm(pidm)
 
         assertNotNull(val)
-        assertEquals 'Troy',  val.firstName
-        assertEquals 'W',     val.middleName
+        assertEquals 'Troy', val.firstName
+        assertEquals 'W', val.middleName
         assertEquals 'Adams', val.lastName
     }
 
@@ -497,6 +506,7 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
         assertEquals "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL", nonPerson2.fullName
     }
 
+
     @Test
     void testFetchByGuid() {
         PersonIdentificationNameCurrent personIdentificationNameCurrent = setupNewPersonIdentificationNameCurrent()
@@ -529,6 +539,7 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
         assertTrue entitiesMap.isEmpty()
     }
 
+
     @Test
     void testFetchAllWithGuidByCriteria() {
         PersonIdentificationNameCurrent personIdentificationNameCurrent = setupNewPersonIdentificationNameCurrent()
@@ -549,9 +560,10 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
         }
     }
 
+
     @Test
-    void testFetchAllByCriteria(){
-        List entities = personIdentificationNameCurrentService.fetchAllByCriteria([:], null,null,5)
+    void testFetchAllByCriteria() {
+        List entities = personIdentificationNameCurrentService.fetchAllByCriteria([:], null, null, 5)
         assertFalse entities.isEmpty()
         assertTrue entities.size() == 5
         entities.each {
@@ -561,6 +573,17 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
             assertNull entitiesPerson.changeIndicator
             assertEquals entitiesPerson.entityIndicator, 'P'
         }
+    }
+
+
+    @Test
+    void testGetPidmToGuidMap() {
+        List<PersonIdentificationNameCurrent> entities = personIdentificationNameCurrentService.fetchAllByCriteria([:])
+        assertFalse entities.isEmpty()
+        List<Integer> pidms = entities.collect { it.pidm }
+        def map = personIdentificationNameCurrentService.getPidmToGuidMap(pidms)
+        assertNotNull map
+        assertEquals pidms.size(), map.size()
     }
 
     // *************************************************************************************************************
@@ -642,6 +665,7 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
 
         return bannerValues.pidm
     }
+
 
     private def setupNewPersonBasicPersonBase(personIdentificationCurrent) {
         def unitOfMeasure = UnitOfMeasure.findByCode("LB")
@@ -755,6 +779,7 @@ class PersonIdentificationNameCurrentServiceIntegrationTests extends BaseIntegra
 
         return personBasicPersonBase
     }
+
 
     private def newUnitOfMeasure() {
         def unitOfMeasure = new UnitOfMeasure(
