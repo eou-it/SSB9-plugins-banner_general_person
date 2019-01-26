@@ -1,5 +1,5 @@
 /*********************************************************************************
- Copyright 2009-2016 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2019 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 import org.junit.Before
@@ -445,7 +445,7 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
 
         def emails = PersonEmail.fetchByPidmAndActiveAndWebDisplayable(pidm)
 
-        assertEquals 1, emails.size()
+        assertEquals 2, emails.size()
         assertEquals 'ansbates@telstra.com', emails[0].emailAddress
     }
 
