@@ -176,7 +176,7 @@ class PersonIdentificationNameCurrentService extends ServiceBase {
     private String getGuidJoinHQL() {
         def query = """FROM PersonIdentificationNameCurrent a, GlobalUniqueIdentifier b
                             where a.entityIndicator = 'P' and a.changeIndicator is null
-                            and b.domainKey = a.pidm and b.ldmName = :ldmName
+                            and b.domainKey = to_char(a.pidm) and b.ldmName = :ldmName
                      """
         return query
     }
