@@ -230,7 +230,8 @@ class PersonEmailCompositeServiceIntegrationTests extends BaseIntegrationTestCas
 
     @Test
     void testFetchByEmailAddressByVendorPidmAndSearchOptionList( ) {
-        def result = personEmailCompositeService.fetchEmailAddressList( 30450 , [searchParam:'dhareppa'],  [max: 10, offset: 0] )
+        def pidm = PersonUtility.getPerson("VENDEMAL1").pidm
+        def result = personEmailCompositeService.fetchEmailAddressList( pidm , [searchParam:'dhareppa'],  [max: 10, offset: 0] )
         assertTrue  result.size() > 0
     }
 

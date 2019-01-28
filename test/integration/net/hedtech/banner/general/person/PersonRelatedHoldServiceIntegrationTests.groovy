@@ -356,7 +356,7 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
         assertEquals '01/24/2018', row.r_from_date.format('MM/dd/yyyy')
         assertEquals 'bbb', row.r_reason
         assertEquals '12/31/2099', row.r_to_date.format('MM/dd/yyy')
-        assertEquals 'Testing Hold by Gopal 1', row.stvhold_desc
+        assertEquals 'AH Reg Hold 01', row.stvhold_desc
         assertEquals 'Student Accounts Office', row.stvorig_desc
     }
 

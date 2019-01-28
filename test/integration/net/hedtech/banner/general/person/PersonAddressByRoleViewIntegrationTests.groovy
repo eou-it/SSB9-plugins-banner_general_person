@@ -38,7 +38,7 @@ class PersonAddressByRoleViewIntegrationTests extends BaseIntegrationTestCase {
 
     @Test
     void testUpdatePersonAddressByRole() {
-        def pidm = PersonUtility.getPerson("HOF00736").pidm
+        def pidm = PersonUtility.getPerson("GDP000003").pidm
         def personAddress = PersonAddressByRoleView.findByPidm(pidm)
 
         // Update domain values

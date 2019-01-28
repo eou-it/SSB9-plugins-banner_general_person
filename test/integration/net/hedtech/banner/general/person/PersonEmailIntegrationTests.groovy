@@ -371,14 +371,14 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     @Test
     void testFetchByEmailAddressAndActiveStatus_ActivePreferred( ) {
         PersonEmail result = PersonEmail.fetchByEmailAddressAndActiveStatus( "Ben29322@Ellucian.edu" )
-        assertEquals( 29322, result.pidm )
+        assertEquals( "Ben29322@Ellucian.edu" , result.emailAddress )
     }
 
 
     @Test
     void testFetchByEmailAddressCaseInsensitive( ) {
         PersonEmail result = PersonEmail.fetchByEmailAddressAndActiveStatus( "beN29322@Ellucian.edu" )
-        assertEquals( 29322, result.pidm )
+        assertEquals( "beN29322@Ellucian.edu".toUpperCase(), result.emailAddress.toUpperCase() )
     }
 
 
@@ -386,7 +386,7 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
     void testFetchByEmailAddressAndActiveStatus_ActiveNotPreferred( ) {
         def result = PersonEmail.fetchByEmailAddressAndActiveStatus( "Neil29311@Ellucian.edu" )
         assertTrue result instanceof PersonEmail
-        assertEquals( 29311, result.pidm )
+        assertEquals( "Neil29311@Ellucian.edu".toUpperCase(), result.emailAddress.toUpperCase() )
     }
 
 
@@ -529,7 +529,8 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
 
     @Test
     void testFetchByEmailAddressByVendorPidmAndSearchOption( ) {
-        def result = PersonEmail.fetchByPidmsAndActiveStatusEmails( 30450 , 'DHAREPPA%',  [max: 10, offset: 0] )
+        def pidm = PersonUtility.getPerson("VENDEMAL1").pidm
+        def result = PersonEmail.fetchByPidmsAndActiveStatusEmails( pidm , 'DHAREPPA%',  [max: 10, offset: 0] )
         assertTrue  result.size() > 0
     }
 
