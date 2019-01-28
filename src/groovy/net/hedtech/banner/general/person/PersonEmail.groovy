@@ -1,5 +1,5 @@
 /*********************************************************************************
- Copyright 2009-2017 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2019 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
@@ -86,7 +86,6 @@ import javax.persistence.*
                 query = """FROM PersonEmail a
     WHERE a.pidm = :pidm
     AND a.displayWebIndicator = 'Y'
-    AND a.emailType.displayWebIndicator = 'Y'
     AND a.statusIndicator = 'A' """),
         @NamedQuery(name = "PersonEmail.fetchByPidmsAndPreferredIndicator",
                 query = """FROM PersonEmail a

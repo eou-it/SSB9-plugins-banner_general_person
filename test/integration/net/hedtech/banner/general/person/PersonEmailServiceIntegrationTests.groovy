@@ -1,5 +1,5 @@
 /*********************************************************************************
-Copyright 2012-2017 Ellucian Company L.P. and its affiliates.
+Copyright 2012-2019 Ellucian Company L.P. and its affiliates.
 **********************************************************************************/
 package net.hedtech.banner.general.person
 import org.junit.Before
@@ -241,7 +241,7 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
 
         def emails = personEmailService.getDisplayableEmails(pidm)
 
-        assertEquals 1, emails.size()
+        assertEquals 2, emails.size()
         assertEquals 'ansbates@telstra.com', emails[0].emailAddress
         assertEquals null, emails[0].lastModified
     }
@@ -274,7 +274,7 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
 
         def emails = personEmailService.getDisplayableEmails(pidm)
 
-        assertEquals 1, emails.size()
+        assertEquals 2, emails.size()
         assertEquals 'ansbates@telstra.com', emails[0].emailAddress
         assertEquals false, emails[0].preferredIndicator
     }
@@ -288,7 +288,7 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
 
         def result = PersonEmail.get(email.id)
 
-        assertEquals 0, personEmailService.getDisplayableEmails(pidm).size()
+        assertEquals 1, personEmailService.getDisplayableEmails(pidm).size()
         assertEquals 'I', result.statusIndicator
         assertEquals false, result.preferredIndicator
     }
