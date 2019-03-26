@@ -1,15 +1,16 @@
 /*******************************************************************************
- Copyright 2016 Ellucian Company L.P. and its affiliates.
+ Copyright 2016-2019 Ellucian Company L.P. and its affiliates.
  ****************************************************************************** */
 package net.hedtech.banner.general.person
 
+import grails.gorm.transactions.Transactional
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.system.SystemUtility
 import net.hedtech.banner.service.ServiceBase
 
 
+@Transactional
 class PersonAddressAdditionalPropertyService extends ServiceBase {
-    boolean transactional = true
 
     def preCreate(map) {
         throwUnsupportedException()

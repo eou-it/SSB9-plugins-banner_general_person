@@ -1,9 +1,10 @@
 /*********************************************************************************
- Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2019 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
 
+import grails.gorm.transactions.Transactional
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.service.ServiceBase
 import groovy.sql.Sql
@@ -11,10 +12,9 @@ import groovy.sql.Sql
 // NOTE:
 // This service is only used for readonly/query operations on SPRIDEN.  Any CUD operation must be done through the
 // PersonIdentificationNameCurrentService or PersonIdentificationNameAlternateService.
-
+@Transactional
 class PersonIdentificationNameService extends ServiceBase {
 
-    boolean transactional = true
     def sessionFactory
 
 

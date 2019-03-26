@@ -1,15 +1,16 @@
 /*********************************************************************************
-Copyright 2012 Ellucian Company L.P. and its affiliates.
+Copyright 2012-2019 Ellucian Company L.P. and its affiliates.
 **********************************************************************************/
  package net.hedtech.banner.general.person
 
+import grails.gorm.transactions.Transactional
 import net.hedtech.banner.service.ServiceBase
 import org.codehaus.groovy.runtime.InvokerHelper
 
+@Transactional
 class PersonEmailCompositeService {
 
     def personEmailService
-    boolean transactional = true
     def sessionFactory
     /**
      * Composite service is required to handle when the e-mail type or e-mail address is changed.  The primary key for the e-mail information

@@ -1,8 +1,9 @@
 /*********************************************************************************
-Copyright 2012-2017 Ellucian Company L.P. and its affiliates.
+Copyright 2012-2019 Ellucian Company L.P. and its affiliates.
 **********************************************************************************/
  package net.hedtech.banner.general.person
 
+import grails.gorm.transactions.Transactional
 import org.apache.log4j.Logger
 
 /**
@@ -13,9 +14,9 @@ import org.apache.log4j.Logger
  * personBasicPersonBase - inserts or updates a single PersonBasicPersonBase
  * personRaces - insert or updates a collection of PersonRace
  */
+@Transactional
 class PersonBiographicalCompositeService {
 
-    boolean transactional = true
     def sessionFactory
     private static final log = Logger.getLogger(PersonBiographicalCompositeService.class)
 

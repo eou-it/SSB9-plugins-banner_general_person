@@ -1,17 +1,19 @@
 /*********************************************************************************
- Copyright 2009-2018 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2019 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
+import grails.gorm.transactions.Transactional
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.service.ServiceBase
 import org.apache.log4j.Logger
 import org.codehaus.groovy.runtime.InvokerHelper
 import org.springframework.security.core.context.SecurityContextHolder
 
+
+@Transactional
 class PersonRelatedHoldService extends ServiceBase {
     private static final log = Logger.getLogger(PersonRelatedHoldService.class)
-    boolean transactional = true
 
     def sessionFactory
 

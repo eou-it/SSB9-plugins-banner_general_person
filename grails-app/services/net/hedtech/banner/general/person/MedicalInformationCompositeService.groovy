@@ -1,19 +1,20 @@
 /*********************************************************************************
- Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2019 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
+import grails.gorm.transactions.Transactional
 import groovy.sql.Sql
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.system.MedicalCondition
 import net.hedtech.banner.service.ServiceBase
 import org.codehaus.groovy.runtime.InvokerHelper
 
+@Transactional
 class MedicalInformationCompositeService {
 
     def medicalInformationService
     def institutionalDescriptionService
-    boolean transactional = true
     def sessionFactory
     /**
      * Medical submit changes driver

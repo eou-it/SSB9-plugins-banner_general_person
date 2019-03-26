@@ -1,8 +1,9 @@
 /*********************************************************************************
- Copyright 2012-2017 Ellucian Company L.P. and its affiliates.
+ Copyright 2012-2019 Ellucian Company L.P. and its affiliates.
  **********************************************************************************/
 package net.hedtech.banner.general.person
 
+import grails.gorm.transactions.Transactional
 import net.hedtech.banner.service.ServiceBase
 
 // NOTE:
@@ -13,10 +14,8 @@ import net.hedtech.banner.service.ServiceBase
 // update and delete may throw org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException a runtime exception if an optimistic lock failure occurs
 // create, update, and delete may throw grails.validation.ValidationException a runtime exception when there is a validation failure
 
+@Transactional
 class AdditionalIDService extends ServiceBase {
-
-    boolean transactional = true
-
 
     def fetchAllByPidmInListAndIdentificationTypeCodeInList(Collection<Integer> pidms, Collection<String> identificationTypeCodes) {
         def list = []

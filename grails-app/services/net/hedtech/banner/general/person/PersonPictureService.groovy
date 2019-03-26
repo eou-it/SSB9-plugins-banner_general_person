@@ -1,5 +1,5 @@
 /*********************************************************************************
-Copyright 2012 Ellucian Company L.P. and its affiliates.
+Copyright 2012-2019 Ellucian Company L.P. and its affiliates.
 **********************************************************************************/
  package net.hedtech.banner.general.person
 
@@ -11,7 +11,6 @@ import grails.util.Holders
  * Note: This service does not extend BaseService as it doesn't access the database.
  */
 class PersonPictureService {
-    static transactional = false
 
     public static final String NO_PHOTO_AVAILABLE = "no_photo_available.png"
 

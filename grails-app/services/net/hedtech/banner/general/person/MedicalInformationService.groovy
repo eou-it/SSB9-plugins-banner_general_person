@@ -1,8 +1,9 @@
 /*********************************************************************************
- Copyright 2009-2017 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2019 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
+import grails.gorm.transactions.Transactional
 import groovy.sql.Sql
 import net.hedtech.banner.service.ServiceBase
 import org.springframework.web.context.request.RequestContextHolder
@@ -17,9 +18,8 @@ import org.springframework.web.context.request.RequestContextHolder
 /**
  * A transactional service supporting persistence of the Medical Information model.
  * */
+@Transactional
 class MedicalInformationService extends ServiceBase{
-
-    boolean transactional = true      // and make transactional (needed only when injecting versus extending)
 
     def institutionalDescriptionService // injected by Spring
     def sessionFactory                  // injected by Spring

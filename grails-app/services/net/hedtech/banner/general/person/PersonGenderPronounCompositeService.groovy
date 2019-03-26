@@ -1,15 +1,17 @@
 /*******************************************************************************
- Copyright 2017 Ellucian Company L.P. and its affiliates.
+ Copyright 2017-2019 Ellucian Company L.P. and its affiliates.
  ****************************************************************************** */
 package net.hedtech.banner.general.person
 
+import grails.gorm.transactions.Transactional
 import net.hedtech.banner.exceptions.ApplicationException
 import org.hibernate.StaleObjectStateException
 import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
 import org.springframework.transaction.annotation.Propagation
-import org.springframework.transaction.annotation.Transactional
+//import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.context.request.RequestContextHolder
 
+//TODO: previously used Spring Transactional (see import above). Does it cause problem switching to Grails 3 Transactional?  JDC 3/19
 @Transactional(readOnly = false, propagation = Propagation.REQUIRED )
 class PersonGenderPronounCompositeService {
     def sessionFactory

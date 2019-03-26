@@ -3,13 +3,14 @@ Copyright 2012-2019 Ellucian Company L.P. and its affiliates.
 **********************************************************************************/
  package net.hedtech.banner.general.person
 
+import grails.gorm.transactions.Transactional
 import net.hedtech.banner.exceptions.ApplicationException
 
+@Transactional
 class PersonAddressCompositeService {
 
     def personAddressService
     def personTelephoneService
-    boolean transactional = true
     def sessionFactory
 
     def createOrUpdate(map, overwrite = true) {

@@ -1,8 +1,9 @@
 /*********************************************************************************
- Copyright 2012-2017 Ellucian Company L.P. and its affiliates.
+ Copyright 2012-2019 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
+import grails.gorm.transactions.Transactional
 import net.hedtech.banner.service.ServiceBase
 import org.apache.log4j.Logger
 
@@ -10,9 +11,9 @@ import org.apache.log4j.Logger
  *  This service is used to process PersonIdentificationNameCurrent,
  *  PersonIdentificationNameAlternate, and PersonBasicPersonBase changes.
  */
+@Transactional
 class PersonIdentificationNameCompositeService extends ServiceBase {
 
-    boolean transactional = true
     def sessionFactory
     private static final log = Logger.getLogger(PersonIdentificationNameCompositeService.class)
 
