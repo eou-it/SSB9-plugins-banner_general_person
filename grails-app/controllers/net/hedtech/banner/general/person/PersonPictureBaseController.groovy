@@ -4,7 +4,7 @@
 package net.hedtech.banner.general.person
 
 import grails.util.Holders
-import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes
+import org.grails.web.util.GrailsApplicationAttributes
 import org.springframework.context.ApplicationContext
 
 /**
@@ -101,11 +101,12 @@ class PersonPictureBaseController {
 
     private def getImagesResourcePath()
     {
-        return getApplicationContext().getResource('images').file.absolutePath
+        return getApplicationContext().getResource('assets').file.absolutePath
     }
 
 
-    private ApplicationContext getApplicationContext() {
+    public ApplicationContext getApplicationContext() {
         return (ApplicationContext) Holders?.getServletContext().getAttribute(GrailsApplicationAttributes.APPLICATION_CONTEXT)
     }
+
 }
