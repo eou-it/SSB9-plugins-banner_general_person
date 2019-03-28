@@ -13,7 +13,6 @@ import org.springframework.security.core.context.SecurityContextHolder
 
 @Transactional
 class PersonRelatedHoldService extends ServiceBase {
-    private static final log = Logger.getLogger(PersonRelatedHoldService.class)
 
     def sessionFactory
 
@@ -41,7 +40,7 @@ class PersonRelatedHoldService extends ServiceBase {
      */
     //Check view
     private validateHoldForUpdate(PersonRelatedHold hold) {
-        log.debug "Compare hold.createdBy: " + hold.createdBy + " to SecurityContextHolder.context?.authentication?.principal: " +
+        logger.debug "Compare hold.createdBy: " + hold.createdBy + " to SecurityContextHolder.context?.authentication?.principal: " +
                 SecurityContextHolder.context?.authentication?.principal
         if (!(hold.createdBy?.toUpperCase(  ) == SecurityContextHolder.context?.authentication?.principal?.username?.toUpperCase() ||
                 hold.createdBy?.toUpperCase(  ) == SecurityContextHolder.context?.authentication?.principal?.oracleUserName?.toUpperCase())) {

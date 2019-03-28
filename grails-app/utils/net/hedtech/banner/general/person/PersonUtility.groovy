@@ -1,5 +1,5 @@
 /*********************************************************************************
- Copyright 2009-2015 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2019 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
@@ -8,7 +8,7 @@ import groovy.sql.Sql
 import net.hedtech.banner.general.overall.IntegrationConfiguration
 import net.hedtech.banner.service.ServiceBase
 import grails.util.Holders as SCH
-import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes as GA
+import org.grails.web.util.GrailsApplicationAttributes as GA
 import org.codehaus.groovy.runtime.InvokerHelper
 import org.springframework.context.ApplicationContext
 import org.springframework.context.i18n.LocaleContextHolder

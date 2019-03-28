@@ -18,8 +18,6 @@ import org.apache.log4j.Logger
 class PersonBiographicalCompositeService {
 
     def sessionFactory
-    private static final log = Logger.getLogger(PersonBiographicalCompositeService.class)
-
     def personBasicPersonBaseService
     def personRaceService
 

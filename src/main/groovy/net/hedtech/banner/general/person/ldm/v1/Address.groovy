@@ -1,16 +1,19 @@
 /*******************************************************************************
- Copyright 2014-2017 Ellucian Company L.P. and its affiliates.
+ Copyright 2014-2019 Ellucian Company L.P. and its affiliates.
  *******************************************************************************/
 package net.hedtech.banner.general.person.ldm.v1
 
+import grails.validation.Validateable
 import net.hedtech.banner.general.overall.IntegrationConfiguration
 import net.hedtech.banner.general.person.PersonAddress
+import org.grails.datastore.gorm.GormValidateable
+import org.grails.datastore.mapping.dirty.checking.DirtyCheckable
 
 
 /**
  * LDM decorator for person resource address.
  */
-class Address {
+class Address implements GormValidateable, DirtyCheckable, Validateable {
 
     @Delegate
     private final PersonAddress address

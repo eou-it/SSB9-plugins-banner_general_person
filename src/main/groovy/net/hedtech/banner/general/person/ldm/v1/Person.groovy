@@ -1,15 +1,18 @@
 /*******************************************************************************
- Copyright 2014-2015 Ellucian Company L.P. and its affiliates.
+ Copyright 2014-2019 Ellucian Company L.P. and its affiliates.
  *******************************************************************************/
 package net.hedtech.banner.general.person.ldm.v1
 
+import grails.validation.Validateable
 import net.hedtech.banner.general.person.PersonBasicPersonBase
 import net.hedtech.banner.general.system.ldm.v1.Metadata
+import org.grails.datastore.gorm.GormValidateable
+import org.grails.datastore.mapping.dirty.checking.DirtyCheckable
 
 /**
  * LDM Decorator for person resource.
  */
-class Person {
+class Person implements GormValidateable, DirtyCheckable, Validateable {
     @Delegate private final PersonBasicPersonBase person
     Metadata metadata
     def maritalStatusDetail

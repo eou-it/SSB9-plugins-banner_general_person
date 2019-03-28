@@ -3,11 +3,7 @@
  *********************************************************************************/
 
 
-import net.hedtech.banner.configuration.ApplicationConfigurationUtils as ConfigFinder
-
 // Support Hibernate annotations
-import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsAnnotationConfiguration
-
 
 // ******************************************************************************
 //
@@ -21,13 +17,10 @@ import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsAnnotationConfiguratio
 // 3. Load the configuration file if its location was specified as a system environment variable
 //
 // Map [ environment variable or -D command line argument name : file path ]
-grails.config.locations = [] // leave this initialized to an empty list, and add your locations
-// in the APPLICATION CONFIGURATION section below.
 
-def locationAdder = ConfigFinder.&addLocation.curry(grails.config.locations)
-
-[BANNER_APP_CONFIG:        "banner_configuration.groovy",
-].each { envName, defaultFileName -> locationAdder(envName, defaultFileName) }
+grails.config.locations = [
+        BANNER_APP_CONFIG: "banner_configuration.groovy"
+]
 
 grails.databinding.useSpringBinder=true
 
@@ -98,7 +91,6 @@ remove this line */
 // installation-specific configuration file (see Config.groovy for the include).
 
 dataSource {
-    configClass = GrailsAnnotationConfiguration.class
     dialect = "org.hibernate.dialect.Oracle10gDialect"
     loggingSql = false
 

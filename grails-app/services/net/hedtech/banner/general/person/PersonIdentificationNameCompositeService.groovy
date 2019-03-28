@@ -15,8 +15,6 @@ import org.apache.log4j.Logger
 class PersonIdentificationNameCompositeService extends ServiceBase {
 
     def sessionFactory
-    private static final log = Logger.getLogger(PersonIdentificationNameCompositeService.class)
-
     def personIdentificationNameCurrentService
     def personIdentificationNameAlternateService
     def personBasicPersonBaseService
