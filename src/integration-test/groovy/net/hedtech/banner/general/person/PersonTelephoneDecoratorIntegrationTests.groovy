@@ -3,6 +3,9 @@
  ****************************************************************************** */
 
 package net.hedtech.banner.general.person
+
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import org.junit.Before
 import org.junit.Test
 import org.junit.After
@@ -11,6 +14,8 @@ import net.hedtech.banner.general.system.TelephoneType
 import net.hedtech.banner.person.PersonTelephoneDecorator
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 
+@Integration
+@Rollback
 class PersonTelephoneDecoratorIntegrationTests extends BaseIntegrationTestCase {
 
     def personTelephoneService

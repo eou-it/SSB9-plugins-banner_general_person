@@ -4,12 +4,16 @@
 
 package net.hedtech.banner.general.person
 
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import net.hedtech.banner.general.person.view.PersonAdvancedSearchView
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
+@Integration
+@Rollback
 class PersonAdvancedSearchViewServiceIntegrationTests extends BaseIntegrationTestCase {
 
     PersonAdvancedSearchViewService personAdvancedSearchViewService

@@ -3,6 +3,9 @@
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
+
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import org.junit.Before
 import org.junit.Test
 import org.junit.After
@@ -12,6 +15,8 @@ import net.hedtech.banner.testing.BaseIntegrationTestCase
 import net.hedtech.banner.general.person.view.NonPersonPersonView
 import org.junit.Ignore
 
+@Integration
+@Rollback
 class NonPersonSearchIntegrationTests extends BaseIntegrationTestCase {
 
     @Before

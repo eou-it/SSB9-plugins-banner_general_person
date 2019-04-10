@@ -2,15 +2,21 @@
 Copyright 2012-2019 Ellucian Company L.P. and its affiliates.
 **********************************************************************************/
 package net.hedtech.banner.general.person
+
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import org.junit.Before
 import org.junit.Test
 import org.junit.After
 
 import groovy.sql.Sql
+import static groovy.test.GroovyAssert.*
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.system.EmailType
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 
+@Integration
+@Rollback
 class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
 
     def personEmailService

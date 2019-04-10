@@ -7,6 +7,8 @@ Copyright 2012 Ellucian Company L.P. and its affiliates.
 
 package net.hedtech.banner.general.person
 
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import grails.util.Holders
 import org.junit.Before
 import org.junit.Test
@@ -19,6 +21,8 @@ import net.hedtech.banner.testing.BaseIntegrationTestCase
 import org.springframework.context.ApplicationContext
 import org.springframework.context.i18n.LocaleContextHolder
 
+@Integration
+@Rollback
 class PersonIdentificationNameDecoratorIntegrationTests extends BaseIntegrationTestCase {
 
     def personIdentificationNameService

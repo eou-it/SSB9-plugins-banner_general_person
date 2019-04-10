@@ -1,16 +1,16 @@
 /*******************************************************************************
- Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2019 Ellucian Company L.P. and its affiliates.
  ****************************************************************************** */
 package net.hedtech.banner.general.person
 
-import grails.test.GrailsUnitTestCase
+import org.grails.testing.GrailsUnitTest
 import org.junit.Test
+import spock.lang.Specification
 
-class PictureFileUtilTests extends GrailsUnitTestCase{
+class PictureFileUtilTests extends Specification implements GrailsUnitTest {
     private static def imageLocation = System.getProperty('base.dir') + File.separator + "test" + File.separator + "resources" + File.separator + "images"
 
-    public void setUp() {
-        super.setUp()
+    public void setup() {
     }
 
 

@@ -2,6 +2,9 @@
 Copyright 2012-2018 Ellucian Company L.P. and its affiliates.
 **********************************************************************************/
 package net.hedtech.banner.general.person.search
+
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import org.junit.Before
 import org.junit.Test
 import org.junit.After
@@ -10,6 +13,8 @@ import net.hedtech.banner.testing.BaseIntegrationTestCase
 import grails.converters.JSON
 
 
+@Integration
+@Rollback
 class PersonSearchControllerIntegrationTests extends BaseIntegrationTestCase {
     def controller
     def personSearchService

@@ -1,15 +1,16 @@
 /*********************************************************************************
- Copyright 2016-2016 Ellucian Company L.P. and its affiliates.
+ Copyright 2016-2019 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
-import grails.test.GrailsUnitTestCase
+import org.grails.testing.GrailsUnitTest
 import org.junit.Test
+import spock.lang.Specification
 
 /**
  * Tests for class PhoneNumberUtility
  */
-class PhoneNumberUtilityTests extends GrailsUnitTestCase {
+class PhoneNumberUtilityTests extends Specification implements GrailsUnitTest {
 
     @Test
     void testParsePhoneNumber() {

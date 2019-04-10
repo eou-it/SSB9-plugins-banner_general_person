@@ -1,10 +1,13 @@
 /*********************************************************************************
-  Copyright 2009-2017 Ellucian Company L.P. and its affiliates.
+  Copyright 2009-2019 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
 
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import groovy.sql.Sql
+import static groovy.test.GroovyAssert.*
 import net.hedtech.banner.general.system.HoldType
 import net.hedtech.banner.general.system.Originator
 import net.hedtech.banner.testing.BaseIntegrationTestCase
@@ -16,6 +19,8 @@ import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureExcep
 
 import java.text.SimpleDateFormat
 
+@Integration
+@Rollback
 class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
 
     //def personRelatedHoldService

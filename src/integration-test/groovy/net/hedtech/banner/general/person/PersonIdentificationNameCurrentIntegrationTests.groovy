@@ -7,6 +7,8 @@
 
 package net.hedtech.banner.general.person
 
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import groovy.sql.Sql
 import net.hedtech.banner.general.system.NameType
 import net.hedtech.banner.general.system.SystemUtility
@@ -15,6 +17,8 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
+@Integration
+@Rollback
 class PersonIdentificationNameCurrentIntegrationTests extends BaseIntegrationTestCase {
 
     @Before

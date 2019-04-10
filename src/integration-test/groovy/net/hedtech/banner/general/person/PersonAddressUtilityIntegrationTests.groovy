@@ -4,6 +4,8 @@
 
 package net.hedtech.banner.general.person
 
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import grails.util.Holders
 import net.hedtech.banner.general.system.TelephoneType
 import net.hedtech.banner.testing.BaseIntegrationTestCase
@@ -13,6 +15,8 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.After
 
+@Integration
+@Rollback
 class PersonAddressUtilityIntegrationTests extends BaseIntegrationTestCase {
 
 

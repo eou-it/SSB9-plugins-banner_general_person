@@ -7,14 +7,19 @@ import org.junit.Ignore
 import org.junit.Test
 import org.junit.After
 
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import grails.validation.ValidationException
 import groovy.sql.Sql
+import static groovy.test.GroovyAssert.*
 import net.hedtech.banner.general.system.AdditionalIdentificationType
 import net.hedtech.banner.testing.BaseIntegrationTestCase
-import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
+import org.springframework.orm.hibernate5.HibernateOptimisticLockingFailureException
 
 import java.text.SimpleDateFormat
 
+@Integration
+@Rollback
 class AdditionalIDIntegrationTests extends BaseIntegrationTestCase {
 
     //Test data for creating new domain instance
@@ -90,7 +95,7 @@ class AdditionalIDIntegrationTests extends BaseIntegrationTestCase {
     }
 
 
-	@Ignore
+    @Ignore
     @Test
     void testUpdateValidAdditionalID() {
         def additionalID = newValidForCreateAdditionalID()
@@ -155,7 +160,7 @@ class AdditionalIDIntegrationTests extends BaseIntegrationTestCase {
             sql = new Sql(sessionFactory.getCurrentSession().connection())
             sql.executeUpdate("update GV_GORADID set GORADID_VERSION = 999 where GORADID_SURROGATE_ID = ?", [additionalID.id])
         } finally {
-            sql?.close() // note that the test will close the connection, since it's our current session's connection
+//            sql?.close() // note that the test will close the connection, since it's our current session's connection
         }
         //Try to update the entity
         //Update the entity

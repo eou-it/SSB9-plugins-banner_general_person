@@ -2,6 +2,9 @@
   Copyright 2009-2018 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
+
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import org.junit.Before
 import org.junit.Test
 import org.junit.After
@@ -10,6 +13,8 @@ import org.junit.After
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 import net.hedtech.banner.general.person.view.PersonAlternateIdView
 
+@Integration
+@Rollback
 class PersonAlternateIdSearchIntegrationTests extends BaseIntegrationTestCase {
 
     @Before

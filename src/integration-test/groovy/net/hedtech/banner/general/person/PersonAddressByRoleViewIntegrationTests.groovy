@@ -4,6 +4,10 @@
 
 package net.hedtech.banner.general.person
 
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
+
+import static groovy.test.GroovyAssert.*
 import net.hedtech.banner.general.person.view.PersonAddressByRoleView
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 import org.springframework.dao.InvalidDataAccessResourceUsageException
@@ -11,6 +15,8 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.After
 
+@Integration
+@Rollback
 class PersonAddressByRoleViewIntegrationTests extends BaseIntegrationTestCase {
 
    @Before

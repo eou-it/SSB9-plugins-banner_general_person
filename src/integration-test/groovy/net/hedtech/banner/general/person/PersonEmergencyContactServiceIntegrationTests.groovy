@@ -1,7 +1,12 @@
 /*********************************************************************************
-Copyright 2012-2017 Ellucian Company L.P. and its affiliates.
+Copyright 2012-2019 Ellucian Company L.P. and its affiliates.
 **********************************************************************************/
 package net.hedtech.banner.general.person
+
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
+
+import static groovy.test.GroovyAssert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.After
@@ -13,6 +18,8 @@ import net.hedtech.banner.general.system.Relationship
 import net.hedtech.banner.general.system.State
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 
+@Integration
+@Rollback
 class PersonEmergencyContactServiceIntegrationTests extends BaseIntegrationTestCase {
 
     def personEmergencyContactService

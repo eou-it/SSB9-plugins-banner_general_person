@@ -3,12 +3,16 @@
  *******************************************************************************/
 package net.hedtech.banner.general.person.view
 
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import net.hedtech.banner.general.person.PersonUtility
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
+@Integration
+@Rollback
 class PersonAddressByRoleViewServiceIntegrationTests extends BaseIntegrationTestCase {
 
     def personAddressByRoleViewService

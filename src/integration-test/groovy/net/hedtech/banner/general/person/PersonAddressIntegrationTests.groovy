@@ -1,11 +1,18 @@
 /*********************************************************************************
-  Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+  Copyright 2009-2019 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
+
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
+import grails.validation.ValidationException
+import groovy.sql.Sql
+import static groovy.test.GroovyAssert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.After
+import org.junit.Ignore
 
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 import net.hedtech.banner.exceptions.ApplicationException
@@ -15,11 +22,10 @@ import net.hedtech.banner.general.system.State
 import net.hedtech.banner.general.system.County
 import net.hedtech.banner.general.system.Nation
 import net.hedtech.banner.general.system.AddressSource
-import grails.validation.ValidationException
-import groovy.sql.Sql
-import org.junit.Ignore
 
 
+@Integration
+@Rollback
 class PersonAddressIntegrationTests extends BaseIntegrationTestCase {
 
 	//Test data for creating new domain instance

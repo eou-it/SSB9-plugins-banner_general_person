@@ -1,9 +1,9 @@
 /*******************************************************************************
- Copyright 2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2013-2019 Ellucian Company L.P. and its affiliates.
  ****************************************************************************** */
 package net.hedtech.banner.general.person
 
-import grails.test.GrailsUnitTestCase
+import org.grails.testing.GrailsUnitTest
 import grails.test.mixin.TestFor
 import grails.util.Holders
 import org.junit.Test

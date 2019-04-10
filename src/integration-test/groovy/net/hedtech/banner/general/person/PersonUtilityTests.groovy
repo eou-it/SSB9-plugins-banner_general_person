@@ -4,8 +4,9 @@
 
 package net.hedtech.banner.general.person
 
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import grails.util.Holders
-import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes
 import org.junit.Before
 import org.junit.Test
 import org.junit.After
@@ -16,6 +17,8 @@ import org.springframework.context.ApplicationContext
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.web.context.request.RequestContextHolder
 
+@Integration
+@Rollback
 class PersonUtilityTests extends BaseIntegrationTestCase {
 
 

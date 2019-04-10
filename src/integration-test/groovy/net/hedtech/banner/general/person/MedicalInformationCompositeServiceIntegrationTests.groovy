@@ -3,6 +3,9 @@
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
+
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import org.junit.Before
 import org.junit.Test
 import org.junit.After
@@ -16,6 +19,8 @@ import net.hedtech.banner.testing.BaseIntegrationTestCase
 import groovy.sql.Sql
 import org.junit.Ignore
 
+@Integration
+@Rollback
 class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegrationTestCase {
 
     def medicalInformationService
@@ -319,7 +324,7 @@ class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegration
             sql = new Sql(sessionFactory.getCurrentSession().connection())
             sql.executeUpdate("update gubinst set GUBINST_HUMANRE_INSTALLED = 'Y' where GUBINST_KEY = 'INST'")
         } finally {
-            sql?.close() // note that the test will close the connection, since it's our current session's connection
+//            sql?.close() // note that the test will close the connection, since it's our current session's connection
         }
     }
 
@@ -330,7 +335,7 @@ class MedicalInformationCompositeServiceIntegrationTests extends BaseIntegration
             sql = new Sql(sessionFactory.getCurrentSession().connection())
             sql.executeUpdate("update gubinst set GUBINST_HUMANRE_INSTALLED = 'N' where GUBINST_KEY = 'INST'")
         } finally {
-            sql?.close() // note that the test will close the connection, since it's our current session's connection
+//            sql?.close() // note that the test will close the connection, since it's our current session's connection
         }
     }
 }

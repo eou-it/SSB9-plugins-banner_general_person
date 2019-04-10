@@ -3,6 +3,8 @@
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import grails.util.Holders
 import groovy.sql.Sql
 import net.hedtech.banner.general.system.InstitutionalDescription
@@ -15,6 +17,8 @@ import org.springframework.context.ApplicationContext
 import org.springframework.context.i18n.LocaleContextHolder as LCH
 
 
+@Integration
+@Rollback
 class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase {
 
     def personSearchService

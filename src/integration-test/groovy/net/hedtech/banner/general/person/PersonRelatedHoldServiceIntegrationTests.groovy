@@ -4,6 +4,8 @@
 
 package net.hedtech.banner.general.person
 
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import org.junit.Before
 import org.junit.Test
 import org.junit.After
@@ -17,6 +19,8 @@ import groovy.sql.Sql
 import java.text.SimpleDateFormat
 
 
+@Integration
+@Rollback
 class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
 
     def personRelatedHoldService

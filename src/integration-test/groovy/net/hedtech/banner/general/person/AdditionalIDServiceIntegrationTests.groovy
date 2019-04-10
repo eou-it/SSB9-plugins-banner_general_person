@@ -1,8 +1,12 @@
 /*********************************************************************************
-Copyright 2012-2014 Ellucian Company L.P. and its affiliates.
+Copyright 2012-2019 Ellucian Company L.P. and its affiliates.
 **********************************************************************************/
 
 package net.hedtech.banner.general.person
+
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
+import static groovy.test.GroovyAssert.*
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
@@ -12,6 +16,8 @@ import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.system.AdditionalIdentificationType
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 
+@Integration
+@Rollback
 class AdditionalIDServiceIntegrationTests extends BaseIntegrationTestCase {
 
     def additionalIDService
