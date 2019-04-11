@@ -3,11 +3,13 @@
   ********************************************************************************* */
 
 
+import grails.plugins.*
+
 /**
  * A Grails Plugin providing cross cutting concerns such as security and database access
  * for Banner web applications.
  * */
-class BannerGeneralPersonGrailsPlugin {
+class BannerGeneralPersonGrailsPlugin extends Plugin {
 
     // Note: the groupId 'should' be used when deploying this plugin via the 'grails maven-deploy --repository=snapshots' command,
     // however it is not being picked up.  Consequently, a pom.xml file is added to the root directory with the correct groupId
