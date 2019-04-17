@@ -24,4 +24,5 @@ plugin.xml
 src/ddl/horizon_upgrade.lis
 *.ser
 *-rtl.css
+build/
 messages_ar_SA.properties
