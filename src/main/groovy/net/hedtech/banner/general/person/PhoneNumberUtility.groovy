@@ -1,12 +1,11 @@
 /*********************************************************************************
- Copyright 2016-2017 Ellucian Company L.P. and its affiliates.
+ Copyright 2016-2019 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
 import com.google.i18n.phonenumbers.NumberParseException
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.i18n.phonenumbers.Phonenumber
-import org.apache.log4j.Logger
 
 /**
  * Utility to deal with phone numbers.
@@ -15,8 +14,6 @@ import org.apache.log4j.Logger
  *
  */
 abstract class PhoneNumberUtility {
-
-    private static final log = Logger.getLogger(PhoneNumberUtility.class)
 
     private static final String REGEX_EXCEPT_ALPHABETS = "[^a-zA-Z]"
     private static final String REGEX_EXCEPT_ALPHABETS_DIGITS = "[^a-zA-Z0-9]"

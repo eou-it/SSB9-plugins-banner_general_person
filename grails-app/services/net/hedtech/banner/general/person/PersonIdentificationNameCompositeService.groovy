@@ -5,7 +5,6 @@ package net.hedtech.banner.general.person
 
 import grails.gorm.transactions.Transactional
 import net.hedtech.banner.service.ServiceBase
-import org.apache.log4j.Logger
 
 /**
  *  This service is used to process PersonIdentificationNameCurrent,

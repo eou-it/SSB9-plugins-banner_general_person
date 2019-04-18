@@ -4,7 +4,6 @@ Copyright 2012-2019 Ellucian Company L.P. and its affiliates.
  package net.hedtech.banner.general.person
 
 import grails.gorm.transactions.Transactional
-import org.apache.log4j.Logger
 
 /**
  * This composite service handles PersonBasicPersonBase and PersonRace domain CRUD as one transaction.

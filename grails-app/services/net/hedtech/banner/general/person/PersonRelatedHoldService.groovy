@@ -6,7 +6,6 @@ package net.hedtech.banner.general.person
 import grails.gorm.transactions.Transactional
 import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.service.ServiceBase
-import org.apache.log4j.Logger
 import org.codehaus.groovy.runtime.InvokerHelper
 import org.springframework.security.core.context.SecurityContextHolder
 
@@ -40,7 +39,7 @@ class PersonRelatedHoldService extends ServiceBase {
      */
     //Check view
     private validateHoldForUpdate(PersonRelatedHold hold) {
-        logger.debug "Compare hold.createdBy: " + hold.createdBy + " to SecurityContextHolder.context?.authentication?.principal: " +
+        log.debug "Compare hold.createdBy: " + hold.createdBy + " to SecurityContextHolder.context?.authentication?.principal: " +
                 SecurityContextHolder.context?.authentication?.principal
         if (!(hold.createdBy?.toUpperCase(  ) == SecurityContextHolder.context?.authentication?.principal?.username?.toUpperCase() ||
                 hold.createdBy?.toUpperCase(  ) == SecurityContextHolder.context?.authentication?.principal?.oracleUserName?.toUpperCase())) {
