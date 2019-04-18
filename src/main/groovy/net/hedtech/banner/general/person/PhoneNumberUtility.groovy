@@ -7,12 +7,15 @@ import com.google.i18n.phonenumbers.NumberParseException
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.i18n.phonenumbers.Phonenumber
 
+import groovy.util.logging.Slf4j
+
 /**
  * Utility to deal with phone numbers.
  * This class mainly acts as a wrapper for Google's common library for parsing, formatting, and validating international phone numbers.
  * https://github.com/googlei18n/libphonenumber
  *
  */
+@Slf4j
 abstract class PhoneNumberUtility {
 
     private static final String REGEX_EXCEPT_ALPHABETS = "[^a-zA-Z]"
