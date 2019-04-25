@@ -26,3 +26,5 @@ src/ddl/horizon_upgrade.lis
 *-rtl.css
 build/
 messages_ar_SA.properties
+.gradle/
+local.properties
