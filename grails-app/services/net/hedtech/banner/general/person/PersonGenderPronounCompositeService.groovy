@@ -6,7 +6,7 @@ package net.hedtech.banner.general.person
 import grails.gorm.transactions.Transactional
 import net.hedtech.banner.exceptions.ApplicationException
 import org.hibernate.StaleObjectStateException
-import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
+import org.springframework.orm.hibernate5.HibernateOptimisticLockingFailureException
 import org.springframework.transaction.annotation.Propagation
 //import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.context.request.RequestContextHolder

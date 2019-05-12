@@ -14,7 +14,7 @@ import groovy.sql.Sql
 import static groovy.test.GroovyAssert.*
 import net.hedtech.banner.general.system.EmailType
 import net.hedtech.banner.testing.BaseIntegrationTestCase
-import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
+import org.springframework.orm.hibernate5.HibernateOptimisticLockingFailureException
 
 @Integration
 @Rollback
@@ -206,7 +206,7 @@ class PersonEmailIntegrationTests extends BaseIntegrationTestCase {
             sql = new Sql( sessionFactory.getCurrentSession().connection() )
             sql.executeUpdate( "update GOREMAL set GOREMAL_VERSION = 999 where GOREMAL_SURROGATE_ID = ?", [personEmail.id] )
         } finally {
-            sql?.close() // note that the test will close the connection, since it's our current session's connection
+            //TODO grails3   sql?.close() // note that the test will close the connection, since it's our current session's connection
         }
         //Try to update the entity
         //Update the entity

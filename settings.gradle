@@ -12,3 +12,12 @@ project(':banner-codenarc').projectDir = new File('../banner_codenarc.git')
 
 include ':i18n-core'
 project(':i18n-core').projectDir = new File('../i18n_core.git')
+
+include ':grails-constraints'
+project(':grails-constraints').projectDir = new File('../grails_constraints.git')
+
+include ':banner-spring-security-cas'
+project(':banner-spring-security-cas').projectDir = new File('../banner_spring_security_cas.git')
+
+include ':banner-spring-security-saml'
+project(':banner-spring-security-saml').projectDir = new File('../banner_spring_security_saml.git')

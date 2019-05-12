@@ -42,7 +42,7 @@ class PersonIdentificationNameService extends ServiceBase {
                     [Sql.VARCHAR, pidm]) { result -> entity = result }
         }
         finally {
-            sql?.close()
+         //TODO grails3   sql?.close()
         }
 
         return entity
@@ -58,7 +58,7 @@ class PersonIdentificationNameService extends ServiceBase {
                     [Sql.VARCHAR, 'ID']) { result -> idPrefix = result }
         }
         finally {
-            sql?.close()
+            //TODO grails3   sql?.close()
         }
 
         return idPrefix
@@ -75,7 +75,7 @@ class PersonIdentificationNameService extends ServiceBase {
                     [Sql.VARCHAR]) { result -> prefixInd = result }
         }
         finally {
-            sql?.close()
+            //TODO grails3   sql?.close()
         }
         return prefixInd
     }
@@ -109,7 +109,7 @@ class PersonIdentificationNameService extends ServiceBase {
                     [Sql.VARCHAR, pidm, fmt]) { result -> formattedName = result }
         }
         finally {
-            sql?.close()
+            //TODO grails3   sql?.close()
         }
         return formattedName
     }

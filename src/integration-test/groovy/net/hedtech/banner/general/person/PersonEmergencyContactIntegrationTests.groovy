@@ -17,7 +17,7 @@ import net.hedtech.banner.general.system.Nation
 import net.hedtech.banner.general.system.Relationship
 import net.hedtech.banner.general.system.State
 import net.hedtech.banner.testing.BaseIntegrationTestCase
-import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
+import org.springframework.orm.hibernate5.HibernateOptimisticLockingFailureException
 
 import java.text.SimpleDateFormat
 
@@ -335,7 +335,7 @@ class PersonEmergencyContactIntegrationTests extends BaseIntegrationTestCase {
             sql = new Sql(sessionFactory.getCurrentSession().connection())
             sql.executeUpdate("update SV_SPREMRG set SPREMRG_VERSION = 999 where SPREMRG_SURROGATE_ID = ?", [personEmergencyContact.id])
         } finally {
-            sql?.close() // note that the test will close the connection, since it's our current session's connection
+            //TODO grails3   sql?.close() // note that the test will close the connection, since it's our current session's connection
         }
         //Try to update the entity
         //Update the entity

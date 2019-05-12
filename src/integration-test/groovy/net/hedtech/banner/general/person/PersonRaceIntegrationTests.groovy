@@ -15,7 +15,7 @@ import groovy.sql.Sql
 import static groovy.test.GroovyAssert.*
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 import org.junit.Ignore
-import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
+import org.springframework.orm.hibernate5.HibernateOptimisticLockingFailureException
 
 @Integration
 @Rollback
@@ -120,7 +120,7 @@ class PersonRaceIntegrationTests extends BaseIntegrationTestCase {
             sql = new Sql(sessionFactory.getCurrentSession().connection())
             sql.executeUpdate("update GV_GORPRAC set GORPRAC_VERSION = 999 where GORPRAC_SURROGATE_ID = ?", [personRace.id])
         } finally {
-            sql?.close() // note that the test will close the connection, since it's our current session's connection
+            //TODO grails3   sql?.close() // note that the test will close the connection, since it's our current session's connection
         }
         //Try to update the entity
         //Update the entity

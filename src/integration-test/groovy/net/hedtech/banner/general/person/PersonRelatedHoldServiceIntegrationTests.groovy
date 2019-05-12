@@ -77,7 +77,7 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
             sql = new Sql(sessionFactory.getCurrentSession().connection())
             sql.executeUpdate("update SPRHOLD set SPRHOLD_USER = 'systest1' where SPRHOLD_SURROGATE_ID = ?", [personRelatedHold.id])
         } finally {
-            sql?.close()
+            //TODO grails3   sql?.close()
         }
 
         //Try to update Release Indicator created by "grails-User"  and fail
@@ -110,7 +110,7 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
             sql = new Sql(sessionFactory.getCurrentSession().connection())
             sql.executeUpdate("update SPRHOLD set SPRHOLD_USER = 'GRAILS_USER' where SPRHOLD_SURROGATE_ID = ?", [personRelatedHold.id])
         } finally {
-            sql?.close()
+            //TODO grails3   sql?.close()
         }
 
         //current loggedin user is grails_user, can updated Release indicator and Hold Type.
@@ -130,7 +130,7 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
             sql = new Sql(sessionFactory.getCurrentSession().connection())
             sql.executeUpdate("update SPRHOLD set SPRHOLD_USER = 'systest1' where SPRHOLD_SURROGATE_ID = ?", [personRelatedHold.id])
         } finally {
-            sql?.close()
+            //TODO grails3   sql?.close()
         }
 
         // field reason is not updatable by current logged in user because current logged-in user is grails_user and DB user is systest1
@@ -199,7 +199,7 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
             sql = new Sql(sessionFactory.getCurrentSession().connection())
             sql.executeUpdate("update SPRHOLD set SPRHOLD_USER = 'GRAILS_USER' where SPRHOLD_SURROGATE_ID = ?", [personRelatedHold.id])
         } finally {
-            sql?.close()
+            //TODO grails3   sql?.close()
         }
 
         personRelatedHold.discard()
@@ -273,7 +273,7 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
             sql = new Sql(sessionFactory.getCurrentSession().connection())
             sql.executeUpdate("update SPRHOLD set SPRHOLD_USER = 'systest1' where SPRHOLD_SURROGATE_ID = ?", [personRelatedHold.id])
         } finally {
-            sql?.close()
+            //TODO grails3   sql?.close()
         }
 
         personRelatedHold.discard()
@@ -301,7 +301,7 @@ class PersonRelatedHoldServiceIntegrationTests extends BaseIntegrationTestCase {
             sql = new Sql(sessionFactory.getCurrentSession().connection())
             sql.executeUpdate("update SPRHOLD set SPRHOLD_USER = 'systest1' where SPRHOLD_SURROGATE_ID = ?", [personRelatedHold.id])
         } finally {
-            sql?.close()
+            //TODO grails3   sql?.close()
         }
 
 

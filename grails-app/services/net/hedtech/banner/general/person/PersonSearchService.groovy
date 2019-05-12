@@ -58,7 +58,7 @@ class PersonSearchService {
             return list
 
         } finally {
-            sql?.close()
+                     //TODO grails3   sql?.close()
         }
     }
 
@@ -102,7 +102,7 @@ class PersonSearchService {
             return list
 
         } finally {
-            sql?.close()
+                     //TODO grails3   sql?.close()
         }
 
     }
@@ -148,7 +148,7 @@ class PersonSearchService {
             }
 
         } finally {
-            sql?.close()
+                     //TODO grails3   sql?.close()
         }
 
         return searchResult
@@ -212,7 +212,7 @@ class PersonSearchService {
             }
 
         } finally {
-            sql?.close()
+                     //TODO grails3   sql?.close()
         }
 
         return searchResult
@@ -349,7 +349,7 @@ class PersonSearchService {
                 count = row.totalCount
             }
         } finally {
-            sql?.close()
+                     //TODO grails3   sql?.close()
         }
         return count
     }
@@ -362,7 +362,7 @@ class PersonSearchService {
                 count = row.totalCount
             }
         } finally {
-            sql?.close()
+                     //TODO grails3   sql?.close()
         }
         return count
     }
@@ -375,7 +375,7 @@ class PersonSearchService {
                 count = row.totalCount
             }
         } finally {
-            sql?.close()
+                     //TODO grails3   sql?.close()
         }
         return count
     }

@@ -260,7 +260,7 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
         } finally {
             sql.executeUpdate("update gubiprf set gubiprf_security_enabled_ind = 'Y' where gubiprf_inst_key = 'INST'")
             sql.commit()
-            sql?.close() // note that the test will close the connection, since it's our current session's connection
+            //TODO grails3   sql?.close() // note that the test will close the connection, since it's our current session's connection
         }
     }
 
@@ -333,7 +333,7 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
         } finally {
             sql.executeUpdate("update gubiprf set gubiprf_security_enabled_ind = 'Y' where gubiprf_inst_key = 'INST'")
             sql.commit()
-            sql?.close() // note that the test will close the connection, since it's our current session's connection
+            //TODO grails3   sql?.close() // note that the test will close the connection, since it's our current session's connection
         }
     }
 
@@ -362,7 +362,7 @@ class PersonAdvancedSearchIDNameIntegrationTests extends BaseIntegrationTestCase
             sql = new Sql(sessionFactory.getCurrentSession().connection())
             sql.executeUpdate("update gtvsdax  set GTVSDAX_EXTERNAL_CODE = ? where GTVSDAX_INTERNAL_CODE = ? and GTVSDAX_INTERNAL_CODE_GROUP=? ", [30,'SEARCH_MAX','GUISRCH'])
         } finally {
-            sql?.close() // note that the test will close the connection, since it's our current session's connection
+            //TODO grails3   sql?.close()) // note that the test will close the connection, since it's our current session's connection
         }
        assertEquals "30", personSearchService.fetchNoOfRowsInPageForGUQSRCH()
    }

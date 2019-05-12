@@ -15,7 +15,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
-import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
+import org.springframework.orm.hibernate5.HibernateOptimisticLockingFailureException
 
 import java.text.SimpleDateFormat
 
@@ -100,7 +100,7 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
             sql = new Sql(sessionFactory.getCurrentSession().connection())
             sql.executeUpdate("update SV_SPRHOLD set SPRHOLD_VERSION = 999 where SPRHOLD_SURROGATE_ID = ?", [personRelatedHold.id])
         } finally {
-            sql?.close() // note that the test will close the connection, since it's our current session's connection
+            //TODO grails3   sql?.close() // note that the test will close the connection, since it's our current session's connection
         }
         //Try to update the entity
         personRelatedHold.pidm = 1

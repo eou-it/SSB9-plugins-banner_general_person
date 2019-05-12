@@ -9,6 +9,7 @@ import net.hedtech.banner.general.overall.IntegrationConfiguration
 import net.hedtech.banner.service.ServiceBase
 import grails.util.Holders as SCH
 import org.grails.web.util.GrailsApplicationAttributes as GA
+import org.hibernate.SessionFactory
 import org.codehaus.groovy.runtime.InvokerHelper
 import org.springframework.context.ApplicationContext
 import org.springframework.context.i18n.LocaleContextHolder
@@ -58,8 +59,7 @@ class PersonUtility {
         def bioSql =
             """select nvl (spbpers_dead_ind,  'N') dead
         from spbpers where spbpers_pidm = ? """
-        def ctx = SCH.servletContext.getAttribute(GA.APPLICATION_CONTEXT)
-        def sessionFactory = ctx.sessionFactory
+        SessionFactory sessionFactory = Holders.getGrailsApplication().getMainContext().sessionFactory
         def session = sessionFactory.currentSession
         def sql = new Sql(session.connection())
         def bio = sql.rows(bioSql, [pidm])[0]
@@ -70,8 +70,7 @@ class PersonUtility {
     public static Boolean isPersonConfidential(Integer pidm) {
         def confSql = """ select nvl(spbpers_confid_ind, 'N') confidential
                       from spbpers where spbpers_pidm = ? """
-        def ctx = SCH.servletContext.getAttribute(GA.APPLICATION_CONTEXT)
-        def sessionFactory = ctx.sessionFactory
+        SessionFactory sessionFactory = Holders.getGrailsApplication().getMainContext().sessionFactory
         def session = sessionFactory.currentSession
         def sql = new Sql(session.connection())
         def conf = sql.rows(confSql, [pidm])[0]
@@ -82,8 +81,7 @@ class PersonUtility {
     public static Map isPersonConfidentialOrDeceased(Integer pidm) {
         def sqlQuery = """ select nvl(spbpers_confid_ind, 'N') confidential,  nvl (spbpers_dead_ind,  'N') dead
                       from spbpers where spbpers_pidm = ? """
-        def ctx = SCH.servletContext.getAttribute(GA.APPLICATION_CONTEXT)
-        def sessionFactory = ctx.sessionFactory
+        SessionFactory sessionFactory = Holders.getGrailsApplication().getMainContext().sessionFactory
         def session = sessionFactory.currentSession
         def sql = new Sql(session.connection())
         def conf = sql.rows(sqlQuery, [pidm])[0]
@@ -96,8 +94,7 @@ class PersonUtility {
                          where goremal_pidm = ?
                            and goremal_status_ind = ?
                            and goremal_preferred_ind = ? """
-        def ctx = SCH.servletContext.getAttribute(GA.APPLICATION_CONTEXT)
-        def sessionFactory = ctx.sessionFactory
+        SessionFactory sessionFactory = Holders.getGrailsApplication().getMainContext().sessionFactory
         def session = sessionFactory.currentSession
         def sql = new Sql(session.connection())
         def conf = sql.rows(emailQuery, [pidm, 'A', 'Y'])[0]
@@ -160,7 +157,8 @@ class PersonUtility {
         def connection
         CallableStatement sqlCall
         def piiActive = "N"
-        def sessionFactory = SCH.servletContext.getAttribute(GA.APPLICATION_CONTEXT)?.sessionFactory
+        SessionFactory sessionFactory = Holders.getGrailsApplication().getMainContext().sessionFactory
+
 
         try {
             connection = sessionFactory.currentSession.connection()
@@ -170,7 +168,7 @@ class PersonUtility {
             piiActive = sqlCall.getString(1)
         }
         finally {
-            sqlCall?.close()
+           // sqlCall?.close()
         }
 
         return (piiActive == "Y")
@@ -180,7 +178,7 @@ class PersonUtility {
     public static turnFgacOff() {
         def connection
         CallableStatement sqlCall
-        def sessionFactory = SCH.servletContext.getAttribute(GA.APPLICATION_CONTEXT)?.sessionFactory
+        SessionFactory sessionFactory = Holders.getGrailsApplication().getMainContext().sessionFactory
 
         try {
             connection = sessionFactory.currentSession.connection()
@@ -188,7 +186,7 @@ class PersonUtility {
             sqlCall.executeUpdate()
         }
         finally {
-            sqlCall?.close()
+          //TODO grails3  sqlCall?.close()
         }
     }
 
@@ -196,7 +194,8 @@ class PersonUtility {
     public static turnFgacOn() {
         def connection
         CallableStatement sqlCall
-        def sessionFactory = SCH.servletContext.getAttribute(GA.APPLICATION_CONTEXT)?.sessionFactory
+        SessionFactory sessionFactory = Holders.getGrailsApplication().getMainContext().sessionFactory
+
 
         try {
             connection = sessionFactory.currentSession.connection()
@@ -204,13 +203,13 @@ class PersonUtility {
             sqlCall.executeUpdate()
         }
         finally {
-            sqlCall?.close()
+          //TODO grails3  sqlCall?.close()
         }
     }
 
 
     public static getPreferredName (params){
-        def ctx = Holders.servletContext.getAttribute(GA.APPLICATION_CONTEXT)
+        def ctx = Holders.getGrailsApplication().getMainContext()
         def preferredNameService = ctx.preferredNameService
         def productName=Holders?.config?.productName ?: null
         def applicationName=Holders?.config?.banner.applicationName ?: null

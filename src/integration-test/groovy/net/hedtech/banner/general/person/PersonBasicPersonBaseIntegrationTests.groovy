@@ -14,7 +14,7 @@ import groovy.sql.Sql
 import static groovy.test.GroovyAssert.*
 import net.hedtech.banner.general.system.*
 import net.hedtech.banner.testing.BaseIntegrationTestCase
-import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
+import org.springframework.orm.hibernate5.HibernateOptimisticLockingFailureException
 
 import java.text.SimpleDateFormat
 
@@ -539,7 +539,7 @@ class PersonBasicPersonBaseIntegrationTests extends BaseIntegrationTestCase {
             sql = new Sql(sessionFactory.getCurrentSession().connection())
             sql.executeUpdate("update SV_SPBPERS set SPBPERS_VERSION = 999 where SPBPERS_SURROGATE_ID = ?", [personBasicPersonBase.id])
         } finally {
-            sql?.close() // note that the test will close the connection, since it's our current session's connection
+            //TODO grails3   sql?.close() // note that the test will close the connection, since it's our current session's connection
         }
         //Try to update the entity
         //Update the entity
