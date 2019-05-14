@@ -1,5 +1,5 @@
 /*********************************************************************************
- Copyright 2013-2016 Ellucian Company L.P. and its affiliates.
+ Copyright 2013-2019 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 package net.hedtech.banner.general.person
 
@@ -9,6 +9,8 @@ import net.hedtech.banner.general.overall.ldm.GlobalUniqueIdentifier
 import net.hedtech.banner.general.system.FgacDomain
 import net.hedtech.banner.general.system.NameType
 import net.hedtech.banner.service.DatabaseModifiesState
+import org.hibernate.annotations.Generated
+import org.hibernate.annotations.GenerationTime
 
 import javax.persistence.*
 
@@ -302,7 +304,8 @@ class PersonIdentificationName implements Serializable {
     ])
     FgacDomain fgacDomain
 
-    @Column(name = "FULL_NAME", nullable = true)
+    @Generated(GenerationTime.ALWAYS)
+    @Column(name="FULL_NAME", insertable=false,updatable=false)
     String fullName
 
     public static readonlyProperties = ['pidm']
