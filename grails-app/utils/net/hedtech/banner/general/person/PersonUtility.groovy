@@ -106,8 +106,9 @@ class PersonUtility {
                          where goremal_pidm = ?
                            and goremal_status_ind = ?
                            and goremal_emal_code = ? """
-        def ctx = SCH.servletContext.getAttribute(GA.APPLICATION_CONTEXT)
-        def sessionFactory = ctx.sessionFactory
+        //def ctx = SCH.servletContext.getAttribute(GA.APPLICATION_CONTEXT)
+       // def sessionFactory = ctx.sessionFactory
+        SessionFactory sessionFactory = Holders.getGrailsApplication().getMainContext().sessionFactory
         def session = sessionFactory.currentSession
         def sql = new Sql(session.connection())
         def conf = sql.rows(emailQuery, [pidm, status,emailCode])[0]
