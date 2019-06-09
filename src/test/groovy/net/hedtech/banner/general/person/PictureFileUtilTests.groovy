@@ -6,8 +6,9 @@ package net.hedtech.banner.general.person
 import org.grails.testing.GrailsUnitTest
 import org.junit.Test
 import spock.lang.Specification
+import static org.junit.Assert.*
 
-class PictureFileUtilTests extends Specification implements GrailsUnitTest {
+class PictureFileUtilTests {
     private static def imageLocation = System.getProperty('base.dir') + File.separator + "test" + File.separator + "resources" + File.separator + "images"
 
     public void setup() {
@@ -19,7 +20,7 @@ class PictureFileUtilTests extends Specification implements GrailsUnitTest {
     }
 
     @Test
-    void testDontFine() {
+    void testDontFind() {
         assertNull PictureFileUtils.getImgFile("images", ['dontfindme.png'])
         assertNull PictureFileUtils.getImgFile(imageLocation, ['dontfindme.png'])
     }

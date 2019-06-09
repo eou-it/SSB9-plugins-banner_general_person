@@ -6,9 +6,10 @@ package net.hedtech.banner.general.person
 import org.grails.testing.GrailsUnitTest
 import org.junit.Test
 import spock.lang.Specification
+import static org.junit.Assert.*
 
 
-class PictureFileNamesUtilTests extends Specification implements GrailsUnitTest {
+class PictureFileNamesUtilTests {
     public void setup() {
     }
 

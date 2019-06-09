@@ -5,12 +5,13 @@ package net.hedtech.banner.general.person
 
 import org.grails.testing.GrailsUnitTest
 import org.junit.Test
+import static org.junit.Assert.*
 import spock.lang.Specification
 
 /**
  * Tests for class PhoneNumberUtility
  */
-class PhoneNumberUtilityTests extends Specification implements GrailsUnitTest {
+class PhoneNumberUtilityTests  {
 
     @Test
     void testParsePhoneNumber() {

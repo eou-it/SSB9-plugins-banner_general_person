@@ -7,13 +7,14 @@ import org.grails.testing.GrailsUnitTest
 import grails.test.mixin.TestFor
 import grails.util.Holders
 import org.junit.Test
+import static org.junit.Assert.*
 
 @TestFor(PersonPictureService)
 class PersonPictureServiceTests {
 
     def personPictureService
     def testResourcePath = System.getProperty('base.dir') + File.separator + "test" + File.separator + "resources" +
-            File.separator + "images" + File.separator + "resources"
+            File.separator + "images"
 
     public void setUp() {
         personPictureService = service
