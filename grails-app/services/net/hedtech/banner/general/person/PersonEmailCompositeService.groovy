@@ -42,7 +42,14 @@ class PersonEmailCompositeService {
                 service.create(domain)
             else if (domain.id) {
                 if (findIfPrimaryKeyChanged(domain)) {
-                    PersonEmail newEmail = new PersonEmail(domain.properties)
+                    PersonEmail newEmail = new PersonEmail(
+                            emailAddress: domain.properties.emailAddress,
+                            emailType: domain.properties.emailType,
+                            commentData: domain.properties.commentData,
+                            pidm: domain.properties.pidm,
+                            displayWebIndicator: domain.properties.displayWebIndicator,
+                            preferredIndicator: domain.properties.preferredIndicator
+                    )
                     def delMap = [domainModel: domain]
 
                     service.delete(delMap)
