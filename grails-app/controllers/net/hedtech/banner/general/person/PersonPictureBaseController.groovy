@@ -101,12 +101,12 @@ class PersonPictureBaseController {
 
     private def getImagesResourcePath()
     {
-        return getApplicationContext().getResource('assets').file.absolutePath
+        return getApplicationContext().getResource('images').file.absolutePath
     }
 
 
     public ApplicationContext getApplicationContext() {
-        return (ApplicationContext) Holders?.getServletContext().getAttribute(GrailsApplicationAttributes.APPLICATION_CONTEXT)
+        return (ApplicationContext) Holders.grailsApplication.getMainContext()
     }
 
 }
