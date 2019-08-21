@@ -118,7 +118,16 @@ codenarc {
 }
 
 cobertura {
-    coverageFormats = ['html', 'xml']
+    coverageFormats = ['xml','html']
+    coverageIgnoreTrivial = true
+    coverageIgnores = ['org.slf4j.Logger.*']
+    //only an example to skip instrumentation
+    //coverageIgnoreMethodAnnotations = ['grails.gorm.transactions.Transactional']
+    coverageExcludes = ['.Application.',
+                        '.BootStrap.',
+                        '.UrlMappings.']
+    sourceCompatibility = 1.6
+    targetCompatibility = 1.6
 }
 
 assets {
