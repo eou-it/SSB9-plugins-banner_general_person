@@ -31,12 +31,16 @@ class PersonGenderPronounCompositeService {
 
     def updatePerson(Map person) {
         checkPersonBaseExists(person)
+        def persistedPerson = fetchPersonalDetails(person.pidm)
 
-        person.maritalStatus = maritalStatusService.fetchByCode(person.maritalStatus.code)
+        if (person.maritalStatus) {
+            person.maritalStatus = maritalStatusService.fetchByCode(person?.maritalStatus?.code)
+        }
+        else {
+            person.maritalStatus = maritalStatusService.fetchByCode(persistedPerson?.maritalStatus?.code)
+        }
 
         if(checkGenderPronounInstalled()) {
-
-            def persistedPerson = fetchPersonalDetails(person.pidm)
             def genderCode = null
             def pronounCode = null
 
