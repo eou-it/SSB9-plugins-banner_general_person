@@ -4,7 +4,9 @@
 package net.hedtech.banner.general.person
 
 import grails.gorm.transactions.Transactional
+import grails.util.Holders
 import net.hedtech.banner.exceptions.ApplicationException
+import org.apache.commons.lang3.StringEscapeUtils
 import org.hibernate.StaleObjectStateException
 import org.springframework.orm.hibernate5.HibernateOptimisticLockingFailureException
 import org.springframework.transaction.annotation.Propagation
@@ -21,24 +23,40 @@ class PersonGenderPronounCompositeService {
     def fetchPersonalDetails(pidm) {
         def personalDetails = personBasicPersonBaseService.getPersonalDetailsForPersonalInformation(pidm)
 
-        if(checkGenderPronounInstalled() && personalDetails.id) {
+        if (checkGenderPronounInstalled() && personalDetails.id) {
             def fetchResult = fetchPersonsGenderPronoun(personalDetails.id)
             personalDetails.gender = fetchResult.gender
             personalDetails.pronoun = fetchResult.pronoun
         }
+
         return personalDetails
+    }
+
+    def fetchPersonalDetailsWithoutHiddenFields (pidm, HashMap<String, Integer> configurations) {
+        def personalDetails = fetchPersonalDetails(pidm)
+        personalDetails = removeNonVisibleFieldsFromPersonModel(personalDetails, configurations)
+        return personalDetails
+    }
+
+    def removeNonVisibleFieldsFromPersonModel(person, HashMap<String, Integer> configurations) {
+        def newPerson = person
+        configurations.forEach ({ key, value ->
+            if (!isFieldViewableOrUpdateable(value)) {
+                newPerson.remove(key)
+            }
+        })
+        return newPerson
+    }
+
+    def isFieldViewableOrUpdateable(field) {
+        return field == 1 || field == 2
     }
 
     def updatePerson(Map person) {
         checkPersonBaseExists(person)
         def persistedPerson = fetchPersonalDetails(person.pidm)
 
-        if (person.maritalStatus) {
-            person.maritalStatus = maritalStatusService.fetchByCode(person?.maritalStatus?.code)
-        }
-        else {
-            person.maritalStatus = maritalStatusService.fetchByCode(persistedPerson?.maritalStatus?.code)
-        }
+        person.maritalStatus = maritalStatusService.fetchByCode(person.maritalStatus ? person?.maritalStatus?.code : persistedPerson?.maritalStatus?.code)
 
         if(checkGenderPronounInstalled()) {
             def genderCode = null
