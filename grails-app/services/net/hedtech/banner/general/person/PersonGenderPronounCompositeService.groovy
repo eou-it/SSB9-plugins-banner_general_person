@@ -20,7 +20,7 @@ class PersonGenderPronounCompositeService {
     def personBasicPersonBaseService
     def maritalStatusService
 
-    def fetchPersonalDetails(pidm) {
+    def fetchPersonalDetails(pidm, configurations = null) {
         def personalDetails = personBasicPersonBaseService.getPersonalDetailsForPersonalInformation(pidm)
 
         if (checkGenderPronounInstalled() && personalDetails.id) {
@@ -29,12 +29,10 @@ class PersonGenderPronounCompositeService {
             personalDetails.pronoun = fetchResult.pronoun
         }
 
-        return personalDetails
-    }
+        if (configurations) {
+            personalDetails = removeNonVisibleFieldsFromPersonModel(personalDetails, configurations)
+        }
 
-    def fetchPersonalDetailsWithoutHiddenFields (pidm, HashMap<String, Integer> configurations) {
-        def personalDetails = fetchPersonalDetails(pidm)
-        personalDetails = removeNonVisibleFieldsFromPersonModel(personalDetails, configurations)
         return personalDetails
     }
 
@@ -45,7 +43,7 @@ class PersonGenderPronounCompositeService {
                 newPerson.remove(key)
             }
         })
-        return newPerson
+        newPerson
     }
 
     def isFieldViewableOrUpdateable(field) {
