@@ -20,7 +20,7 @@ class PersonGenderPronounCompositeService {
     def personBasicPersonBaseService
     def maritalStatusService
 
-    def fetchPersonalDetails(pidm, configurations = null) {
+    def fetchPersonalDetails(pidm, personalDetailsFieldDisplayConfigurations = null) {
         def personalDetails = personBasicPersonBaseService.getPersonalDetailsForPersonalInformation(pidm)
 
         if (checkGenderPronounInstalled() && personalDetails.id) {
@@ -29,8 +29,8 @@ class PersonGenderPronounCompositeService {
             personalDetails.pronoun = fetchResult.pronoun
         }
 
-        if (configurations) {
-            personalDetails = removeNonVisibleFieldsFromPersonModel(personalDetails, configurations)
+        if (personalDetailsFieldDisplayConfigurations) {
+            personalDetails = removeNonVisibleFieldsFromPersonModel(personalDetails, personalDetailsFieldDisplayConfigurations)
         }
 
         return personalDetails
