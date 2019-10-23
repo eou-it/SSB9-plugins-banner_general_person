@@ -53,13 +53,16 @@ class PersonTelephoneService extends ServiceBase {
         return entities
     }
 
-    def fetchActiveTelephonesByPidm(pidm, sequenceConfig = null, includeUnlisted = false) {
+    def fetchActiveTelephonesByPidm(pidm, sequenceConfig = null, includeUnlisted = false, displaySequence = null) {
         def telephoneRecords = includeUnlisted ? PersonTelephone.fetchActiveTelephoneWithUnlistedByPidm(pidm) :
                                                  PersonTelephone.fetchActiveTelephoneByPidm(pidm)
         def telephone
         def telephones = []
         def decorator
         def telephoneDisplaySequence = PersonUtility.getDisplaySequence('telephoneDisplaySequence', sequenceConfig)
+        if (displaySequence) {
+            telephoneDisplaySequence = displaySequence
+        }
 
         telephoneRecords.each { it ->
             telephone = [:]
