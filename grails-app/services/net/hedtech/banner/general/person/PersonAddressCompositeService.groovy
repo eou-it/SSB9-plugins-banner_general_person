@@ -99,7 +99,8 @@ class PersonAddressCompositeService {
 
 
     private boolean checkDatesForUpdate(domain) {
-        checkForOptimisticLockingError(domain)
+        PersonUtility.checkForOptimisticLockingError(domain, PersonAddress,
+                MessageHelper.message("default.optimistic.locking.failure", MessageHelper.message("personInfo.title.address")))
         def addressCriteria = [pidm:domain.pidm,addressType:domain.addressType,fromDate:domain.fromDate,toDate:domain.toDate,id:domain.id]
          if (domain.fromDate == null && domain.toDate == null)   {
           if (PersonAddress.fetchNotInactiveAddressByPidmAndAddressTypeExcludingId(pidm:domain.pidm,addressType:domain.addressType,fromDate:domain.fromDate,toDate:domain.toDate,id:domain.id).list.size() > 0)
@@ -114,20 +115,6 @@ class PersonAddressCompositeService {
     private boolean checkPhone(domain) {
         if (((domain.countryPhone) || (domain.phoneArea)) && !(domain.phoneNumber))  {
             throw new ApplicationException(PersonAddress,"@@r1:phoneNumberNeededWithAncillaryPhoneInfo@@")
-        }
-    }
-
-    /**
-     * Checks if the session address version is different from the address of the same ID
-     * stored in the database.
-     *
-     * @throws ApplicationException
-     */
-    private checkForOptimisticLockingError(domain){
-        def addressInDatabase = PersonAddress?.get(domain?.id)
-        def optimisticLockingError = domain?.version != addressInDatabase?.version
-        if (optimisticLockingError){
-            throw new ApplicationException("", MessageHelper.message("default.optimistic.locking.failure", MessageHelper.message("personInfo.title.address")))
         }
     }
 
