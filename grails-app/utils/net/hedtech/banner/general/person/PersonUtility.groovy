@@ -5,6 +5,7 @@ package net.hedtech.banner.general.person
 
 import grails.util.Holders
 import groovy.sql.Sql
+import net.hedtech.banner.exceptions.ApplicationException
 import net.hedtech.banner.general.overall.IntegrationConfiguration
 import net.hedtech.banner.service.ServiceBase
 import grails.util.Holders as SCH
@@ -151,6 +152,19 @@ class PersonUtility {
             oldDomainObject.setProperties(content)
         }
         return (property in oldDomainObject.dirtyPropertyNames)
+    }
+
+    /**
+     *  Checks if the object version in the session is different from the version of the object of the same ID
+     *  stored in the database. Needed in certain scenarios where concurrent data editing issues
+     *  occur before Hibernate is able to perform an optimistic locking check.
+     */
+    public static checkForOptimisticLockingError(sessionObject, objectClass, optimisticLockingErrorMessage){
+        def objectInDatabase = objectClass?.get(sessionObject?.id)
+        def optimisticLockingError = sessionObject?.version != objectInDatabase?.version
+        if (optimisticLockingError){
+            throw new ApplicationException("", optimisticLockingErrorMessage)
+        }
     }
 
 

@@ -4,6 +4,7 @@ Copyright 2012-2019 Ellucian Company L.P. and its affiliates.
  package net.hedtech.banner.general.person
 
 import grails.gorm.transactions.Transactional
+import net.hedtech.banner.i18n.MessageHelper
 import net.hedtech.banner.service.ServiceBase
 import org.codehaus.groovy.runtime.InvokerHelper
 
@@ -41,6 +42,8 @@ class PersonEmailCompositeService {
             if (domain.id == null)
                 service.create(domain)
             else if (domain.id) {
+                PersonUtility.checkForOptimisticLockingError(domain, PersonEmail,
+                        MessageHelper.message("default.optimistic.locking.failure", MessageHelper.message("personInfo.title.email")))
                 if (findIfPrimaryKeyChanged(domain)) {
                     PersonEmail newEmail = new PersonEmail(
                             emailAddress: domain.properties.emailAddress,
