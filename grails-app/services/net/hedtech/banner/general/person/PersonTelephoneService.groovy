@@ -98,7 +98,7 @@ class PersonTelephoneService extends ServiceBase {
 
     void inactivateAndCreate(phone) {
         PersonUtility.checkForOptimisticLockingError(phone, PersonTelephone,
-                MessageHelper.message("default.optimistic.locking.failure", MessageHelper.message("personInfo.title.phoneNumber")))
+                MessageHelper.message("default.optimistic.locking.failure.refresh", MessageHelper.message("personInfo.title.phoneNumber")))
 
         inactivatePhone(phone)
 
