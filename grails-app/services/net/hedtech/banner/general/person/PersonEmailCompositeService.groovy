@@ -43,7 +43,7 @@ class PersonEmailCompositeService {
                 service.create(domain)
             else if (domain.id) {
                 PersonUtility.checkForOptimisticLockingError(domain, PersonEmail,
-                        MessageHelper.message("default.optimistic.locking.failure", MessageHelper.message("personInfo.title.email")))
+                        MessageHelper.message("default.optimistic.locking.failure.refresh", MessageHelper.message("personInfo.title.email")))
                 if (findIfPrimaryKeyChanged(domain)) {
                     PersonEmail newEmail = new PersonEmail(
                             emailAddress: domain.properties.emailAddress,

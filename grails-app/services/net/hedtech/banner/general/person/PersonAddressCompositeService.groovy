@@ -100,7 +100,7 @@ class PersonAddressCompositeService {
 
     private boolean checkDatesForUpdate(domain) {
         PersonUtility.checkForOptimisticLockingError(domain, PersonAddress,
-                MessageHelper.message("default.optimistic.locking.failure", MessageHelper.message("personInfo.title.address")))
+                MessageHelper.message("default.optimistic.locking.failure.refresh", MessageHelper.message("personInfo.title.address")))
         def addressCriteria = [pidm:domain.pidm,addressType:domain.addressType,fromDate:domain.fromDate,toDate:domain.toDate,id:domain.id]
          if (domain.fromDate == null && domain.toDate == null)   {
           if (PersonAddress.fetchNotInactiveAddressByPidmAndAddressTypeExcludingId(pidm:domain.pidm,addressType:domain.addressType,fromDate:domain.fromDate,toDate:domain.toDate,id:domain.id).list.size() > 0)
