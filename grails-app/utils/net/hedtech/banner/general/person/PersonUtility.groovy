@@ -27,6 +27,8 @@ import java.sql.CallableStatement
 class PersonUtility {
 
     static final PERSON_CONFIG = 'personConfig'
+    static final PROXY_PREFERRED_NAME_PRODUCT_NAME = 'Banner Proxy'
+    static final PROXY_PREFERRED_NAME_APPLICATION_NAME = 'ProxyAccess'
 
 
     public static Boolean isPersonValid(String bannerId) {
@@ -235,6 +237,15 @@ class PersonUtility {
             params.put("appname", applicationName)
 
         return preferredNameService.getPreferredName(params)
+    }
+
+    /*Proxies always use the same name display rule to view the names of the students
+    * who proxied them.*/
+    public static getPreferredNameForProxyDisplay (studentPidm) {
+        def context = Holders.getGrailsApplication().getMainContext()
+        def preferredNameService = context.preferredNameService
+        def proxyNameDisplayParams = ["pidm": studentPidm, "productname": PROXY_PREFERRED_NAME_PRODUCT_NAME, "appname": PROXY_PREFERRED_NAME_APPLICATION_NAME]
+        return preferredNameService.getPreferredName(proxyNameDisplayParams)
     }
 
     public static setPersonConfigInSession(config) {
