@@ -1,10 +1,11 @@
 /*********************************************************************************
-Copyright 2012-2018 Ellucian Company L.P. and its affiliates.
+Copyright 2012-2020 Ellucian Company L.P. and its affiliates.
 **********************************************************************************/
 package net.hedtech.banner.general.person.search
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import grails.util.Holders
 import org.junit.Before
 import org.junit.Test
 import org.junit.After
@@ -17,12 +18,11 @@ import grails.converters.JSON
 @Rollback
 class PersonSearchControllerIntegrationTests extends BaseIntegrationTestCase {
     def controller
-    def personSearchService
 
     @Before
     public void setUp() {
         formContext = ['GUAGMNU'] //(removing GEAPART because of GUOBOBS_UI_VERSION = B)
-        controller = new PersonSearchController()
+        controller = Holders.grailsApplication.getMainContext().getBean("net.hedtech.banner.general.person.search.PersonSearchController")
         super.setUp()
     }
 
