@@ -1,5 +1,5 @@
 /*******************************************************************************
- Copyright 2017-2019 Ellucian Company L.P. and its affiliates.
+ Copyright 2017-2020 Ellucian Company L.P. and its affiliates.
  *******************************************************************************/
 package net.hedtech.banner.general.person
 
@@ -257,7 +257,7 @@ class PersonGenderPronounCompositeServiceIntegrationTests extends BaseIntegratio
 
     @Test
     void testFetchPronounListOffset() {
-        def result = personGenderPronounCompositeService.fetchPronounList(2, 2, '')
+        def result = personGenderPronounCompositeService.fetchPronounList(2, 4, '')
         assertTrue 2 >= result.size()
         assertTrue result.code.contains('B002')
         assertTrue result.description.contains('she')
