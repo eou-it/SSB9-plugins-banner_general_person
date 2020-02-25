@@ -46,12 +46,12 @@ class PersonEmailCompositeService {
                         MessageHelper.message("default.optimistic.locking.failure.refresh", MessageHelper.message("personInfo.title.email")))
                 if (findIfPrimaryKeyChanged(domain)) {
                     PersonEmail newEmail = new PersonEmail(
-                            emailAddress: domain.properties.emailAddress,
-                            emailType: domain.properties.emailType,
-                            commentData: domain.properties.commentData,
-                            pidm: domain.properties.pidm,
-                            displayWebIndicator: domain.properties.displayWebIndicator,
-                            preferredIndicator: domain.properties.preferredIndicator
+                            emailAddress: domain.emailAddress,
+                            emailType: domain.emailType,
+                            commentData: domain.commentData,
+                            pidm: domain.pidm,
+                            displayWebIndicator: domain.displayWebIndicator,
+                            preferredIndicator: domain.preferredIndicator
                     )
                     def delMap = [domainModel: domain]
 
