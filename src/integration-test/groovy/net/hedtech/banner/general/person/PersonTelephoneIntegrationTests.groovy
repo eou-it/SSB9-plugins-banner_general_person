@@ -421,7 +421,7 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
         personTelephone.primaryIndicator = "Y"
         personTelephone.statusIndicator = null
         personTelephone.unlistIndicator = null
-        personTelephone.save()
+        personTelephone.save(failOnError: true, flush: true)
         def personTelephone1 = newValidForCreatePersonTelephone()
         personTelephone1.pidm = pidm
         personTelephone1.sequenceNumber = maxSeqNo + 1
@@ -430,7 +430,7 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
         personTelephone1.primaryIndicator = null
         personTelephone1.statusIndicator = null
         personTelephone1.unlistIndicator = null
-        personTelephone1.save()
+        personTelephone1.save(failOnError: true, flush: true)
 
         def phone = PersonTelephone.fetchActiveTelephoneByPidmAndTelephoneType(pidm,telephoneType.code)
 
@@ -450,13 +450,17 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
 
         def sanity = PersonTelephone.findAllByPidm(pidm).size()
 
+        // Although this address type initialization happens in setUp, as of the Grails 3 (and GORM 6.1) upgrades,
+        // for some reason they're not found in the database once we enter this test, so adding them back in.
+        initializeAddressTypes()
+
         createAddressFor(pidm, "Z1")
 
         // 4 telephone numbers for Z1
         // 1. Active, primary, listed
         // 2. Active, not-primary, listed
         // 3. Inactive, not-primary, listed
-        // 5. Inacrtive, not-primary, unlisted
+        // 5. Inactive, not-primary, unlisted
         // Should get back 1
         def personTelephone = newValidForCreatePersonTelephone()
         personTelephone.pidm = pidm
