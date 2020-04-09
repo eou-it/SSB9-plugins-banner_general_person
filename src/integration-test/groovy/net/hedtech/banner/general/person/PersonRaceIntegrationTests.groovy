@@ -201,7 +201,7 @@ class PersonRaceIntegrationTests extends BaseIntegrationTestCase {
         assertEquals quiredPersonRace, personRace
 
 
-        personRace.delete()
+        personRace.delete(failOnError: true, flush: true)
         assertNull personRace.get(id)
         quiredPersonRace = PersonRace.fetchByPidmAndRace(personRace.pidm, personRace.race)
         assertNull quiredPersonRace

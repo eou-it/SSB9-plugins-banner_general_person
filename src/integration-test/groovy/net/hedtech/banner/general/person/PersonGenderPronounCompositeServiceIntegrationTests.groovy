@@ -257,7 +257,7 @@ class PersonGenderPronounCompositeServiceIntegrationTests extends BaseIntegratio
 
     @Test
     void testFetchPronounListOffset() {
-        def result = personGenderPronounCompositeService.fetchPronounList(2, 4, '')
+        def result = personGenderPronounCompositeService.fetchPronounList(2, 2, '')
         assertTrue 2 >= result.size()
         assertTrue result.code.contains('B002')
         assertTrue result.description.contains('she')

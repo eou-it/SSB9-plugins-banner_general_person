@@ -83,7 +83,10 @@ environments {
 
     }
     test {
-
+        // The GORM 6.1 upgrade which came with Grails 3 causes certain integration tests to fail due to new behavior
+        // related to dirty checking. According to http://gorm.grails.org/6.1.8/hibernate/manual, to revert to the
+        // Hibernate behavior -- needed for these tests to pass -- this property is necessary.
+        hibernate.hibernateDirtyChecking = true
     }
     production {
 

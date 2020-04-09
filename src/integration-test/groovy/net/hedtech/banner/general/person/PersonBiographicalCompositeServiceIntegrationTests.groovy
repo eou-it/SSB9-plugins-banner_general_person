@@ -207,7 +207,7 @@ class PersonBiographicalCompositeServiceIntegrationTests extends BaseIntegration
                 namePrefix: "TT",
                 nameSuffix: "TT",
                 veraIndicator: "V",
-                citizenshiopIndicator: "U",
+                citizenshipIndicator: "U",
                 deadDate: null,
                 hair: "BR",
                 eyeColor: "BR",
