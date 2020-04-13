@@ -62,6 +62,11 @@ dependencies {
     compile "org.hibernate:hibernate-ehcache:5.1.17.Final"
 }
 
+configurations {
+    runtime.exclude group: "org.springframework.boot", module: "spring-boot-starter-actuator"
+    runtime.exclude group: "org.grails", module: "grails-gorm-testing-support"
+}
+
 
 // Added for BannerXE - Internal plugin dependency
 grails {
