@@ -36,7 +36,7 @@ class PersonPictureBaseController {
             def pictureBytes
             def contentType
 			//Added decode api for Non english charaters
-            def imageFile = personPictureService.getPictureFileForUserWith(URLDecoder.decode(params.bannerId,"UTF-8"))
+            def imageFile = personPictureService.getPictureFileForUserWith(decode(params.bannerId))
             if (null == imageFile)
             {
                 // we didn't find a file for our user, so send back the default
@@ -109,6 +109,24 @@ class PersonPictureBaseController {
 
     public ApplicationContext getApplicationContext() {
         return (ApplicationContext) Holders.grailsApplication.getMainContext()
+    }
+
+
+    /**
+     * This method returns the decode value
+     * @param paramValue The request params
+     * @return returns decode value for the given paramValue.
+     */
+    private def decode(def paramValue){
+        def returnStr = paramValue
+        if(returnStr) {
+            try {
+                returnStr = URLDecoder.decode(paramValue,"UTF-8")
+            }catch(UnsupportedEncodingException e){
+                log.error"Error UnsupportedEncodingException for given value = "+paramValue
+            }
+        }
+        return returnStr
     }
 
 }
