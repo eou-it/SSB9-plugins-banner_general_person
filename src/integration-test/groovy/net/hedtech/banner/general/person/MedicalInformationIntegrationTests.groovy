@@ -1,5 +1,5 @@
 /*********************************************************************************
-  Copyright 2009-2019 Ellucian Company L.P. and its affiliates.
+  Copyright 2009-2020 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
  package net.hedtech.banner.general.person
 
@@ -45,14 +45,12 @@ class MedicalInformationIntegrationTests extends BaseIntegrationTestCase {
     @Test
     void testUpdate() {
         def entity = newMedicalInformation()
-        save entity
-
         assertNotNull entity.id
         assertEquals(new Long(0), entity.version)
         assertTrue(entity.disabilityIndicator)
 
         entity.disabilityIndicator = false
-        save entity
+        entity.save(flush: true, failOnError: true)
 
         def updated = MedicalInformation.get(entity.id)
         assertEquals new Long(1), updated.version

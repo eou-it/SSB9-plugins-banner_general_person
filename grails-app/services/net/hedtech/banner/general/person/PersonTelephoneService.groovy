@@ -4,6 +4,7 @@
 package net.hedtech.banner.general.person
 
 import grails.gorm.transactions.Transactional
+import net.hedtech.banner.i18n.MessageHelper
 import net.hedtech.banner.person.PersonTelephoneDecorator
 import net.hedtech.banner.service.ServiceBase
 
@@ -53,13 +54,16 @@ class PersonTelephoneService extends ServiceBase {
         return entities
     }
 
-    def fetchActiveTelephonesByPidm(pidm, sequenceConfig = null, includeUnlisted = false) {
+    def fetchActiveTelephonesByPidm(pidm, sequenceConfig = null, includeUnlisted = false, displaySequence = null) {
         def telephoneRecords = includeUnlisted ? PersonTelephone.fetchActiveTelephoneWithUnlistedByPidm(pidm) :
                                                  PersonTelephone.fetchActiveTelephoneByPidm(pidm)
         def telephone
         def telephones = []
         def decorator
         def telephoneDisplaySequence = PersonUtility.getDisplaySequence('telephoneDisplaySequence', sequenceConfig)
+        if (displaySequence) {
+            telephoneDisplaySequence = displaySequence
+        }
 
         telephoneRecords.each { it ->
             telephone = [:]
@@ -93,10 +97,13 @@ class PersonTelephoneService extends ServiceBase {
     }
 
     void inactivateAndCreate(phone) {
+        PersonUtility.checkForOptimisticLockingError(phone, PersonTelephone,
+                MessageHelper.message("default.optimistic.locking.failure.refresh", MessageHelper.message("personInfo.title.phoneNumber")))
+
         inactivatePhone(phone)
 
-        phone.remove('id');
-        phone.remove('version');
+        phone.remove('id')
+        phone.remove('version')
         phone.statusIndicator = null
         create(phone)
     }

@@ -4,6 +4,7 @@ Copyright 2012-2019 Ellucian Company L.P. and its affiliates.
  package net.hedtech.banner.general.person
 
 import grails.gorm.transactions.Transactional
+import net.hedtech.banner.i18n.MessageHelper
 import net.hedtech.banner.service.ServiceBase
 import org.codehaus.groovy.runtime.InvokerHelper
 
@@ -41,14 +42,16 @@ class PersonEmailCompositeService {
             if (domain.id == null)
                 service.create(domain)
             else if (domain.id) {
+                PersonUtility.checkForOptimisticLockingError(domain, PersonEmail,
+                        MessageHelper.message("default.optimistic.locking.failure.refresh", MessageHelper.message("personInfo.title.email")))
                 if (findIfPrimaryKeyChanged(domain)) {
                     PersonEmail newEmail = new PersonEmail(
-                            emailAddress: domain.properties.emailAddress,
-                            emailType: domain.properties.emailType,
-                            commentData: domain.properties.commentData,
-                            pidm: domain.properties.pidm,
-                            displayWebIndicator: domain.properties.displayWebIndicator,
-                            preferredIndicator: domain.properties.preferredIndicator
+                            emailAddress: domain.emailAddress,
+                            emailType: domain.emailType,
+                            commentData: domain.commentData,
+                            pidm: domain.pidm,
+                            displayWebIndicator: domain.displayWebIndicator,
+                            preferredIndicator: domain.preferredIndicator
                     )
                     def delMap = [domainModel: domain]
 

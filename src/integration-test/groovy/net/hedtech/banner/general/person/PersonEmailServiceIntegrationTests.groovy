@@ -1,5 +1,5 @@
 /*********************************************************************************
-Copyright 2012-2019 Ellucian Company L.P. and its affiliates.
+Copyright 2012-2020 Ellucian Company L.P. and its affiliates.
 **********************************************************************************/
 package net.hedtech.banner.general.person
 
@@ -321,7 +321,7 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
         def personEmail = newValidForCreatePersonEmail()
         personEmail.statusIndicator = 'I'
         personEmail.preferredIndicator = false
-        personEmail.save()
+        personEmail.save(flush: true, failOnError: true)
         def emailMap = [
                 pidm: personEmail.pidm,
                 emailAddress: personEmail.emailAddress,
@@ -341,7 +341,7 @@ class PersonEmailServiceIntegrationTests extends BaseIntegrationTestCase {
         def personEmail = newValidForCreatePersonEmail()
         personEmail.statusIndicator = 'I'
         personEmail.preferredIndicator = false
-        personEmail.save()
+        personEmail.save(flush: true, failOnError: true)
         def result = personEmailService.fetchByPidmAndTypeAndAddress(personEmail.pidm, personEmail.emailType.code, personEmail.emailAddress)
 
         assertEquals 1, result.size()

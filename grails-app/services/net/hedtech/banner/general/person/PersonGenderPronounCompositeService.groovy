@@ -8,35 +8,51 @@ import net.hedtech.banner.exceptions.ApplicationException
 import org.hibernate.StaleObjectStateException
 import org.springframework.orm.hibernate5.HibernateOptimisticLockingFailureException
 import org.springframework.transaction.annotation.Propagation
-//import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.context.request.RequestContextHolder
 
-//TODO: previously used Spring Transactional (see import above). Does it cause problem switching to Grails 3 Transactional?  JDC 3/19
 @Transactional(readOnly = false, propagation = Propagation.REQUIRED )
 class PersonGenderPronounCompositeService {
     def sessionFactory
     def personBasicPersonBaseService
     def maritalStatusService
 
-    def fetchPersonalDetails(pidm) {
+    def fetchPersonalDetails(pidm, personalDetailsFieldDisplayConfigurations = null) {
         def personalDetails = personBasicPersonBaseService.getPersonalDetailsForPersonalInformation(pidm)
 
-        if(checkGenderPronounInstalled() && personalDetails.id) {
+        if (checkGenderPronounInstalled() && personalDetails.id) {
             def fetchResult = fetchPersonsGenderPronoun(personalDetails.id)
             personalDetails.gender = fetchResult.gender
             personalDetails.pronoun = fetchResult.pronoun
         }
+
+        if (personalDetailsFieldDisplayConfigurations) {
+            personalDetails = removeNonVisibleFieldsFromPersonModel(personalDetails, personalDetailsFieldDisplayConfigurations)
+        }
+
         return personalDetails
+    }
+
+    def removeNonVisibleFieldsFromPersonModel(person, HashMap<String, Integer> configurations) {
+        def newPerson = person
+        configurations.forEach ({ key, value ->
+            if (!isFieldViewableOrUpdateable(value)) {
+                newPerson.remove(key)
+            }
+        })
+        newPerson
+    }
+
+    def isFieldViewableOrUpdateable(field) {
+        return field == 1 || field == 2
     }
 
     def updatePerson(Map person) {
         checkPersonBaseExists(person)
+        def persistedPerson = fetchPersonalDetails(person.pidm)
 
-        person.maritalStatus = maritalStatusService.fetchByCode(person.maritalStatus.code)
+        person.maritalStatus = maritalStatusService.fetchByCode(person.maritalStatus ? person?.maritalStatus?.code : persistedPerson?.maritalStatus?.code)
 
         if(checkGenderPronounInstalled()) {
-
-            def persistedPerson = fetchPersonalDetails(person.pidm)
             def genderCode = null
             def pronounCode = null
 
@@ -72,13 +88,15 @@ class PersonGenderPronounCompositeService {
             int version = person.version + 1 == baseUpdateResult.version ? baseUpdateResult.version : person.version
 
             if(isDirty) {
-                def personUpdateSql = 'update spbpers set spbpers_gndr_code = ?, spbpers_pprn_code = ? where spbpers_surrogate_id = ? and spbpers_version = ?'
+                def userId = PersonIdentificationName?.fetchBannerPerson(person?.pidm)?.bannerId
+                def personUpdateSql = 'update spbpers set spbpers_gndr_code = ?, spbpers_pprn_code = ?, spbpers_user_id = ?, spbpers_activity_date = SYSDATE where spbpers_surrogate_id = ? and spbpers_version = ?'
                 int rowsUpdated = sessionFactory.getCurrentSession().createSQLQuery(personUpdateSql)
-                            .setString(0, genderCode)
-                            .setString(1, pronounCode)
-                            .setLong(2, persistedPerson.id)
-                            .setInteger(3, version)
-                            .executeUpdate()
+                        .setString(0, genderCode)
+                        .setString(1, pronounCode)
+                        .setString(2, userId)
+                        .setLong(3, persistedPerson.id)
+                        .setInteger(4, version)
+                        .executeUpdate()
 
                 if (rowsUpdated == 0) {
                     throw new ApplicationException( this.class, new HibernateOptimisticLockingFailureException( new StaleObjectStateException( PersonBasicPersonBase.class.simpleName, persistedPerson.id ) ) )

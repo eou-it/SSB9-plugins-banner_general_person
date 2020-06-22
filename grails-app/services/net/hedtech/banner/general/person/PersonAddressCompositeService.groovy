@@ -5,6 +5,7 @@ Copyright 2012-2019 Ellucian Company L.P. and its affiliates.
 
 import grails.gorm.transactions.Transactional
 import net.hedtech.banner.exceptions.ApplicationException
+import net.hedtech.banner.i18n.MessageHelper
 
 @Transactional
 class PersonAddressCompositeService {
@@ -98,6 +99,8 @@ class PersonAddressCompositeService {
 
 
     private boolean checkDatesForUpdate(domain) {
+        PersonUtility.checkForOptimisticLockingError(domain, PersonAddress,
+                MessageHelper.message("default.optimistic.locking.failure.refresh", MessageHelper.message("personInfo.title.address")))
         def addressCriteria = [pidm:domain.pidm,addressType:domain.addressType,fromDate:domain.fromDate,toDate:domain.toDate,id:domain.id]
          if (domain.fromDate == null && domain.toDate == null)   {
           if (PersonAddress.fetchNotInactiveAddressByPidmAndAddressTypeExcludingId(pidm:domain.pidm,addressType:domain.addressType,fromDate:domain.fromDate,toDate:domain.toDate,id:domain.id).list.size() > 0)
