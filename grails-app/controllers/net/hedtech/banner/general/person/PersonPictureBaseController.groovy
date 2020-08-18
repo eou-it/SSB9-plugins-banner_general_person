@@ -1,5 +1,5 @@
 /*******************************************************************************
- Copyright 2015 Ellucian Company L.P. and its affiliates.
+ Copyright 2015-2020 Ellucian Company L.P. and its affiliates.
  ****************************************************************************** */
 package net.hedtech.banner.general.person
 
@@ -29,12 +29,14 @@ class PersonPictureBaseController {
      *   -- bannerId The banner id of the user to render the image for.
      */
     def picture() {
+
+
         if (hasAccess())
         {
             def pictureBytes
             def contentType
-
-            def imageFile = personPictureService.getPictureFileForUserWith(params.bannerId)
+			//Added decode api for Non english charaters
+            def imageFile = personPictureService.getPictureFileForUserWith(decode(params.bannerId))
             if (null == imageFile)
             {
                 // we didn't find a file for our user, so send back the default
@@ -107,6 +109,24 @@ class PersonPictureBaseController {
 
     public ApplicationContext getApplicationContext() {
         return (ApplicationContext) Holders.grailsApplication.getMainContext()
+    }
+
+
+    /**
+     * This method returns the decode value
+     * @param paramValue The request params
+     * @return returns decode value for the given paramValue.
+     */
+    private def decode(def paramValue){
+        def returnStr = paramValue
+        if(returnStr) {
+            try {
+                returnStr = URLDecoder.decode(paramValue,"UTF-8")
+            }catch(UnsupportedEncodingException e){
+                log.error"Error UnsupportedEncodingException for given value = "+paramValue
+            }
+        }
+        return returnStr
     }
 
 }

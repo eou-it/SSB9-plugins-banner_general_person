@@ -1,5 +1,5 @@
 /*********************************************************************************
- Copyright 2009-2019 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2020 Ellucian Company L.P. and its affiliates.
  ********************************************************************************* */
 
 package net.hedtech.banner.general.person
@@ -51,7 +51,11 @@ class PersonIdentificationNameIntegrationTests extends BaseIntegrationTestCase {
         def personIdentificationName = newPersonIdentificationName()
         save personIdentificationName
 
-        def newPersonIdentification = new PersonIdentificationName(personIdentificationName.properties)
+        def persistentPropertyMap = personIdentificationName.gormPersistentEntity.persistentPropertyNames.collectEntries {
+            [it, personIdentificationName[it]]
+        }
+
+        def newPersonIdentification = new PersonIdentificationName(persistentPropertyMap)
         newPersonIdentification.changeIndicator = "N"
         newPersonIdentification.lastName = "YYYYYYYY"
         save newPersonIdentification

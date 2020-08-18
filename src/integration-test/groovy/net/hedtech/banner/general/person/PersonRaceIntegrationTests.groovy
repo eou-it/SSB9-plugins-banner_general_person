@@ -1,6 +1,6 @@
-/*********************************************************************************
-Copyright 2012-2019 Ellucian Company L.P. and its affiliates.
-**********************************************************************************/
+/*******************************************************************************
+ Copyright 2012-2020 Ellucian Company L.P. and its affiliates.
+ *******************************************************************************/
 
 package net.hedtech.banner.general.person
 
@@ -201,7 +201,7 @@ class PersonRaceIntegrationTests extends BaseIntegrationTestCase {
         assertEquals quiredPersonRace, personRace
 
 
-        personRace.delete()
+        personRace.delete(failOnError: true, flush: true)
         assertNull personRace.get(id)
         quiredPersonRace = PersonRace.fetchByPidmAndRace(personRace.pidm, personRace.race)
         assertNull quiredPersonRace

@@ -1,6 +1,6 @@
-/*********************************************************************************
-  Copyright 2009-2019 Ellucian Company L.P. and its affiliates.
- ********************************************************************************* */
+/*******************************************************************************
+ Copyright 2009-2020 Ellucian Company L.P. and its affiliates.
+ *******************************************************************************/
 
 package net.hedtech.banner.general.person
 
@@ -241,7 +241,7 @@ class PersonRelatedHoldIntegrationTests extends BaseIntegrationTestCase {
         def personRelatedHold = newPersonRelatedHold()
         personRelatedHold.pidm  = PersonIdentificationName.findByBannerIdAndChangeIndicatorIsNull("HOS00002").pidm
         holdList.add(personRelatedHold)
-        holdList.each{it.save()}
+        holdList.each{it.save(failOnError: true, flush: true)}
 
         def df1 = new SimpleDateFormat("yyyy-MM-dd")
         def holdDate = df1.parse("2010-08-01")
