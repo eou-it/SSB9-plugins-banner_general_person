@@ -662,6 +662,14 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
         assertEquals '4441512', results[0].phoneNumber
     }
 
+    @Test
+    void testFetchActiveTelephoneListWithUnlistedByPidmAndTelephoneType() {
+        def pidm = PersonUtility.getPerson("GDP000004").pidm
+        def results = PersonTelephone.fetchActiveTelephoneListWithUnlistedByPidmAndTelephoneType(pidm, [TelephoneType.fetchByCode("MA"), TelephoneType.fetchByCode("PR")])
+
+        assertTrue results.size() > 1
+        assertTrue results[0] instanceof PersonTelephone
+    }
 
     @Test
     void testFetchTelephonesByPidmAndAddressTypes() {
