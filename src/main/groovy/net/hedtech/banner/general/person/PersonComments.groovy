@@ -150,10 +150,10 @@ class PersonComments implements Serializable {
 
     static constraints = {
         pidm(nullable: false)
-        id(nullable: false)
+        id(nullable: true)
         lastModified(nullable: false)
         commentCode(nullable: false,  maxSize: 3)
-        version(nullable: false)
+        version(nullable: true)
         commentTypeCode(nullable: true,  maxSize: 4)
         lastModifiedBy(nullable: true,  maxSize: 30)
         contactDate(nullable: true)
