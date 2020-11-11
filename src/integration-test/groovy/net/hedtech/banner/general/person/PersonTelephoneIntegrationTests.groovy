@@ -683,7 +683,7 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
 
     /*Test to fetch the telephone details based on the params passed*/
     @Test
-    void testFetchActiveTelephoneListWithUnlistedByPidmAndTelephoneType(){
+    void testActiveTelephoneListWithUnlistedByPidmAndTelephoneType(){
         def personTelephone = new PersonTelephone()
         def pidm = PersonUtility.getPerson("A00050995").pidm
         def result = personTelephone.fetchActiveTelephoneListWithUnlistedByPidmAndTelephoneType(pidm, [TelephoneType.fetchByCode("BU")])
