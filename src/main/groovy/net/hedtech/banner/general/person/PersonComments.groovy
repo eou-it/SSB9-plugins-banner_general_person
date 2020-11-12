@@ -28,6 +28,12 @@ import javax.persistence.Version
 @Table(name = "SPRCMNT")
 @ToString(includeNames = true, ignoreNulls = true)
 @EqualsAndHashCode(includeFields = true)
+@NamedQueries(value = [
+        @NamedQuery(name = "PersonComments.fetchByPidmAndComments",
+                query = """FROM PersonComments pc
+                           WHERE pc.pidm = :pidm AND pc.text like :text
+                    """)
+])
 class PersonComments implements Serializable {
 
     /*
@@ -167,6 +173,23 @@ class PersonComments implements Serializable {
         text(nullable: true,  maxSize: 4000)
         guidStorage(nullable: true,  maxSize: 36)
         narrativeText(nullable: true)
+    }
+
+    /**
+     * This Method is used to get the PersonComments details
+     * param pidm
+     * param text
+     * @return PersonComments
+     */
+    public static PersonComments fetchByPidmAndComments(Integer pidm, String text) {
+        def personCommentsDetails
+        personCommentsDetails = PersonComments.withSession { session ->
+            session.getNamedQuery('PersonComments.fetchByPidmAndComments')
+                    .setInteger('pidm', pidm)
+                    .setString('text', text)
+                    .uniqueResult()
+        }
+        return personCommentsDetails
     }
 
 }

@@ -20,4 +20,9 @@ class PersonCommentsService extends ServiceBase {
     def preDelete(domainModelOrMap) {
 
     }
+
+    def getPersonCommentsDetailsBypidmAndComments(Integer pidm, String text) {
+        def personCommentsDetails = PersonComments.fetchByPidmAndComments(pidm, text)
+        return personCommentsDetails
+    }
 }
