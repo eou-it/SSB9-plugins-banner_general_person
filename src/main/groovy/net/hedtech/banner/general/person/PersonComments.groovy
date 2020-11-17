@@ -31,7 +31,7 @@ import javax.persistence.Version
 @NamedQueries(value = [
         @NamedQuery(name = "PersonComments.fetchByPidmAndComments",
                 query = """FROM PersonComments pc
-                           WHERE pc.pidm = :pidm AND pc.text like :text
+                           WHERE pc.pidm = :pidm AND pc.text like :text order by pc.lastModified desc
                     """)
 ])
 class PersonComments implements Serializable {
@@ -187,7 +187,7 @@ class PersonComments implements Serializable {
             session.getNamedQuery('PersonComments.fetchByPidmAndComments')
                     .setInteger('pidm', pidm)
                     .setString('text', text)
-                    .uniqueResult()
+                    .list()[0]
         }
         return personCommentsDetails
     }
