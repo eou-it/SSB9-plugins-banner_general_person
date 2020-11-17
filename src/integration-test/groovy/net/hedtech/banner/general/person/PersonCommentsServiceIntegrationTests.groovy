@@ -64,4 +64,16 @@ class PersonCommentsServiceIntegrationTests extends BaseIntegrationTestCase {
         assertNull PersonComments.get(id)
 
     }
+
+    //Test to fetch the Person Comments
+    @Test
+    void testGetPersonCommentsDetailsBypidmAndComments(){
+        def personComments = new PersonComments(pidm: PersonUtility.getPerson("A00050995").pidm, commentCode: "GC", text: "Graduation Name Change to test1", lastModified: new Date(),
+                lastModifiedBy: "GRAILS", dataOrigin: "Banner")
+        personComments = personCommentsService.create([domainModel: personComments])
+        assertNotNull personComments
+
+        def personCommentsDetails = personCommentsService.getPersonCommentsDetailsBypidmAndComments(PersonUtility.getPerson("A00050995").pidm, 'Name Change to %')
+        assertNotNull personCommentsDetails
+    }
 }

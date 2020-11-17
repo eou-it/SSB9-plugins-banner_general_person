@@ -69,6 +69,18 @@ class PersonCommentsIntegrationTests extends BaseIntegrationTestCase{
         assertNull PersonComments.get(id)
     }
 
+    //Test to fetch the Person Comments
+    @Test
+    void testGetPersonCommentsDetailsBypidmAndComments(){
+        def personComments = newPersonComments()
+        save personComments
+        //Test if the generated entity now has an id assigned
+        assertNotNull personComments.id
+
+        def personCommentsDetails = PersonComments.fetchByPidmAndComments(PersonUtility.getPerson("A00050995").pidm, 'Graduation Name %')
+        assertNotNull personCommentsDetails.id
+    }
+
 
     //Data to create person comments
     private def newPersonComments() {
