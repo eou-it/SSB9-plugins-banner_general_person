@@ -12,11 +12,16 @@ import javax.persistence.*
 @EqualsAndHashCode(includeFields = true)
 @ToString(includeNames = true, includeFields = true)
 @NamedQueries(value = [
-        @NamedQuery(name = "AdditionalIdInformation.fetchUnverifiedByPidm",
-                query = """ FROM AdditionalIdInformation a
+        @NamedQuery(name = "AdditionalIdInformation.fetchExistingByPidm",
+                query = """ SELECT  a.additionalId FROM AdditionalIdInformation a
 		           WHERE a.pidm = :pidm 
 		           AND a.adidCode = :adidCode
-                   AND a.additionalId =additionalId """)
+                  """),
+        @NamedQuery(name = "AdditionalIdInformation.fetchExistingFullRecordByPidm",
+                query = """  FROM AdditionalIdInformation a
+		           WHERE a.pidm = :pidm 
+		           AND a.adidCode = :adidCode
+                   """)
 ])
 
 class AdditionalIdInformation implements Serializable{
@@ -49,16 +54,26 @@ class AdditionalIdInformation implements Serializable{
     String additionalId
 
 
-    static def fetchAdditionalIdInfoByPidm(Integer pidm,String adidCode,String additionalId) {
+
+    static def fetchExistingByPidm(Integer pidm,String adidCode) {
 
         def additionalIdInfo = AdditionalIdInformation.withSession { session ->
-            session.getNamedQuery('AdditionalIdInformation.fetchUnverifiedByPidm')
+            session.getNamedQuery('AdditionalIdInformation.fetchExistingByPidm')
                     .setInteger('pidm', pidm)
                     .setString('adidCode', adidCode)
-                    .setString('additionalId', additionalId)
                     .uniqueResult()
         }
         return additionalIdInfo
+    }
+
+    static def fetchExistingFullRecordByPidm(Integer pidm,String adidCode) {
+        def recordToUpdate = AdditionalIdInformation.withSession { session ->
+            session.getNamedQuery('AdditionalIdInformation.fetchExistingFullRecordByPidm')
+                    .setInteger('pidm', pidm)
+                    .setString('adidCode', adidCode)
+                    .uniqueResult()
+        }
+        recordToUpdate
     }
 
 }
