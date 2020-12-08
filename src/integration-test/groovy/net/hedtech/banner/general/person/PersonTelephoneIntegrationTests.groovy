@@ -662,6 +662,14 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
         assertEquals '4441512', results[0].phoneNumber
     }
 
+    @Test
+    void testFetchActiveTelephoneListWithUnlistedByPidmAndTelephoneType() {
+        def pidm = PersonUtility.getPerson("GDP000004").pidm
+        def results = PersonTelephone.fetchActiveTelephoneListWithUnlistedByPidmAndTelephoneType(pidm, [TelephoneType.fetchByCode("MA"), TelephoneType.fetchByCode("PR")])
+
+        assertTrue results.size() > 1
+        assertTrue results[0] instanceof PersonTelephone
+    }
 
     @Test
     void testFetchTelephonesByPidmAndAddressTypes() {
@@ -673,7 +681,26 @@ class PersonTelephoneIntegrationTests extends BaseIntegrationTestCase {
         assertEquals '2083094', results[0].phoneNumber
     }
 
+    /*Test to fetch the telephone details based on the params passed*/
+    @Test
+    void testActiveTelephoneListWithUnlistedByPidmAndTelephoneType(){
+        def personTelephone = new PersonTelephone()
+        def pidm = PersonUtility.getPerson("A00050995").pidm
+        def result = personTelephone.fetchActiveTelephoneListWithUnlistedByPidmAndTelephoneType(pidm, [TelephoneType.fetchByCode("BU")])
+        assertNotNull(result)
+        assertEquals('080', result[0].phoneArea)
+        assertEquals('2324', result[0].phoneExtension)
+        assertEquals('Y', result[0].primaryIndicator)
+    }
 
+    /*Test to fetch the telephone details when invalid params are passed*/
+    @Test
+    void testFetchActiveTelephoneListWithUnlistedByPidmAndTelephoneType_InvalidParams(){
+        def personTelephone = new PersonTelephone()
+        def pidm = PersonUtility.getPerson("A00050995").pidm
+        def result = personTelephone.fetchActiveTelephoneListWithUnlistedByPidmAndTelephoneType(pidm, [TelephoneType.fetchByCode("ABCD")])
+        assertTrue result.size() == 0
+    }
 
     private def newValidForCreatePersonTelephone() {
         i_success_pidm = PersonUtility.getPerson("GDP000005").pidm
