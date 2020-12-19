@@ -5,9 +5,7 @@ package net.hedtech.banner.general.person
 
 import javax.imageio.ImageIO
 import java.nio.file.Files
-import java.nio.file.Path
 import java.nio.file.Paths
-
 /**
  * This class provides basic utilities for processing person pictures.
  */
