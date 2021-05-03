@@ -1,10 +1,11 @@
 /*******************************************************************************
- Copyright 2009-2013 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2021 Ellucian Company L.P. and its affiliates.
  ****************************************************************************** */
 package net.hedtech.banner.general.person
 
 import javax.imageio.ImageIO
-
+import java.nio.file.Files
+import java.nio.file.Paths
 /**
  * This class provides basic utilities for processing person pictures.
  */
@@ -24,7 +25,7 @@ class PictureFileUtils {
     static File getImgFile(basePath, fromThese) {
         fromThese.findResult { name ->
             def file = new File(basePath, name)
-            file.exists() ? file : null
+            (file.exists() && Files.isReadable(Paths.get(file.getPath()))) ? file : null
         }
     }
 
