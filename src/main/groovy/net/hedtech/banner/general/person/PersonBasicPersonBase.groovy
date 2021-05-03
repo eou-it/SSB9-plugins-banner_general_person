@@ -512,7 +512,7 @@ class PersonBasicPersonBase implements Serializable {
         preferenceFirstName(nullable: true, maxSize: 60)
         namePrefix(nullable: true, maxSize: 20)
         nameSuffix(nullable: true, maxSize: 20)
-        veraIndicator(nullable: true, maxSize: 1, inList: ["V", "B", "O", "N"])
+        veraIndicator(nullable: true, maxSize: 1, inList: ["N", "A", "V", "R", "I", "E"])
         citizenshipIndicator(nullable: true, maxSize: 1)
         deadDate(nullable: true)
         hair(nullable: true, maxSize: 2)
